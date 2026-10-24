@@ -1,0 +1,6 @@
+{
+  "name": "Dilijent School",
+  "description": "Dilijent School Management System - Student records, Teacher profiles and subject assignments, Ethiopian curriculum grading and attendance",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

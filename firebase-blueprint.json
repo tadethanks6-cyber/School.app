@@ -1,0 +1,494 @@
+{
+  "entities": {
+    "user": {
+      "title": "User",
+      "description": "User profile with role-based metadata",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Unique auth UID of the user"
+        },
+        "fullName": {
+          "type": "string",
+          "description": "Full name of the user"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number of user"
+        },
+        "role": {
+          "type": "string",
+          "description": "User role: Admin, Teacher, Finance, etc."
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when user registered"
+        }
+      },
+      "required": ["userId", "fullName", "phone", "role", "createdAt"]
+    },
+    "student": {
+      "title": "Student",
+      "description": "Student record in the school database",
+      "type": "object",
+      "properties": {
+        "studentIdNumber": {
+          "type": "string",
+          "description": "Student unique ID number, e.g. ET-2017-001"
+        },
+        "fullName": {
+          "type": "string",
+          "description": "Full name of the student"
+        },
+        "gender": {
+          "type": "string",
+          "description": "Gender: ወንድ or ሴት"
+        },
+        "age": {
+          "type": "integer",
+          "description": "Age of the student"
+        },
+        "grade": {
+          "type": "string",
+          "description": "Grade level"
+        },
+        "section": {
+          "type": "string",
+          "description": "Section letter"
+        },
+        "academicYear": {
+          "type": "string",
+          "description": "Academic year"
+        },
+        "parentName": {
+          "type": "string",
+          "description": "Parent or guardian full name"
+        },
+        "parentPhone": {
+          "type": "string",
+          "description": "Parent phone contact"
+        },
+        "address": {
+          "type": "string",
+          "description": "Residential address"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status: ንቁ, ያቋረጠ, etc."
+        },
+        "specialNeeds": {
+          "type": "string",
+          "description": "Special needs or notes"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Creator user UID"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when record was created"
+        }
+      },
+      "required": ["studentIdNumber", "fullName", "gender", "age", "grade", "section", "parentName", "parentPhone", "userId", "createdAt"]
+    },
+    "teacher": {
+      "title": "Teacher",
+      "description": "Teacher profile and assignment capacity",
+      "type": "object",
+      "properties": {
+        "teacherCode": {
+          "type": "string",
+          "description": "Unique code e.g. T-101"
+        },
+        "fullName": {
+          "type": "string",
+          "description": "Teacher full name"
+        },
+        "title": {
+          "type": "string",
+          "description": "Honorific title"
+        },
+        "gender": {
+          "type": "string",
+          "description": "Gender"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address"
+        },
+        "qualification": {
+          "type": "string",
+          "description": "Academic qualification"
+        },
+        "specialization": {
+          "type": "string",
+          "description": "Subject specialization"
+        },
+        "department": {
+          "type": "string",
+          "description": "School department"
+        },
+        "isHomeroomTeacher": {
+          "type": "boolean",
+          "description": "Whether is homeroom teacher"
+        },
+        "homeroomClass": {
+          "type": "string",
+          "description": "Assigned homeroom class"
+        },
+        "joinedYear": {
+          "type": "string",
+          "description": "Year joined"
+        },
+        "maxWeeklyPeriods": {
+          "type": "integer",
+          "description": "Maximum weekly period limit"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status: ንቁ or በእረፍት ላይ"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Creator user UID"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["teacherCode", "fullName", "gender", "phone", "qualification", "specialization", "userId", "createdAt"]
+    },
+    "staff": {
+      "title": "Staff",
+      "description": "Administrative and operational staff member",
+      "type": "object",
+      "properties": {
+        "staffCode": {
+          "type": "string",
+          "description": "Unique staff code e.g. ADM-101"
+        },
+        "fullName": {
+          "type": "string",
+          "description": "Staff member name"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role in school"
+        },
+        "department": {
+          "type": "string",
+          "description": "Department"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone contact"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address"
+        },
+        "gender": {
+          "type": "string",
+          "description": "Gender"
+        },
+        "qualification": {
+          "type": "string",
+          "description": "Qualification level"
+        },
+        "employmentType": {
+          "type": "string",
+          "description": "Employment type: ቋሚ, ኮንትራት"
+        },
+        "salary": {
+          "type": "string",
+          "description": "Salary details"
+        },
+        "hiringDate": {
+          "type": "string",
+          "description": "Hiring date"
+        },
+        "responsibilities": {
+          "type": "string",
+          "description": "Duties and roles description"
+        },
+        "emergencyContact": {
+          "type": "string",
+          "description": "Emergency contact"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status: ንቁ, etc."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Creator user UID"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["staffCode", "fullName", "role", "department", "phone", "userId", "createdAt"]
+    },
+    "subject": {
+      "title": "Subject",
+      "description": "Curriculum course / subject",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Subject code"
+        },
+        "name": {
+          "type": "string",
+          "description": "Subject name"
+        },
+        "gradeLevel": {
+          "type": "string",
+          "description": "Target grade level"
+        },
+        "periodsPerWeek": {
+          "type": "integer",
+          "description": "Periods per week"
+        },
+        "passingScore": {
+          "type": "integer",
+          "description": "Passing score"
+        },
+        "category": {
+          "type": "string",
+          "description": "Category"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Creator user UID"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["code", "name", "gradeLevel", "periodsPerWeek", "userId", "createdAt"]
+    },
+    "workload": {
+      "title": "Workload",
+      "description": "Teacher workload class allotment",
+      "type": "object",
+      "properties": {
+        "teacherId": {
+          "type": "string",
+          "description": "Teacher reference ID"
+        },
+        "teacherName": {
+          "type": "string",
+          "description": "Teacher name"
+        },
+        "subjectId": {
+          "type": "string",
+          "description": "Subject reference ID"
+        },
+        "subjectName": {
+          "type": "string",
+          "description": "Subject name"
+        },
+        "grade": {
+          "type": "string",
+          "description": "Grade level"
+        },
+        "section": {
+          "type": "string",
+          "description": "Section letter"
+        },
+        "periodsPerWeek": {
+          "type": "integer",
+          "description": "Periods per week"
+        },
+        "daysAllotted": {
+          "type": "string",
+          "description": "Days allotted"
+        },
+        "academicYear": {
+          "type": "string",
+          "description": "Academic year"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Creator user UID"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["teacherName", "subjectName", "grade", "section", "periodsPerWeek", "userId", "createdAt"]
+    },
+    "grade": {
+      "title": "Grade",
+      "description": "Student score / academic result record",
+      "type": "object",
+      "properties": {
+        "studentId": {
+          "type": "string",
+          "description": "Student reference ID"
+        },
+        "studentName": {
+          "type": "string",
+          "description": "Student full name"
+        },
+        "grade": {
+          "type": "string",
+          "description": "Grade level"
+        },
+        "section": {
+          "type": "string",
+          "description": "Section letter"
+        },
+        "subjectName": {
+          "type": "string",
+          "description": "Subject name"
+        },
+        "semester": {
+          "type": "string",
+          "description": "Semester"
+        },
+        "academicYear": {
+          "type": "string",
+          "description": "Academic year"
+        },
+        "quizScore": {
+          "type": "number",
+          "description": "Quiz mark /10"
+        },
+        "assignmentScore": {
+          "type": "number",
+          "description": "Assignment mark /10"
+        },
+        "midExamScore": {
+          "type": "number",
+          "description": "Mid exam mark /30"
+        },
+        "finalExamScore": {
+          "type": "number",
+          "description": "Final exam mark /50"
+        },
+        "totalScore": {
+          "type": "number",
+          "description": "Total mark /100"
+        },
+        "letterGrade": {
+          "type": "string",
+          "description": "Letter grade"
+        },
+        "remarks": {
+          "type": "string",
+          "description": "Remarks"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Creator user UID"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["studentName", "grade", "section", "subjectName", "totalScore", "userId", "createdAt"]
+    },
+    "attendance": {
+      "title": "Attendance",
+      "description": "Student daily attendance log",
+      "type": "object",
+      "properties": {
+        "studentId": {
+          "type": "string",
+          "description": "Student reference ID"
+        },
+        "studentName": {
+          "type": "string",
+          "description": "Student name"
+        },
+        "grade": {
+          "type": "string",
+          "description": "Grade level"
+        },
+        "section": {
+          "type": "string",
+          "description": "Section letter"
+        },
+        "date": {
+          "type": "string",
+          "description": "Date of attendance"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status: ተገኝቷል, ቀርቷል, etc."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Creator user UID"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["studentName", "grade", "section", "date", "status", "userId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "user",
+      "description": "User profiles and account settings"
+    },
+    "/students/{studentId}": {
+      "schema": "student",
+      "description": "School students directory"
+    },
+    "/teachers/{teacherId}": {
+      "schema": "teacher",
+      "description": "Teaching faculty profiles"
+    },
+    "/staff/{staffId}": {
+      "schema": "staff",
+      "description": "Administrative and operational staff"
+    },
+    "/subjects/{subjectId}": {
+      "schema": "subject",
+      "description": "School curriculum courses"
+    },
+    "/workloads/{workloadId}": {
+      "schema": "workload",
+      "description": "Teacher course assignments"
+    },
+    "/grades/{gradeId}": {
+      "schema": "grade",
+      "description": "Student exam and coursework marks"
+    },
+    "/attendance/{attendanceId}": {
+      "schema": "attendance",
+      "description": "Daily student attendance tracking"
+    }
+  }
+}

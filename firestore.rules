@@ -1,0 +1,249 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.matches('^[a-zA-Z0-9_\\-]+$') && id.size() > 0 && id.size() <= 128;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // User profile validation
+    function isValidUser(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 100 &&
+             data.phone is string && data.phone.size() >= 9 && data.phone.size() <= 20 &&
+             data.role is string && data.role.size() >= 2 && data.role.size() <= 50 &&
+             (!('email' in data) || (data.email is string && data.email.size() <= 100)) &&
+             data.createdAt is timestamp && data.createdAt <= request.time;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUser(incoming());
+      allow update: if isOwner(userId) && isValidId(userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidUser(incoming()) &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['fullName', 'phone', 'role', 'email']);
+      allow delete: if isOwner(userId);
+    }
+
+    // Student validation
+    function isValidStudent(data) {
+      return data.studentIdNumber is string && data.studentIdNumber.size() >= 2 && data.studentIdNumber.size() <= 50 &&
+             data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 100 &&
+             data.gender is string && data.gender.size() >= 2 && data.gender.size() <= 10 &&
+             data.age is int && data.age >= 3 && data.age <= 30 &&
+             data.grade is string && data.grade.size() >= 1 && data.grade.size() <= 50 &&
+             data.section is string && data.section.size() >= 1 && data.section.size() <= 10 &&
+             data.parentName is string && data.parentName.size() >= 2 && data.parentName.size() <= 100 &&
+             data.parentPhone is string && data.parentPhone.size() >= 9 && data.parentPhone.size() <= 20 &&
+             data.userId is string && data.userId == request.auth.uid &&
+             (!('academicYear' in data) || (data.academicYear is string && data.academicYear.size() <= 30)) &&
+             (!('address' in data) || (data.address is string && data.address.size() <= 200)) &&
+             (!('status' in data) || (data.status is string && data.status.size() <= 30)) &&
+             (!('specialNeeds' in data) || (data.specialNeeds is string && data.specialNeeds.size() <= 200)) &&
+             data.createdAt is timestamp && data.createdAt <= request.time;
+    }
+
+    match /students/{studentId} {
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(studentId) && isValidStudent(incoming());
+      allow update: if isSignedIn() && isValidId(studentId) &&
+                       existing().userId == request.auth.uid &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidStudent(incoming());
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+
+    // Teacher validation
+    function isValidTeacher(data) {
+      return data.teacherCode is string && data.teacherCode.size() >= 2 && data.teacherCode.size() <= 50 &&
+             data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 100 &&
+             data.gender is string && data.gender.size() >= 2 && data.gender.size() <= 10 &&
+             data.phone is string && data.phone.size() >= 9 && data.phone.size() <= 20 &&
+             data.qualification is string && data.qualification.size() >= 2 && data.qualification.size() <= 80 &&
+             data.specialization is string && data.specialization.size() >= 2 && data.specialization.size() <= 80 &&
+             data.userId is string && data.userId == request.auth.uid &&
+             (!('title' in data) || (data.title is string && data.title.size() <= 20)) &&
+             (!('email' in data) || (data.email is string && data.email.size() <= 100)) &&
+             (!('department' in data) || (data.department is string && data.department.size() <= 80)) &&
+             (!('isHomeroomTeacher' in data) || data.isHomeroomTeacher is bool) &&
+             (!('homeroomClass' in data) || (data.homeroomClass is string && data.homeroomClass.size() <= 30)) &&
+             (!('joinedYear' in data) || (data.joinedYear is string && data.joinedYear.size() <= 30)) &&
+             (!('maxWeeklyPeriods' in data) || data.maxWeeklyPeriods is int) &&
+             (!('status' in data) || (data.status is string && data.status.size() <= 30)) &&
+             data.createdAt is timestamp && data.createdAt <= request.time;
+    }
+
+    match /teachers/{teacherId} {
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(teacherId) && isValidTeacher(incoming());
+      allow update: if isSignedIn() && isValidId(teacherId) &&
+                       existing().userId == request.auth.uid &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidTeacher(incoming());
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+
+    // Staff validation
+    function isValidStaff(data) {
+      return data.staffCode is string && data.staffCode.size() >= 2 && data.staffCode.size() <= 50 &&
+             data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 100 &&
+             data.role is string && data.role.size() >= 2 && data.role.size() <= 80 &&
+             data.department is string && data.department.size() >= 2 && data.department.size() <= 80 &&
+             data.phone is string && data.phone.size() >= 9 && data.phone.size() <= 20 &&
+             data.userId is string && data.userId == request.auth.uid &&
+             (!('title' in data) || (data.title is string && data.title.size() <= 20)) &&
+             (!('email' in data) || (data.email is string && data.email.size() <= 100)) &&
+             (!('gender' in data) || (data.gender is string && data.gender.size() <= 10)) &&
+             (!('qualification' in data) || (data.qualification is string && data.qualification.size() <= 80)) &&
+             (!('employmentType' in data) || (data.employmentType is string && data.employmentType.size() <= 40)) &&
+             (!('salary' in data) || (data.salary is string && data.salary.size() <= 40)) &&
+             (!('hiringDate' in data) || (data.hiringDate is string && data.hiringDate.size() <= 30)) &&
+             (!('responsibilities' in data) || (data.responsibilities is string && data.responsibilities.size() <= 300)) &&
+             (!('emergencyContact' in data) || (data.emergencyContact is string && data.emergencyContact.size() <= 50)) &&
+             (!('status' in data) || (data.status is string && data.status.size() <= 30)) &&
+             data.createdAt is timestamp && data.createdAt <= request.time;
+    }
+
+    match /staff/{staffId} {
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(staffId) && isValidStaff(incoming());
+      allow update: if isSignedIn() && isValidId(staffId) &&
+                       existing().userId == request.auth.uid &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidStaff(incoming());
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+
+    // Subject validation
+    function isValidSubject(data) {
+      return data.code is string && data.code.size() >= 2 && data.code.size() <= 30 &&
+             data.name is string && data.name.size() >= 2 && data.name.size() <= 80 &&
+             data.gradeLevel is string && data.gradeLevel.size() >= 1 && data.gradeLevel.size() <= 30 &&
+             data.periodsPerWeek is int && data.periodsPerWeek >= 1 && data.periodsPerWeek <= 20 &&
+             data.userId is string && data.userId == request.auth.uid &&
+             (!('passingScore' in data) || data.passingScore is int) &&
+             (!('category' in data) || (data.category is string && data.category.size() <= 50)) &&
+             data.createdAt is timestamp && data.createdAt <= request.time;
+    }
+
+    match /subjects/{subjectId} {
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(subjectId) && isValidSubject(incoming());
+      allow update: if isSignedIn() && isValidId(subjectId) &&
+                       existing().userId == request.auth.uid &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidSubject(incoming());
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+
+    // Workload validation
+    function isValidWorkload(data) {
+      return data.teacherName is string && data.teacherName.size() >= 2 && data.teacherName.size() <= 100 &&
+             data.subjectName is string && data.subjectName.size() >= 2 && data.subjectName.size() <= 80 &&
+             data.grade is string && data.grade.size() >= 1 && data.grade.size() <= 30 &&
+             data.section is string && data.section.size() >= 1 && data.section.size() <= 10 &&
+             data.periodsPerWeek is int && data.periodsPerWeek >= 1 && data.periodsPerWeek <= 20 &&
+             data.userId is string && data.userId == request.auth.uid &&
+             (!('teacherId' in data) || (data.teacherId is string && data.teacherId.size() <= 50)) &&
+             (!('subjectId' in data) || (data.subjectId is string && data.subjectId.size() <= 50)) &&
+             (!('daysAllotted' in data) || (data.daysAllotted is string && data.daysAllotted.size() <= 100)) &&
+             (!('academicYear' in data) || (data.academicYear is string && data.academicYear.size() <= 30)) &&
+             data.createdAt is timestamp && data.createdAt <= request.time;
+    }
+
+    match /workloads/{workloadId} {
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(workloadId) && isValidWorkload(incoming());
+      allow update: if isSignedIn() && isValidId(workloadId) &&
+                       existing().userId == request.auth.uid &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidWorkload(incoming());
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+
+    // Grade validation
+    function isValidGrade(data) {
+      return data.studentName is string && data.studentName.size() >= 2 && data.studentName.size() <= 100 &&
+             data.grade is string && data.grade.size() >= 1 && data.grade.size() <= 30 &&
+             data.section is string && data.section.size() >= 1 && data.section.size() <= 10 &&
+             data.subjectName is string && data.subjectName.size() >= 2 && data.subjectName.size() <= 80 &&
+             (data.totalScore is int || data.totalScore is float) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             (!('studentId' in data) || (data.studentId is string && data.studentId.size() <= 50)) &&
+             (!('semester' in data) || (data.semester is string && data.semester.size() <= 30)) &&
+             (!('academicYear' in data) || (data.academicYear is string && data.academicYear.size() <= 30)) &&
+             (!('quizScore' in data) || (data.quizScore is int || data.quizScore is float)) &&
+             (!('assignmentScore' in data) || (data.assignmentScore is int || data.assignmentScore is float)) &&
+             (!('midExamScore' in data) || (data.midExamScore is int || data.midExamScore is float)) &&
+             (!('finalExamScore' in data) || (data.finalExamScore is int || data.finalExamScore is float)) &&
+             (!('letterGrade' in data) || (data.letterGrade is string && data.letterGrade.size() <= 10)) &&
+             (!('remarks' in data) || (data.remarks is string && data.remarks.size() <= 200)) &&
+             data.createdAt is timestamp && data.createdAt <= request.time;
+    }
+
+    match /grades/{gradeId} {
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(gradeId) && isValidGrade(incoming());
+      allow update: if isSignedIn() && isValidId(gradeId) &&
+                       existing().userId == request.auth.uid &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidGrade(incoming());
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+
+    // Attendance validation
+    function isValidAttendance(data) {
+      return data.studentName is string && data.studentName.size() >= 2 && data.studentName.size() <= 100 &&
+             data.grade is string && data.grade.size() >= 1 && data.grade.size() <= 30 &&
+             data.section is string && data.section.size() >= 1 && data.section.size() <= 10 &&
+             data.date is string && data.date.size() >= 4 && data.date.size() <= 30 &&
+             data.status is string && data.status.size() >= 2 && data.status.size() <= 30 &&
+             data.userId is string && data.userId == request.auth.uid &&
+             (!('studentId' in data) || (data.studentId is string && data.studentId.size() <= 50)) &&
+             data.createdAt is timestamp && data.createdAt <= request.time;
+    }
+
+    match /attendance/{attendanceId} {
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(attendanceId) && isValidAttendance(incoming());
+      allow update: if isSignedIn() && isValidId(attendanceId) &&
+                       existing().userId == request.auth.uid &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidAttendance(incoming());
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+  }
+}
