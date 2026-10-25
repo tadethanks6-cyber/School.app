@@ -68,6 +68,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Security
+import com.example.data.model.AssessmentScheme
 import com.example.data.model.Student
 import com.example.data.model.StudentGrade
 import com.example.data.model.Subject
@@ -94,6 +95,8 @@ fun GradesScreen(
     currentTeacher: Teacher? = null,
     currentStudent: Student? = null,
     teacherWorkloads: List<TeacherWorkload> = emptyList(),
+    assessmentScheme: AssessmentScheme = AssessmentScheme.MOE_STANDARD,
+    onConfigureSchemeClick: (() -> Unit)? = null,
     onAddGradeClick: () -> Unit,
     onDeleteGradeClick: (StudentGrade) -> Unit,
     modifier: Modifier = Modifier
@@ -219,6 +222,58 @@ fun GradesScreen(
                             fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    }
+                }
+            }
+
+            // Executive Assessment Scheme Banner for Principal / Headmaster (ርዕሰ መ/ር)
+            if (isAdmin && onConfigureSchemeClick != null) {
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = NavyPrimary.copy(alpha = 0.07f)),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, NavyPrimary.copy(alpha = 0.25f)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("⚙️", fontSize = 16.sp, modifier = Modifier.padding(end = 6.dp))
+                                Text(
+                                    text = if (isAmharic) "የኢትዮጵያ ስርዓተ-ትምህርት ምዘና ማዋቀሪያ" else "Curriculum Evaluation Scheme",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.5.sp,
+                                    color = NavyPrimary
+                                )
+                            }
+                            Text(
+                                text = "${if (isAmharic) assessmentScheme.titleAmharic else assessmentScheme.titleEnglish} • ${assessmentScheme.schoolType}",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = EthioGreen
+                            )
+                            Text(
+                                text = "${assessmentScheme.test1Label}: ${assessmentScheme.test1Weight.toInt()}% | ${assessmentScheme.assignmentLabel}: ${assessmentScheme.assignmentWeight.toInt()}% | ${assessmentScheme.midExamLabel}: ${assessmentScheme.midExamWeight.toInt()}% | ${assessmentScheme.finalExamLabel}: ${assessmentScheme.finalExamWeight.toInt()}%",
+                                fontSize = 10.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Button(
+                            onClick = onConfigureSchemeClick,
+                            colors = ButtonDefaults.buttonColors(containerColor = GoldAccent),
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.padding(start = 8.dp)
+                        ) {
+                            Text(
+                                text = if (isAmharic) "አዋቅር" else "Configure",
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 11.5.sp
+                            )
+                        }
                     }
                 }
             }
@@ -430,6 +485,7 @@ fun GradesScreen(
                                 canManage = canManage,
                                 isMySubject = isMySubject,
                                 isAdmin = isAdmin,
+                                assessmentScheme = assessmentScheme,
                                 onDelete = { gradeToDelete = gradeItem }
                             )
                         }
@@ -502,6 +558,7 @@ fun GradeCardItem(
     canManage: Boolean = true,
     isMySubject: Boolean = false,
     isAdmin: Boolean = true,
+    assessmentScheme: AssessmentScheme = AssessmentScheme.MOE_STANDARD,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -575,7 +632,7 @@ fun GradeCardItem(
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // Score breakdown row
+            // Score breakdown row with dynamic labels from AssessmentScheme
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
@@ -586,10 +643,10 @@ fun GradeCardItem(
                     )
                     .padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
-                ScoreColumn(label = if (isAmharic) "ጥያቄ (10)" else "Quiz", score = grade.quizScore)
-                ScoreColumn(label = if (isAmharic) "ምደባ (10)" else "Assign", score = grade.assignmentScore)
-                ScoreColumn(label = if (isAmharic) "አጋማሽ (30)" else "Mid", score = grade.midExamScore)
-                ScoreColumn(label = if (isAmharic) "መጨረሻ (50)" else "Final", score = grade.finalExamScore)
+                ScoreColumn(label = "${assessmentScheme.test1Label} (${assessmentScheme.test1Weight.toInt()}%)", score = grade.quizScore)
+                ScoreColumn(label = "${assessmentScheme.assignmentLabel} (${assessmentScheme.assignmentWeight.toInt()}%)", score = grade.assignmentScore)
+                ScoreColumn(label = "${assessmentScheme.midExamLabel} (${assessmentScheme.midExamWeight.toInt()}%)", score = grade.midExamScore)
+                ScoreColumn(label = "${assessmentScheme.finalExamLabel} (${assessmentScheme.finalExamWeight.toInt()}%)", score = grade.finalExamScore)
             }
         }
     }
@@ -615,6 +672,7 @@ fun GradeFormDialog(
     subjects: List<Subject>,
     isAmharic: Boolean,
     assignedSubjectNames: List<String> = emptyList(),
+    assessmentScheme: AssessmentScheme = AssessmentScheme.MOE_STANDARD,
     onDismiss: () -> Unit,
     onSave: (StudentGrade) -> Unit
 ) {
@@ -647,8 +705,16 @@ fun GradeFormDialog(
             val m = midExam.toFloatOrNull() ?: 0f
             val f = finalExam.toFloatOrNull() ?: 0f
 
-            if (q > 10f || a > 10f || m > 30f || f > 50f) {
-                errorMsg = if (isAmharic) "እባክዎ ትክክለኛ የነጥብ ወሰን ያስገቡ (10፣ 10፣ 30፣ 50)" else "Scores exceed max limits"
+            val maxQ = assessmentScheme.test1Weight
+            val maxA = assessmentScheme.assignmentWeight
+            val maxM = assessmentScheme.midExamWeight
+            val maxF = assessmentScheme.finalExamWeight
+
+            if (q > maxQ || a > maxA || m > maxM || f > maxF) {
+                errorMsg = if (isAmharic)
+                    "እባክዎ ትክክለኛ የነጥብ ወሰን ያስገቡ (ከፍተኛ: ${maxQ.toInt()}፣ ${maxA.toInt()}፣ ${maxM.toInt()}፣ ${maxF.toInt()})"
+                else
+                    "Scores exceed maximum limits (${maxQ.toInt()}, ${maxA.toInt()}, ${maxM.toInt()}, ${maxF.toInt()})"
             } else {
                 val gradeRecord = StudentGrade(
                     studentId = student.id,
@@ -813,41 +879,41 @@ fun GradeFormDialog(
                     }
                 }
 
-                // Quiz (out of 10)
+                // Component 1 (Quiz / Test 1)
                 OutlinedTextField(
                     value = quiz,
                     onValueChange = { quiz = it },
-                    label = { Text(if (isAmharic) "ጥያቄ/ፈተና (ከ 10)" else "Quiz (out of 10)") },
+                    label = { Text("${assessmentScheme.test1Label} (ከ ${assessmentScheme.test1Weight.toInt()})") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Assignment (out of 10)
+                // Component 2 (Assignment / Homework)
                 OutlinedTextField(
                     value = assignment,
                     onValueChange = { assignment = it },
-                    label = { Text(if (isAmharic) "የቤት ስራ/ምደባ (ከ 10)" else "Assignment (out of 10)") },
+                    label = { Text("${assessmentScheme.assignmentLabel} (ከ ${assessmentScheme.assignmentWeight.toInt()})") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Mid Exam (out of 30)
+                // Component 3 (Mid Exam)
                 OutlinedTextField(
                     value = midExam,
                     onValueChange = { midExam = it },
-                    label = { Text(if (isAmharic) "አጋማሽ ፈተና (ከ 30)" else "Mid Exam (out of 30)") },
+                    label = { Text("${assessmentScheme.midExamLabel} (ከ ${assessmentScheme.midExamWeight.toInt()})") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Final Exam (out of 50)
+                // Component 4 (Final Exam)
                 OutlinedTextField(
                     value = finalExam,
                     onValueChange = { finalExam = it },
-                    label = { Text(if (isAmharic) "የመጨረሻ ፈተና (ከ 50)" else "Final Exam (out of 50)") },
+                    label = { Text("${assessmentScheme.finalExamLabel} (ከ ${assessmentScheme.finalExamWeight.toInt()})") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()

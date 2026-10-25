@@ -89,6 +89,7 @@ import com.example.data.model.UserAccount
 import com.example.ui.SchoolNavTab
 import com.example.ui.SchoolViewModel
 import com.example.ui.components.EthiopianFlagAccent
+import com.example.ui.screens.AssessmentSchemeDialog
 import com.example.ui.screens.AttendanceScreen
 import com.example.ui.screens.DashboardScreen
 import com.example.ui.screens.GradeFormDialog
@@ -174,6 +175,8 @@ class MainActivity : ComponentActivity() {
                 val workloadToEdit by viewModel.workloadToEdit.collectAsStateWithLifecycle()
 
                 val showAddGrade by viewModel.showAddGradeDialog.collectAsStateWithLifecycle()
+                val showAssessmentSchemeDialog by viewModel.showAssessmentSchemeDialog.collectAsStateWithLifecycle()
+                val assessmentScheme by viewModel.assessmentScheme.collectAsStateWithLifecycle()
                 val selectedStudentForGrades by viewModel.selectedStudentForGrades.collectAsStateWithLifecycle()
                 val gradesList by viewModel.studentGrades.collectAsStateWithLifecycle()
 
@@ -431,6 +434,8 @@ class MainActivity : ComponentActivity() {
                                     currentTeacher = currentTeacher,
                                     currentStudent = currentStudent,
                                     teacherWorkloads = teacherWorkloads,
+                                    assessmentScheme = assessmentScheme,
+                                    onConfigureSchemeClick = { viewModel.showAssessmentSchemeDialog.value = true },
                                     onAddGradeClick = { viewModel.showAddGradeDialog.value = true },
                                     onDeleteGradeClick = { grade ->
                                         viewModel.deleteGrade(grade)
@@ -1026,9 +1031,21 @@ class MainActivity : ComponentActivity() {
                         subjects = subjects,
                         isAmharic = isAmharic,
                         assignedSubjectNames = if (isAdmin) emptyList() else teacherWorkloads.map { it.subjectName },
+                        assessmentScheme = assessmentScheme,
                         onDismiss = { viewModel.showAddGradeDialog.value = false },
                         onSave = { grade ->
                             viewModel.saveGrade(grade)
+                        }
+                    )
+                }
+
+                if (showAssessmentSchemeDialog) {
+                    AssessmentSchemeDialog(
+                        currentScheme = assessmentScheme,
+                        isAmharic = isAmharic,
+                        onDismiss = { viewModel.showAssessmentSchemeDialog.value = false },
+                        onSave = { newScheme ->
+                            viewModel.updateAssessmentScheme(newScheme)
                         }
                     )
                 }

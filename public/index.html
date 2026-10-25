@@ -10,425 +10,163 @@
   <style>
     :root {
       --primary: #1E3A8A;
-      --primary-light: #3B82F6;
+      --primary-light: #2563EB;
       --primary-dark: #172554;
-      --accent: #EAB308;
-      --accent-light: #FEF08A;
-      --success: #16A34A;
-      --danger: #DC2626;
-      --warning: #EA580C;
+      --accent: #F59E0B;
+      --accent-light: #FEF3C7;
+      --success: #10B981;
+      --danger: #EF4444;
+      --warning: #F97316;
       --bg: #F8FAFC;
       --card-bg: #FFFFFF;
       --text: #0F172A;
       --text-muted: #64748B;
       --border: #E2E8F0;
-      --radius: 14px;
-      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+      --radius: 12px;
+      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      font-family: 'Noto Sans Ethiopic', 'Plus Jakarta Sans', sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Noto Sans Ethiopic', 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text); line-height: 1.5; }
 
     header {
       background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
-      color: white;
-      padding: 1.25rem 1rem;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      color: white; padding: 1rem; position: sticky; top: 0; z-index: 50;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.12);
     }
+    .header-content { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .logo-group { display: flex; align-items: center; gap: 0.75rem; }
+    .logo-badge { width: 42px; height: 42px; background: rgba(255,255,255,0.15); border: 2px solid var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+    .logo-text h1 { font-size: 1.15rem; font-weight: 700; }
+    .logo-text p { font-size: 0.72rem; color: #93C5FD; }
 
-    .header-content {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
-    }
+    .header-actions { display: flex; align-items: center; gap: 0.5rem; }
+    .user-pill { background: rgba(255,255,255,0.15); padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; display: flex; align-items: center; gap: 0.4rem; }
+    .apk-btn { background: var(--accent); color: #78350F; font-weight: 700; text-decoration: none; padding: 0.5rem 0.9rem; border-radius: 20px; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.35rem; transition: all 0.2s; }
+    .apk-btn:hover { transform: translateY(-1px); }
 
-    .logo-group {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
+    .container { max-width: 1100px; margin: 1rem auto; padding: 0 1rem 3rem 1rem; }
 
-    .logo-badge {
-      width: 44px;
-      height: 44px;
-      background: rgba(255, 255, 255, 0.15);
-      border: 2px solid var(--accent);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
+    /* Announcement Banner */
+    .banner {
+      background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: var(--radius);
+      padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;
     }
-
-    .logo-text h1 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-    }
-
-    .logo-text p {
-      font-size: 0.75rem;
-      color: #93C5FD;
-    }
-
-    .apk-cta-btn {
-      background: var(--accent);
-      color: #713F12;
-      font-weight: 700;
-      text-decoration: none;
-      padding: 0.6rem 1.1rem;
-      border-radius: 50px;
-      font-size: 0.85rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      box-shadow: 0 4px 12px rgba(234, 179, 8, 0.4);
-      transition: all 0.2s;
-    }
-
-    .apk-cta-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(234, 179, 8, 0.5);
-    }
-
-    .container {
-      max-width: 1100px;
-      margin: 1rem auto;
-      padding: 0 1rem 3rem 1rem;
-    }
-
-    /* Hero Banner */
-    .hero-banner {
-      background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
-      border: 1px solid #BFDBFE;
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    @media (min-width: 768px) {
-      .hero-banner {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-      }
-    }
-
-    .hero-content h2 {
-      font-size: 1.35rem;
-      color: var(--primary-dark);
-      font-weight: 800;
-      margin-bottom: 0.35rem;
-    }
-
-    .hero-content p {
-      font-size: 0.9rem;
-      color: #334155;
-      max-width: 580px;
-    }
-
-    .download-box {
-      background: white;
-      border-radius: var(--radius);
-      padding: 1rem 1.25rem;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border);
-      text-align: center;
-      min-width: 260px;
-    }
-
-    .btn-download-large {
-      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-      color: white;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 0.95rem;
-      padding: 0.85rem 1.25rem;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
-      margin-bottom: 0.4rem;
-      transition: all 0.2s;
-    }
-
-    .btn-download-large:hover {
-      background: linear-gradient(135deg, #059669 0%, #047857 100%);
-      transform: translateY(-1px);
-    }
-
-    .apk-size-note {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
+    .banner h3 { font-size: 0.95rem; color: var(--primary); font-weight: 700; }
+    .banner p { font-size: 0.82rem; color: #334155; }
+    .btn-secondary { background: white; border: 1.5px solid var(--primary-light); color: var(--primary); font-weight: 600; padding: 0.45rem 0.85rem; border-radius: 8px; font-size: 0.8rem; cursor: pointer; text-decoration: none; font-family: inherit; }
+    .btn-secondary:hover { background: #F1F5F9; }
 
     /* Tabs */
-    .tabs-nav {
-      display: flex;
-      gap: 0.5rem;
-      overflow-x: auto;
-      padding-bottom: 0.5rem;
-      margin-bottom: 1.25rem;
-      border-bottom: 2px solid var(--border);
-      scrollbar-width: none;
-    }
+    .tabs-nav { display: flex; gap: 0.4rem; overflow-x: auto; padding-bottom: 0.4rem; margin-bottom: 1.25rem; border-bottom: 2px solid var(--border); scrollbar-width: none; }
+    .tabs-nav::-webkit-scrollbar { display: none; }
+    .tab-btn { background: transparent; border: none; padding: 0.6rem 0.9rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); border-radius: 8px; cursor: pointer; white-space: nowrap; font-family: inherit; transition: 0.2s; }
+    .tab-btn.active { background: var(--primary); color: white; }
 
-    .tabs-nav::-webkit-scrollbar {
-      display: none;
-    }
+    /* Stats Grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1.25rem; }
+    @media (min-width: 640px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+    .stat-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; box-shadow: var(--shadow); }
+    .stat-icon { font-size: 1.3rem; margin-bottom: 0.25rem; }
+    .stat-val { font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); }
+    .stat-label { font-size: 0.78rem; color: var(--text-muted); }
 
-    .tab-btn {
-      background: transparent;
-      border: none;
-      padding: 0.65rem 1rem;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      border-radius: 8px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.2s;
-      font-family: inherit;
-    }
+    /* Panel Card & Tables */
+    .panel-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; box-shadow: var(--shadow); margin-bottom: 1.25rem; }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+    .panel-title { font-size: 1.05rem; font-weight: 700; color: var(--primary-dark); }
+    .search-input { padding: 0.5rem 0.8rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; font-family: inherit; outline: none; min-width: 200px; }
 
-    .tab-btn.active {
-      background: var(--primary);
-      color: white;
-    }
+    .btn-primary { background: var(--primary); color: white; border: none; padding: 0.5rem 0.9rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .btn-primary:hover { background: var(--primary-light); }
+    .btn-accent { background: var(--accent); color: #78350F; border: none; padding: 0.5rem 0.9rem; border-radius: 8px; font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .btn-accent:hover { background: #D97706; color: white; }
 
-    /* Stats Cards */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-    }
+    .table-responsive { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
+    th { background: #F8FAFC; color: #475569; padding: 0.65rem 0.8rem; font-weight: 600; font-size: 0.78rem; border-bottom: 2px solid var(--border); }
+    td { padding: 0.65rem 0.8rem; border-bottom: 1px solid var(--border); }
+    tr:hover td { background: #F8FAFC; }
 
-    @media (min-width: 640px) {
-      .stats-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    .stat-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.1rem;
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .stat-icon {
-      font-size: 1.4rem;
-    }
-
-    .stat-val {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: var(--primary-dark);
-    }
-
-    .stat-label {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    /* Cards & Tables */
-    .panel-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.25rem;
-      box-shadow: var(--shadow);
-      margin-bottom: 1.5rem;
-    }
-
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .panel-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--primary-dark);
-    }
-
-    .search-input {
-      padding: 0.55rem 0.9rem;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-family: inherit;
-      outline: none;
-      min-width: 220px;
-    }
-
-    .search-input:focus {
-      border-color: var(--primary-light);
-    }
-
-    .table-responsive {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.88rem;
-      text-align: left;
-    }
-
-    th {
-      background: #F1F5F9;
-      color: #475569;
-      padding: 0.75rem 0.9rem;
-      font-weight: 600;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-    }
-
-    td {
-      padding: 0.75rem 0.9rem;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-    }
-
-    tr:hover td {
-      background: #F8FAFC;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 0.25rem 0.55rem;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
+    .badge { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.72rem; font-weight: 600; }
     .badge-success { background: #DCFCE7; color: #15803D; }
     .badge-primary { background: #DBEAFE; color: #1E40AF; }
     .badge-warning { background: #FEF3C7; color: #B45309; }
     .badge-danger { background: #FEE2E2; color: #B91C1C; }
 
-    /* Login Modal & Accounts */
-    .account-cards {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
-    }
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; padding: 1rem; }
+    .modal-box { background: white; border-radius: var(--radius); width: 100%; max-width: 540px; padding: 1.5rem; max-height: 90vh; overflow-y: auto; }
+    .modal-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--primary); }
+    .modal-subtitle { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem; }
+    .form-group { margin-bottom: 0.85rem; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 0.25rem; }
+    .form-control { width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; font-family: inherit; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.25rem; }
 
-    @media (min-width: 640px) {
-      .account-cards {
-        grid-template-columns: repeat(3, 1fr);
-      }
+    /* Preset Box in Modal */
+    .preset-card {
+      border: 1.5px solid var(--border); border-radius: 8px; padding: 0.75rem; margin-bottom: 0.5rem;
+      cursor: pointer; transition: 0.2s; display: flex; align-items: flex-start; gap: 0.6rem;
     }
+    .preset-card:hover { border-color: var(--primary-light); background: #F8FAFC; }
+    .preset-card.active { border-color: var(--primary); background: #EFF6FF; }
 
-    .account-box {
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      padding: 1rem;
-      background: #F8FAFC;
-      transition: all 0.2s;
-    }
+    /* Report Card Preview */
+    .report-card-view { border: 2px dashed #CBD5E1; padding: 1.25rem; border-radius: 10px; background: #FAFAFA; margin-top: 1rem; }
+    .report-header { text-align: center; border-bottom: 2px solid #E2E8F0; padding-bottom: 0.75rem; margin-bottom: 0.75rem; }
 
-    .account-box:hover {
-      border-color: var(--primary);
-      background: white;
-    }
-
-    .account-role {
-      font-weight: 700;
-      color: var(--primary);
-      font-size: 0.95rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .account-cred {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      font-family: monospace;
-      background: #E2E8F0;
-      padding: 0.2rem 0.4rem;
-      border-radius: 4px;
-      display: inline-block;
-      margin-top: 0.25rem;
-    }
-
-    footer {
-      text-align: center;
-      padding: 1.5rem;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      border-top: 1px solid var(--border);
-      background: white;
-    }
+    footer { text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border); background: white; }
   </style>
 </head>
 <body>
 
-  <!-- Top Navigation -->
+  <!-- Header -->
   <header>
     <div class="header-content">
       <div class="logo-group">
         <div class="logo-badge">🎓</div>
         <div class="logo-text">
           <h1>ዲሊጀንት ትምህርት ቤት</h1>
-          <p>Dilijent School MIS • Addis Ababa</p>
+          <p>Dilijent School Management System • Addis Ababa</p>
         </div>
       </div>
-      <a href="/dilijent-school.apk" class="apk-cta-btn" download>
-        <span>📲</span>
-        <span>APK አውርድ</span>
-      </a>
+      <div class="header-actions">
+        <div class="user-pill" id="currentRoleDisplay">👤 ኃላፊ (Admin)</div>
+        <a href="dilijent-school.apk" class="apk-btn" download>
+          <span>📲</span><span>APK አውርድ</span>
+        </a>
+      </div>
     </div>
   </header>
 
   <div class="container">
 
-    <!-- Hero / Direct APK Download Callout -->
-    <div class="hero-banner">
-      <div class="hero-content">
-        <h2>እንኳን ወደ ዲሊጀንት ትምህርት ቤት በደህና መጡ!</h2>
-        <p>ይህ የትምህርት ቤት ማኔጅመንት ሲስተም የተማሪዎችን መዝገብ፣ የአስተማሪዎች መረጃ፣ የውጤት ዝርዝር እና የዕለት ተዕለት አቴንዳንስ ያጠቃልላል። በቀጥታ በብሮውዘር መጠቀም ወይም አፑን በስልክዎ ላይ መጫን ይችላሉ።</p>
+    <!-- Web Banner with Share & Role switcher -->
+    <div class="banner">
+      <div>
+        <h3>🌐 የትምህርት ቤቱ የቀጥታ ዌብሳይት (Web Application)</h3>
+        <p>ይህ ድረ-ገጽ በማንኛውም ስልክ እና ኮምፒውተር ላይ በብሮውዘር ይሰራል! አዳዲስ መረጃዎችን መመዝገብና መመልከት ይችላሉ።</p>
       </div>
-      <div class="download-box">
-        <a href="/dilijent-school.apk" class="btn-download-large" download>
-          <span>⬇️</span>
-          <span>አፑን በስልክዎ ጫን (APK)</span>
-        </a>
-        <div class="apk-size-note">ለአንድሮይድ ስልኮች • ነፃ ማውረጃ</div>
+      <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+        <button class="btn-accent" onclick="openSchemeModal()">⚙️ የውጤት አሰጣጥ ማዋቀሪያ (ርዕሰ መ/ር)</button>
+        <button class="btn-secondary" onclick="openRoleModal()">🔄 ሚና ቀይር (Role)</button>
+        <button class="btn-secondary" onclick="shareWebsiteLink()">🔗 ሊንክ ኮፒ</button>
+      </div>
+    </div>
+
+    <!-- Active Assessment Scheme Callout -->
+    <div class="panel-card" style="padding:0.85rem 1.15rem; background:#F8FAFC; border-left:4px solid var(--accent); margin-bottom:1rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+        <div>
+          <span style="font-size:0.8rem; color:var(--text-muted);">ንቁ የኢትዮጵያ ስርዓተ-ትምህርት ምዘና፡</span>
+          <strong id="activeSchemeTitle" style="color:var(--primary); font-size:0.9rem; margin-left:0.25rem;">መደበኛ የመንግስት ስርዓተ-ትምህርት</strong>
+          <span id="activeSchemeTypeBadge" class="badge badge-primary" style="margin-left:0.5rem;">የመንግስት</span>
+          <div id="activeSchemeBreakdown" style="font-size:0.75rem; color:#475569; margin-top:0.2rem;">
+            ፈተና 1: 10% | የቤት ስራ: 10% | አጋማሽ ፈተና: 30% | ማጠቃለያ ፈተና: 50% = ድምር 100%
+          </div>
+        </div>
+        <button class="btn-secondary" style="font-size:0.75rem; padding:0.35rem 0.65rem;" onclick="openSchemeModal()">ቀይር / አዋቅር</button>
       </div>
     </div>
 
@@ -439,7 +177,7 @@
       <button class="tab-btn" onclick="switchTab('teachers')">👩‍🏫 መምህራን (Teachers)</button>
       <button class="tab-btn" onclick="switchTab('grades')">📝 ውጤት እና ምዘና (Grades)</button>
       <button class="tab-btn" onclick="switchTab('attendance')">📅 የዕለት አቴንዳንስ (Attendance)</button>
-      <button class="tab-btn" onclick="switchTab('accounts')">🔐 የሙከራ አካውንቶች (Demo)</button>
+      <button class="tab-btn" onclick="switchTab('report')">📜 የውጤት ካርድ (Report Card)</button>
     </div>
 
     <!-- TAB 1: DASHBOARD -->
@@ -447,7 +185,7 @@
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon">👨‍🎓</div>
-          <div class="stat-val">1,248</div>
+          <div class="stat-val" id="totalStudentsCount">1,248</div>
           <div class="stat-label">ጠቅላላ ተማሪዎች</div>
         </div>
         <div class="stat-card">
@@ -458,7 +196,7 @@
         <div class="stat-card">
           <div class="stat-icon">🏫</div>
           <div class="stat-val">32</div>
-          <div class="stat-label">ክፍሎች (Classes)</div>
+          <div class="stat-label">ክፍሎች (9-12)</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon">✅</div>
@@ -469,49 +207,22 @@
 
       <div class="panel-card">
         <div class="panel-header">
-          <h3 class="panel-title">የቅርብ ጊዜ የተማሪዎች እንቅስቃሴ (Recent Activities)</h3>
-          <span class="badge badge-primary">2016/2017 ዓ.ም Semester II</span>
+          <h3 class="panel-title">የቅርብ ጊዜ እንቅስቃሴዎች (Recent Updates)</h3>
+          <span class="badge badge-primary">2017 ዓ.ም Semester I</span>
         </div>
         <div class="table-responsive">
           <table>
             <thead>
               <tr>
                 <th>የተማሪ ስም</th>
-                <th>መለያ ቁጥር (ID)</th>
+                <th>መለያ ቁጥር</th>
                 <th>ክፍል</th>
                 <th>አማካይ ውጤት</th>
-                <th>ሁኔታ</th>
+                <th>ደረጃ</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td><strong>አቤል ታደሰ (Abel Tadesse)</strong></td>
-                <td>DIL/2024/001</td>
-                <td>12A - Natural Science</td>
-                <td><strong>94.5% (A)</strong></td>
-                <td><span class="badge badge-success">ከፍተኛ ውጤት</span></td>
-              </tr>
-              <tr>
-                <td><strong>ሄለን ገብሬ (Helen Gebre)</strong></td>
-                <td>DIL/2024/002</td>
-                <td>11B - Social Science</td>
-                <td><strong>88.0% (A)</strong></td>
-                <td><span class="badge badge-success">አልፏል</span></td>
-              </tr>
-              <tr>
-                <td><strong>ናሆም በቀለ (Nahom Bekele)</strong></td>
-                <td>DIL/2024/003</td>
-                <td>10C - General</td>
-                <td><strong>76.4% (B)</strong></td>
-                <td><span class="badge badge-success">አልፏል</span></td>
-              </tr>
-              <tr>
-                <td><strong>ቤተልሔም ሰለሞን (Betelhem Solomon)</strong></td>
-                <td>DIL/2024/004</td>
-                <td>9A - General</td>
-                <td><strong>91.2% (A)</strong></td>
-                <td><span class="badge badge-success">ከፍተኛ ውጤት</span></td>
-              </tr>
+            <tbody id="dashboardRecentTable">
+              <!-- Rendered via JS -->
             </tbody>
           </table>
         </div>
@@ -523,69 +234,26 @@
       <div class="panel-card">
         <div class="panel-header">
           <h3 class="panel-title">የተማሪዎች ሙሉ መዝገብ</h3>
-          <input type="text" id="studentSearch" class="search-input" placeholder="በስም ወይም በመለያ ይፈልጉ..." onkeyup="filterStudents()">
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <input type="text" id="studentSearch" class="search-input" placeholder="በስም ወይም በመለያ ፈልግ..." onkeyup="filterStudents()">
+            <button class="btn-primary" onclick="openAddStudentModal()">+ አዲስ ተማሪ መዝግብ</button>
+          </div>
         </div>
         <div class="table-responsive">
-          <table id="studentsTable">
+          <table>
             <thead>
               <tr>
-                <th>መለያ</th>
+                <th>መለያ ቁጥር</th>
                 <th>ሙሉ ስም</th>
                 <th>ጾታ</th>
-                <th>ክፍል እና ክፍልፋይ</th>
+                <th>ክፍል</th>
                 <th>የአሳዳጊ ስልክ</th>
                 <th>ሁኔታ</th>
+                <th>እርምጃ</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>DIL-001</td>
-                <td><strong>አቤል ታደሰ</strong></td>
-                <td>ወንድ</td>
-                <td>12A (Natural)</td>
-                <td>+251 911 234567</td>
-                <td><span class="badge badge-success">ንቁ (Active)</span></td>
-              </tr>
-              <tr>
-                <td>DIL-002</td>
-                <td><strong>ሄለን ገብሬ</strong></td>
-                <td>ሴት</td>
-                <td>11B (Social)</td>
-                <td>+251 922 345678</td>
-                <td><span class="badge badge-success">ንቁ (Active)</span></td>
-              </tr>
-              <tr>
-                <td>DIL-003</td>
-                <td><strong>ናሆም በቀለ</strong></td>
-                <td>ወንድ</td>
-                <td>10C</td>
-                <td>+251 933 456789</td>
-                <td><span class="badge badge-success">ንቁ (Active)</span></td>
-              </tr>
-              <tr>
-                <td>DIL-004</td>
-                <td><strong>ቤተልሔም ሰለሞን</strong></td>
-                <td>ሴት</td>
-                <td>9A</td>
-                <td>+251 944 567890</td>
-                <td><span class="badge badge-success">ንቁ (Active)</span></td>
-              </tr>
-              <tr>
-                <td>DIL-005</td>
-                <td><strong>ዮናስ አለሙ</strong></td>
-                <td>ወንድ</td>
-                <td>12B (Natural)</td>
-                <td>+251 955 678901</td>
-                <td><span class="badge badge-success">ንቁ (Active)</span></td>
-              </tr>
-              <tr>
-                <td>DIL-006</td>
-                <td><strong>ሳባ ተስፋዬ</strong></td>
-                <td>ሴት</td>
-                <td>10A</td>
-                <td>+251 966 789012</td>
-                <td><span class="badge badge-success">ንቁ (Active)</span></td>
-              </tr>
+            <tbody id="studentsTableBody">
+              <!-- Dynamic Rows -->
             </tbody>
           </table>
         </div>
@@ -605,9 +273,9 @@
               <tr>
                 <th>የመምህሩ ስም</th>
                 <th>የትምህርት ዓይነት (Subject)</th>
-                <th>የሚያስተምሩት ክፍል</th>
+                <th>ክፍል</th>
                 <th>ስልክ ቁጥር</th>
-                <th>ደረጃ</th>
+                <th>ኃላፊነት</th>
               </tr>
             </thead>
             <tbody>
@@ -649,67 +317,41 @@
     <div id="tab-grades" class="tab-content" style="display:none;">
       <div class="panel-card">
         <div class="panel-header">
-          <h3 class="panel-title">የኢትዮጵያ ስርዓተ-ትምህርት የውጤት አሰጣጥ (Evaluation Breakdown)</h3>
-          <span class="badge badge-warning">Mid + Final + Assessments</span>
+          <div>
+            <h3 class="panel-title">የኢትዮጵያ ስርዓተ-ትምህርት ምዘና እና ውጤት (100%)</h3>
+            <p id="gradeTableSubLabel" style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem;">
+              እንደ ርዕሰ መ/ር ምርጫ የሚሰላ
+            </p>
+          </div>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button class="btn-primary" onclick="openAddGradeModal()">➕ ውጤት አስገባ (Add Grade)</button>
+            <button class="btn-accent" onclick="openSchemeModal()">⚙️ ስርዓተ-ትምህርት አዋቅር (ርዕሰ መ/ር)</button>
+          </div>
         </div>
-        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
-          ምዘናው በኢትዮጵያ ስታንዳርድ መሠረት፡ ፈተና 1 (10%) + አጋማሽ ፈተና (20%) + ፈተና 2 (10%) + ፕሮጀክት/ሆምወርክ (10%) + ማጠቃለያ ፈተና (50%) = ድምር 100% ይሰላል።
-        </p>
+        <div style="margin-bottom:0.85rem; display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+          <label style="font-size:0.8rem; font-weight:600; color:#475569;">የትምህርት ዓይነት ምረጥ (Filter Subject):</label>
+          <select id="gradeSubjectFilter" class="form-control" style="width:auto; min-width:200px;" onchange="renderGrades()">
+            <option value="Mathematics">ሒሳብ (Mathematics)</option>
+            <option value="English">እንግሊዝኛ (English)</option>
+            <option value="Physics">ፊዚክስ (Physics)</option>
+            <option value="Chemistry">ኬሚስትሪ (Chemistry)</option>
+            <option value="Biology">ባዮሎጂ (Biology)</option>
+            <option value="Civics">ስነ-ዜጋ (Civics)</option>
+            <option value="History">ታሪክ (History)</option>
+            <option value="Geography">ጆግራፊ (Geography)</option>
+            <option value="Amharic">አማርኛ (Amharic)</option>
+            <option value="IT">መረጃ ቴክኖሎጂ (IT)</option>
+          </select>
+        </div>
         <div class="table-responsive">
           <table>
             <thead>
-              <tr>
-                <th>የተማሪ ስም</th>
-                <th>የትምህርት ዓይነት</th>
-                <th>ፈተና 1 (10%)</th>
-                <th>Mid (20%)</th>
-                <th>ፕሮጀክት (10%)</th>
-                <th>Final (50%)</th>
-                <th>ድምር (100%)</th>
-                <th>ደረጃ</th>
+              <tr id="gradesTableHeadRow">
+                <!-- Dynamically Rendered Header -->
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td><strong>አቤል ታደሰ</strong></td>
-                <td>Mathematics</td>
-                <td>9.5</td>
-                <td>19.0</td>
-                <td>9.5</td>
-                <td>47.5</td>
-                <td><strong>85.5%</strong></td>
-                <td><span class="badge badge-success">A (እጅግ በጣም ጥሩ)</span></td>
-              </tr>
-              <tr>
-                <td><strong>ሄለን ገብሬ</strong></td>
-                <td>English</td>
-                <td>9.0</td>
-                <td>18.0</td>
-                <td>9.0</td>
-                <td>44.0</td>
-                <td><strong>80.0%</strong></td>
-                <td><span class="badge badge-success">A (በጣም ጥሩ)</span></td>
-              </tr>
-              <tr>
-                <td><strong>ናሆም በቀለ</strong></td>
-                <td>Physics</td>
-                <td>7.5</td>
-                <td>15.0</td>
-                <td>8.0</td>
-                <td>37.0</td>
-                <td><strong>67.5%</strong></td>
-                <td><span class="badge badge-primary">C (መካከለኛ)</span></td>
-              </tr>
-              <tr>
-                <td><strong>ቤተልሔም ሰለሞን</strong></td>
-                <td>Chemistry</td>
-                <td>9.0</td>
-                <td>18.5</td>
-                <td>9.0</td>
-                <td>46.0</td>
-                <td><strong>82.5%</strong></td>
-                <td><span class="badge badge-success">A (በጣም ጥሩ)</span></td>
-              </tr>
+            <tbody id="gradesTableBody">
+              <!-- Rendered via JS -->
             </tbody>
           </table>
         </div>
@@ -720,8 +362,8 @@
     <div id="tab-attendance" class="tab-content" style="display:none;">
       <div class="panel-card">
         <div class="panel-header">
-          <h3 class="panel-title">የዛሬ ተማሪዎች አቴንዳንስ (Daily Attendance)</h3>
-          <span class="badge badge-success">ዛሬ: ጥቅምት 14/2017 ዓ.ም</span>
+          <h3 class="panel-title">የዕለት ተዕለት አቴንዳንስ (Daily Attendance)</h3>
+          <span class="badge badge-success">ዛሬ፡ ጥቅምት 14/2017 ዓ.ም</span>
         </div>
         <div class="table-responsive">
           <table>
@@ -731,69 +373,264 @@
                 <th>ክፍል</th>
                 <th>ሁኔታ</th>
                 <th>ማስታወሻ</th>
+                <th>አቴንዳንስ ቀይር</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td><strong>አቤል ታደሰ</strong></td>
-                <td>12A</td>
-                <td><span class="badge badge-success">ተገኝቷል (Present)</span></td>
-                <td>በሰዓቱ ገብቷል</td>
-              </tr>
-              <tr>
-                <td><strong>ሄለን ገብሬ</strong></td>
-                <td>11B</td>
-                <td><span class="badge badge-success">ተገኝቷል (Present)</span></td>
-                <td>በሰዓቱ ገብቷል</td>
-              </tr>
-              <tr>
-                <td><strong>ናሆም በቀለ</strong></td>
-                <td>10C</td>
-                <td><span class="badge badge-warning">ዘግይቷል (Late)</span></td>
-                <td>15 ደቂቃ ዘግይቷል</td>
-              </tr>
-              <tr>
-                <td><strong>ቤተልሔም ሰለሞን</strong></td>
-                <td>9A</td>
-                <td><span class="badge badge-danger">ቀሪ (Absent)</span></td>
-                <td>የሕመም ፈቃድ አለላት</td>
-              </tr>
+            <tbody id="attendanceTableBody">
+              <!-- Rendered via JS -->
             </tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- TAB 6: ACCOUNTS -->
-    <div id="tab-accounts" class="tab-content" style="display:none;">
+    <!-- TAB 6: REPORT CARD -->
+    <div id="tab-report" class="tab-content" style="display:none;">
       <div class="panel-card">
         <div class="panel-header">
-          <h3 class="panel-title">የሙከራ አካውንቶች (Demo Accounts)</h3>
-          <span class="badge badge-primary">ለሙከራ ዝግጁ</span>
+          <h3 class="panel-title">የተማሪ ውጤት ካርድ (Official Student Report Card)</h3>
+          <button class="btn-primary" onclick="window.print()">🖨️ ፕሪንት አድርግ (Print)</button>
         </div>
-        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
-          በAndroid App ላይ ወይም በሲስተሙ ለመግባት የሚከተሉትን አካውንቶች ይጠቀሙ፦
-        </p>
-        <div class="account-cards">
-          <div class="account-box">
-            <div class="account-role">👑 የትምህርት ቤት ኃላፊ (Admin)</div>
-            <p style="font-size:0.8rem; color:#475569;">ሙሉ መብት (ተማሪና መምህር መመዝገብ፣ ሪፖርት ማየት)</p>
-            <div class="account-cred">User: admin | Pass: admin123</div>
+        <div class="report-card-view">
+          <div class="report-header">
+            <h2 style="color:var(--primary); font-size:1.25rem;">ዲሊጀንት አካዳሚ (Dilijent Academy)</h2>
+            <p style="font-size:0.85rem; color:#475569;">የ2017 ዓ.ም የመጀመሪያ ወሰነ-ትምህርት (Semester I) የተማሪ ውጤት መግለጫ</p>
+            <span id="reportCardSchemePill" class="badge badge-primary" style="margin-top:0.3rem;"></span>
           </div>
-          <div class="account-box">
-            <div class="account-role">👩‍🏫 መምህር (Teacher)</div>
-            <p style="font-size:0.8rem; color:#475569;">ውጤት ማስገባት እና አቴንዳንስ መመዝገብ</p>
-            <div class="account-cred">User: teacher | Pass: teacher123</div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:1rem; font-size:0.85rem; flex-wrap:wrap; gap:0.5rem;">
+            <div><strong>የተማሪ ስም:</strong> አቤል ታደሰ (Abel Tadesse)</div>
+            <div><strong>መለያ ቁጥር:</strong> DIL-001</div>
+            <div><strong>ክፍል:</strong> 12A (Natural Science)</div>
+            <div><strong>አማካይ:</strong> 88.5% (ደረጃ: 1ኛ)</div>
           </div>
-          <div class="account-box">
-            <div class="account-role">👨‍🎓 ተማሪ / ወላጅ (Student)</div>
-            <p style="font-size:0.8rem; color:#475569;">የራስን ውጤት፣ የክፍል መርሃ-ግብር እና አቴንዳንስ ማየት</p>
-            <div class="account-cred">User: student | Pass: student123</div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr id="reportCardHeaderRow">
+                  <!-- Dynamic Report Header -->
+                </tr>
+              </thead>
+              <tbody id="reportCardBody">
+                <!-- Dynamic Report Rows -->
+              </tbody>
+            </table>
+          </div>
+          <div style="margin-top:1.25rem; font-size:0.8rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+            <div><strong>የክፍል ኃላፊ ፊርማ:</strong> መምህር ዳዊት በቀለ _________</div>
+            <div><strong>የርዕሰ-መምህር ፊርማ:</strong> አቶ ሙሉጌታ ከበደ _________</div>
           </div>
         </div>
       </div>
     </div>
 
+  </div>
+
+  <!-- Modal: Assessment Scheme Settings (ርዕሰ-መምህር ገፅ) -->
+  <div id="schemeModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">⚙️ የኢትዮጵያ ስርዓተ-ትምህርት ምዘና ማዋቀሪያ</div>
+      <div class="modal-subtitle">የርዕሰ-መምህር / Admin ገፅ፡ ለመንግስት ወይም ለግል ትምህርት ቤቶች እንደፍላጎትዎ የምዘና ዓይነቶችን እና ክብደትን ይወስኑ።</div>
+
+      <div class="form-group">
+        <label>1. የትምህርት ቤቱ ዓይነት (School Type)</label>
+        <div style="display:flex; gap:0.5rem;">
+          <button type="button" id="btnSchoolPublic" class="btn-secondary" style="flex:1;" onclick="setSchoolType('የመንግስት')">🏛️ የመንግስት ት/ቤት</button>
+          <button type="button" id="btnSchoolPrivate" class="btn-secondary" style="flex:1;" onclick="setSchoolType('የግል')">🏫 የግል ትምህርት ቤት</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>2. ዝግጁ ሞዴሎች (Ready Presets)</label>
+        <div id="presetsContainer">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <div class="form-group" style="border-top:1px solid var(--border); padding-top:0.75rem;">
+        <label>3. የምዘና ክፍሎች እና የክብደት መቶኛ (Weights)</label>
+        
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem; margin-bottom:0.4rem;">
+          <input type="text" id="sch_t1_label" class="form-control" placeholder="ምዘና 1 ስም" oninput="calculateSchemeTotal()">
+          <input type="number" id="sch_t1_weight" class="form-control" placeholder="10%" oninput="calculateSchemeTotal()">
+        </div>
+
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem; margin-bottom:0.4rem;">
+          <input type="text" id="sch_as_label" class="form-control" placeholder="ምዘና 2 ስም" oninput="calculateSchemeTotal()">
+          <input type="number" id="sch_as_weight" class="form-control" placeholder="10%" oninput="calculateSchemeTotal()">
+        </div>
+
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem; margin-bottom:0.4rem;">
+          <input type="text" id="sch_mid_label" class="form-control" placeholder="ምዘና 3 ስም" oninput="calculateSchemeTotal()">
+          <input type="number" id="sch_mid_weight" class="form-control" placeholder="30%" oninput="calculateSchemeTotal()">
+        </div>
+
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem; margin-bottom:0.4rem;">
+          <input type="text" id="sch_final_label" class="form-control" placeholder="ምዘና 4 ስም" oninput="calculateSchemeTotal()">
+          <input type="number" id="sch_final_weight" class="form-control" placeholder="50%" oninput="calculateSchemeTotal()">
+        </div>
+      </div>
+
+      <!-- Total Weight Indicator -->
+      <div style="display:flex; justify-content:space-between; align-items:center; background:#F8FAFC; padding:0.6rem 0.8rem; border-radius:8px; margin-top:0.5rem;">
+        <div>
+          <span style="font-size:0.8rem; font-weight:600;">ጠቅላላ የክብደት ድምር፡</span>
+          <span id="schemeTotalIndicator" style="font-weight:700; margin-left:0.25rem;">100%</span>
+        </div>
+        <span id="schemeValidationStatus" class="badge badge-success">✓ ትክክል ነው</span>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" onclick="closeSchemeModal()">ሰርዝ</button>
+        <button type="button" class="btn-primary" onclick="saveAssessmentScheme()">አስቀምጥና ተግብር</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add Grade (ውጤት ማስገቢያ) -->
+  <div id="addGradeModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">📝 የተማሪ ውጤት ማስገቢያ (Add / Edit Grade)</div>
+      <div class="modal-subtitle">የተማሪውን ስም፣ የትምህርት ዓይነት እና ነጥቦችን ሞልተው ያስቀምጡ።</div>
+      <form onsubmit="saveGradeEntry(event)">
+        <div class="form-group">
+          <label>ተማሪ ይምረጡ (Select Student) *</label>
+          <select id="gradeStudentSelect" class="form-control" required onchange="onGradeStudentSelectChange()">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
+          <div class="form-group">
+            <label>የትምህርት ዓይነት (Subject) *</label>
+            <select id="gradeSubjectSelect" class="form-control" required onchange="onGradeSubjectChange()">
+              <option value="Mathematics">ሒሳብ (Mathematics)</option>
+              <option value="English">እንግሊዝኛ (English)</option>
+              <option value="Physics">ፊዚክስ (Physics)</option>
+              <option value="Chemistry">ኬሚስትሪ (Chemistry)</option>
+              <option value="Biology">ባዮሎጂ (Biology)</option>
+              <option value="Civics">ስነ-ዜጋ (Civics)</option>
+              <option value="History">ታሪክ (History)</option>
+              <option value="Geography">ጆግራፊ (Geography)</option>
+              <option value="Amharic">አማርኛ (Amharic)</option>
+              <option value="IT">መረጃ ቴክኖሎጂ (IT)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>ወሰነ-ትምህርት (Semester) *</label>
+            <select id="gradeSemesterSelect" class="form-control">
+              <option value="1">1ኛ ሴሚስተር (Semester I)</option>
+              <option value="2">2ኛ ሴሚስተር (Semester II)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="background:#F8FAFC; border:1px solid var(--border); padding:0.85rem; border-radius:8px;">
+          <div style="font-weight:700; font-size:0.82rem; color:var(--primary); margin-bottom:0.6rem;">
+            የምዘና ነጥቦች (በተመረጠው ስርዓተ-ትምህርት መሠረት)
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; margin-bottom:0.5rem;">
+            <div>
+              <label id="lblScore1" style="font-size:0.75rem; font-weight:600; color:#475569; display:block; margin-bottom:0.2rem;">ምዘና 1</label>
+              <input type="number" id="inputGradeScore1" step="0.1" min="0" class="form-control" required oninput="calculateLiveModalGrade()">
+            </div>
+            <div>
+              <label id="lblScore2" style="font-size:0.75rem; font-weight:600; color:#475569; display:block; margin-bottom:0.2rem;">ምዘና 2</label>
+              <input type="number" id="inputGradeScore2" step="0.1" min="0" class="form-control" required oninput="calculateLiveModalGrade()">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
+            <div>
+              <label id="lblScore3" style="font-size:0.75rem; font-weight:600; color:#475569; display:block; margin-bottom:0.2rem;">ምዘና 3</label>
+              <input type="number" id="inputGradeScore3" step="0.1" min="0" class="form-control" required oninput="calculateLiveModalGrade()">
+            </div>
+            <div>
+              <label id="lblScore4" style="font-size:0.75rem; font-weight:600; color:#475569; display:block; margin-bottom:0.2rem;">ምዘና 4</label>
+              <input type="number" id="inputGradeScore4" step="0.1" min="0" class="form-control" required oninput="calculateLiveModalGrade()">
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Score Summary Card -->
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#EFF6FF; border:1px solid #BFDBFE; padding:0.75rem 1rem; border-radius:8px; margin-bottom:1rem;">
+          <div>
+            <div style="font-size:0.75rem; color:#475569;">የተሰላ ድምር ውጤት:</div>
+            <strong id="modalCalculatedTotal" style="font-size:1.2rem; color:var(--primary);">0.0%</strong>
+          </div>
+          <div style="display:flex; align-items:center;">
+            <span id="modalGradeLetterBadge" class="badge badge-primary" style="font-size:0.85rem; padding:0.35rem 0.65rem;">ደረጃ: -</span>
+            <span id="modalGradePassBadge" class="badge badge-success" style="font-size:0.85rem; padding:0.35rem 0.65rem; margin-left:0.25rem;">አልፏል</span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeAddGradeModal()">ሰርዝ (Cancel)</button>
+          <button type="submit" class="btn-primary">💾 ውጤቱን መዝግብ (Save Grade)</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add Student -->
+  <div id="addStudentModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">➕ አዲስ ተማሪ መመዝገቢያ</div>
+      <form onsubmit="saveNewStudent(event)">
+        <div class="form-group">
+          <label>የተማሪው ሙሉ ስም</label>
+          <input type="text" id="newStudentName" class="form-control" required placeholder="ለምሳሌ፡ ዮሴፍ ሀጎስ">
+        </div>
+        <div class="form-group">
+          <label>ጾታ</label>
+          <select id="newStudentGender" class="form-control">
+            <option value="ወንድ">ወንድ (Male)</option>
+            <option value="ሴት">ሴት (Female)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>ክፍል እና ክፍልፋይ</label>
+          <select id="newStudentGrade" class="form-control">
+            <option value="12A">12A (Natural Science)</option>
+            <option value="12B">12B (Social Science)</option>
+            <option value="11A">11A (Natural Science)</option>
+            <option value="11B">11B (Social Science)</option>
+            <option value="10A">10A (General)</option>
+            <option value="9A">9A (General)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>የወላጅ/አሳዳጊ ስልክ ቁጥር</label>
+          <input type="tel" id="newStudentPhone" class="form-control" required placeholder="+251 9... ">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeAddStudentModal()">ሰርዝ (Cancel)</button>
+          <button type="submit" class="btn-primary">መዝግብ (Save)</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Switch Role -->
+  <div id="roleModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">🔄 ሚና ይምረጡ (Select Role)</div>
+      <p style="font-size:0.85rem; color:#475569; margin-bottom:1rem;">እንደየትኛው ተጠቃሚ መግባት ይፈልጋሉ?</p>
+      <div style="display:flex; flex-direction:column; gap:0.5rem;">
+        <button class="btn-secondary" style="text-align:left; padding:0.8rem;" onclick="setRole('admin')">
+          <strong>👑 የትምህርት ቤት ኃላፊ (Admin)</strong><br><small>ሙሉ የመቆጣጠር፣ የተማሪና መምህራን የመመዝገብ፣ ስርዓተ-ትምህርት የማዋቀር መብት</small>
+        </button>
+        <button class="btn-secondary" style="text-align:left; padding:0.8rem;" onclick="setRole('teacher')">
+          <strong>👩‍🏫 መምህር (Teacher)</strong><br><small>የክፍል አቴንዳንስ መመዝገብ እና ውጤት ማስገባት</small>
+        </button>
+        <button class="btn-secondary" style="text-align:left; padding:0.8rem;" onclick="setRole('student')">
+          <strong>👨‍🎓 ተማሪ / ወላጅ (Student/Parent)</strong><br><small>የራስን ውጤት ካርድ እና የክፍል መርሃ-ግብር ማየት</small>
+        </button>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" onclick="closeRoleModal()">ዝጋ</button>
+      </div>
+    </div>
   </div>
 
   <footer>
@@ -802,25 +639,530 @@
   </footer>
 
   <script>
+    // Assessment Scheme Presets
+    const SCHEME_PRESETS = [
+      {
+        id: 'moe_standard',
+        title: 'መደበኛ የመንግስት ስርዓተ-ትምህርት (10% + 10% + 30% + 50%)',
+        schoolType: 'የመንግስት',
+        t1Label: 'ጥያቄ/ፈተና 1', t1Weight: 10,
+        asLabel: 'የቤት ስራ/ምደባ', asWeight: 10,
+        midLabel: 'አጋማሽ ፈተና (Mid)', midWeight: 30,
+        finalLabel: 'ማጠቃለያ ፈተና (Final)', finalWeight: 50
+      },
+      {
+        id: 'private_model_a',
+        title: 'የግል ት/ቤት አማራጭ 1 - Continuous (15% + 15% + 10% + 60%)',
+        schoolType: 'የግል',
+        t1Label: 'ኩዊዝ/ፈተና', t1Weight: 15,
+        asLabel: 'ሆምወርክ/ክላስወርክ', asWeight: 15,
+        midLabel: 'ወርሃዊ ምዘና', midWeight: 10,
+        finalLabel: 'ማጠቃለያ ፈተና', finalWeight: 60
+      },
+      {
+        id: 'private_model_b',
+        title: 'የግል ት/ቤት አማራጭ 2 - ሚዛናዊ (15% + 15% + 20% + 50%)',
+        schoolType: 'የግል',
+        t1Label: 'ኩዊዝ/ፈተና', t1Weight: 15,
+        asLabel: 'ፕሮጀክት/የቤት ስራ', asWeight: 15,
+        midLabel: 'አጋማሽ ፈተና', midWeight: 20,
+        finalLabel: 'ማጠቃለያ ፈተና', finalWeight: 50
+      },
+      {
+        id: 'private_model_c',
+        title: 'የግል ት/ቤት አማራጭ 3 - ፈተና ተኮር (Mid 30% + Final 70%)',
+        schoolType: 'የግል',
+        t1Label: 'ተከታታይ ምዘና 1', t1Weight: 0,
+        asLabel: 'ተከታታይ ምዘና 2', asWeight: 0,
+        midLabel: 'አጋማሽ ፈተና', midWeight: 30,
+        finalLabel: 'ማጠቃለያ ፈተና', finalWeight: 70
+      }
+    ];
+
+    let currentScheme = JSON.parse(localStorage.getItem('dilijent_assessment_scheme')) || SCHEME_PRESETS[0];
+
+    // Initial Seed Data with LocalStorage persistence
+    let students = JSON.parse(localStorage.getItem('dilijent_students')) || [
+      { id: 'DIL-001', name: 'አቤል ታደሰ', gender: 'ወንድ', grade: '12A', phone: '+251 911 234567', scores: [9.5, 9.5, 28.5, 47.0], status: 'ንቁ' },
+      { id: 'DIL-002', name: 'ሄለን ገብሬ', gender: 'ሴት', grade: '11B', phone: '+251 922 345678', scores: [9.0, 9.0, 26.0, 44.0], status: 'ንቁ' },
+      { id: 'DIL-003', name: 'ናሆም በቀለ', gender: 'ወንድ', grade: '10C', phone: '+251 933 456789', scores: [7.5, 8.0, 22.0, 38.0], status: 'ንቁ' },
+      { id: 'DIL-004', name: 'ቤተልሔም ሰለሞን', gender: 'ሴት', grade: '9A', phone: '+251 944 567890', scores: [9.0, 9.0, 27.5, 46.0], status: 'ንቁ' },
+      { id: 'DIL-005', name: 'ዮናስ አለሙ', gender: 'ወንድ', grade: '12B', phone: '+251 955 678901', scores: [8.5, 8.0, 24.0, 42.0], status: 'ንቁ' }
+    ];
+
+    let attendance = JSON.parse(localStorage.getItem('dilijent_attendance')) || [
+      { name: 'አቤል ታደሰ', grade: '12A', status: 'Present', note: 'በሰዓቱ ገብቷል' },
+      { name: 'ሄለን ገብሬ', grade: '11B', status: 'Present', note: 'በሰዓቱ ገብቷል' },
+      { name: 'ናሆም በቀለ', grade: '10C', status: 'Late', note: '15 ደቂቃ ዘግይቷል' },
+      { name: 'ቤተልሔም ሰለሞን', grade: '9A', status: 'Absent', note: 'የሕመም ፈቃድ' }
+    ];
+
+    function calculateTotal(scores) {
+      // Scale scores to current scheme weights
+      const t1 = Math.min(scores[0] || 0, currentScheme.t1Weight);
+      const as = Math.min(scores[1] || 0, currentScheme.asWeight);
+      const mid = Math.min(scores[2] || 0, currentScheme.midWeight);
+      const fn = Math.min(scores[3] || 0, currentScheme.finalWeight);
+      const sum = t1 + as + mid + fn;
+      return sum.toFixed(1);
+    }
+
+    function getLetter(total) {
+      const t = parseFloat(total);
+      if (t >= 90) return 'A';
+      if (t >= 80) return 'B';
+      if (t >= 65) return 'C';
+      if (t >= 50) return 'D';
+      return 'F';
+    }
+
+    function saveState() {
+      localStorage.setItem('dilijent_students', JSON.stringify(students));
+      localStorage.setItem('dilijent_attendance', JSON.stringify(attendance));
+      localStorage.setItem('dilijent_assessment_scheme', JSON.stringify(currentScheme));
+      updateSchemeUI();
+      renderDashboard();
+      renderStudents();
+      renderGrades();
+      renderAttendance();
+      renderReportCard();
+    }
+
+    function updateSchemeUI() {
+      document.getElementById('activeSchemeTitle').innerText = currentScheme.title;
+      document.getElementById('activeSchemeTypeBadge').innerText = currentScheme.schoolType;
+      document.getElementById('activeSchemeTypeBadge').className = currentScheme.schoolType === 'የግል' ? 'badge badge-warning' : 'badge badge-primary';
+      document.getElementById('activeSchemeBreakdown').innerText = 
+        `${currentScheme.t1Label}: ${currentScheme.t1Weight}% | ${currentScheme.asLabel}: ${currentScheme.asWeight}% | ${currentScheme.midLabel}: ${currentScheme.midWeight}% | ${currentScheme.finalLabel}: ${currentScheme.finalWeight}% = ድምር 100%`;
+      document.getElementById('gradeTableSubLabel').innerText = 
+        `ምዘናው በ${currentScheme.schoolType} ት/ቤት ስታንዳርድ መሠረት፡ ${currentScheme.t1Label}(${currentScheme.t1Weight}%) + ${currentScheme.asLabel}(${currentScheme.asWeight}%) + ${currentScheme.midLabel}(${currentScheme.midWeight}%) + ${currentScheme.finalLabel}(${currentScheme.finalWeight}%) = ድምር 100%`;
+      document.getElementById('reportCardSchemePill').innerText = `${currentScheme.title} (${currentScheme.schoolType})`;
+    }
+
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      
-      const targetTab = document.getElementById('tab-' + tabId);
-      if (targetTab) {
-        targetTab.style.display = 'block';
-      }
+      const target = document.getElementById('tab-' + tabId);
+      if (target) target.style.display = 'block';
       event.currentTarget.classList.add('active');
+    }
+
+    function renderDashboard() {
+      const tbody = document.getElementById('dashboardRecentTable');
+      tbody.innerHTML = students.slice(0, 4).map(s => {
+        const total = calculateTotal(s.scores);
+        const letter = getLetter(total);
+        return `
+          <tr>
+            <td><strong>${s.name}</strong></td>
+            <td>${s.id}</td>
+            <td>${s.grade}</td>
+            <td><strong>${total}%</strong></td>
+            <td><span class="badge ${parseFloat(total) >= 50 ? 'badge-success' : 'badge-danger'}">${letter}</span></td>
+          </tr>
+        `;
+      }).join('');
+      document.getElementById('totalStudentsCount').innerText = students.length;
+    }
+
+    function renderStudents() {
+      const tbody = document.getElementById('studentsTableBody');
+      tbody.innerHTML = students.map((s, idx) => `
+        <tr>
+          <td>${s.id}</td>
+          <td><strong>${s.name}</strong></td>
+          <td>${s.gender}</td>
+          <td>${s.grade}</td>
+          <td>${s.phone}</td>
+          <td><span class="badge badge-success">${s.status}</span></td>
+          <td><button class="btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.75rem;" onclick="removeStudent(${idx})">ሰርዝ</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderGrades() {
+      const subjectFilter = document.getElementById('gradeSubjectFilter') ? document.getElementById('gradeSubjectFilter').value : 'Mathematics';
+      // Dynamic Header
+      const thead = document.getElementById('gradesTableHeadRow');
+      thead.innerHTML = `
+        <th>ተማሪ</th>
+        <th>የት/ት ዓይነት</th>
+        <th>${currentScheme.t1Label} (${currentScheme.t1Weight}%)</th>
+        <th>${currentScheme.asLabel} (${currentScheme.asWeight}%)</th>
+        <th>${currentScheme.midLabel} (${currentScheme.midWeight}%)</th>
+        <th>${currentScheme.finalLabel} (${currentScheme.finalWeight}%)</th>
+        <th>ድምር (100%)</th>
+        <th>ደረጃ</th>
+        <th>እርምጃ</th>
+      `;
+
+      const tbody = document.getElementById('gradesTableBody');
+      tbody.innerHTML = students.map(s => {
+        let sc = (s.subjectGrades && s.subjectGrades[subjectFilter]) ? s.subjectGrades[subjectFilter] : s.scores;
+        if (!sc || sc.length < 4) sc = [0, 0, 0, 0];
+
+        const s1 = parseFloat(sc[0] || 0);
+        const s2 = parseFloat(sc[1] || 0);
+        const s3 = parseFloat(sc[2] || 0);
+        const s4 = parseFloat(sc[3] || 0);
+        const total = (s1 + s2 + s3 + s4).toFixed(1);
+        const letter = getLetter(total);
+
+        return `
+          <tr>
+            <td><strong>${s.name}</strong> <small style="color:#64748B;">(${s.id})</small></td>
+            <td><span class="badge badge-primary">${subjectFilter}</span></td>
+            <td>${s1.toFixed(1)}</td>
+            <td>${s2.toFixed(1)}</td>
+            <td>${s3.toFixed(1)}</td>
+            <td>${s4.toFixed(1)}</td>
+            <td><strong>${total}%</strong></td>
+            <td><span class="badge ${parseFloat(total) >= 50 ? 'badge-success' : 'badge-danger'}">${letter}</span></td>
+            <td>
+              <button class="btn-secondary" style="padding:0.25rem 0.55rem; font-size:0.75rem;" onclick="openAddGradeModal('${s.id}', '${subjectFilter}')">✏️ ውጤት አስገባ</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderReportCard() {
+      const headerRow = document.getElementById('reportCardHeaderRow');
+      headerRow.innerHTML = `
+        <th>የትምህርት ዓይነት</th>
+        <th>${currentScheme.t1Label} (${currentScheme.t1Weight}%)</th>
+        <th>${currentScheme.asLabel} (${currentScheme.asWeight}%)</th>
+        <th>${currentScheme.midLabel} (${currentScheme.midWeight}%)</th>
+        <th>${currentScheme.finalLabel} (${currentScheme.finalWeight}%)</th>
+        <th>ድምር (100%)</th>
+        <th>ደረጃ</th>
+        <th>አስተያየት</th>
+      `;
+
+      const sampleSubjects = [
+        { name: 'Mathematics (ሒሳብ)', s: [9.5, 9.5, 28.5, 47.0] },
+        { name: 'Physics (ፊዚክስ)', s: [8.5, 9.0, 26.0, 44.0] },
+        { name: 'Chemistry (ኬሚስትሪ)', s: [9.0, 8.5, 25.5, 43.5] },
+        { name: 'English (እንግሊዝኛ)', s: [9.5, 9.5, 27.0, 46.0] },
+        { name: 'Civics (ስነ-ዜጋ)', s: [9.0, 9.0, 28.0, 45.0] }
+      ];
+
+      const tbody = document.getElementById('reportCardBody');
+      tbody.innerHTML = sampleSubjects.map(sub => {
+        const s1 = (sub.s[0] * (currentScheme.t1Weight / 10)).toFixed(1);
+        const s2 = (sub.s[1] * (currentScheme.asWeight / 10)).toFixed(1);
+        const s3 = (sub.s[2] * (currentScheme.midWeight / 30)).toFixed(1);
+        const s4 = (sub.s[3] * (currentScheme.finalWeight / 50)).toFixed(1);
+        const total = (parseFloat(s1) + parseFloat(s2) + parseFloat(s3) + parseFloat(s4)).toFixed(1);
+        const letter = getLetter(total);
+
+        return `
+          <tr>
+            <td><strong>${sub.name}</strong></td>
+            <td>${s1}</td>
+            <td>${s2}</td>
+            <td>${s3}</td>
+            <td>${s4}</td>
+            <td><strong>${total}%</strong></td>
+            <td><span class="badge ${parseFloat(total) >= 50 ? 'badge-success' : 'badge-danger'}">${letter}</span></td>
+            <td>${parseFloat(total) >= 85 ? 'እጅግ በጣም ጥሩ' : 'ጥሩ'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderAttendance() {
+      const tbody = document.getElementById('attendanceTableBody');
+      tbody.innerHTML = attendance.map((a, i) => `
+        <tr>
+          <td><strong>${a.name}</strong></td>
+          <td>${a.grade}</td>
+          <td>
+            <span class="badge ${a.status === 'Present' ? 'badge-success' : a.status === 'Late' ? 'badge-warning' : 'badge-danger'}">
+              ${a.status === 'Present' ? 'ተገኝቷል' : a.status === 'Late' ? 'ዘግይቷል' : 'ቀሪ'}
+            </span>
+          </td>
+          <td>${a.note}</td>
+          <td>
+            <button class="btn-secondary" style="padding:0.2rem 0.4rem; font-size:0.72rem;" onclick="toggleAttendance(${i})">ቀይር</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function toggleAttendance(index) {
+      const order = ['Present', 'Late', 'Absent'];
+      const curr = order.indexOf(attendance[index].status);
+      attendance[index].status = order[(curr + 1) % order.length];
+      saveState();
+    }
+
+    function removeStudent(idx) {
+      if (confirm('ተማሪውን ከመዝገብ መሰረዝ ይፈልጋሉ?')) {
+        students.splice(idx, 1);
+        saveState();
+      }
     }
 
     function filterStudents() {
       const q = document.getElementById('studentSearch').value.toLowerCase();
-      const rows = document.querySelectorAll('#studentsTable tbody tr');
-      rows.forEach(row => {
-        const text = row.innerText.toLowerCase();
-        row.style.display = text.includes(q) ? '' : 'none';
+      document.querySelectorAll('#studentsTableBody tr').forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
       });
     }
+
+    // Modal Handlers
+    function openAddStudentModal() { document.getElementById('addStudentModal').style.display = 'flex'; }
+    function closeAddStudentModal() { document.getElementById('addStudentModal').style.display = 'none'; }
+    function openRoleModal() { document.getElementById('roleModal').style.display = 'flex'; }
+    function closeRoleModal() { document.getElementById('roleModal').style.display = 'none'; }
+
+    // Add Grade Modal Handlers
+    function openAddGradeModal(studentId, subject) {
+      const studentSelect = document.getElementById('gradeStudentSelect');
+      studentSelect.innerHTML = students.map(s => `
+        <option value="${s.id}" ${s.id === studentId ? 'selected' : ''}>${s.name} (${s.id} - ${s.grade})</option>
+      `).join('');
+
+      if (subject) {
+        document.getElementById('gradeSubjectSelect').value = subject;
+      }
+
+      // Update dynamic labels from current assessment scheme
+      document.getElementById('lblScore1').innerText = `${currentScheme.t1Label} (ከ ${currentScheme.t1Weight}%) *`;
+      document.getElementById('lblScore2').innerText = `${currentScheme.asLabel} (ከ ${currentScheme.asWeight}%) *`;
+      document.getElementById('lblScore3').innerText = `${currentScheme.midLabel} (ከ ${currentScheme.midWeight}%) *`;
+      document.getElementById('lblScore4').innerText = `${currentScheme.finalLabel} (ከ ${currentScheme.finalWeight}%) *`;
+
+      document.getElementById('inputGradeScore1').max = currentScheme.t1Weight;
+      document.getElementById('inputGradeScore2').max = currentScheme.asWeight;
+      document.getElementById('inputGradeScore3').max = currentScheme.midWeight;
+      document.getElementById('inputGradeScore4').max = currentScheme.finalWeight;
+
+      loadExistingScoresIntoModal();
+      document.getElementById('addGradeModal').style.display = 'flex';
+    }
+
+    function closeAddGradeModal() {
+      document.getElementById('addGradeModal').style.display = 'none';
+    }
+
+    function onGradeStudentSelectChange() {
+      loadExistingScoresIntoModal();
+    }
+
+    function onGradeSubjectChange() {
+      loadExistingScoresIntoModal();
+    }
+
+    function loadExistingScoresIntoModal() {
+      const studentId = document.getElementById('gradeStudentSelect').value;
+      const subject = document.getElementById('gradeSubjectSelect').value;
+      const student = students.find(s => s.id === studentId);
+
+      if (student) {
+        let sc = (student.subjectGrades && student.subjectGrades[subject]) ? student.subjectGrades[subject] : student.scores;
+        if (!sc || sc.length < 4) sc = [0, 0, 0, 0];
+
+        document.getElementById('inputGradeScore1').value = sc[0] !== undefined ? sc[0] : '';
+        document.getElementById('inputGradeScore2').value = sc[1] !== undefined ? sc[1] : '';
+        document.getElementById('inputGradeScore3').value = sc[2] !== undefined ? sc[2] : '';
+        document.getElementById('inputGradeScore4').value = sc[3] !== undefined ? sc[3] : '';
+      }
+      calculateLiveModalGrade();
+    }
+
+    function calculateLiveModalGrade() {
+      const s1 = parseFloat(document.getElementById('inputGradeScore1').value) || 0;
+      const s2 = parseFloat(document.getElementById('inputGradeScore2').value) || 0;
+      const s3 = parseFloat(document.getElementById('inputGradeScore3').value) || 0;
+      const s4 = parseFloat(document.getElementById('inputGradeScore4').value) || 0;
+
+      const total = (s1 + s2 + s3 + s4).toFixed(1);
+      const letter = getLetter(total);
+      const isPassed = parseFloat(total) >= 50;
+
+      document.getElementById('modalCalculatedTotal').innerText = total + '%';
+      document.getElementById('modalGradeLetterBadge').innerText = 'ደረጃ: ' + letter;
+      document.getElementById('modalGradeLetterBadge').className = 'badge ' + (isPassed ? 'badge-primary' : 'badge-danger');
+      document.getElementById('modalGradePassBadge').innerText = isPassed ? 'አልፏል (Pass)' : 'አልተሳካም (Fail)';
+      document.getElementById('modalGradePassBadge').className = 'badge ' + (isPassed ? 'badge-success' : 'badge-danger');
+    }
+
+    function saveGradeEntry(e) {
+      e.preventDefault();
+      const studentId = document.getElementById('gradeStudentSelect').value;
+      const subject = document.getElementById('gradeSubjectSelect').value;
+
+      const s1 = parseFloat(document.getElementById('inputGradeScore1').value) || 0;
+      const s2 = parseFloat(document.getElementById('inputGradeScore2').value) || 0;
+      const s3 = parseFloat(document.getElementById('inputGradeScore3').value) || 0;
+      const s4 = parseFloat(document.getElementById('inputGradeScore4').value) || 0;
+
+      // Validate against active scheme limits
+      if (s1 > currentScheme.t1Weight || s2 > currentScheme.asWeight || s3 > currentScheme.midWeight || s4 > currentScheme.finalWeight) {
+        alert(`የነጥብ ስህተት! ከፍተኛ ወሰን: ${currentScheme.t1Label} (${currentScheme.t1Weight}%), ${currentScheme.asLabel} (${currentScheme.asWeight}%), ${currentScheme.midLabel} (${currentScheme.midWeight}%), ${currentScheme.finalLabel} (${currentScheme.finalWeight}%)`);
+        return;
+      }
+
+      const studentIndex = students.findIndex(s => s.id === studentId);
+      if (studentIndex !== -1) {
+        const student = students[studentIndex];
+        student.subjectGrades = student.subjectGrades || {};
+        student.subjectGrades[subject] = [s1, s2, s3, s4];
+        student.scores = [s1, s2, s3, s4];
+
+        // Recalculate average
+        const total = (s1 + s2 + s3 + s4).toFixed(1);
+        student.avg = total + '%';
+
+        // Automatically update localStorage via saveState()
+        saveState();
+
+        closeAddGradeModal();
+        alert(`የ${student.name} የ${subject} ውጤት በተሳካ ሁኔታ በሲስተሙ ተመዝግቧል! (ድምር: ${total}%)`);
+      }
+    }
+
+    function openSchemeModal() {
+      document.getElementById('sch_t1_label').value = currentScheme.t1Label;
+      document.getElementById('sch_t1_weight').value = currentScheme.t1Weight;
+      document.getElementById('sch_as_label').value = currentScheme.asLabel;
+      document.getElementById('sch_as_weight').value = currentScheme.asWeight;
+      document.getElementById('sch_mid_label').value = currentScheme.midLabel;
+      document.getElementById('sch_mid_weight').value = currentScheme.midWeight;
+      document.getElementById('sch_final_label').value = currentScheme.finalLabel;
+      document.getElementById('sch_final_weight').value = currentScheme.finalWeight;
+
+      renderPresetsInModal();
+      calculateSchemeTotal();
+      document.getElementById('schemeModal').style.display = 'flex';
+    }
+
+    function closeSchemeModal() {
+      document.getElementById('schemeModal').style.display = 'none';
+    }
+
+    function renderPresetsInModal() {
+      const container = document.getElementById('presetsContainer');
+      container.innerHTML = SCHEME_PRESETS.map((p, idx) => `
+        <div class="preset-card ${currentScheme.id === p.id ? 'active' : ''}" onclick="selectPreset(${idx})">
+          <input type="radio" name="presetRadio" ${currentScheme.id === p.id ? 'checked' : ''} style="margin-top:0.25rem;">
+          <div>
+            <div style="font-weight:700; font-size:0.85rem; color:var(--primary);">${p.title}</div>
+            <div style="font-size:0.75rem; color:#475569;">
+              ${p.t1Label}: ${p.t1Weight}% | ${p.asLabel}: ${p.asWeight}% | ${p.midLabel}: ${p.midWeight}% | ${p.finalLabel}: ${p.finalWeight}%
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function selectPreset(idx) {
+      const p = SCHEME_PRESETS[idx];
+      currentScheme = { ...p };
+      document.getElementById('sch_t1_label').value = p.t1Label;
+      document.getElementById('sch_t1_weight').value = p.t1Weight;
+      document.getElementById('sch_as_label').value = p.asLabel;
+      document.getElementById('sch_as_weight').value = p.asWeight;
+      document.getElementById('sch_mid_label').value = p.midLabel;
+      document.getElementById('sch_mid_weight').value = p.midWeight;
+      document.getElementById('sch_final_label').value = p.finalLabel;
+      document.getElementById('sch_final_weight').value = p.finalWeight;
+
+      renderPresetsInModal();
+      calculateSchemeTotal();
+    }
+
+    function setSchoolType(type) {
+      currentScheme.schoolType = type;
+      if (type === 'የመንግስት') {
+        selectPreset(0);
+      } else {
+        selectPreset(1);
+      }
+    }
+
+    function calculateSchemeTotal() {
+      const w1 = parseFloat(document.getElementById('sch_t1_weight').value) || 0;
+      const w2 = parseFloat(document.getElementById('sch_as_weight').value) || 0;
+      const w3 = parseFloat(document.getElementById('sch_mid_weight').value) || 0;
+      const w4 = parseFloat(document.getElementById('sch_final_weight').value) || 0;
+      const total = w1 + w2 + w3 + w4;
+
+      document.getElementById('schemeTotalIndicator').innerText = total.toFixed(1) + '%';
+      const isValid = (total >= 99.9 && total <= 100.1);
+      const badge = document.getElementById('schemeValidationStatus');
+
+      if (isValid) {
+        badge.className = 'badge badge-success';
+        badge.innerText = '✓ ትክክል ነው (100%)';
+      } else {
+        badge.className = 'badge badge-danger';
+        badge.innerText = '⚠️ ድምሩ 100% መሆን አለበት';
+      }
+      return isValid;
+    }
+
+    function saveAssessmentScheme() {
+      if (!calculateSchemeTotal()) {
+        alert('እባክዎ የምዘናዎቹ ድምር በትክክል 100% መሆኑን ያረጋግጡ!');
+        return;
+      }
+
+      currentScheme = {
+        id: 'custom_' + Date.now(),
+        title: (currentScheme.schoolType === 'የግል' ? 'የግል ት/ቤት ስርዓተ-ትምህርት' : 'የመንግስት ስርዓተ-ትምህርት'),
+        schoolType: currentScheme.schoolType || 'የመንግስት',
+        t1Label: document.getElementById('sch_t1_label').value || 'ምዘና 1',
+        t1Weight: parseFloat(document.getElementById('sch_t1_weight').value) || 0,
+        asLabel: document.getElementById('sch_as_label').value || 'ምዘና 2',
+        asWeight: parseFloat(document.getElementById('sch_as_weight').value) || 0,
+        midLabel: document.getElementById('sch_mid_label').value || 'አጋማሽ ፈተና',
+        midWeight: parseFloat(document.getElementById('sch_mid_weight').value) || 0,
+        finalLabel: document.getElementById('sch_final_label').value || 'ማጠቃለያ ፈተና',
+        finalWeight: parseFloat(document.getElementById('sch_final_weight').value) || 0
+      };
+
+      saveState();
+      closeSchemeModal();
+      alert('የኢትዮጵያ ስርዓተ-ትምህርት ምዘና ማዋቀሪያው በተሳካ ሁኔታ ተተግብሯል!');
+    }
+
+    function setRole(role) {
+      const label = role === 'admin' ? '👤 ኃላፊ (Admin)' : role === 'teacher' ? '👩‍🏫 መምህር (Teacher)' : '👨‍🎓 ተማሪ (Student)';
+      document.getElementById('currentRoleDisplay').innerText = label;
+      closeRoleModal();
+      alert('ወደ ' + label + ' ሚና በተሳካ ሁኔታ ተቀይሯል!');
+    }
+
+    function saveNewStudent(e) {
+      e.preventDefault();
+      const name = document.getElementById('newStudentName').value;
+      const gender = document.getElementById('newStudentGender').value;
+      const grade = document.getElementById('newStudentGrade').value;
+      const phone = document.getElementById('newStudentPhone').value;
+      const id = 'DIL-00' + (students.length + 1);
+
+      students.push({ id, name, gender, grade, phone, scores: [8.5, 8.5, 25.0, 42.0], status: 'ንቁ' });
+      attendance.push({ name, grade, status: 'Present', note: 'በሰዓቱ ገብቷል' });
+      saveState();
+      closeAddStudentModal();
+      e.target.reset();
+      alert('ተማሪው በተሳካ ሁኔታ ተመዝግቧል!');
+    }
+
+    function shareWebsiteLink() {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(window.location.href);
+        alert('የድረ-ገጹ ሊንክ ኮፒ ተደርጓል! ለተማሪዎችና መምህራን መላክ ይችላሉ።');
+      } else {
+        alert(window.location.href);
+      }
+    }
+
+    // Initialize
+    saveState();
   </script>
 </body>
 </html>

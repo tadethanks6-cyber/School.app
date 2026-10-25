@@ -8,6 +8,8 @@ import com.example.data.model.AttendanceRecord
 import com.example.data.model.SchoolStats
 import com.example.data.model.Staff
 import com.example.data.model.Student
+import com.example.data.model.AssessmentScheme
+import android.content.Context
 import com.example.data.model.StudentGrade
 import com.example.data.model.Subject
 import com.example.data.model.Teacher
@@ -596,7 +598,55 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
     val workloadToEdit = MutableStateFlow<TeacherWorkload?>(null)
 
     val showAddGradeDialog = MutableStateFlow(false)
+    val showAssessmentSchemeDialog = MutableStateFlow(false)
     val selectedStudentForGrades = MutableStateFlow<Student?>(null)
+
+    // Dynamic Assessment Scheme (የኢትዮጵያ ስርዓተ-ትምህርት ውጤት አሰጣጥ ማዋቀሪያ)
+    private val prefs = application.getSharedPreferences("dilijent_school_prefs", Context.MODE_PRIVATE)
+    private val _assessmentScheme = MutableStateFlow(loadAssessmentScheme())
+    val assessmentScheme: StateFlow<AssessmentScheme> = _assessmentScheme.asStateFlow()
+
+    private fun loadAssessmentScheme(): AssessmentScheme {
+        val id = prefs.getString("scheme_id", AssessmentScheme.MOE_STANDARD.id) ?: AssessmentScheme.MOE_STANDARD.id
+        val preset = AssessmentScheme.PRESETS.find { it.id == id }
+        return if (preset != null && id != "custom") {
+            preset
+        } else {
+            AssessmentScheme(
+                id = prefs.getString("scheme_id", "custom") ?: "custom",
+                titleAmharic = prefs.getString("scheme_title_am", "ብጁ ስርዓተ-ትምህርት") ?: "ብጁ ስርዓተ-ትምህርት",
+                titleEnglish = prefs.getString("scheme_title_en", "Custom Assessment Scheme") ?: "Custom Assessment Scheme",
+                schoolType = prefs.getString("scheme_school_type", "የግል") ?: "የግል",
+                test1Label = prefs.getString("scheme_t1_label", "ጥያቄ/ፈተና 1") ?: "ጥያቄ/ፈተና 1",
+                test1Weight = prefs.getFloat("scheme_t1_weight", 10f),
+                assignmentLabel = prefs.getString("scheme_as_label", "የቤት ስራ/ፕሮጀክት") ?: "የቤት ስራ/ፕሮጀክት",
+                assignmentWeight = prefs.getFloat("scheme_as_weight", 10f),
+                midExamLabel = prefs.getString("scheme_mid_label", "አጋማሽ ፈተና") ?: "አጋማሽ ፈተና",
+                midExamWeight = prefs.getFloat("scheme_mid_weight", 30f),
+                finalExamLabel = prefs.getString("scheme_final_label", "ማጠቃለያ ፈተና") ?: "ማጠቃለያ ፈተና",
+                finalExamWeight = prefs.getFloat("scheme_final_weight", 50f)
+            )
+        }
+    }
+
+    fun updateAssessmentScheme(newScheme: AssessmentScheme) {
+        _assessmentScheme.value = newScheme
+        prefs.edit()
+            .putString("scheme_id", newScheme.id)
+            .putString("scheme_title_am", newScheme.titleAmharic)
+            .putString("scheme_title_en", newScheme.titleEnglish)
+            .putString("scheme_school_type", newScheme.schoolType)
+            .putString("scheme_t1_label", newScheme.test1Label)
+            .putFloat("scheme_t1_weight", newScheme.test1Weight)
+            .putString("scheme_as_label", newScheme.assignmentLabel)
+            .putFloat("scheme_as_weight", newScheme.assignmentWeight)
+            .putString("scheme_mid_label", newScheme.midExamLabel)
+            .putFloat("scheme_mid_weight", newScheme.midExamWeight)
+            .putString("scheme_final_label", newScheme.finalExamLabel)
+            .putFloat("scheme_final_weight", newScheme.finalExamWeight)
+            .apply()
+        showAssessmentSchemeDialog.value = false
+    }
 
     // Grades for selected student
     val studentGrades = MutableStateFlow<List<StudentGrade>>(emptyList())
