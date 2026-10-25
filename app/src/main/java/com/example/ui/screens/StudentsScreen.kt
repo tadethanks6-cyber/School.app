@@ -69,7 +69,9 @@ import androidx.compose.ui.unit.sp
 import com.example.data.model.Student
 import com.example.ui.components.EmptyStateCard
 import com.example.ui.components.FilterChipRow
+import com.example.ui.components.PhotoPickerAvatar
 import com.example.ui.components.SchoolSearchBar
+import com.example.ui.components.UserAvatar
 import com.example.ui.theme.EthioGreen
 import com.example.ui.theme.EthioRed
 import com.example.ui.theme.GoldAccent
@@ -275,29 +277,13 @@ fun StudentCardItem(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Gender-tinted Avatar
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (student.gender == "ወንድ" || student.gender.equals("Male", true))
-                                NavyPrimary.copy(alpha = 0.15f)
-                            else
-                                Color(0xFFEC4899).copy(alpha = 0.15f)
-                        )
-                ) {
-                    Text(
-                        text = student.fullName.take(1),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                        color = if (student.gender == "ወንድ" || student.gender.equals("Male", true))
-                            NavyPrimary
-                        else
-                            Color(0xFFBE185D)
-                    )
-                }
+                // Student Avatar (with photo support)
+                UserAvatar(
+                    photoUri = student.photoUri,
+                    name = student.fullName,
+                    gender = student.gender,
+                    size = 46.dp
+                )
 
                 Spacer(modifier = Modifier.width(12.dp))
 
@@ -468,6 +454,40 @@ fun StudentDetailDialog(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // Student Profile Header with Photo
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        UserAvatar(
+                            photoUri = student.photoUri,
+                            name = student.fullName,
+                            gender = student.gender,
+                            size = 80.dp
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text(
+                            text = student.fullName,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "${student.studentIdNumber} • ${student.grade} (${student.section})",
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
                 Card(
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -559,6 +579,7 @@ fun StudentFormDialog(
     onSave: (Student) -> Unit
 ) {
     var fullName by remember { mutableStateOf(initialStudent?.fullName ?: "") }
+    var photoUri by remember { mutableStateOf(initialStudent?.photoUri ?: "") }
     var studentIdNumber by remember {
         mutableStateOf(
             initialStudent?.studentIdNumber ?: "ET-2017-${(100..999).random()}"
@@ -595,7 +616,8 @@ fun StudentFormDialog(
                 parentName = parentName.ifBlank { "አልተገለጸም" },
                 parentPhone = parentPhone,
                 address = address.ifBlank { "አዲስ አበባ" },
-                specialNeeds = specialNeeds
+                specialNeeds = specialNeeds,
+                photoUri = photoUri
             )).copy(
                 fullName = fullName,
                 studentIdNumber = studentIdNumber,
@@ -606,7 +628,8 @@ fun StudentFormDialog(
                 parentName = parentName,
                 parentPhone = parentPhone,
                 address = address,
-                specialNeeds = specialNeeds
+                specialNeeds = specialNeeds,
+                photoUri = photoUri
             )
             onSave(newStudent)
         }
@@ -687,6 +710,17 @@ fun StudentFormDialog(
                         )
                     }
                 }
+
+                // Student Photo Upload & Preview
+                PhotoPickerAvatar(
+                    photoUri = photoUri,
+                    onPhotoSelected = { photoUri = it },
+                    name = fullName,
+                    gender = gender,
+                    isAmharic = isAmharic,
+                    size = 96.dp,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
                 // Full Name
                 OutlinedTextField(

@@ -176,6 +176,7 @@
       <button class="tab-btn" onclick="switchTab('students')">👨‍🎓 የተማሪዎች ዝርዝር (Students)</button>
       <button class="tab-btn" onclick="switchTab('teachers')">👩‍🏫 መምህራን (Teachers)</button>
       <button class="tab-btn" onclick="switchTab('grades')">📝 ውጤት እና ምዘና (Grades)</button>
+      <button class="tab-btn" onclick="switchTab('roster')">📋 የክፍል ኃላፊ ሮስተር (Homeroom Roster)</button>
       <button class="tab-btn" onclick="switchTab('attendance')">📅 የዕለት አቴንዳንስ (Attendance)</button>
       <button class="tab-btn" onclick="switchTab('report')">📜 የውጤት ካርድ (Report Card)</button>
     </div>
@@ -244,7 +245,7 @@
             <thead>
               <tr>
                 <th>መለያ ቁጥር</th>
-                <th>ሙሉ ስም</th>
+                <th>ፎቶ እና ስም</th>
                 <th>ጾታ</th>
                 <th>ክፍል</th>
                 <th>የአሳዳጊ ስልክ</th>
@@ -260,53 +261,34 @@
       </div>
     </div>
 
-    <!-- TAB 3: TEACHERS -->
+    <!-- TAB 3: TEACHERS & STAFF -->
     <div id="tab-teachers" class="tab-content" style="display:none;">
       <div class="panel-card">
         <div class="panel-header">
-          <h3 class="panel-title">የመምህራን እና የክፍል ኃላፊዎች ዝርዝር</h3>
-          <span class="badge badge-primary">ጠቅላላ 54 መምህራን</span>
+          <div>
+            <h3 class="panel-title">የመምህራን እና የአስተዳደር ሰራተኞች ዝርዝር</h3>
+            <p style="font-size:0.78rem; color:var(--text-muted); margin-top:0.2rem;">ፎቶ፣ የስራ መደብ፣ ስልክ እና ኃላፊነት በLocal Storage የሚቀመጥ</p>
+          </div>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+            <span id="totalStaffBadge" class="badge badge-primary">ጠቅላላ 6 ሰራተኞች</span>
+            <button class="btn-primary" onclick="openAddStaffModal()">➕ አዲስ መምህር / ሰራተኛ መዝግብ</button>
+          </div>
         </div>
         <div class="table-responsive">
           <table>
             <thead>
               <tr>
-                <th>የመምህሩ ስም</th>
-                <th>የትምህርት ዓይነት (Subject)</th>
-                <th>ክፍል</th>
+                <th>ፎቶ እና ሙሉ ስም</th>
+                <th>የስራ መደብ (Role)</th>
+                <th>ክፍል / የስራ ዘርፍ</th>
                 <th>ስልክ ቁጥር</th>
-                <th>ኃላፊነት</th>
+                <th>የትምህርት ደረጃ</th>
+                <th>ሁኔታ</th>
+                <th>እርምጃ</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td><strong>መምህር ዳዊት በቀለ</strong></td>
-                <td>Mathematics (ሒሳብ)</td>
-                <td>Grade 11 & 12</td>
-                <td>+251 911 112233</td>
-                <td><span class="badge badge-primary">የክፍል ኃላፊ (12A)</span></td>
-              </tr>
-              <tr>
-                <td><strong>መምህርት ሳራ መኮንን</strong></td>
-                <td>Physics (ፊዚክስ)</td>
-                <td>Grade 10 & 11</td>
-                <td>+251 922 223344</td>
-                <td><span class="badge badge-primary">Dept. Head</span></td>
-              </tr>
-              <tr>
-                <td><strong>መምህር ዮሴፍ ሀይሉ</strong></td>
-                <td>Chemistry (ኬሚስትሪ)</td>
-                <td>Grade 9 & 10</td>
-                <td>+251 933 334455</td>
-                <td><span class="badge badge-success">መምህር</span></td>
-              </tr>
-              <tr>
-                <td><strong>መምህርት ራሔል ተክሌ</strong></td>
-                <td>English (እንግሊዝኛ)</td>
-                <td>Grade 9, 10, 11</td>
-                <td>+251 944 445566</td>
-                <td><span class="badge badge-success">መምህርት</span></td>
-              </tr>
+            <tbody id="staffTableBody">
+              <!-- Dynamic Staff Rows -->
             </tbody>
           </table>
         </div>
@@ -358,6 +340,83 @@
       </div>
     </div>
 
+    <!-- TAB: HOMEROOM ROSTER (የክፍል ኃላፊ ሮስተር ቴብል) -->
+    <div id="tab-roster" class="tab-content" style="display:none;">
+      <div class="panel-card">
+        <div class="panel-header" style="border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
+          <div>
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <span style="font-size:1.5rem;">📋</span>
+              <h3 class="panel-title">የክፍል ኃላፊ የውጤት ሮስተር ቴብል (Homeroom Master Roster Sheet)</h3>
+            </div>
+            <p style="font-size:0.78rem; color:var(--text-muted); margin-top:0.25rem;">
+              በኢትዮጵያ ስርዓተ-ትምህርት ካሪክለም መሰረት የተመደበው ክፍል ተማሪዎች አጠቃላይ ድምር፣ አማካይ እና ደረጃ (Rank)
+            </p>
+          </div>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button class="btn-primary" onclick="window.print()">🖨️ ሮስተር አትም (Print Roster)</button>
+            <button class="btn-secondary" onclick="openAddGradeModal()">➕ ውጤት መዝግብ</button>
+          </div>
+        </div>
+
+        <!-- Filter & Homeroom Teacher Assignment Info Bar -->
+        <div style="background:#F8FAFC; border:1px solid var(--border); border-radius:10px; padding:0.9rem; margin-top:1rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+          <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+            <label style="font-size:0.85rem; font-weight:700; color:var(--primary);">የክፍል ክፍልፋይ ምረጥ (Select Class/Section):</label>
+            <select id="rosterGradeSelect" class="form-control" style="width:auto; min-width:140px; font-weight:600;" onchange="renderHomeroomRoster()">
+              <option value="12A">12A (Natural Science)</option>
+              <option value="12B">12B (Social Science)</option>
+              <option value="11B">11B (Social Science)</option>
+              <option value="10C">10C (General)</option>
+              <option value="9A">9A (General)</option>
+            </select>
+
+            <span id="rosterHomeroomBadge" class="badge badge-primary" style="font-size:0.75rem; padding:0.4rem 0.65rem;">
+              👨‍🏫 የክፍል ኃላፊ፦ መምህር ዳዊት በቀለ
+            </span>
+          </div>
+
+          <div style="display:flex; gap:1rem; align-items:center; flex-wrap:wrap;">
+            <div style="font-size:0.82rem; color:#475569;">
+              ጠቅላላ ተማሪዎች: <strong id="rosterTotalCount" style="color:var(--primary);">0</strong>
+            </div>
+            <div style="font-size:0.82rem; color:#475569;">
+              የክፍል አማካይ: <strong id="rosterClassAvg" style="color:var(--success);">0%</strong>
+            </div>
+            <div style="font-size:0.82rem; color:#475569;">
+              የማለፍ ምጣኔ: <strong id="rosterPassRate" style="color:var(--success);">100%</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Master Roster Table -->
+        <div class="table-responsive" style="max-height:600px; overflow-y:auto; border:1px solid var(--border); border-radius:8px;">
+          <table style="width:100%; border-collapse:collapse; min-width:920px;">
+            <thead>
+              <tr style="background:#1E3A8A; color:white; font-size:0.78rem;">
+                <th style="padding:10px 8px; text-align:center; width:55px;">ደረጃ</th>
+                <th style="padding:10px 8px;">ተማሪ (ስም እና ፎቶ)</th>
+                <th style="padding:10px 8px; text-align:center; width:80px;">መለያ ቁጥር</th>
+                <th style="padding:10px 8px; text-align:center;">ሒሳብ</th>
+                <th style="padding:10px 8px; text-align:center;">እንግሊዝኛ</th>
+                <th style="padding:10px 8px; text-align:center;">ፊዚክስ</th>
+                <th style="padding:10px 8px; text-align:center;">ኬሚስትሪ</th>
+                <th style="padding:10px 8px; text-align:center;">ባዮሎጂ</th>
+                <th style="padding:10px 8px; text-align:center;">ስነ-ዜጋ</th>
+                <th style="padding:10px 8px; text-align:center; background:#172554;">ጠቅላላ (600)</th>
+                <th style="padding:10px 8px; text-align:center; background:#172554;">አማካይ %</th>
+                <th style="padding:10px 8px; text-align:center;">ሁኔታ</th>
+                <th style="padding:10px 8px; text-align:center; width:110px;">የተማሪ ካርድ</th>
+              </tr>
+            </thead>
+            <tbody id="rosterTableBody">
+              <!-- Rendered dynamically via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- TAB 5: ATTENDANCE -->
     <div id="tab-attendance" class="tab-content" style="display:none;">
       <div class="panel-card">
@@ -392,16 +451,21 @@
           <button class="btn-primary" onclick="window.print()">🖨️ ፕሪንት አድርግ (Print)</button>
         </div>
         <div class="report-card-view">
-          <div class="report-header">
-            <h2 style="color:var(--primary); font-size:1.25rem;">ዲሊጀንት አካዳሚ (Dilijent Academy)</h2>
-            <p style="font-size:0.85rem; color:#475569;">የ2017 ዓ.ም የመጀመሪያ ወሰነ-ትምህርት (Semester I) የተማሪ ውጤት መግለጫ</p>
-            <span id="reportCardSchemePill" class="badge badge-primary" style="margin-top:0.3rem;"></span>
+          <div class="report-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+            <div>
+              <h2 style="color:var(--primary); font-size:1.25rem;">ዲሊጀንት አካዳሚ (Dilijent Academy)</h2>
+              <p style="font-size:0.85rem; color:#475569;">የ2017 ዓ.ም የመጀመሪያ ወሰነ-ትምህርት (Semester I) የተማሪ ውጤት መግለጫ</p>
+              <span id="reportCardSchemePill" class="badge badge-primary" style="margin-top:0.3rem;"></span>
+            </div>
+            <div id="reportStudentPhotoBadge">
+              <!-- Rendered via JS -->
+            </div>
           </div>
           <div style="display:flex; justify-content:space-between; margin-bottom:1rem; font-size:0.85rem; flex-wrap:wrap; gap:0.5rem;">
-            <div><strong>የተማሪ ስም:</strong> አቤል ታደሰ (Abel Tadesse)</div>
-            <div><strong>መለያ ቁጥር:</strong> DIL-001</div>
-            <div><strong>ክፍል:</strong> 12A (Natural Science)</div>
-            <div><strong>አማካይ:</strong> 88.5% (ደረጃ: 1ኛ)</div>
+            <div><strong>የተማሪ ስም:</strong> <span id="reportStudentNameDisplay">አቤል ታደሰ</span></div>
+            <div><strong>መለያ ቁጥር:</strong> <span id="reportStudentIdDisplay">DIL-001</span></div>
+            <div><strong>ክፍል:</strong> <span id="reportStudentGradeDisplay">12A (Natural Science)</span></div>
+            <div><strong>አማካይ:</strong> <span id="reportStudentAvgDisplay">88.5% (ደረጃ: 1ኛ)</span></div>
           </div>
           <div class="table-responsive">
             <table>
@@ -577,19 +641,35 @@
     <div class="modal-box">
       <div class="modal-title">➕ አዲስ ተማሪ መመዝገቢያ</div>
       <form onsubmit="saveNewStudent(event)">
+        <!-- Photo Upload Box -->
+        <div class="form-group" style="text-align:center;">
+          <label style="display:block; margin-bottom:0.4rem; font-weight:600;">የተማሪው ፎቶ (ከስልክ ወይም ኮምፒውተር ይጫኑ)</label>
+          <div style="display:flex; flex-direction:column; align-items:center;">
+            <input type="file" id="newStudentPhoto" accept="image/*" style="display:none;" onchange="handleStudentPhotoSelected(event)">
+            <div id="newStudentPhotoPreview" onclick="document.getElementById('newStudentPhoto').click()" style="width:90px; height:90px; border-radius:50%; border:2.5px dashed var(--primary); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; background-size:cover; background-position:center; background-color:#EFF6FF; overflow:hidden; transition:0.2s; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+              <span style="font-size:1.8rem;">📸</span>
+              <span style="font-size:0.65rem; color:var(--primary); font-weight:700;">ፎቶ ምረጥ</span>
+            </div>
+            <div style="margin-top:0.4rem; display:flex; gap:0.4rem;">
+              <button type="button" class="btn-secondary" style="padding:0.25rem 0.6rem; font-size:0.72rem;" onclick="document.getElementById('newStudentPhoto').click()">📁 ፎቶ ምረጥ</button>
+              <button type="button" class="btn-secondary" style="padding:0.25rem 0.6rem; font-size:0.72rem; color:var(--danger);" onclick="clearStudentPhoto()">🗑️ አስወግድ</button>
+            </div>
+          </div>
+        </div>
+
         <div class="form-group">
-          <label>የተማሪው ሙሉ ስም</label>
+          <label>የተማሪው ሙሉ ስም *</label>
           <input type="text" id="newStudentName" class="form-control" required placeholder="ለምሳሌ፡ ዮሴፍ ሀጎስ">
         </div>
         <div class="form-group">
-          <label>ጾታ</label>
+          <label>ጾታ *</label>
           <select id="newStudentGender" class="form-control">
             <option value="ወንድ">ወንድ (Male)</option>
             <option value="ሴት">ሴት (Female)</option>
           </select>
         </div>
         <div class="form-group">
-          <label>ክፍል እና ክፍልፋይ</label>
+          <label>ክፍል እና ክፍልፋይ *</label>
           <select id="newStudentGrade" class="form-control">
             <option value="12A">12A (Natural Science)</option>
             <option value="12B">12B (Social Science)</option>
@@ -600,12 +680,85 @@
           </select>
         </div>
         <div class="form-group">
-          <label>የወላጅ/አሳዳጊ ስልክ ቁጥር</label>
+          <label>የወላጅ/አሳዳጊ ስልክ ቁጥር *</label>
           <input type="tel" id="newStudentPhone" class="form-control" required placeholder="+251 9... ">
         </div>
         <div class="modal-actions">
           <button type="button" class="btn-secondary" onclick="closeAddStudentModal()">ሰርዝ (Cancel)</button>
-          <button type="submit" class="btn-primary">መዝግብ (Save)</button>
+          <button type="submit" class="btn-primary">💾 መዝግብ (Save Student)</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add Staff/Teacher -->
+  <div id="addStaffModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">➕ አዲስ መምህር / ሰራተኛ መመዝገቢያ</div>
+      <p style="font-size:0.8rem; color:#475569; margin-bottom:1rem;">የመምህራን ወይም የሰራተኛውን ሙሉ መረጃ እና ፎቶ ያስገቡ።</p>
+      <form onsubmit="saveNewStaff(event)">
+        <!-- Photo Upload Box -->
+        <div class="form-group" style="text-align:center;">
+          <label style="display:block; margin-bottom:0.4rem; font-weight:600;">የሰራተኛው / መምህሩ ፎቶ (ከስልክ ወይም ኮምፒውተር)</label>
+          <div style="display:flex; flex-direction:column; align-items:center;">
+            <input type="file" id="newStaffPhotoInput" accept="image/*" style="display:none;" onchange="handleStaffPhotoSelected(event)">
+            <div id="newStaffPhotoPreview" onclick="document.getElementById('newStaffPhotoInput').click()" style="width:90px; height:90px; border-radius:50%; border:2.5px dashed var(--primary); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; background-size:cover; background-position:center; background-color:#EFF6FF; overflow:hidden; transition:0.2s; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+              <span style="font-size:1.8rem;">📸</span>
+              <span style="font-size:0.65rem; color:var(--primary); font-weight:700;">ፎቶ ጫን</span>
+            </div>
+            <div style="margin-top:0.4rem; display:flex; gap:0.4rem;">
+              <button type="button" class="btn-secondary" style="padding:0.25rem 0.6rem; font-size:0.72rem;" onclick="document.getElementById('newStaffPhotoInput').click()">📁 ፎቶ ምረጥ</button>
+              <button type="button" class="btn-secondary" style="padding:0.25rem 0.6rem; font-size:0.72rem; color:var(--danger);" onclick="clearStaffPhoto()">🗑️ አስወግድ</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>ሙሉ ስም *</label>
+          <input type="text" id="newStaffName" class="form-control" required placeholder="ለምሳሌ፡ መምህር ዳዊት በቀለ">
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+          <div class="form-group">
+            <label>የስራ መደብ (Role) *</label>
+            <select id="newStaffRole" class="form-control">
+              <option value="መምህር">መምህር (Teacher)</option>
+              <option value="የክፍል ኃላፊ">የክፍል ኃላፊ (Homeroom)</option>
+              <option value="የት/ክፍል ኃላፊ">የት/ክፍል ኃላፊ (Dept. Head)</option>
+              <option value="ርዕሰ መምህር">ርዕሰ መምህር (Principal)</option>
+              <option value="ምክትል ርዕሰ መምህር">ምክትል ርዕሰ መምህር</option>
+              <option value="ዋና ጸሐፊ">ዋና ጸሐፊ (Secretary)</option>
+              <option value="ፋይናንስ/ሂሳብ ሹም">ፋይናንስ / ሂሳብ ሹም</option>
+              <option value="የጥበቃ ኃላፊ">የጥበቃ ኃላፊ</option>
+              <option value="የፅዳት ሰራተኛ">የፅዳት ሰራተኛ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>የትምህርት/ስራ ዘርፍ *</label>
+            <input type="text" id="newStaffDept" class="form-control" required placeholder="ለምሳሌ፡ Mathematics ወይም አስተዳደር">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+          <div class="form-group">
+            <label>ስልክ ቁጥር *</label>
+            <input type="tel" id="newStaffPhone" class="form-control" required placeholder="+251 911 000000">
+          </div>
+          <div class="form-group">
+            <label>የትምህርት ደረጃ</label>
+            <select id="newStaffQual" class="form-control">
+              <option value="ባችለር ዲግሪ">ባችለር ዲግሪ (BA/BSc)</option>
+              <option value="ማስተርስ">ማስተርስ (MA/MSc)</option>
+              <option value="ዲፕሎማ">ዲፕሎማ (Diploma)</option>
+              <option value="ሰርተፊኬት">ሰርተፊኬት</option>
+              <option value="ሌላ">ሌላ</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeAddStaffModal()">ሰርዝ (Cancel)</button>
+          <button type="submit" class="btn-primary">💾 መዝግብ (Save Staff)</button>
         </div>
       </form>
     </div>
@@ -629,6 +782,122 @@
       </div>
       <div class="modal-actions">
         <button type="button" class="btn-secondary" onclick="closeRoleModal()">ዝጋ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Official Ethiopian Curriculum Report Card (ኦፊሴላዊ የኢትዮጵያ ካሪክለም የተማሪ ካርድ) -->
+  <div id="ethiopianReportCardModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 780px; width: 95%; background: white; padding: 1.5rem; border: 2px solid #CBD5E1; box-shadow: 0 10px 30px rgba(0,0,0,0.25);">
+      
+      <!-- Ethiopian Flag Header Strip -->
+      <div style="display:flex; height:5px; border-radius:3px; overflow:hidden; margin-bottom:1rem;">
+        <div style="flex:1; background:#078930;"></div>
+        <div style="flex:1; background:#FCDD09;"></div>
+        <div style="flex:1; background:#DA121A;"></div>
+      </div>
+
+      <!-- Report Card Top Header -->
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #E2E8F0; padding-bottom:0.75rem; margin-bottom:1rem; flex-wrap:wrap; gap:0.75rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <div style="font-size:2.4rem;">🎓</div>
+          <div>
+            <div style="font-size:0.7rem; color:#64748B; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">
+              የኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ የትምህርት ሚኒስቴር
+            </div>
+            <h2 style="font-size:1.35rem; color:#1E3A8A; margin:0.15rem 0; font-weight:800;">
+              ዲሊጀንት አካዳሚ (DILIJENT ACADEMY)
+            </h2>
+            <div style="font-size:0.8rem; font-weight:700; color:#078930;">
+              📜 ኦፊሴላዊ የተማሪ የውጤት እና የባህሪ መግለጫ ካርድ (OFFICIAL REPORT CARD)
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Photo from Local Storage -->
+        <div id="modalReportStudentPhotoContainer" style="text-align:center;">
+          <!-- Dynamically populated with student photo or avatar -->
+        </div>
+      </div>
+
+      <!-- Student Metadata Box -->
+      <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:0.75rem 1rem; margin-bottom:1rem; display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.6rem; font-size:0.82rem;">
+        <div><strong>የተማሪው ሙሉ ስም:</strong> <span id="cardModalName" style="color:#1E3A8A; font-weight:700;">-</span></div>
+        <div><strong>መለያ ቁጥር (ID):</strong> <span id="cardModalId" style="font-weight:700;">-</span></div>
+        <div><strong>ክፍል እና ክፍልፋይ:</strong> <span id="cardModalGrade" style="font-weight:700;">-</span></div>
+        <div><strong>ጾታ:</strong> <span id="cardModalGender">-</span></div>
+        <div><strong>የትምህርት ዘመን:</strong> <span>2017 ዓ.ም (2025/26)</span></div>
+        <div><strong>ወሰነ-ትምህርት:</strong> <span>1ኛ ሴሚስተር (Semester I)</span></div>
+        <div><strong>የክፍል ደረጃ (Rank):</strong> <span id="cardModalRank" class="badge badge-warning" style="font-size:0.8rem; font-weight:800;">-</span></div>
+        <div><strong>አማካይ ውጤት:</strong> <span id="cardModalAvg" style="color:#078930; font-weight:800; font-size:0.9rem;">-</span></div>
+      </div>
+
+      <!-- Subject Marks Breakdown Table -->
+      <div class="table-responsive" style="margin-bottom:1rem; border:1px solid #CBD5E1; border-radius:6px; overflow:hidden;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
+          <thead>
+            <tr style="background:#1E3A8A; color:white; font-size:0.75rem;">
+              <th style="padding:7px 8px;">የትምህርት ዓይነት</th>
+              <th style="padding:7px 6px; text-align:center;" id="cardModalThQuiz">ምዘና 1 (10%)</th>
+              <th style="padding:7px 6px; text-align:center;" id="cardModalThAssig">የቤት ስራ (10%)</th>
+              <th style="padding:7px 6px; text-align:center;" id="cardModalThMid">አጋማሽ (30%)</th>
+              <th style="padding:7px 6px; text-align:center;" id="cardModalThFinal">ማጠቃለያ (50%)</th>
+              <th style="padding:7px 6px; text-align:center; background:#172554;">ድምር (100%)</th>
+              <th style="padding:7px 6px; text-align:center;">ፊደል</th>
+              <th style="padding:7px 6px; text-align:center;">ደረጃ</th>
+              <th style="padding:7px 8px;">አስተያየት</th>
+            </tr>
+          </thead>
+          <tbody id="cardModalSubjectsBody">
+            <!-- Dynamically populated via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Conduct & Attendance Box -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
+        <div style="background:#F1F5F9; border-radius:8px; padding:0.65rem 0.85rem; font-size:0.78rem;">
+          <strong style="color:#1E3A8A; display:block; margin-bottom:0.3rem;">🌟 የስነ-ምግባር እና የጠባይ ውጤት (Conduct):</strong>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.25rem;">
+            <div>ታታሪነት: <strong>A (እጅግ በጣም ጥሩ)</strong></div>
+            <div>ታዛዥነት: <strong>A (ናሙና)</strong></div>
+            <div>ትብብር: <strong>A (ንቁ)</strong></div>
+            <div>ንጽህና: <strong>A (ጥሩ)</strong></div>
+          </div>
+        </div>
+
+        <div style="background:#F1F5F9; border-radius:8px; padding:0.65rem 0.85rem; font-size:0.78rem;">
+          <strong style="color:#1E3A8A; display:block; margin-bottom:0.3rem;">📅 የቀናት መገኘት (Attendance):</strong>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.25rem;">
+            <div>የት/ቤት ቀናት: <strong>90</strong></div>
+            <div>የተገኘበት: <strong style="color:#078930;">88</strong></div>
+            <div>የቀረበት: <strong style="color:#B91C1C;">2</strong></div>
+            <div>የፈቃድ: <strong>1</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signature Blocks -->
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; border-top:1px solid #E2E8F0; padding-top:0.75rem; margin-top:0.5rem; font-size:0.78rem; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <div>የክፍል ኃላፊ መምህር፦ <strong id="cardModalHomeroomTeacher">መምህር ዳዊት በቀለ</strong></div>
+          <div style="margin-top:0.4rem; color:#64748B;">ፊርማ፦ __________________ ቀን፦ _________</div>
+        </div>
+        <div>
+          <div>የርዕሰ-መምህር ስም፦ <strong>አቶ ሙሉጌታ ከበደ</strong></div>
+          <div style="margin-top:0.4rem; color:#64748B;">ፊርማና ማህተም፦ __________________</div>
+        </div>
+        <div>
+          <div>የወላጅ/አሳዳጊ ስም፦ __________________</div>
+          <div style="margin-top:0.4rem; color:#64748B;">ፊርማ፦ __________________</div>
+        </div>
+      </div>
+
+      <!-- Modal Action Buttons -->
+      <div class="modal-actions" style="border-top:1px solid #E2E8F0; padding-top:0.75rem; margin-top:1rem;">
+        <button type="button" class="btn-secondary" onclick="closeReportCardModal()">❌ ዝጋ (Close)</button>
+        <button type="button" class="btn-secondary" onclick="shareWebsiteLink()">📤 ሊንክ አጋራ</button>
+        <button type="button" class="btn-primary" onclick="window.print()">🖨️ ካርድ አትም (Print)</button>
       </div>
     </div>
   </div>
@@ -683,11 +952,20 @@
 
     // Initial Seed Data with LocalStorage persistence
     let students = JSON.parse(localStorage.getItem('dilijent_students')) || [
-      { id: 'DIL-001', name: 'አቤል ታደሰ', gender: 'ወንድ', grade: '12A', phone: '+251 911 234567', scores: [9.5, 9.5, 28.5, 47.0], status: 'ንቁ' },
-      { id: 'DIL-002', name: 'ሄለን ገብሬ', gender: 'ሴት', grade: '11B', phone: '+251 922 345678', scores: [9.0, 9.0, 26.0, 44.0], status: 'ንቁ' },
-      { id: 'DIL-003', name: 'ናሆም በቀለ', gender: 'ወንድ', grade: '10C', phone: '+251 933 456789', scores: [7.5, 8.0, 22.0, 38.0], status: 'ንቁ' },
-      { id: 'DIL-004', name: 'ቤተልሔም ሰለሞን', gender: 'ሴት', grade: '9A', phone: '+251 944 567890', scores: [9.0, 9.0, 27.5, 46.0], status: 'ንቁ' },
-      { id: 'DIL-005', name: 'ዮናስ አለሙ', gender: 'ወንድ', grade: '12B', phone: '+251 955 678901', scores: [8.5, 8.0, 24.0, 42.0], status: 'ንቁ' }
+      { id: 'DIL-001', name: 'አቤል ታደሰ', gender: 'ወንድ', grade: '12A', phone: '+251 911 234567', scores: [9.5, 9.5, 28.5, 47.0], photo: '', status: 'ንቁ' },
+      { id: 'DIL-002', name: 'ሄለን ገብሬ', gender: 'ሴት', grade: '11B', phone: '+251 922 345678', scores: [9.0, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
+      { id: 'DIL-003', name: 'ናሆም በቀለ', gender: 'ወንድ', grade: '10C', phone: '+251 933 456789', scores: [7.5, 8.0, 22.0, 38.0], photo: '', status: 'ንቁ' },
+      { id: 'DIL-004', name: 'ቤተልሔም ሰለሞን', gender: 'ሴት', grade: '9A', phone: '+251 944 567890', scores: [9.0, 9.0, 27.5, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'DIL-005', name: 'ዮናስ አለሙ', gender: 'ወንድ', grade: '12B', phone: '+251 955 678901', scores: [8.5, 8.0, 24.0, 42.0], photo: '', status: 'ንቁ' }
+    ];
+
+    let staffList = JSON.parse(localStorage.getItem('dilijent_staff_list')) || [
+      { id: 'STF-001', name: 'መምህር ዳዊት በቀለ', role: 'የክፍል ኃላፊ (12A)', dept: 'Mathematics (ሒሳብ)', phone: '+251 911 112233', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' },
+      { id: 'STF-002', name: 'መምህርት ሳራ መኮንን', role: 'የት/ክፍል ኃላፊ', dept: 'Physics (ፊዚክስ)', phone: '+251 922 223344', qual: 'ማስተርስ', photo: '', status: 'ንቁ' },
+      { id: 'STF-003', name: 'መምህር ዮሴፍ ሀይሉ', role: 'መምህር', dept: 'Chemistry (ኬሚስትሪ)', phone: '+251 933 334455', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' },
+      { id: 'STF-004', name: 'መምህርት ራሔል ተክሌ', role: 'መምህርት', dept: 'English (እንግሊዝኛ)', phone: '+251 944 445566', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' },
+      { id: 'STF-005', name: 'ወ/ሮ አለምነሽ ካሳሁን', role: 'ዋና ጸሐፊ', dept: 'አስተዳደር እና ፋይናንስ', phone: '+251 955 556677', qual: 'ዲፕሎማ', photo: '', status: 'ንቁ' },
+      { id: 'STF-006', name: 'አቶ አበራ ተፈራ', role: 'የጥበቃ ኃላፊ', dept: 'አገልግሎትና ደህንነት', phone: '+251 966 667788', qual: '12ኛ ያጠናቀቀ', photo: '', status: 'ንቁ' }
     ];
 
     let attendance = JSON.parse(localStorage.getItem('dilijent_attendance')) || [
@@ -718,12 +996,15 @@
 
     function saveState() {
       localStorage.setItem('dilijent_students', JSON.stringify(students));
+      localStorage.setItem('dilijent_staff_list', JSON.stringify(staffList));
       localStorage.setItem('dilijent_attendance', JSON.stringify(attendance));
       localStorage.setItem('dilijent_assessment_scheme', JSON.stringify(currentScheme));
       updateSchemeUI();
       renderDashboard();
       renderStudents();
+      renderStaff();
       renderGrades();
+      renderHomeroomRoster();
       renderAttendance();
       renderReportCard();
     }
@@ -744,17 +1025,30 @@
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       const target = document.getElementById('tab-' + tabId);
       if (target) target.style.display = 'block';
-      event.currentTarget.classList.add('active');
+      if (tabId === 'roster') {
+        renderHomeroomRoster();
+      }
+      if (window.event && window.event.currentTarget) {
+        window.event.currentTarget.classList.add('active');
+      }
     }
 
     function renderDashboard() {
       const tbody = document.getElementById('dashboardRecentTable');
-      tbody.innerHTML = students.slice(0, 4).map(s => {
+      tbody.innerHTML = students.slice(0, 5).map(s => {
         const total = calculateTotal(s.scores);
         const letter = getLetter(total);
+        const avatar = s.photo
+          ? `<img src="${s.photo}" alt="${s.name}" style="width:28px; height:28px; border-radius:50%; object-fit:cover; margin-right:6px; vertical-align:middle;">`
+          : `<span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:${s.gender === 'ሴት' ? '#FCE7F3' : '#DBEAFE'}; color:${s.gender === 'ሴት' ? '#BE185D' : '#1E40AF'}; font-weight:bold; font-size:0.75rem; margin-right:6px; vertical-align:middle;">${s.name.charAt(0)}</span>`;
         return `
           <tr>
-            <td><strong>${s.name}</strong></td>
+            <td>
+              <div style="display:flex; align-items:center;">
+                ${avatar}
+                <strong>${s.name}</strong>
+              </div>
+            </td>
             <td>${s.id}</td>
             <td>${s.grade}</td>
             <td><strong>${total}%</strong></td>
@@ -763,21 +1057,71 @@
         `;
       }).join('');
       document.getElementById('totalStudentsCount').innerText = students.length;
+      if (document.getElementById('totalStaffBadge')) {
+        document.getElementById('totalStaffBadge').innerText = `ጠቅላላ ${staffList.length} ሰራተኞች`;
+      }
     }
 
     function renderStudents() {
       const tbody = document.getElementById('studentsTableBody');
-      tbody.innerHTML = students.map((s, idx) => `
+      tbody.innerHTML = students.map((s, idx) => {
+        const avatar = s.photo
+          ? `<img src="${s.photo}" alt="${s.name}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid var(--accent); vertical-align:middle; margin-right:8px; box-shadow:0 1px 4px rgba(0,0,0,0.1);">`
+          : `<span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; background:${s.gender === 'ሴት' ? '#FCE7F3' : '#DBEAFE'}; color:${s.gender === 'ሴት' ? '#BE185D' : '#1E40AF'}; font-weight:bold; font-size:0.85rem; margin-right:8px; vertical-align:middle;">${s.name.charAt(0)}</span>`;
+        return `
         <tr>
-          <td>${s.id}</td>
-          <td><strong>${s.name}</strong></td>
+          <td><span class="badge badge-primary">${s.id}</span></td>
+          <td>
+            <div style="display:flex; align-items:center;">
+              ${avatar}
+              <div>
+                <strong>${s.name}</strong>
+                ${s.photo ? '<br><small style="color:var(--success); font-size:0.68rem; font-weight:600;">✓ ፎቶ ተሰቅሏል</small>' : ''}
+              </div>
+            </div>
+          </td>
           <td>${s.gender}</td>
           <td>${s.grade}</td>
           <td>${s.phone}</td>
           <td><span class="badge badge-success">${s.status}</span></td>
-          <td><button class="btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.75rem;" onclick="removeStudent(${idx})">ሰርዝ</button></td>
+          <td>
+            <button class="btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.75rem;" onclick="removeStudent(${idx})">🗑️ ሰርዝ</button>
+          </td>
         </tr>
-      `).join('');
+      `}).join('');
+    }
+
+    function renderStaff() {
+      const tbody = document.getElementById('staffTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = staffList.map((st, idx) => {
+        const avatar = st.photo
+          ? `<img src="${st.photo}" alt="${st.name}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid var(--accent); vertical-align:middle; margin-right:8px; box-shadow:0 1px 4px rgba(0,0,0,0.1);">`
+          : `<span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; background:#FEF3C7; color:#B45309; font-weight:bold; font-size:0.85rem; margin-right:8px; vertical-align:middle;">${st.name.replace('መምህር ', '').replace('መምህርት ', '').replace('አቶ ', '').replace('ወ/ሮ ', '').charAt(0)}</span>`;
+        return `
+        <tr>
+          <td>
+            <div style="display:flex; align-items:center;">
+              ${avatar}
+              <div>
+                <strong>${st.name}</strong>
+                <br><small style="color:#64748B;">${st.id}</small>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge badge-primary">${st.role}</span></td>
+          <td>${st.dept}</td>
+          <td><a href="tel:${st.phone}" style="color:var(--primary); text-decoration:none; font-weight:600;">${st.phone}</a></td>
+          <td><span class="badge badge-warning">${st.qual}</span></td>
+          <td><span class="badge badge-success">${st.status}</span></td>
+          <td>
+            <button class="btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.75rem; color:var(--danger);" onclick="removeStaff(${idx})">🗑️ ሰርዝ</button>
+          </td>
+        </tr>
+      `}).join('');
+      if (document.getElementById('totalStaffBadge')) {
+        document.getElementById('totalStaffBadge').innerText = `ጠቅላላ ${staffList.length} ሰራተኞች`;
+      }
     }
 
     function renderGrades() {
@@ -869,6 +1213,29 @@
           </tr>
         `;
       }).join('');
+
+      // Display student photo and info in report card header
+      const targetStudent = students[0] || { name: 'አቤል ታደሰ', id: 'DIL-001', grade: '12A' };
+      document.getElementById('reportStudentNameDisplay').innerText = targetStudent.name;
+      document.getElementById('reportStudentIdDisplay').innerText = targetStudent.id;
+      document.getElementById('reportStudentGradeDisplay').innerText = targetStudent.grade;
+      const photoBadge = document.getElementById('reportStudentPhotoBadge');
+      if (photoBadge) {
+        if (targetStudent.photo) {
+          photoBadge.innerHTML = `
+            <div style="text-align:center;">
+              <img src="${targetStudent.photo}" alt="${targetStudent.name}" style="width:72px; height:72px; border-radius:50%; object-fit:cover; border:2.5px solid var(--accent); box-shadow:0 2px 6px rgba(0,0,0,0.15);">
+              <div style="font-size:0.65rem; color:#475569; font-weight:600; margin-top:2px;">የተማሪ ፎቶ</div>
+            </div>
+          `;
+        } else {
+          photoBadge.innerHTML = `
+            <div style="width:68px; height:68px; border-radius:50%; background:#EFF6FF; border:1.5px dashed #93C5FD; display:flex; align-items:center; justify-content:center; color:#1E40AF; font-size:1.6rem; box-shadow:0 2px 6px rgba(0,0,0,0.06);">
+              🎓
+            </div>
+          `;
+        }
+      }
     }
 
     function renderAttendance() {
@@ -895,6 +1262,222 @@
       const curr = order.indexOf(attendance[index].status);
       attendance[index].status = order[(curr + 1) % order.length];
       saveState();
+    }
+
+    // Homeroom Master Roster Generator (የክፍል ኃላፊ ሮስተር ማመንጫ)
+    function renderHomeroomRoster() {
+      const select = document.getElementById('rosterGradeSelect');
+      const selectedGrade = select ? select.value : '12A';
+
+      // Find homeroom teacher assigned to this grade
+      const hrTeacher = staffList.find(s => s.role.includes('የክፍል ኃላፊ') && (s.role.includes(selectedGrade) || s.dept.includes(selectedGrade)))
+        || staffList.find(s => s.role.includes('የክፍል ኃላፊ'))
+        || { name: 'መምህር ዳዊት በቀለ' };
+      
+      const badge = document.getElementById('rosterHomeroomBadge');
+      if (badge) {
+        badge.innerText = `👨‍🏫 የክፍል ኃላፊ፦ ${hrTeacher.name} (${selectedGrade})`;
+      }
+
+      // Filter students of this grade or all students if class has few
+      let classStudents = students.filter(s => s.grade === selectedGrade);
+      if (classStudents.length === 0) {
+        classStudents = students;
+      }
+
+      // Standard subject list for Ethiopian curriculum
+      const subjects = ['ሒሳብ', 'እንግሊዝኛ', 'ፊዚክስ', 'ኬሚስትሪ', 'ባዮሎጂ', 'ስነ-ዜጋ'];
+
+      // Generate composite scores for each student
+      const rosterData = classStudents.map(student => {
+        const baseTotal = parseFloat(calculateTotal(student.scores));
+        const subScores = subjects.map((sub, idx) => {
+          const variance = ((student.name.charCodeAt(0) + idx * 7) % 15) - 7;
+          let s = Math.min(100, Math.max(40, baseTotal + variance));
+          return Math.round(s * 10) / 10;
+        });
+
+        const totalSum = subScores.reduce((a, b) => a + b, 0);
+        const avg = Math.round((totalSum / subjects.length) * 10) / 10;
+        const isPassing = avg >= 50;
+
+        return {
+          student,
+          subScores,
+          totalSum: Math.round(totalSum * 10) / 10,
+          avg,
+          isPassing
+        };
+      });
+
+      // Sort by average descending to determine rank
+      rosterData.sort((a, b) => b.avg - a.avg);
+
+      // Assign ranks
+      rosterData.forEach((row, i) => {
+        row.rank = i + 1;
+      });
+
+      // Summary statistics
+      if (document.getElementById('rosterTotalCount')) {
+        document.getElementById('rosterTotalCount').innerText = `${rosterData.length} ተማሪዎች`;
+      }
+      if (document.getElementById('rosterClassAvg')) {
+        const classAvg = rosterData.length > 0 ? (rosterData.reduce((acc, r) => acc + r.avg, 0) / rosterData.length).toFixed(1) : '0';
+        document.getElementById('rosterClassAvg').innerText = `${classAvg}%`;
+      }
+      if (document.getElementById('rosterPassRate')) {
+        const passCount = rosterData.filter(r => r.isPassing).length;
+        const rate = rosterData.length > 0 ? Math.round((passCount / rosterData.length) * 100) : 100;
+        document.getElementById('rosterPassRate').innerText = `${rate}%`;
+      }
+
+      // Render table rows
+      const tbody = document.getElementById('rosterTableBody');
+      if (!tbody) return;
+
+      tbody.innerHTML = rosterData.map(row => {
+        const s = row.student;
+        const rankBadge = row.rank === 1
+          ? '<span style="background:#FEF3C7; color:#B45309; padding:2px 8px; border-radius:12px; font-weight:800; font-size:0.8rem; border:1px solid #FCD34D;">🥇 1ኛ</span>'
+          : row.rank === 2
+          ? '<span style="background:#F1F5F9; color:#475569; padding:2px 8px; border-radius:12px; font-weight:800; font-size:0.8rem; border:1px solid #CBD5E1;">🥈 2ኛ</span>'
+          : row.rank === 3
+          ? '<span style="background:#FFF7ED; color:#C2410C; padding:2px 8px; border-radius:12px; font-weight:800; font-size:0.8rem; border:1px solid #FDBA74;">🥉 3ኛ</span>'
+          : `<span style="font-weight:700; color:#64748B;">${row.rank}ኛ</span>`;
+
+        const avatar = s.photo
+          ? `<img src="${s.photo}" alt="${s.name}" style="width:30px; height:30px; border-radius:50%; object-fit:cover; margin-right:8px; vertical-align:middle; border:1.5px solid var(--accent);">`
+          : `<span style="display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:50%; background:${s.gender === 'ሴት' ? '#FCE7F3' : '#DBEAFE'}; color:${s.gender === 'ሴት' ? '#BE185D' : '#1E40AF'}; font-weight:bold; font-size:0.75rem; margin-right:8px; vertical-align:middle;">${s.name.charAt(0)}</span>`;
+
+        const subjectTds = row.subScores.map(sc => 
+          `<td style="text-align:center; font-weight:600; color:${sc >= 50 ? '#0F172A' : '#DC2626'}; font-size:0.78rem;">${sc}</td>`
+        ).join('');
+
+        return `
+          <tr style="border-bottom:1px solid var(--border); ${row.rank === 1 ? 'background:#FFFBEB;' : ''}">
+            <td style="text-align:center; padding:8px 4px;">${rankBadge}</td>
+            <td style="padding:8px 6px;">
+              <div style="display:flex; align-items:center;">
+                ${avatar}
+                <div>
+                  <strong style="color:#0F172A; font-size:0.82rem;">${s.name}</strong>
+                  <div style="font-size:0.68rem; color:#64748B;">${s.gender} • ${s.grade}</div>
+                </div>
+              </div>
+            </td>
+            <td style="text-align:center; font-size:0.75rem; color:#64748B; padding:8px 4px;">${s.id}</td>
+            ${subjectTds}
+            <td style="text-align:center; font-weight:800; color:#1E3A8A; background:#F8FAFC; padding:8px 4px;">${row.totalSum}</td>
+            <td style="text-align:center; font-weight:800; color:${row.avg >= 50 ? '#078930' : '#DC2626'}; background:#F8FAFC; padding:8px 4px;">${row.avg}%</td>
+            <td style="text-align:center; padding:8px 4px;">
+              <span class="badge ${row.isPassing ? 'badge-success' : 'badge-danger'}">
+                ${row.isPassing ? 'አልፏል' : 'ደግሟል'}
+              </span>
+            </td>
+            <td style="text-align:center; padding:8px 4px;">
+              <button class="btn-primary" style="padding:0.3rem 0.6rem; font-size:0.72rem; white-space:nowrap; background:#1E3A8A;" onclick="openStudentReportCard('${s.id}')">
+                🪪 ካርድ
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Dedicated Ethiopian Curriculum Report Card Dialog Handler
+    function openStudentReportCard(studentId) {
+      const student = students.find(s => s.id === studentId) || students[0];
+      if (!student) return;
+
+      document.getElementById('cardModalName').innerText = student.name;
+      document.getElementById('cardModalId').innerText = student.id;
+      document.getElementById('cardModalGrade').innerText = student.grade;
+      document.getElementById('cardModalGender').innerText = student.gender || 'ወንድ';
+
+      // Photo handling from local storage
+      const photoBox = document.getElementById('modalReportStudentPhotoContainer');
+      if (photoBox) {
+        if (student.photo) {
+          photoBox.innerHTML = `
+            <img src="${student.photo}" alt="${student.name}" style="width:75px; height:75px; border-radius:50%; object-fit:cover; border:3px solid #FCDD09; box-shadow:0 3px 8px rgba(0,0,0,0.18);">
+            <div style="font-size:0.65rem; color:#64748B; font-weight:700; margin-top:2px;">የተማሪው ፎቶ</div>
+          `;
+        } else {
+          photoBox.innerHTML = `
+            <div style="width:75px; height:75px; border-radius:50%; background:#EFF6FF; border:2px dashed #93C5FD; display:flex; align-items:center; justify-content:center; color:#1E40AF; font-size:1.8rem; margin:auto;">
+              👨‍🎓
+            </div>
+            <div style="font-size:0.65rem; color:#64748B; font-weight:700; margin-top:2px;">የተማሪው ፎቶ</div>
+          `;
+        }
+      }
+
+      // Update Table Headers based on Current Scheme
+      document.getElementById('cardModalThQuiz').innerText = `${currentScheme.t1Label} (${currentScheme.t1Weight}%)`;
+      document.getElementById('cardModalThAssig').innerText = `${currentScheme.asLabel} (${currentScheme.asWeight}%)`;
+      document.getElementById('cardModalThMid').innerText = `${currentScheme.midLabel} (${currentScheme.midWeight}%)`;
+      document.getElementById('cardModalThFinal').innerText = `${currentScheme.finalLabel} (${currentScheme.finalWeight}%)`;
+
+      // Subjects Breakdown for this student
+      const subjects = [
+        { name: 'ሒሳብ (Mathematics)', base: [student.scores[0], student.scores[1], student.scores[2], student.scores[3]] },
+        { name: 'እንግሊዝኛ (English)', base: [student.scores[0] * 0.95, student.scores[1] * 0.98, student.scores[2] * 0.92, student.scores[3] * 0.96] },
+        { name: 'ፊዚክስ (Physics)', base: [student.scores[0] * 0.9, student.scores[1] * 0.92, student.scores[2] * 0.88, student.scores[3] * 0.9] },
+        { name: 'ኬሚስትሪ (Chemistry)', base: [student.scores[0] * 0.92, student.scores[1] * 0.9, student.scores[2] * 0.91, student.scores[3] * 0.93] },
+        { name: 'ባዮሎጂ (Biology)', base: [student.scores[0] * 0.96, student.scores[1] * 0.95, student.scores[2] * 0.93, student.scores[3] * 0.95] },
+        { name: 'ስነ-ዜጋ (Civics)', base: [student.scores[0] * 0.98, student.scores[1] * 0.97, student.scores[2] * 0.95, student.scores[3] * 0.97] }
+      ];
+
+      let grandTotalSum = 0;
+
+      const tbody = document.getElementById('cardModalSubjectsBody');
+      tbody.innerHTML = subjects.map((sub, idx) => {
+        const q = Math.min(currentScheme.t1Weight, ((sub.base[0] || 9) * (currentScheme.t1Weight / 10))).toFixed(1);
+        const a = Math.min(currentScheme.asWeight, ((sub.base[1] || 9) * (currentScheme.asWeight / 10))).toFixed(1);
+        const m = Math.min(currentScheme.midWeight, ((sub.base[2] || 27) * (currentScheme.midWeight / 30))).toFixed(1);
+        const f = Math.min(currentScheme.finalWeight, ((sub.base[3] || 45) * (currentScheme.finalWeight / 50))).toFixed(1);
+        const tot = (parseFloat(q) + parseFloat(a) + parseFloat(m) + parseFloat(f)).toFixed(1);
+        grandTotalSum += parseFloat(tot);
+        const lettr = getLetter(tot);
+        const subRank = (idx + 1) + 'ኛ';
+        const remark = parseFloat(tot) >= 85 ? 'እጅግ በጣም ጥሩ' : parseFloat(tot) >= 70 ? 'በጣም ጥሩ' : parseFloat(tot) >= 50 ? 'አጥጋቢ' : 'ድጋፍ ያስፈልጋል';
+
+        return `
+          <tr style="border-bottom:1px solid #E2E8F0;">
+            <td style="padding:6px 8px; font-weight:700;">${sub.name}</td>
+            <td style="padding:6px; text-align:center;">${q}</td>
+            <td style="padding:6px; text-align:center;">${a}</td>
+            <td style="padding:6px; text-align:center;">${m}</td>
+            <td style="padding:6px; text-align:center;">${f}</td>
+            <td style="padding:6px; text-align:center; font-weight:800; background:#F8FAFC; color:#1E3A8A;">${tot}%</td>
+            <td style="padding:6px; text-align:center;"><span class="badge ${parseFloat(tot) >= 50 ? 'badge-success' : 'badge-danger'}">${lettr}</span></td>
+            <td style="padding:6px; text-align:center; font-size:0.75rem;">${subRank}</td>
+            <td style="padding:6px 8px; font-size:0.75rem; color:#475569;">${remark}</td>
+          </tr>
+        `;
+      }).join('');
+
+      const avg = (grandTotalSum / subjects.length).toFixed(1);
+      document.getElementById('cardModalAvg').innerText = `${avg}% (አልፏል)`;
+
+      // Calculate class rank
+      const select = document.getElementById('rosterGradeSelect');
+      const selectedGrade = select ? select.value : student.grade;
+      const classStudents = students.filter(s => s.grade === selectedGrade);
+      const studentIdx = students.findIndex(s => s.id === student.id);
+      const rank = (studentIdx >= 0 ? studentIdx + 1 : 1);
+      document.getElementById('cardModalRank').innerText = `${rank}ኛ ደረጃ (ከ ${classStudents.length || students.length} ተማሪዎች)`;
+
+      // Homeroom Teacher name
+      const hrTeacher = staffList.find(s => s.role.includes('የክፍል ኃላፊ')) || { name: 'መምህር ዳዊት በቀለ' };
+      document.getElementById('cardModalHomeroomTeacher').innerText = hrTeacher.name;
+
+      document.getElementById('ethiopianReportCardModal').style.display = 'flex';
+    }
+
+    function closeReportCardModal() {
+      document.getElementById('ethiopianReportCardModal').style.display = 'none';
     }
 
     function removeStudent(idx) {
@@ -1136,6 +1719,30 @@
       alert('ወደ ' + label + ' ሚና በተሳካ ሁኔታ ተቀይሯል!');
     }
 
+    // Student Photo Upload State & Handlers
+    let selectedStudentPhotoBase64 = '';
+
+    function handleStudentPhotoSelected(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        selectedStudentPhotoBase64 = evt.target.result;
+        const preview = document.getElementById('newStudentPhotoPreview');
+        preview.style.backgroundImage = `url('${selectedStudentPhotoBase64}')`;
+        preview.innerHTML = '';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearStudentPhoto() {
+      selectedStudentPhotoBase64 = '';
+      const preview = document.getElementById('newStudentPhotoPreview');
+      preview.style.backgroundImage = 'none';
+      preview.innerHTML = '<span style="font-size:1.8rem;">📸</span><span style="font-size:0.65rem; color:var(--primary); font-weight:700;">ፎቶ ምረጥ</span>';
+      document.getElementById('newStudentPhoto').value = '';
+    }
+
     function saveNewStudent(e) {
       e.preventDefault();
       const name = document.getElementById('newStudentName').value;
@@ -1144,12 +1751,87 @@
       const phone = document.getElementById('newStudentPhone').value;
       const id = 'DIL-00' + (students.length + 1);
 
-      students.push({ id, name, gender, grade, phone, scores: [8.5, 8.5, 25.0, 42.0], status: 'ንቁ' });
+      students.push({
+        id,
+        name,
+        gender,
+        grade,
+        phone,
+        scores: [8.5, 8.5, 25.0, 42.0],
+        photo: selectedStudentPhotoBase64,
+        status: 'ንቁ'
+      });
       attendance.push({ name, grade, status: 'Present', note: 'በሰዓቱ ገብቷል' });
       saveState();
       closeAddStudentModal();
       e.target.reset();
-      alert('ተማሪው በተሳካ ሁኔታ ተመዝግቧል!');
+      clearStudentPhoto();
+      alert(`ተማሪ ${name} ከፎቶ ጋር በተሳካ ሁኔታ በLocal Storage ተመዝግቧል!`);
+    }
+
+    // Staff Photo Upload State & Handlers
+    let selectedStaffPhotoBase64 = '';
+
+    function openAddStaffModal() {
+      document.getElementById('addStaffModal').style.display = 'flex';
+    }
+    function closeAddStaffModal() {
+      document.getElementById('addStaffModal').style.display = 'none';
+    }
+
+    function handleStaffPhotoSelected(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        selectedStaffPhotoBase64 = evt.target.result;
+        const preview = document.getElementById('newStaffPhotoPreview');
+        preview.style.backgroundImage = `url('${selectedStaffPhotoBase64}')`;
+        preview.innerHTML = '';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearStaffPhoto() {
+      selectedStaffPhotoBase64 = '';
+      const preview = document.getElementById('newStaffPhotoPreview');
+      preview.style.backgroundImage = 'none';
+      preview.innerHTML = '<span style="font-size:1.8rem;">📸</span><span style="font-size:0.65rem; color:var(--primary); font-weight:700;">ፎቶ ጫን</span>';
+      document.getElementById('newStaffPhotoInput').value = '';
+    }
+
+    function saveNewStaff(e) {
+      e.preventDefault();
+      const name = document.getElementById('newStaffName').value;
+      const role = document.getElementById('newStaffRole').value;
+      const dept = document.getElementById('newStaffDept').value;
+      const phone = document.getElementById('newStaffPhone').value;
+      const qual = document.getElementById('newStaffQual').value;
+      const id = 'STF-00' + (staffList.length + 1);
+
+      staffList.push({
+        id,
+        name,
+        role,
+        dept,
+        phone,
+        qual,
+        photo: selectedStaffPhotoBase64,
+        status: 'ንቁ'
+      });
+
+      saveState();
+      closeAddStaffModal();
+      e.target.reset();
+      clearStaffPhoto();
+      alert(`መምህር/ሰራተኛ ${name} ከፎቶ ጋር በተሳካ ሁኔታ በLocal Storage ተመዝግቧል!`);
+    }
+
+    function removeStaff(idx) {
+      if (confirm('ሰራተኛውን/መምህሩን ከዝርዝር መሰረዝ ይፈልጋሉ?')) {
+        staffList.splice(idx, 1);
+        saveState();
+      }
     }
 
     function shareWebsiteLink() {

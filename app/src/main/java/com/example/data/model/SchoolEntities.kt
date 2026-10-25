@@ -19,6 +19,7 @@ data class Student(
     val address: String,
     val status: String = "ንቁ", // "ንቁ" (Active), "ያቋረጠ" (Dropped), "የተዛወረ" (Transferred)
     val specialNeeds: String = "",
+    val photoUri: String = "",
     val registeredDate: Long = System.currentTimeMillis()
 )
 
@@ -39,6 +40,7 @@ data class Teacher(
     val homeroomClass: String = "", // e.g. "10ኛ-A"
     val joinedYear: String = "2015 ዓ.ም",
     val maxWeeklyPeriods: Int = 20, // Standard weekly teaching capacity
+    val photoUri: String = "",
     val status: String = "ንቁ" // "ንቁ" (Active), "በእረፍት ላይ" (On Leave)
 )
 
@@ -132,6 +134,7 @@ data class Staff(
     val hiringDate: String = "2015 ዓ.ም",
     val responsibilities: String = "", // የስራ ድርሻ ዝርዝር መግለጫ
     val emergencyContact: String = "", // የአደጋ ጊዜ ተጠሪ ስልክ
+    val photoUri: String = "",
     val status: String = "ንቁ" // "ንቁ", "በእረፍት ላይ", "የተሰናበተ"
 )
 

@@ -138,6 +138,9 @@ interface TeacherWorkloadDao {
 
 @Dao
 interface StudentGradeDao {
+    @Query("SELECT * FROM student_grades")
+    fun getAllGrades(): Flow<List<StudentGrade>>
+
     @Query("SELECT * FROM student_grades WHERE studentId = :studentId ORDER BY semester ASC, subjectName ASC")
     fun getGradesForStudent(studentId: Long): Flow<List<StudentGrade>>
 

@@ -99,7 +99,9 @@ import com.example.data.model.Teacher
 import com.example.data.model.TeacherWithAssignments
 import com.example.data.model.TeacherWorkload
 import com.example.ui.components.EmptyStateCard
+import com.example.ui.components.PhotoPickerAvatar
 import com.example.ui.components.SchoolSearchBar
+import com.example.ui.components.UserAvatar
 import com.example.ui.theme.EthioGreen
 import com.example.ui.theme.EthioRed
 import com.example.ui.theme.GoldAccent
@@ -334,21 +336,13 @@ fun TeacherCardItem(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(46.dp)
-                        .clip(CircleShape)
-                        .background(NavyPrimary.copy(alpha = 0.12f))
-                        .border(1.5.dp, NavyPrimary.copy(alpha = 0.3f), CircleShape)
-                ) {
-                    Text(
-                        text = teacher.fullName.replace("አቶ ", "").replace("ወ/ሮ ", "").replace("ወ/ሪት ", "").take(1),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        color = NavyPrimary
-                    )
-                }
+                // Teacher Avatar with photo support
+                UserAvatar(
+                    photoUri = teacher.photoUri,
+                    name = teacher.fullName,
+                    gender = teacher.gender,
+                    size = 46.dp
+                )
 
                 Spacer(modifier = Modifier.width(12.dp))
 
@@ -753,21 +747,12 @@ fun TeacherDetailDialog(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .size(56.dp)
-                                    .clip(CircleShape)
-                                    .background(NavyPrimary.copy(alpha = 0.15f))
-                                    .border(2.dp, NavyPrimary, CircleShape)
-                            ) {
-                                Text(
-                                    text = teacher.fullName.replace("አቶ ", "").replace("ወ/ሮ ", "").replace("ወ/ሪት ", "").take(1),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 24.sp,
-                                    color = NavyPrimary
-                                )
-                            }
+                            UserAvatar(
+                                photoUri = teacher.photoUri,
+                                name = teacher.fullName,
+                                gender = teacher.gender,
+                                size = 56.dp
+                            )
 
                             Spacer(modifier = Modifier.width(14.dp))
 
@@ -1214,6 +1199,7 @@ fun TeacherFormDialog(
     onSave: (Teacher) -> Unit
 ) {
     var title by remember { mutableStateOf(initialTeacher?.title ?: "አቶ") }
+    var photoUri by remember { mutableStateOf(initialTeacher?.photoUri ?: "") }
     var fullName by remember { mutableStateOf(initialTeacher?.fullName ?: "") }
     var teacherCode by remember {
         mutableStateOf(
@@ -1273,7 +1259,8 @@ fun TeacherFormDialog(
                 joinedYear = joinedYear,
                 maxWeeklyPeriods = maxPeriodsInt,
                 isHomeroomTeacher = isHomeroom,
-                homeroomClass = if (isHomeroom) homeroomClass else ""
+                homeroomClass = if (isHomeroom) homeroomClass else "",
+                photoUri = photoUri
             )).copy(
                 teacherCode = teacherCode,
                 fullName = fullName,
@@ -1287,7 +1274,8 @@ fun TeacherFormDialog(
                 joinedYear = joinedYear,
                 maxWeeklyPeriods = maxPeriodsInt,
                 isHomeroomTeacher = isHomeroom,
-                homeroomClass = if (isHomeroom) homeroomClass else ""
+                homeroomClass = if (isHomeroom) homeroomClass else "",
+                photoUri = photoUri
             )
             onSave(newTeacher)
         }
@@ -1369,6 +1357,17 @@ fun TeacherFormDialog(
                         )
                     }
                 }
+
+                // Teacher Photo Upload & Preview
+                PhotoPickerAvatar(
+                    photoUri = photoUri,
+                    onPhotoSelected = { photoUri = it },
+                    name = fullName,
+                    gender = gender,
+                    isAmharic = isAmharic,
+                    size = 96.dp,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
                 // Title and Gender Row
                 Row(

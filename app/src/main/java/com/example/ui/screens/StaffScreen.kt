@@ -85,7 +85,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.data.model.Staff
+import com.example.ui.components.PhotoPickerAvatar
 import com.example.ui.components.SectionHeader
+import com.example.ui.components.UserAvatar
 import com.example.ui.theme.EthioGreen
 import com.example.ui.theme.GoldAccent
 import com.example.ui.theme.NavyPrimary
@@ -455,20 +457,13 @@ fun StaffCardItem(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(46.dp)
-                        .clip(CircleShape)
-                        .background(roleBadgeColor.copy(alpha = 0.15f))
-                ) {
-                    Text(
-                        text = staff.fullName.take(2),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = roleBadgeColor
-                    )
-                }
+                // Staff Avatar with photo support
+                UserAvatar(
+                    photoUri = staff.photoUri,
+                    name = staff.fullName,
+                    gender = staff.gender,
+                    size = 46.dp
+                )
 
                 Spacer(modifier = Modifier.width(12.dp))
 
@@ -702,6 +697,7 @@ fun StaffFormDialog(
     onSave: (Staff) -> Unit
 ) {
     var title by remember { mutableStateOf(initialStaff?.title ?: "አቶ") }
+    var photoUri by remember { mutableStateOf(initialStaff?.photoUri ?: "") }
     var fullName by remember { mutableStateOf(initialStaff?.fullName ?: "") }
     var staffCode by remember { mutableStateOf(initialStaff?.staffCode ?: "ADM-${(100..999).random()}") }
     var gender by remember { mutableStateOf(initialStaff?.gender ?: "ወንድ") }
@@ -757,7 +753,20 @@ fun StaffFormDialog(
 
                 Spacer(modifier = Modifier.height(10.dp))
                 HorizontalDivider()
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Staff Photo Upload & Preview
+                PhotoPickerAvatar(
+                    photoUri = photoUri,
+                    onPhotoSelected = { photoUri = it },
+                    name = fullName,
+                    gender = gender,
+                    isAmharic = isAmharic,
+                    size = 96.dp,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
 
                 // Title selection chips
                 Text(
@@ -1142,6 +1151,7 @@ fun StaffFormDialog(
                                         hiringDate = hiringDate.trim(),
                                         responsibilities = responsibilities.trim(),
                                         emergencyContact = emergencyContact.trim(),
+                                        photoUri = photoUri,
                                         status = initialStaff?.status ?: "ንቁ"
                                     )
                                 )
@@ -1221,20 +1231,12 @@ fun StaffDetailDialog(
                             .padding(20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .size(64.dp)
-                                .clip(CircleShape)
-                                .background(GoldAccent)
-                        ) {
-                            Text(
-                                text = staff.fullName.take(2),
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 22.sp,
-                                color = Color.Black
-                            )
-                        }
+                        UserAvatar(
+                            photoUri = staff.photoUri,
+                            name = staff.fullName,
+                            gender = staff.gender,
+                            size = 72.dp
+                        )
 
                         Spacer(modifier = Modifier.height(10.dp))
 

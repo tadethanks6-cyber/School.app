@@ -116,6 +116,8 @@ class SchoolRepository(
         workloadDao.deleteWorkloadById(id)
 
     // Grades
+    val allGrades: Flow<List<StudentGrade>> = gradeDao.getAllGrades()
+
     fun getGradesForStudent(studentId: Long): Flow<List<StudentGrade>> =
         gradeDao.getGradesForStudent(studentId)
 

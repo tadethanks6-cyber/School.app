@@ -88,6 +88,7 @@ fun GradesScreen(
     selectedStudent: Student?,
     onSelectStudent: (Student) -> Unit,
     grades: List<StudentGrade>,
+    allGrades: List<StudentGrade> = grades,
     subjects: List<Subject>,
     isAmharic: Boolean,
     isAdmin: Boolean = true,
@@ -104,6 +105,16 @@ fun GradesScreen(
     var selectedSemester by remember { mutableStateOf("1ኛ ሴሚስተር") }
     var studentDropdownExpanded by remember { mutableStateOf(false) }
     var gradeToDelete by remember { mutableStateOf<StudentGrade?>(null) }
+
+    // Report Card Dialog State
+    var activeReportCardStudent by remember { mutableStateOf<Student?>(null) }
+    var activeReportCardGrades by remember { mutableStateOf<List<StudentGrade>>(emptyList()) }
+    var activeReportCardRank by remember { mutableStateOf(1) }
+    var activeReportCardTotal by remember { mutableStateOf(1) }
+
+    // Tab switcher between Individual Student View and Homeroom Roster Table
+    val isHomeroomTeacher = currentTeacher?.isHomeroomTeacher == true
+    var gradesViewMode by remember { mutableStateOf(if (isHomeroomTeacher && !isAdmin) 1 else 0) }
 
     val isTeacherRole = !isAdmin && currentTeacher != null
     val assignedClasses = remember(teacherWorkloads) {
@@ -232,7 +243,7 @@ fun GradesScreen(
                     shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(containerColor = NavyPrimary.copy(alpha = 0.07f)),
                     border = androidx.compose.foundation.BorderStroke(1.dp, NavyPrimary.copy(alpha = 0.25f)),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp)
                 ) {
                     Row(
                         modifier = Modifier.padding(12.dp),
@@ -278,226 +289,331 @@ fun GradesScreen(
                 }
             }
 
-            // Student Picker Dropdown
-            ExposedDropdownMenuBox(
-                expanded = studentDropdownExpanded,
-                onExpandedChange = { studentDropdownExpanded = !studentDropdownExpanded }
-            ) {
-                OutlinedTextField(
-                    value = selectedStudent?.let { "${it.fullName} (${it.grade}-${it.section})" }
-                        ?: (if (isAmharic) "ተማሪ ምረጥ..." else "Select Student..."),
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text(if (isAmharic) "ተማሪ ምረጥ" else "Select Student") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.School,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = studentDropdownExpanded) },
+            // Mode Switcher: Single Student Card vs Homeroom Roster Table (Teachers & Admin)
+            if (!isStudent) {
+                TabRow(
+                    selectedTabIndex = gradesViewMode,
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor()
-                        .testTag("student_picker_dropdown")
-                )
-                ExposedDropdownMenu(
-                    expanded = studentDropdownExpanded,
-                    onDismissRequest = { studentDropdownExpanded = false }
+                        .clip(RoundedCornerShape(10.dp))
+                        .padding(bottom = 8.dp)
+                        .testTag("grades_tab_mode_switcher")
                 ) {
-                    visibleStudents.forEach { s ->
-                        DropdownMenuItem(
-                            text = { Text("${s.fullName} • ${s.studentIdNumber} (${s.grade}-${s.section})") },
-                            onClick = {
-                                onSelectStudent(s)
-                                studentDropdownExpanded = false
+                    Tab(
+                        selected = gradesViewMode == 0,
+                        onClick = { gradesViewMode = 0 },
+                        text = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("👤 ", fontSize = 13.sp)
+                                Text(
+                                    if (isAmharic) "የተማሪ ውጤት (ካርድ)" else "Student Report",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
-                        )
-                    }
+                        }
+                    )
+                    Tab(
+                        selected = gradesViewMode == 1,
+                        onClick = { gradesViewMode = 1 },
+                        text = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("📋 ", fontSize = 13.sp)
+                                Text(
+                                    if (isAmharic) "የክፍል ኃላፊ ሮስተር ቴብል" else "Homeroom Roster",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                if (isHomeroomTeacher) {
+                                    Surface(
+                                        color = EthioGreen,
+                                        shape = RoundedCornerShape(4.dp),
+                                        modifier = Modifier.padding(start = 4.dp)
+                                    ) {
+                                        Text(
+                                            text = if (isAmharic) "ኃላፊ" else "HR",
+                                            color = Color.White,
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Semester Switcher
-            TabRow(
-                selectedTabIndex = if (selectedSemester == "1ኛ ሴሚስተር") 0 else 1,
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(10.dp))
-            ) {
-                Tab(
-                    selected = selectedSemester == "1ኛ ሴሚስተር",
-                    onClick = { selectedSemester = "1ኛ ሴሚስተር" },
-                    text = {
-                        Text(
-                            if (isAmharic) "1ኛ ሴሚስተር" else "Semester 1",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                )
-                Tab(
-                    selected = selectedSemester == "2ኛ ሴሚስተር",
-                    onClick = { selectedSemester = "2ኛ ሴሚስተር" },
-                    text = {
-                        Text(
-                            if (isAmharic) "2ኛ ሴሚስተር" else "Semester 2",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            if (selectedStudent == null) {
-                EmptyStateCard(
-                    message = if (isAmharic) "የውጤት መዝገብ ወይም ካርድ ለማየት እባክዎ ከላይ ተማሪ ይምረጡ" else "Please select a student above to view report card",
-                    icon = Icons.Default.Assessment
+            if (gradesViewMode == 1 && !isStudent) {
+                // Dedicated Homeroom Roster View
+                HomeroomRosterView(
+                    students = students,
+                    allGrades = allGrades,
+                    subjects = subjects,
+                    assessmentScheme = assessmentScheme,
+                    isAmharic = isAmharic,
+                    isAdmin = isAdmin,
+                    currentTeacher = currentTeacher,
+                    onViewReportCard = { student, stGrades, rank, total ->
+                        activeReportCardStudent = student
+                        activeReportCardGrades = stGrades
+                        activeReportCardRank = rank
+                        activeReportCardTotal = total
+                    },
+                    modifier = Modifier.fillMaxSize()
                 )
             } else {
-                // Report Card Header (የተማሪ የውጤት ካርድ ማጠቃለያ)
-                Card(
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-                    modifier = Modifier.fillMaxWidth()
+                // Individual Student Report View
+                // Student Picker Dropdown
+                ExposedDropdownMenuBox(
+                    expanded = studentDropdownExpanded,
+                    onExpandedChange = { studentDropdownExpanded = !studentDropdownExpanded }
                 ) {
-                    Column(modifier = Modifier.padding(14.dp)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Column {
-                                Text(
-                                    text = if (isAmharic) "የትምህርት ውጤት ካርድ (Report Card)" else "Official Academic Report Card",
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                Text(
-                                    text = "${selectedStudent.fullName} • ${selectedStudent.grade}-${selectedStudent.section}",
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                            Surface(
-                                shape = RoundedCornerShape(6.dp),
-                                color = GoldAccent
-                            ) {
-                                Text(
-                                    text = selectedStudent.academicYear,
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Black,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(10.dp))
-                        EthiopianFlagAccent()
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                        // Average & Status Row
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Column {
-                                Text(
-                                    text = if (isAmharic) "አማካይ ውጤት (Average)" else "Average Score",
-                                    fontSize = 11.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = String.format("%.1f%%", averageScore),
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (averageScore >= 50) EthioGreen else EthioRed
-                                )
-                            }
-
-                            Column(horizontalAlignment = Alignment.End) {
-                                Text(
-                                    text = if (isAmharic) "የማለፊያ ሁኔታ (Status)" else "Academic Status",
-                                    fontSize = 11.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                val statusText = when {
-                                    filteredGrades.isEmpty() -> if (isAmharic) "ውጤት አልተመዘገበም" else "No Data"
-                                    averageScore >= 85 -> if (isAmharic) "በጣም ከፍተኛ ማዕረግ" else "High Distinction"
-                                    averageScore >= 75 -> if (isAmharic) "ከፍተኛ ማዕረግ" else "Distinction"
-                                    averageScore >= 50 -> if (isAmharic) "አልፏል (Promoted)" else "Promoted"
-                                    else -> if (isAmharic) "ያልተጠናቀቀ/የወደቀ" else "Detained"
+                    OutlinedTextField(
+                        value = selectedStudent?.let { "${it.fullName} (${it.grade}-${it.section})" }
+                            ?: (if (isAmharic) "ተማሪ ምረጥ..." else "Select Student..."),
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text(if (isAmharic) "ተማሪ ምረጥ" else "Select Student") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.School,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = studentDropdownExpanded) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor()
+                            .testTag("student_picker_dropdown")
+                    )
+                    ExposedDropdownMenu(
+                        expanded = studentDropdownExpanded,
+                        onDismissRequest = { studentDropdownExpanded = false }
+                    ) {
+                        visibleStudents.forEach { s ->
+                            DropdownMenuItem(
+                                text = { Text("${s.fullName} • ${s.studentIdNumber} (${s.grade}-${s.section})") },
+                                onClick = {
+                                    onSelectStudent(s)
+                                    studentDropdownExpanded = false
                                 }
-                                Text(
-                                    text = statusText,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (averageScore >= 50) EthioGreen else EthioRed
-                                )
-                            }
+                            )
                         }
                     }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Semester Switcher
+                TabRow(
+                    selectedTabIndex = if (selectedSemester == "1ኛ ሴሚስተር") 0 else 1,
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                ) {
+                    Tab(
+                        selected = selectedSemester == "1ኛ ሴሚስተር",
+                        onClick = { selectedSemester = "1ኛ ሴሚስተር" },
+                        text = {
+                            Text(
+                                if (isAmharic) "1ኛ ሴሚስተር" else "Semester 1",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    )
+                    Tab(
+                        selected = selectedSemester == "2ኛ ሴሚስተር",
+                        onClick = { selectedSemester = "2ኛ ሴሚስተር" },
+                        text = {
+                            Text(
+                                if (isAmharic) "2ኛ ሴሚስተር" else "Semester 2",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = if (isAmharic) "የተመዘገቡ የትምህርት ዓይነቶች (${filteredGrades.size})" else "Registered Subjects (${filteredGrades.size})",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-
-                if (filteredGrades.isEmpty()) {
+                if (selectedStudent == null) {
                     EmptyStateCard(
-                        message = if (isAmharic) "ለዚህ ሴሚስተር የተመዘገበ ውጤት የለም። ለመመዝገብ + ይጫኑ" else "No grades recorded for this semester. Click + to add"
+                        message = if (isAmharic) "የውጤት መዝገብ ወይም ካርድ ለማየት እባክዎ ከላይ ተማሪ ይምረጡ" else "Please select a student above to view report card",
+                        icon = Icons.Default.Assessment
                     )
                 } else {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxSize()
+                    // Report Card Header (የተማሪ የውጤት ካርድ ማጠቃለያ)
+                    Card(
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        items(filteredGrades, key = { it.id }) { gradeItem ->
-                            val isMySubject = isTeacherRole && assignedSubjectNames.any {
-                                gradeItem.subjectName.contains(it, ignoreCase = true) || it.contains(gradeItem.subjectName, ignoreCase = true)
+                        Column(modifier = Modifier.padding(14.dp)) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column {
+                                    Text(
+                                        text = if (isAmharic) "የትምህርት ውጤት ካርድ (Report Card)" else "Official Academic Report Card",
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                    Text(
+                                        text = "${selectedStudent.fullName} • ${selectedStudent.grade}-${selectedStudent.section}",
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = GoldAccent
+                                ) {
+                                    Text(
+                                        text = selectedStudent.academicYear,
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.Black,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
                             }
-                            val canManage = (isAdmin || isMySubject) && !isStudent
 
-                            GradeCardItem(
-                                grade = gradeItem,
-                                isAmharic = isAmharic,
-                                canManage = canManage,
-                                isMySubject = isMySubject,
-                                isAdmin = isAdmin,
-                                assessmentScheme = assessmentScheme,
-                                onDelete = { gradeToDelete = gradeItem }
-                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            EthiopianFlagAccent()
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            // Average & Status Row
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column {
+                                    Text(
+                                        text = if (isAmharic) "አማካይ ውጤት (Average)" else "Average Score",
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text(
+                                        text = String.format("%.1f%%", averageScore),
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (averageScore >= 50) EthioGreen else EthioRed
+                                    )
+                                }
+
+                                Column(horizontalAlignment = Alignment.End) {
+                                    Text(
+                                        text = if (isAmharic) "የማለፊያ ሁኔታ (Status)" else "Academic Status",
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    val statusText = when {
+                                        filteredGrades.isEmpty() -> if (isAmharic) "ውጤት አልተመዘገበም" else "No Data"
+                                        averageScore >= 85 -> if (isAmharic) "በጣም ከፍተኛ ማዕረግ" else "High Distinction"
+                                        averageScore >= 75 -> if (isAmharic) "ከፍተኛ ማዕረግ" else "Distinction"
+                                        averageScore >= 50 -> if (isAmharic) "አልፏል (Promoted)" else "Promoted"
+                                        else -> if (isAmharic) "ያልተጠናቀቀ/የወደቀ" else "Detained"
+                                    }
+                                    Text(
+                                        text = statusText,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (averageScore >= 50) EthioGreen else EthioRed
+                                    )
+                                }
+                            }
+
+                            // View Official Ethiopian Report Card Button
+                            Button(
+                                onClick = {
+                                    activeReportCardStudent = selectedStudent
+                                    activeReportCardGrades = filteredGrades
+                                    activeReportCardRank = 1
+                                    activeReportCardTotal = visibleStudents.size.coerceAtLeast(1)
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary),
+                                shape = RoundedCornerShape(10.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 10.dp)
+                                    .testTag("btn_view_official_report_card")
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text("🪪 ", fontSize = 14.sp)
+                                    Text(
+                                        text = if (isAmharic) "ኦፊሴላዊ የኢትዮጵያ ካሪክለም የውጤት ካርድ ይመልከቱ" else "View Official Ethiopian Curriculum Report Card",
+                                        color = GoldAccent,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
                         }
-                        item {
-                            Spacer(modifier = Modifier.height(80.dp))
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = if (isAmharic) "የተመዘገቡ የትምህርት ዓይነቶች (${filteredGrades.size})" else "Registered Subjects (${filteredGrades.size})",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    if (filteredGrades.isEmpty()) {
+                        EmptyStateCard(
+                            message = if (isAmharic) "ለዚህ ሴሚስተር የተመዘገበ ውጤት የለም። ለመመዝገብ + ይጫኑ" else "No grades recorded for this semester. Click + to add"
+                        )
+                    } else {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(filteredGrades, key = { it.id }) { gradeItem ->
+                                val isMySubject = isTeacherRole && assignedSubjectNames.any {
+                                    gradeItem.subjectName.contains(it, ignoreCase = true) || it.contains(gradeItem.subjectName, ignoreCase = true)
+                                }
+                                val canManage = (isAdmin || isMySubject) && !isStudent
+
+                                GradeCardItem(
+                                    grade = gradeItem,
+                                    isAmharic = isAmharic,
+                                    canManage = canManage,
+                                    isMySubject = isMySubject,
+                                    isAdmin = isAdmin,
+                                    assessmentScheme = assessmentScheme,
+                                    onDelete = { gradeToDelete = gradeItem }
+                                )
+                            }
+                            item {
+                                Spacer(modifier = Modifier.height(80.dp))
+                            }
                         }
                     }
                 }
             }
         }
 
-        val canAddGrade = (isAdmin || (isTeacherRole && assignedSubjectNames.isNotEmpty())) && !isStudent
+        val canAddGrade = (isAdmin || (isTeacherRole && assignedSubjectNames.isNotEmpty())) && !isStudent && gradesViewMode == 0
         if (selectedStudent != null && canAddGrade) {
             FloatingActionButton(
                 onClick = onAddGradeClick,
@@ -514,6 +630,21 @@ fun GradesScreen(
                 )
             }
         }
+    }
+
+    // Official Ethiopian Curriculum Report Card Dialog
+    activeReportCardStudent?.let { student ->
+        EthiopianReportCardDialog(
+            student = student,
+            studentGrades = activeReportCardGrades,
+            allSubjects = subjects,
+            rank = activeReportCardRank,
+            totalStudents = activeReportCardTotal,
+            assessmentScheme = assessmentScheme,
+            isAmharic = isAmharic,
+            homeroomTeacherName = currentTeacher?.fullName ?: "አቶ ሙሉጌታ ታከለ",
+            onDismiss = { activeReportCardStudent = null }
+        )
     }
 
     // Delete Confirmation

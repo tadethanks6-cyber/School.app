@@ -179,6 +179,7 @@ class MainActivity : ComponentActivity() {
                 val assessmentScheme by viewModel.assessmentScheme.collectAsStateWithLifecycle()
                 val selectedStudentForGrades by viewModel.selectedStudentForGrades.collectAsStateWithLifecycle()
                 val gradesList by viewModel.studentGrades.collectAsStateWithLifecycle()
+                val allGradesList by viewModel.allGrades.collectAsStateWithLifecycle()
 
                 // Staff state
                 val staffList by viewModel.filteredStaff.collectAsStateWithLifecycle()
@@ -427,6 +428,7 @@ class MainActivity : ComponentActivity() {
                                         viewModel.selectStudentForGrades(student)
                                     },
                                     grades = gradesList,
+                                    allGrades = allGradesList,
                                     subjects = subjects,
                                     isAmharic = isAmharic,
                                     isAdmin = isAdmin,

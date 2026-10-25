@@ -648,7 +648,10 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         showAssessmentSchemeDialog.value = false
     }
 
-    // Grades for selected student
+    // All Grades and Grades for selected student
+    val allGrades: StateFlow<List<StudentGrade>> = repository.allGrades
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     val studentGrades = MutableStateFlow<List<StudentGrade>>(emptyList())
 
     fun selectStudentForGrades(student: Student) {
