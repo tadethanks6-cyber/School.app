@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
         Staff::class,
         UserAccount::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 abstract class SchoolDatabase : RoomDatabase() {
@@ -460,10 +460,18 @@ abstract class SchoolDatabase : RoomDatabase() {
             // 7. Initial Role-Based Users for Login Gate (መግቢያ በር)
             val defaultUsers = listOf(
                 UserAccount(
-                    fullName = "ዶ/ር ተስፋዬ ገብረመድህን",
+                    fullName = "ሲስተም አድሚን (እኔ)",
+                    email = "admin@dilijent.edu.et",
+                    phone = "0900000000",
+                    password = "admin123",
+                    role = "ሲስተም አድሚን (Super Admin)"
+                ),
+                UserAccount(
+                    fullName = "ዶ/ር ተስፋዬ ገብረመድህን (ርዕሰ መምህር)",
+                    email = "principal@dilijent.edu.et",
                     phone = "0911000000",
                     password = "1234",
-                    role = "ርዕሰ መምህር (Admin)"
+                    role = "ርዕሰ መምህር (Principal)"
                 ),
                 UserAccount(
                     fullName = "አቶ ከበደ ለማ",

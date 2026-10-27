@@ -89,6 +89,7 @@ import com.example.data.model.UserAccount
 import com.example.ui.SchoolNavTab
 import com.example.ui.SchoolViewModel
 import com.example.ui.components.EthiopianFlagAccent
+import com.example.ui.screens.AdminPasswordManagerDialog
 import com.example.ui.screens.AssessmentSchemeDialog
 import com.example.ui.screens.AttendanceScreen
 import com.example.ui.screens.DashboardScreen
@@ -198,13 +199,18 @@ class MainActivity : ComponentActivity() {
                 val currentStaff by viewModel.currentStaff.collectAsStateWithLifecycle()
                 val currentStudent by viewModel.currentStudent.collectAsStateWithLifecycle()
                 val isAdmin by viewModel.isAdmin.collectAsStateWithLifecycle()
+                val isSuperAdmin by viewModel.isSuperAdmin.collectAsStateWithLifecycle()
                 val isTeacher by viewModel.isTeacher.collectAsStateWithLifecycle()
                 val isStudent by viewModel.isStudent.collectAsStateWithLifecycle()
                 val teacherWorkloads by viewModel.teacherWorkloads.collectAsStateWithLifecycle()
+                val isAdminLoginMode by viewModel.isAdminLoginMode.collectAsStateWithLifecycle()
+                val loginEmail by viewModel.loginEmail.collectAsStateWithLifecycle()
                 val loginPhone by viewModel.loginPhone.collectAsStateWithLifecycle()
                 val loginPassword by viewModel.loginPassword.collectAsStateWithLifecycle()
                 val loginError by viewModel.loginErrorMessage.collectAsStateWithLifecycle()
                 val isAuthenticating by viewModel.isAuthenticating.collectAsStateWithLifecycle()
+                val showAdminPasswordManager by viewModel.showAdminPasswordManagerDialog.collectAsStateWithLifecycle()
+                val allUsers by viewModel.allUsers.collectAsStateWithLifecycle()
 
                 // Dynamically sync fullscreen state with system bars
                 LaunchedEffect(isFullScreen) {
@@ -220,6 +226,10 @@ class MainActivity : ComponentActivity() {
 
                 if (!isLoggedIn) {
                     LoginScreen(
+                        isAdminMode = isAdminLoginMode,
+                        onToggleAdminMode = { viewModel.isAdminLoginMode.value = it },
+                        email = loginEmail,
+                        onEmailChange = { viewModel.loginEmail.value = it },
                         phone = loginPhone,
                         onPhoneChange = { viewModel.loginPhone.value = it },
                         password = loginPassword,
@@ -230,9 +240,24 @@ class MainActivity : ComponentActivity() {
                         isFullScreen = isFullScreen,
                         onToggleLanguage = { viewModel.toggleLanguage() },
                         onToggleFullScreen = { viewModel.toggleFullScreen() },
-                        onLoginClick = { viewModel.login(loginPhone, loginPassword) },
-                        onQuickDemoLogin = { viewModel.quickLoginAsPrincipal() },
-                        onQuickRoleLogin = { phone -> viewModel.quickLoginAs(phone) },
+                        onLoginClick = {
+                            if (isAdminLoginMode) {
+                                viewModel.login(loginEmail, loginPassword, isEmailLogin = true)
+                            } else {
+                                viewModel.login(loginPhone, loginPassword, isEmailLogin = false)
+                            }
+                        },
+                        onQuickDemoLogin = { viewModel.quickLoginAsAdmin() },
+                        onQuickRoleLogin = { identifier, isEmail, pass ->
+                            viewModel.isAdminLoginMode.value = isEmail
+                            if (isEmail) {
+                                viewModel.loginEmail.value = identifier
+                            } else {
+                                viewModel.loginPhone.value = identifier
+                            }
+                            viewModel.loginPassword.value = pass
+                            viewModel.login(identifier, pass, isEmailLogin = isEmail)
+                        },
                         onRegisterNewUser = { name, regPhone, regPass, role ->
                             viewModel.registerAccount(name, regPhone, regPass, role) {}
                         },
@@ -604,6 +629,32 @@ class MainActivity : ComponentActivity() {
                                         )
                                     }
                                     Spacer(modifier = Modifier.height(6.dp))
+                                    // Rail Admin Password Manager Button
+                                    if (isAdmin || isSuperAdmin) {
+                                        Surface(
+                                            shape = RoundedCornerShape(12.dp),
+                                            color = GoldAccent.copy(alpha = 0.25f),
+                                            border = androidx.compose.foundation.BorderStroke(1.dp, GoldAccent),
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .clickable { viewModel.showAdminPasswordManagerDialog.value = true }
+                                                .testTag("btn_rail_password_manager")
+                                        ) {
+                                            Column(
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 6.dp)
+                                            ) {
+                                                Text(text = "🔐", fontSize = 14.sp)
+                                                Text(
+                                                    text = if (isAmharic) "የይለፍ ቃል" else "Pass",
+                                                    fontSize = 9.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = GoldAccent
+                                                )
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                    }
                                     // Rail Share Web Link Button
                                     Surface(
                                         shape = RoundedCornerShape(12.dp),
@@ -800,6 +851,34 @@ class MainActivity : ComponentActivity() {
                                             }
 
                                             Spacer(modifier = Modifier.width(6.dp))
+
+                                            // Mobile Admin Password Manager Button
+                                            if (isAdmin || isSuperAdmin) {
+                                                Surface(
+                                                    shape = RoundedCornerShape(16.dp),
+                                                    color = GoldAccent.copy(alpha = 0.25f),
+                                                    border = androidx.compose.foundation.BorderStroke(1.dp, GoldAccent),
+                                                    modifier = Modifier
+                                                        .clip(RoundedCornerShape(16.dp))
+                                                        .clickable { viewModel.showAdminPasswordManagerDialog.value = true }
+                                                        .testTag("btn_topbar_passwords_mobile")
+                                                ) {
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 5.dp)
+                                                    ) {
+                                                        Text(text = "🔐", fontSize = 11.sp)
+                                                        Spacer(modifier = Modifier.width(3.dp))
+                                                        Text(
+                                                            text = if (isAmharic) "የይለፍ ቃል" else "Pass",
+                                                            fontSize = 11.sp,
+                                                            fontWeight = FontWeight.Bold,
+                                                            color = GoldAccent
+                                                        )
+                                                    }
+                                                }
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                            }
 
                                             // Mobile Share Web Link Button
                                             Surface(
@@ -1079,6 +1158,17 @@ class MainActivity : ComponentActivity() {
                         onDeleteStaff = { s ->
                             viewModel.deleteStaff(s)
                             viewModel.selectedStaffForDetails.value = null
+                        }
+                    )
+                }
+
+                if (showAdminPasswordManager) {
+                    AdminPasswordManagerDialog(
+                        users = allUsers,
+                        isAmharic = isAmharic,
+                        onDismiss = { viewModel.showAdminPasswordManagerDialog.value = false },
+                        onUpdatePassword = { userId, newPass ->
+                            viewModel.updateUserPassword(userId, newPass)
                         }
                     )
                 }

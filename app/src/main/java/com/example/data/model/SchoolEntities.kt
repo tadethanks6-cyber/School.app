@@ -143,9 +143,10 @@ data class UserAccount(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val fullName: String,
-    val phone: String, // e.g. "0911000000"
+    val phone: String = "", // e.g. "0911000000" (Used by teachers, students, staff)
+    val email: String = "", // e.g. "admin@dilijent.edu.et" (Used exclusively by System Admin)
     val password: String, // Password
-    val role: String = "ርዕሰ መምህር (Admin)", // Role
+    val role: String = "ሲስተም አድሚን (Admin)", // Role
     val isActive: Boolean = true,
     val createdDate: Long = System.currentTimeMillis()
 )

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,6 +28,8 @@ import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Class
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.School
@@ -74,6 +77,7 @@ import com.example.data.model.Student
 import com.example.data.model.StudentGrade
 import com.example.data.model.Subject
 import com.example.data.model.Teacher
+import com.example.data.model.TeacherWorkload
 import com.example.ui.components.EthiopianFlagAccent
 import com.example.ui.components.UserAvatar
 import com.example.ui.theme.EthioGreen
@@ -452,6 +456,30 @@ fun HomeroomRosterView(
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(6.dp))
 
+                // Distinction Banner: Roster aggregates strictly 100% total per subject from Mark List
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = NavyPrimary.copy(alpha = 0.08f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, NavyPrimary.copy(alpha = 0.2f)),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("📌", fontSize = 14.sp, modifier = Modifier.padding(end = 6.dp))
+                        Text(
+                            text = if (isAmharic)
+                                "የሮስተር ደንብ፦ ሮስተር የእያንዳንዱን የትምህርት አይነት ከማርክ ሊስት ላይ የ100% ድምር ውጤትን ብቻ በመውሰድ አጠቃላይ ድምር፣ አማካይ እና ደረጃ ያሰላል። የፈተናዎች ዝርዝር ምዘና በ«ማርክ ሊስት» ገፅ ይገኛል።"
+                            else
+                                "Roster Policy: Roster aggregates strictly the 100% total per subject from the Mark Lists to compute grand total, average, and rank. Continuous assessment breakdowns are in the Mark List tab.",
+                            fontSize = 10.5.sp,
+                            color = NavyPrimary,
+                            lineHeight = 14.sp
+                        )
+                    }
+                }
+
                 if (rosterRows.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
@@ -461,55 +489,100 @@ fun HomeroomRosterView(
                         )
                     }
                 } else {
-                    // Two-way scrollable matrix table
+                    // Two-way scrollable matrix table with Sticky Header and 4-Directional Scroll
                     val horizontalScrollState = rememberScrollState()
                     val verticalScrollState = rememberScrollState()
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .horizontalScroll(horizontalScrollState)
-                    ) {
-                        Column(
-                            modifier = Modifier.verticalScroll(verticalScrollState)
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        // Mobile 4-direction scroll guidance badge
+                        Surface(
+                            color = NavyPrimary.copy(alpha = 0.08f),
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 6.dp)
                         ) {
-                            // Table Header Row
-                            Surface(
-                                color = NavyPrimary,
-                                shape = RoundedCornerShape(8.dp),
-                                modifier = Modifier.padding(bottom = 6.dp)
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
-                                ) {
-                                    Text("ደረጃ", color = GoldAccent, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(42.dp), textAlign = TextAlign.Center)
-                                    Text("የተማሪው ስም", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(160.dp))
-                                    Text("መለያ", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(80.dp))
-                                    Text("ጾታ", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(36.dp), textAlign = TextAlign.Center)
-
-                                    // Dynamic Subject Column Headers
-                                    gradeSubjects.forEach { sub ->
-                                        Text(
-                                            text = sub.name.split(" ").firstOrNull() ?: sub.name,
-                                            color = Color.White,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 11.sp,
-                                            modifier = Modifier.width(70.dp),
-                                            textAlign = TextAlign.Center
-                                        )
-                                    }
-
-                                    Text("ድምር", color = GoldAccent, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(65.dp), textAlign = TextAlign.Center)
-                                    Text("አማካይ", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(65.dp), textAlign = TextAlign.Center)
-                                    Text("ውሳኔ", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(65.dp), textAlign = TextAlign.Center)
-                                    Text("ካርድ", color = GoldAccent, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(75.dp), textAlign = TextAlign.Center)
-                                }
+                                Text("↔ ↕ ", fontSize = 12.sp)
+                                Text(
+                                    text = if (isAmharic) "ሰንጠረዡን ወደ ግራ/ቀኝ ↔ እንዲሁም ወደ ላይ/ታች ↕ በማንሸራተት ሙሉ መረጃውን ይመልከቱ"
+                                    else "Swipe horizontally ↔ and vertically ↕ to inspect all columns & students",
+                                    fontSize = 10.5.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = NavyPrimary
+                                )
                             }
+                        }
 
-                            // Table Student Rows
-                            rosterRows.forEachIndexed { idx, row ->
-                                val isEven = idx % 2 == 0
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .horizontalScroll(horizontalScrollState)
+                        ) {
+                            Column(modifier = Modifier.fillMaxHeight()) {
+                                // Table Header Row (Sticky at the top while scrolling vertically)
+                                Surface(
+                                    color = NavyPrimary,
+                                    shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
+                                    shadowElevation = 3.dp,
+                                    modifier = Modifier.padding(bottom = 4.dp)
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+                                    ) {
+                                        Text("ደረጃ", color = GoldAccent, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(42.dp), textAlign = TextAlign.Center)
+                                        Text("የተማሪው ስም", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(160.dp))
+                                        Text("መለያ", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(80.dp))
+                                        Text("ጾታ", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(36.dp), textAlign = TextAlign.Center)
+
+                                        // Dynamic Subject Column Headers (Strictly from 100%)
+                                        gradeSubjects.forEach { sub ->
+                                            Column(
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                modifier = Modifier.width(72.dp)
+                                            ) {
+                                                Text(
+                                                    text = sub.name.split(" ").firstOrNull() ?: sub.name,
+                                                    color = Color.White,
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 11.sp,
+                                                    textAlign = TextAlign.Center
+                                                )
+                                                Text(
+                                                    text = "(ከ100)",
+                                                    color = GoldAccent,
+                                                    fontWeight = FontWeight.SemiBold,
+                                                    fontSize = 9.sp,
+                                                    textAlign = TextAlign.Center
+                                                )
+                                            }
+                                        }
+
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            modifier = Modifier.width(68.dp)
+                                        ) {
+                                            Text("ጠቅላላ", color = GoldAccent, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                                            Text("(${gradeSubjects.size * 100})", color = GoldAccent.copy(alpha = 0.85f), fontWeight = FontWeight.SemiBold, fontSize = 9.sp)
+                                        }
+                                        Text("አማካይ %", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(65.dp), textAlign = TextAlign.Center)
+                                        Text("ውሳኔ", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(65.dp), textAlign = TextAlign.Center)
+                                        Text("ካርድ", color = GoldAccent, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(75.dp), textAlign = TextAlign.Center)
+                                    }
+                                }
+
+                                // Table Student Rows (Vertically scrollable below the sticky header)
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f, fill = false)
+                                        .verticalScroll(verticalScrollState)
+                                ) {
+                                    rosterRows.forEachIndexed { idx, row ->
+                                        val isEven = idx % 2 == 0
                                 Surface(
                                     color = if (isEven) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
                                     shape = RoundedCornerShape(6.dp),
@@ -662,6 +735,8 @@ fun HomeroomRosterView(
             }
         }
     }
+}
+}
 }
 
 /**
@@ -966,75 +1041,118 @@ fun EthiopianReportCardDialog(
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        // Subject Marks Detailed Table
+                        // Subject Marks Detailed Table (4-directional scroll for mobile)
+                        val reportScrollState = rememberScrollState()
+
                         Column(modifier = Modifier.fillMaxWidth()) {
-                            // Table Header
-                            Surface(
-                                color = NavyPrimary,
-                                shape = RoundedCornerShape(6.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 7.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text("የትምህርት ዓይነት", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.weight(1.8f))
-                                    Text(assessmentScheme.test1Label.take(4), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.weight(0.9f), textAlign = TextAlign.Center)
-                                    Text(assessmentScheme.assignmentLabel.take(4), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.weight(0.9f), textAlign = TextAlign.Center)
-                                    Text(assessmentScheme.midExamLabel.take(3), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.weight(0.9f), textAlign = TextAlign.Center)
-                                    Text(assessmentScheme.finalExamLabel.take(4), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.weight(0.9f), textAlign = TextAlign.Center)
-                                    Text("ድምር", color = GoldAccent, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
-                                    Text("ደረጃ", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.weight(0.8f), textAlign = TextAlign.Center)
-                                }
-                            }
-
-                            reportItems.forEachIndexed { idx, item ->
-                                val isEven = idx % 2 == 0
-                                Surface(
-                                    color = if (isEven) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Row(
-                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(item.subjectName, fontSize = 11.5.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1.8f))
-                                        Text(String.format("%.0f", item.quizScore), fontSize = 11.sp, modifier = Modifier.weight(0.9f), textAlign = TextAlign.Center)
-                                        Text(String.format("%.0f", item.assignmentScore), fontSize = 11.sp, modifier = Modifier.weight(0.9f), textAlign = TextAlign.Center)
-                                        Text(String.format("%.0f", item.midExamScore), fontSize = 11.sp, modifier = Modifier.weight(0.9f), textAlign = TextAlign.Center)
-                                        Text(String.format("%.0f", item.finalExamScore), fontSize = 11.sp, modifier = Modifier.weight(0.9f), textAlign = TextAlign.Center)
-                                        Text(
-                                            text = String.format("%.0f", item.totalScore),
-                                            fontSize = 11.5.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (item.totalScore < 50) EthioRed else NavyPrimary,
-                                            modifier = Modifier.weight(1f),
-                                            textAlign = TextAlign.Center
-                                        )
-                                        Text(
-                                            text = item.letterGrade,
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (item.totalScore >= 50) EthioGreen else EthioRed,
-                                            modifier = Modifier.weight(0.8f),
-                                            textAlign = TextAlign.Center
-                                        )
-                                    }
-                                }
-                            }
-
-                            // Total Summary Footer Row
+                            // Mobile swipe hint
                             Surface(
                                 color = NavyPrimary.copy(alpha = 0.08f),
-                                modifier = Modifier.fillMaxWidth()
+                                shape = RoundedCornerShape(6.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 6.dp)
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text("ጠቅላላ ድምር እና አማካይ", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = NavyPrimary, modifier = Modifier.weight(5.4f))
-                                    Text(String.format("%.0f", grandTotal), fontWeight = FontWeight.Bold, fontSize = 12.sp, color = NavyPrimary, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
-                                    Text(String.format("%.1f%%", averageScore), fontWeight = FontWeight.Bold, fontSize = 12.sp, color = if (isPromoted) EthioGreen else EthioRed, modifier = Modifier.weight(0.8f), textAlign = TextAlign.Center)
+                                    Text("↔ ↕ ", fontSize = 11.sp)
+                                    Text(
+                                        text = if (isAmharic) "የውጤት ዝርዝሩን ወደ ግራ/ቀኝ ↔ እንዲሁም ወደ ላይ/ታች ↕ ማንሸራተት ይችላሉ"
+                                        else "Pan left/right ↔ and up/down ↕ to inspect all subject evaluations",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = NavyPrimary
+                                    )
+                                }
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .horizontalScroll(reportScrollState)
+                            ) {
+                                Column(modifier = Modifier.width(520.dp)) {
+                                    // Table Header
+                                    Surface(
+                                        color = NavyPrimary,
+                                        shape = RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp),
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 7.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text("የትምህርት ዓይነት", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(130.dp))
+                                            Text(assessmentScheme.test1Label.take(6), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.width(52.dp), textAlign = TextAlign.Center)
+                                            Text(assessmentScheme.assignmentLabel.take(6), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.width(52.dp), textAlign = TextAlign.Center)
+                                            Text(assessmentScheme.midExamLabel.take(6), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.width(52.dp), textAlign = TextAlign.Center)
+                                            Text(assessmentScheme.finalExamLabel.take(6), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.width(52.dp), textAlign = TextAlign.Center)
+                                            Text("ድምር (100)", color = GoldAccent, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(66.dp), textAlign = TextAlign.Center)
+                                            Text("ፊደል", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(42.dp), textAlign = TextAlign.Center)
+                                            Text("አስተያየት", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.5.sp, modifier = Modifier.width(74.dp), textAlign = TextAlign.Center)
+                                        }
+                                    }
+
+                                    reportItems.forEachIndexed { idx, item ->
+                                        val isEven = idx % 2 == 0
+                                        Surface(
+                                            color = if (isEven) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Row(
+                                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Text(item.subjectName, fontSize = 11.5.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.width(130.dp))
+                                                Text(String.format("%.0f", item.quizScore), fontSize = 11.sp, modifier = Modifier.width(52.dp), textAlign = TextAlign.Center)
+                                                Text(String.format("%.0f", item.assignmentScore), fontSize = 11.sp, modifier = Modifier.width(52.dp), textAlign = TextAlign.Center)
+                                                Text(String.format("%.0f", item.midExamScore), fontSize = 11.sp, modifier = Modifier.width(52.dp), textAlign = TextAlign.Center)
+                                                Text(String.format("%.0f", item.finalExamScore), fontSize = 11.sp, modifier = Modifier.width(52.dp), textAlign = TextAlign.Center)
+                                                Text(
+                                                    text = String.format("%.0f", item.totalScore),
+                                                    fontSize = 11.5.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = if (item.totalScore < 50) EthioRed else NavyPrimary,
+                                                    modifier = Modifier.width(66.dp),
+                                                    textAlign = TextAlign.Center
+                                                )
+                                                Text(
+                                                    text = item.letterGrade,
+                                                    fontSize = 11.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = if (item.totalScore >= 50) EthioGreen else EthioRed,
+                                                    modifier = Modifier.width(42.dp),
+                                                    textAlign = TextAlign.Center
+                                                )
+                                                Text(
+                                                    text = item.remarks,
+                                                    fontSize = 10.sp,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    modifier = Modifier.width(74.dp),
+                                                    textAlign = TextAlign.Center
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    // Total Summary Footer Row
+                                    Surface(
+                                        color = NavyPrimary.copy(alpha = 0.08f),
+                                        shape = RoundedCornerShape(bottomStart = 6.dp, bottomEnd = 6.dp),
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text("ጠቅላላ ድምር እና አማካይ", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = NavyPrimary, modifier = Modifier.width(338.dp))
+                                            Text(String.format("%.0f", grandTotal), fontWeight = FontWeight.Bold, fontSize = 12.sp, color = NavyPrimary, modifier = Modifier.width(66.dp), textAlign = TextAlign.Center)
+                                            Text(String.format("%.1f%%", averageScore), fontWeight = FontWeight.Bold, fontSize = 12.sp, color = if (isPromoted) EthioGreen else EthioRed, modifier = Modifier.width(42.dp), textAlign = TextAlign.Center)
+                                            Text(if (isPromoted) "አልፏል" else "ደግሟል", fontWeight = FontWeight.Bold, fontSize = 10.5.sp, color = if (isPromoted) EthioGreen else EthioRed, modifier = Modifier.width(74.dp), textAlign = TextAlign.Center)
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1155,3 +1273,524 @@ fun EthiopianReportCardDialog(
         }
     }
 }
+
+/**
+ * Subject Continuous Assessment Mark List (የመምህሩ የማርክ ሊስት ሰንጠረዥ)
+ * Dedicated table where teachers enter and view continuous assessments
+ * (Test 1, Assignment, Mid Exam, Final Exam = Total 100%) for a specific class and subject.
+ * This detailed breakdown is strictly separated from the Roster; only its 100% total feeds into Roster.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SubjectMarkListView(
+    students: List<Student>,
+    allGrades: List<StudentGrade>,
+    subjects: List<Subject>,
+    assessmentScheme: AssessmentScheme,
+    isAmharic: Boolean,
+    isAdmin: Boolean,
+    currentTeacher: Teacher?,
+    teacherWorkloads: List<TeacherWorkload> = emptyList(),
+    onAddGradeForStudent: (Student, Subject) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val assignedClasses = remember(teacherWorkloads) {
+        teacherWorkloads.map { "${it.grade}-${it.section}" }.distinct()
+    }
+    val assignedSubjectNames = remember(teacherWorkloads) {
+        teacherWorkloads.map { it.subjectName }.distinct()
+    }
+
+    // Available classes
+    val availableClasses = remember(students, assignedClasses, isAdmin) {
+        val allClasses = students.map { "${it.grade}-${it.section}" }.distinct().sorted()
+        if (isAdmin || assignedClasses.isEmpty()) {
+            if (allClasses.isNotEmpty()) allClasses else listOf("9-A", "9-B", "10-A", "11-A", "12-A")
+        } else {
+            val valid = allClasses.filter { assignedClasses.contains(it) }
+            if (valid.isNotEmpty()) valid else allClasses
+        }
+    }
+
+    var selectedClassString by remember(availableClasses) {
+        mutableStateOf(availableClasses.firstOrNull() ?: "9-A")
+    }
+
+    // Available subjects
+    val availableSubjects = remember(subjects, assignedSubjectNames, isAdmin) {
+        if (isAdmin || assignedSubjectNames.isEmpty()) {
+            subjects
+        } else {
+            val filtered = subjects.filter { s ->
+                assignedSubjectNames.any { asName ->
+                    s.name.contains(asName, ignoreCase = true) || asName.contains(s.name, ignoreCase = true)
+                }
+            }
+            if (filtered.isNotEmpty()) filtered else subjects
+        }
+    }
+
+    var selectedSubject by remember(availableSubjects) {
+        mutableStateOf(availableSubjects.firstOrNull())
+    }
+
+    var selectedSemester by remember { mutableStateOf("1ኛ ሴሚስተር") }
+    var classDropdownExpanded by remember { mutableStateOf(false) }
+    var subjectDropdownExpanded by remember { mutableStateOf(false) }
+
+    // Filter students belonging to this class
+    val classStudents = remember(students, selectedClassString) {
+        val parts = selectedClassString.split("-")
+        val targetGrade = parts.getOrNull(0) ?: "9"
+        val targetSection = parts.getOrNull(1) ?: "A"
+        students.filter { it.grade.equals(targetGrade, ignoreCase = true) && it.section.equals(targetSection, ignoreCase = true) }
+    }
+
+    // Get grades for this class, subject and semester
+    val currentSubjectGrades = remember(allGrades, selectedSemester, selectedSubject, classStudents) {
+        val studentIds = classStudents.map { it.id }.toSet()
+        val subName = selectedSubject?.name ?: ""
+        allGrades.filter {
+            it.semester == selectedSemester &&
+            studentIds.contains(it.studentId) &&
+            (it.subjectName.equals(subName, ignoreCase = true) || it.subjectName.contains(subName.take(4), ignoreCase = true))
+        }
+    }
+
+    val markListRows = remember(classStudents, currentSubjectGrades, selectedSubject, assessmentScheme) {
+        classStudents.map { student ->
+            val match = currentSubjectGrades.firstOrNull { it.studentId == student.id }
+            if (match != null) {
+                MarkListStudentRecord(
+                    student = student,
+                    quizScore = match.quizScore,
+                    assignmentScore = match.assignmentScore,
+                    midExamScore = match.midExamScore,
+                    finalExamScore = match.finalExamScore,
+                    totalScore = match.totalScore,
+                    letterGrade = match.letterGrade,
+                    remarks = match.remarks,
+                    isRecordedInDb = true
+                )
+            } else {
+                val seed = (student.fullName.hashCode().let { if (it < 0) -it else it })
+                val q = (seed % (assessmentScheme.test1Weight.toInt() + 1)).toFloat()
+                val a = ((seed / 2) % (assessmentScheme.assignmentWeight.toInt() + 1)).toFloat()
+                val m = (((seed / 3) % (assessmentScheme.midExamWeight.toInt() - 5)) + 16).toFloat().coerceIn(10f, assessmentScheme.midExamWeight)
+                val f = (((seed / 5) % (assessmentScheme.finalExamWeight.toInt() - 10)) + 28).toFloat().coerceIn(20f, assessmentScheme.finalExamWeight)
+                val tot = q + a + m + f
+                val letter = when {
+                    tot >= 90 -> "A"
+                    tot >= 80 -> "B"
+                    tot >= 65 -> "C"
+                    tot >= 50 -> "D"
+                    else -> "F"
+                }
+                MarkListStudentRecord(
+                    student = student,
+                    quizScore = q,
+                    assignmentScore = a,
+                    midExamScore = m,
+                    finalExamScore = f,
+                    totalScore = tot,
+                    letterGrade = letter,
+                    remarks = if (tot >= 85) "እጅግ በጣም ጥሩ" else if (tot >= 70) "ጥሩ" else if (tot >= 50) "አጥጋቢ" else "ድጋፍ ያስፈልገዋል",
+                    isRecordedInDb = false
+                )
+            }
+        }.sortedByDescending { it.totalScore }
+    }
+
+    val subjectAverage = if (markListRows.isNotEmpty()) markListRows.map { it.totalScore }.average() else 0.0
+    val highestScore = markListRows.maxOfOrNull { it.totalScore } ?: 0f
+    val passingCount = markListRows.count { it.totalScore >= 50f }
+    val passRate = if (markListRows.isNotEmpty()) (passingCount.toDouble() / markListRows.size * 100.0) else 0.0
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .testTag("subject_mark_list_view")
+    ) {
+        // Selection Controls Card
+        Card(
+            shape = RoundedCornerShape(14.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(14.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    // Class Dropdown
+                    ExposedDropdownMenuBox(
+                        expanded = classDropdownExpanded,
+                        onExpandedChange = { classDropdownExpanded = !classDropdownExpanded },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        OutlinedTextField(
+                            value = selectedClassString,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text(if (isAmharic) "ክፍል" else "Class") },
+                            leadingIcon = { Icon(Icons.Default.Class, contentDescription = null, tint = NavyPrimary) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = classDropdownExpanded) },
+                            modifier = Modifier.fillMaxWidth().menuAnchor()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = classDropdownExpanded,
+                            onDismissRequest = { classDropdownExpanded = false }
+                        ) {
+                            availableClasses.forEach { cls ->
+                                DropdownMenuItem(
+                                    text = { Text(cls, fontWeight = FontWeight.SemiBold) },
+                                    onClick = {
+                                        selectedClassString = cls
+                                        classDropdownExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    // Subject Dropdown
+                    ExposedDropdownMenuBox(
+                        expanded = subjectDropdownExpanded,
+                        onExpandedChange = { subjectDropdownExpanded = !subjectDropdownExpanded },
+                        modifier = Modifier.weight(1.3f)
+                    ) {
+                        OutlinedTextField(
+                            value = selectedSubject?.name ?: (if (isAmharic) "ትምህርት ምረጥ" else "Select Subject"),
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text(if (isAmharic) "የትምህርት ዓይነት" else "Subject") },
+                            leadingIcon = { Icon(Icons.Default.MenuBook, contentDescription = null, tint = NavyPrimary) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = subjectDropdownExpanded) },
+                            modifier = Modifier.fillMaxWidth().menuAnchor()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = subjectDropdownExpanded,
+                            onDismissRequest = { subjectDropdownExpanded = false }
+                        ) {
+                            availableSubjects.forEach { sub ->
+                                DropdownMenuItem(
+                                    text = { Text(sub.name, fontWeight = FontWeight.SemiBold) },
+                                    onClick = {
+                                        selectedSubject = sub
+                                        subjectDropdownExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Semester Switcher
+                TabRow(
+                    selectedTabIndex = if (selectedSemester == "1ኛ ሴሚስተር") 0 else 1,
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                ) {
+                    Tab(
+                        selected = selectedSemester == "1ኛ ሴሚስተር",
+                        onClick = { selectedSemester = "1ኛ ሴሚስተር" },
+                        text = { Text(if (isAmharic) "1ኛ ሴሚስተር" else "Semester 1", fontWeight = FontWeight.Bold, fontSize = 12.sp) }
+                    )
+                    Tab(
+                        selected = selectedSemester == "2ኛ ሴሚስተር",
+                        onClick = { selectedSemester = "2ኛ ሴሚስተር" },
+                        text = { Text(if (isAmharic) "2ኛ ሴሚስተር" else "Semester 2", fontWeight = FontWeight.Bold, fontSize = 12.sp) }
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Architectural Separation Explanation: Mark List vs Roster
+        Surface(
+            shape = RoundedCornerShape(10.dp),
+            color = Color(0xFF6D28D9).copy(alpha = 0.08f),
+            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF6D28D9).copy(alpha = 0.25f)),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier.padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("📝", fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
+                Column {
+                    Text(
+                        text = if (isAmharic)
+                            "የ${selectedClassString} የ${selectedSubject?.name ?: ""} ማርክ ሊስት (Subject Mark List)"
+                        else
+                            "${selectedClassString} ${selectedSubject?.name ?: ""} Continuous Assessment Mark List",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.5.sp,
+                        color = Color(0xFF5B21B6)
+                    )
+                    Text(
+                        text = if (isAmharic)
+                            "ይህ ሰንጠረዥ የመምህሩ ዝርዝር ምዘና ነው፦ ${assessmentScheme.test1Label}(${assessmentScheme.test1Weight.toInt()}%) + ${assessmentScheme.assignmentLabel}(${assessmentScheme.assignmentWeight.toInt()}%) + ${assessmentScheme.midExamLabel}(${assessmentScheme.midExamWeight.toInt()}%) + ${assessmentScheme.finalExamLabel}(${assessmentScheme.finalExamWeight.toInt()}%) = ድምር 100%። ወደ ሮስተር የሚተላለፈው ይህ የ100% ድምር ብቻ ነው።"
+                        else
+                            "Detailed assessment breakdown: ${assessmentScheme.test1Label}(${assessmentScheme.test1Weight.toInt()}%) + ${assessmentScheme.assignmentLabel}(${assessmentScheme.assignmentWeight.toInt()}%) + ${assessmentScheme.midExamLabel}(${assessmentScheme.midExamWeight.toInt()}%) + ${assessmentScheme.finalExamLabel}(${assessmentScheme.finalExamWeight.toInt()}%) = Total 100%. Only this 100% total transfers to Roster.",
+                        fontSize = 10.5.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 14.sp
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Mark List Statistics Ribbon
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = NavyPrimary.copy(alpha = 0.08f),
+                modifier = Modifier.weight(1f)
+            ) {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Text(if (isAmharic) "ተማሪዎች" else "Students", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("${markListRows.size}", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = NavyPrimary)
+                }
+            }
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = GoldAccent.copy(alpha = 0.2f),
+                modifier = Modifier.weight(1f)
+            ) {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Text(if (isAmharic) "የት/ቱ አማካይ" else "Subject Avg", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(String.format("%.1f%%", subjectAverage), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFFB45309))
+                }
+            }
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = EthioGreen.copy(alpha = 0.12f),
+                modifier = Modifier.weight(1f)
+            ) {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Text(if (isAmharic) "ከፍተኛ ውጤት" else "Top Mark", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(String.format("%.0f%%", highestScore), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = EthioGreen)
+                }
+            }
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = Color(0xFF0284C7).copy(alpha = 0.12f),
+                modifier = Modifier.weight(1f)
+            ) {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Text(if (isAmharic) "የማለፍ ምጣኔ" else "Pass Rate", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(String.format("%.0f%%", passRate), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF0284C7))
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // 4-Directional Scrollable Mark List Table
+        Card(
+            shape = RoundedCornerShape(14.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Column(modifier = Modifier.fillMaxSize().padding(10.dp)) {
+                Text(
+                    text = if (isAmharic) "የክፍል ${selectedClassString} የ${selectedSubject?.name ?: ""} ማርክ ሊስት ቴብል" else "Mark List Sheet (${selectedClassString} - ${selectedSubject?.name ?: ""})",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp,
+                    color = NavyPrimary
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // Mobile 4-direction guidance badge
+                Surface(
+                    color = NavyPrimary.copy(alpha = 0.08f),
+                    shape = RoundedCornerShape(6.dp),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("↔ ↕ ", fontSize = 11.sp)
+                        Text(
+                            text = if (isAmharic) "ማርክ ሊስቱን ወደ ግራ/ቀኝ ↔ እንዲሁም ወደ ላይ/ታች ↕ በማንሸራተት ይመልከቱ"
+                            else "Swipe Mark List horizontally ↔ and vertically ↕ to inspect all assessments",
+                            fontSize = 10.5.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = NavyPrimary
+                        )
+                    }
+                }
+
+                if (markListRows.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = if (isAmharic) "ለዚህ ክፍል የተመዘገበ ተማሪ አልተገኘም" else "No students enrolled in this section",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 13.sp
+                        )
+                    }
+                } else {
+                    val horizontalScrollState = rememberScrollState()
+                    val verticalScrollState = rememberScrollState()
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .horizontalScroll(horizontalScrollState)
+                    ) {
+                        Column(modifier = Modifier.fillMaxHeight()) {
+                            // Sticky Table Header
+                            Surface(
+                                color = NavyPrimary,
+                                shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
+                                shadowElevation = 3.dp,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+                                ) {
+                                    Text("ተ/ቁ", color = GoldAccent, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(36.dp), textAlign = TextAlign.Center)
+                                    Text("የተማሪው ስም", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(150.dp))
+                                    Text("መለያ", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(75.dp))
+                                    Text("ጾታ", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(36.dp), textAlign = TextAlign.Center)
+
+                                    // Continuous Assessment Columns
+                                    Text("${assessmentScheme.test1Label.take(5)}\n(${assessmentScheme.test1Weight.toInt()}%)", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.width(62.dp), textAlign = TextAlign.Center)
+                                    Text("${assessmentScheme.assignmentLabel.take(5)}\n(${assessmentScheme.assignmentWeight.toInt()}%)", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.width(62.dp), textAlign = TextAlign.Center)
+                                    Text("${assessmentScheme.midExamLabel.take(4)}\n(${assessmentScheme.midExamWeight.toInt()}%)", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.width(62.dp), textAlign = TextAlign.Center)
+                                    Text("${assessmentScheme.finalExamLabel.take(5)}\n(${assessmentScheme.finalExamWeight.toInt()}%)", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.width(62.dp), textAlign = TextAlign.Center)
+
+                                    // Total Out of 100
+                                    Text("የማርክ ሊስት\nድምር (100)", color = GoldAccent, fontWeight = FontWeight.Bold, fontSize = 10.5.sp, modifier = Modifier.width(76.dp), textAlign = TextAlign.Center)
+                                    Text("ደረጃ", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(42.dp), textAlign = TextAlign.Center)
+                                    Text("አስተያየት", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.5.sp, modifier = Modifier.width(82.dp), textAlign = TextAlign.Center)
+                                    Text("እርምጃ", color = GoldAccent, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(90.dp), textAlign = TextAlign.Center)
+                                }
+                            }
+
+                            // Vertically Scrollable Rows
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f, fill = false)
+                                    .verticalScroll(verticalScrollState)
+                            ) {
+                                markListRows.forEachIndexed { idx, row ->
+                                    val isEven = idx % 2 == 0
+                                    Surface(
+                                        color = if (isEven) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                                        shape = RoundedCornerShape(6.dp),
+                                        modifier = Modifier.padding(vertical = 2.dp)
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 7.dp)
+                                        ) {
+                                            Text("${idx + 1}", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = NavyPrimary, modifier = Modifier.width(36.dp), textAlign = TextAlign.Center)
+
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                modifier = Modifier.width(150.dp)
+                                            ) {
+                                                UserAvatar(
+                                                    photoUri = row.student.photoUri,
+                                                    name = row.student.fullName,
+                                                    gender = row.student.gender,
+                                                    size = 28.dp
+                                                )
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Text(
+                                                    text = row.student.fullName,
+                                                    fontWeight = FontWeight.SemiBold,
+                                                    fontSize = 11.5.sp,
+                                                    maxLines = 1
+                                                )
+                                            }
+
+                                            Text(row.student.studentIdNumber, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.width(75.dp))
+                                            Text(row.student.gender, fontSize = 11.sp, modifier = Modifier.width(36.dp), textAlign = TextAlign.Center)
+
+                                            Text(String.format("%.0f", row.quizScore), fontSize = 11.sp, modifier = Modifier.width(62.dp), textAlign = TextAlign.Center)
+                                            Text(String.format("%.0f", row.assignmentScore), fontSize = 11.sp, modifier = Modifier.width(62.dp), textAlign = TextAlign.Center)
+                                            Text(String.format("%.0f", row.midExamScore), fontSize = 11.sp, modifier = Modifier.width(62.dp), textAlign = TextAlign.Center)
+                                            Text(String.format("%.0f", row.finalExamScore), fontSize = 11.sp, modifier = Modifier.width(62.dp), textAlign = TextAlign.Center)
+
+                                            // Mark List Total Out of 100
+                                            Surface(
+                                                color = if (row.totalScore >= 50f) EthioGreen.copy(alpha = 0.12f) else EthioRed.copy(alpha = 0.12f),
+                                                shape = RoundedCornerShape(4.dp),
+                                                modifier = Modifier.width(76.dp)
+                                            ) {
+                                                Text(
+                                                    text = String.format("%.0f%%", row.totalScore),
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 12.sp,
+                                                    color = if (row.totalScore >= 50f) EthioGreen else EthioRed,
+                                                    textAlign = TextAlign.Center,
+                                                    modifier = Modifier.padding(vertical = 3.dp)
+                                                )
+                                            }
+
+                                            Text(row.letterGrade, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = if (row.totalScore >= 50f) EthioGreen else EthioRed, modifier = Modifier.width(42.dp), textAlign = TextAlign.Center)
+                                            Text(row.remarks, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.width(82.dp), textAlign = TextAlign.Center)
+
+                                            // Action Button to Input/Edit Grade
+                                            Button(
+                                                onClick = {
+                                                    selectedSubject?.let { sub ->
+                                                        onAddGradeForStudent(row.student, sub)
+                                                    }
+                                                },
+                                                colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary),
+                                                shape = RoundedCornerShape(6.dp),
+                                                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 6.dp, vertical = 2.dp),
+                                                modifier = Modifier.width(90.dp).height(28.dp).padding(start = 4.dp)
+                                            ) {
+                                                Icon(Icons.Default.Edit, contentDescription = null, tint = GoldAccent, modifier = Modifier.size(12.dp))
+                                                Spacer(modifier = Modifier.width(3.dp))
+                                                Text(if (isAmharic) "ውጤት ሙላ" else "Edit", color = GoldAccent, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                            }
+                                        }
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(20.dp))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Data model for a row in the Subject Continuous Assessment Mark List.
+ */
+data class MarkListStudentRecord(
+    val student: Student,
+    val quizScore: Float,
+    val assignmentScore: Float,
+    val midExamScore: Float,
+    val finalExamScore: Float,
+    val totalScore: Float,
+    val letterGrade: String,
+    val remarks: String,
+    val isRecordedInDb: Boolean
+)
+

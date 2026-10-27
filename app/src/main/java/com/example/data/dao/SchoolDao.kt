@@ -213,8 +213,20 @@ interface UserAccountDao {
     @Query("SELECT * FROM user_accounts WHERE phone = :phone AND password = :password LIMIT 1")
     suspend fun authenticate(phone: String, password: String): UserAccount?
 
+    @Query("SELECT * FROM user_accounts WHERE LOWER(email) = LOWER(:email) AND password = :password LIMIT 1")
+    suspend fun authenticateByEmail(email: String, password: String): UserAccount?
+
     @Query("SELECT * FROM user_accounts WHERE phone = :phone LIMIT 1")
     suspend fun getUserByPhone(phone: String): UserAccount?
+
+    @Query("SELECT * FROM user_accounts WHERE LOWER(email) = LOWER(:email) LIMIT 1")
+    suspend fun getUserByEmail(email: String): UserAccount?
+
+    @Query("UPDATE user_accounts SET password = :newPassword WHERE id = :userId")
+    suspend fun updatePassword(userId: Long, newPassword: String)
+
+    @Update
+    suspend fun updateUser(user: UserAccount)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUser(user: UserAccount): Long

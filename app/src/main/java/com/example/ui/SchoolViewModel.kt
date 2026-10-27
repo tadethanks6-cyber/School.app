@@ -62,6 +62,22 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
             staffDao = db.staffDao(),
             userAccountDao = db.userAccountDao()
         )
+
+        // Ensure System Admin account exists for Email login
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            val adminUser = repository.getUserByEmail("admin@dilijent.edu.et")
+            if (adminUser == null) {
+                repository.registerUser(
+                    UserAccount(
+                        fullName = "ሲስተም አድሚን (እኔ)",
+                        email = "admin@dilijent.edu.et",
+                        phone = "0900000000",
+                        password = "admin123",
+                        role = "ሲስተም አድሚን (Super Admin)"
+                    )
+                )
+            }
+        }
     }
 
     // Active Navigation Tab
@@ -395,9 +411,15 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val isSuperAdmin: StateFlow<Boolean> = _currentUser.map {
+        val role = it?.role ?: ""
+        val email = it?.email ?: ""
+        role.contains("ሲስተም") || email.equals("admin@dilijent.edu.et", ignoreCase = true)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     val isAdmin: StateFlow<Boolean> = _currentUser.map {
         val role = it?.role ?: ""
-        role.contains("ርዕሰ መምህር") || role.contains("Admin") || role.contains("አስተዳዳሪ")
+        role.contains("ርዕሰ መምህር") || role.contains("Admin") || role.contains("አስተዳዳሪ") || role.contains("ሲስተም")
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     val isTeacher: StateFlow<Boolean> = _currentUser.map {
@@ -418,20 +440,51 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         admin || role.contains("ጸሐፊ") || role.contains("መዝጋቢ") || role.contains("ምክትል")
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    // Login Form State
+    val isAdminLoginMode = MutableStateFlow(false) // false = Phone mode (Teacher/Student/Staff), true = Email mode (Admin)
+    val loginEmail = MutableStateFlow("admin@dilijent.edu.et")
     val loginPhone = MutableStateFlow("0911000000")
     val loginPassword = MutableStateFlow("1234")
     val loginErrorMessage = MutableStateFlow<String?>(null)
     val isAuthenticating = MutableStateFlow(false)
 
-    fun login(phone: String, pass: String, onSuccess: () -> Unit = {}) {
+    // Admin Credentials & Password Manager Dialog
+    val showAdminPasswordManagerDialog = MutableStateFlow(false)
+
+    fun login(
+        identifier: String,
+        pass: String,
+        isEmailLogin: Boolean = isAdminLoginMode.value,
+        onSuccess: () -> Unit = {}
+    ) {
         viewModelScope.launch {
             isAuthenticating.value = true
             loginErrorMessage.value = null
-            var user = repository.authenticate(phone.trim(), pass.trim())
+            var user: UserAccount? = if (isEmailLogin) {
+                // Email login for System Admin
+                val cleanEmail = identifier.trim()
+                val found = repository.authenticateByEmail(cleanEmail, pass.trim())
+                if (found == null && cleanEmail.equals("admin@dilijent.edu.et", ignoreCase = true) && pass.trim() == "admin123") {
+                    val fallbackAdmin = UserAccount(
+                        fullName = "ሲስተም አድሚን (እኔ)",
+                        email = "admin@dilijent.edu.et",
+                        phone = "0900000000",
+                        password = "admin123",
+                        role = "ሲስተም አድሚን (Super Admin)"
+                    )
+                    repository.registerUser(fallbackAdmin)
+                    fallbackAdmin
+                } else {
+                    found
+                }
+            } else {
+                // Phone login for Teachers, Students, Staff, and Principal
+                repository.authenticate(identifier.trim(), pass.trim())
+            }
 
-            // If account is not in user_accounts table yet but matches a Teacher, Student, or Staff member with default pin 1234
-            if (user == null && pass.trim() == "1234") {
-                val matchingTeacher = allTeachers.value.firstOrNull { it.phone == phone.trim() }
+            // Fallback for teacher/student/staff matching with initial PIN 1234
+            if (!isEmailLogin && user == null && pass.trim() == "1234") {
+                val matchingTeacher = allTeachers.value.firstOrNull { it.phone == identifier.trim() }
                 if (matchingTeacher != null) {
                     val created = UserAccount(
                         fullName = matchingTeacher.fullName,
@@ -442,7 +495,7 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                     repository.registerUser(created)
                     user = created
                 } else {
-                    val matchingStudent = allStudents.value.firstOrNull { it.parentPhone == phone.trim() || it.studentIdNumber.equals(phone.trim(), ignoreCase = true) }
+                    val matchingStudent = allStudents.value.firstOrNull { it.parentPhone == identifier.trim() || it.studentIdNumber.equals(identifier.trim(), ignoreCase = true) }
                     if (matchingStudent != null) {
                         val created = UserAccount(
                             fullName = matchingStudent.fullName,
@@ -453,7 +506,7 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                         repository.registerUser(created)
                         user = created
                     } else {
-                        val matchingStaff = allStaff.value.firstOrNull { it.phone == phone.trim() }
+                        val matchingStaff = allStaff.value.firstOrNull { it.phone == identifier.trim() }
                         if (matchingStaff != null) {
                             val created = UserAccount(
                                 fullName = matchingStaff.fullName,
@@ -483,23 +536,48 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                 onSuccess()
             } else {
                 isAuthenticating.value = false
-                loginErrorMessage.value = if (_isAmharic.value)
-                    "የስልክ ቁጥር ወይም የይለፍ ቃል ልክ አይደለም! እባክዎ እንደገና ይሞክሩ።"
-                else
-                    "Incorrect phone number or password! Please try again."
+                loginErrorMessage.value = if (_isAmharic.value) {
+                    if (isEmailLogin) "የአድሚን ኢሜል ወይም የይለፍ ቃል ልክ አይደለም! እባክዎ እንደገና ይሞክሩ።"
+                    else "የስልክ ቁጥር ወይም የይለፍ ቃል ልክ አይደለም! እባክዎ እንደገና ይሞክሩ።"
+                } else {
+                    if (isEmailLogin) "Incorrect admin email or password! Please try again."
+                    else "Incorrect phone number or password! Please try again."
+                }
             }
         }
     }
 
     // Role-specific quick login for testing and instant access
+    fun quickLoginAsAdmin() {
+        isAdminLoginMode.value = true
+        loginEmail.value = "admin@dilijent.edu.et"
+        loginPassword.value = "admin123"
+        login("admin@dilijent.edu.et", "admin123", isEmailLogin = true)
+    }
+
     fun quickLoginAs(phone: String, pass: String = "1234") {
+        isAdminLoginMode.value = false
         loginPhone.value = phone
         loginPassword.value = pass
-        login(phone, pass)
+        login(phone, pass, isEmailLogin = false)
     }
 
     fun quickLoginAsPrincipal() {
         quickLoginAs("0911000000", "1234")
+    }
+
+    fun updateUserPassword(userId: Long, newPass: String, onDone: () -> Unit = {}) {
+        viewModelScope.launch {
+            repository.updatePassword(userId, newPass.trim())
+            onDone()
+        }
+    }
+
+    fun updateUserAccount(user: UserAccount, onDone: () -> Unit = {}) {
+        viewModelScope.launch {
+            repository.updateUser(user)
+            onDone()
+        }
     }
 
     fun logout() {

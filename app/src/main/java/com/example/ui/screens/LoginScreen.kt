@@ -26,9 +26,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
+import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MenuBook
@@ -94,24 +96,31 @@ import com.example.ui.theme.NavyPrimary
 data class DemoRoleProfile(
     val titleAm: String,
     val titleEn: String,
-    val phone: String,
+    val identifier: String, // email or phone
+    val isEmail: Boolean = false,
+    val defaultPass: String = "1234",
     val color: Color,
     val iconVector: androidx.compose.ui.graphics.vector.ImageVector
 )
 
 val availableDemoRoles = listOf(
-    DemoRoleProfile("👑 ርዕሰ መምህር (Admin)", "Principal / Admin", "0911000000", Color(0xFF1E3A8A), Icons.Default.School),
-    DemoRoleProfile("👨‍🏫 መምህር - ሂሳብ (9A)", "Math Teacher (Grade 9A)", "0911223344", Color(0xFF6D28D9), Icons.Default.MenuBook),
-    DemoRoleProfile("👩‍🏫 መምህርት - እንግሊዝኛ (9A)", "English Teacher (Grade 9A)", "0922334455", Color(0xFF7C3AED), Icons.Default.MenuBook),
-    DemoRoleProfile("👨‍🎓 ተማሪ - ዮናስ (9A)", "Student - Jonas (9A)", "0911002233", Color(0xFF0284C7), Icons.Default.School),
-    DemoRoleProfile("✍️ ዋና ጸሐፊ / መዝጋቢ", "Secretary / Registrar", "0912334455", Color(0xFF0D9488), Icons.Default.People),
-    DemoRoleProfile("💰 ፋይናንስ / ሂሳብ ሹም", "Finance Officer", "0913445566", Color(0xFF047857), Icons.Default.CheckCircle),
-    DemoRoleProfile("📦 ንብረት ክፍል ኃላፊ", "Store & Property Head", "0914556677", Color(0xFFD97706), Icons.Default.Lock),
-    DemoRoleProfile("🎓 ም/ርዕሰ መምህር", "Vice Principal", "0918000000", Color(0xFF4338CA), Icons.Default.Badge)
+    DemoRoleProfile("👑 ሲስተም አድሚን (እኔ)", "System Admin (Me)", "admin@dilijent.edu.et", isEmail = true, defaultPass = "admin123", color = Color(0xFFB45309), Icons.Default.Security),
+    DemoRoleProfile("🎓 ርዕሰ መምህር (Principal)", "School Principal", "0911000000", isEmail = false, defaultPass = "1234", color = Color(0xFF1E3A8A), Icons.Default.School),
+    DemoRoleProfile("👨‍🏫 መምህር - ሂሳብ (9A)", "Math Teacher (Grade 9A)", "0911223344", isEmail = false, defaultPass = "1234", color = Color(0xFF6D28D9), Icons.Default.MenuBook),
+    DemoRoleProfile("👩‍🏫 መምህርት - እንግሊዝኛ (9A)", "English Teacher (Grade 9A)", "0922334455", isEmail = false, defaultPass = "1234", color = Color(0xFF7C3AED), Icons.Default.MenuBook),
+    DemoRoleProfile("👨‍🎓 ተማሪ - ዮናስ (9A)", "Student - Jonas (9A)", "0911002233", isEmail = false, defaultPass = "1234", color = Color(0xFF0284C7), Icons.Default.School),
+    DemoRoleProfile("✍️ ዋና ጸሐፊ / መዝጋቢ", "Secretary / Registrar", "0912334455", isEmail = false, defaultPass = "1234", color = Color(0xFF0D9488), Icons.Default.People),
+    DemoRoleProfile("💰 ፋይናንስ / ሂሳብ ሹም", "Finance Officer", "0913445566", isEmail = false, defaultPass = "1234", color = Color(0xFF047857), Icons.Default.CheckCircle),
+    DemoRoleProfile("📦 ንብረት ክፍል ኃላፊ", "Store & Property Head", "0914556677", isEmail = false, defaultPass = "1234", color = Color(0xFFD97706), Icons.Default.Lock),
+    DemoRoleProfile("🎓 ም/ርዕሰ መምህር", "Vice Principal", "0918000000", isEmail = false, defaultPass = "1234", color = Color(0xFF4338CA), Icons.Default.Badge)
 )
 
 @Composable
 fun LoginScreen(
+    isAdminMode: Boolean = false,
+    onToggleAdminMode: (Boolean) -> Unit = {},
+    email: String = "admin@dilijent.edu.et",
+    onEmailChange: (String) -> Unit = {},
     phone: String,
     onPhoneChange: (String) -> Unit,
     password: String,
@@ -124,7 +133,7 @@ fun LoginScreen(
     onToggleFullScreen: () -> Unit,
     onLoginClick: () -> Unit,
     onQuickDemoLogin: () -> Unit,
-    onQuickRoleLogin: (phone: String) -> Unit = {},
+    onQuickRoleLogin: (identifier: String, isEmail: Boolean, pass: String) -> Unit = { _, _, _ -> },
     onRegisterNewUser: (name: String, phone: String, pass: String, role: String) -> Unit,
     onGoogleSignInSuccess: (name: String, email: String, uid: String) -> Unit = { _, _, _ -> },
     onGoogleSignInError: (String) -> Unit = {}
@@ -494,8 +503,12 @@ fun LoginScreen(
                             }
                         }
 
-                        // Input Form (Phone & Password)
+                        // Input Form (Email for Admin, Phone for others)
                         LoginFormFields(
+                            isAdminMode = isAdminMode,
+                            onToggleAdminMode = onToggleAdminMode,
+                            email = email,
+                            onEmailChange = onEmailChange,
                             phone = phone,
                             onPhoneChange = onPhoneChange,
                             password = password,
@@ -525,10 +538,15 @@ fun LoginScreen(
                             roles = availableDemoRoles,
                             columns = 2,
                             isAmharic = isAmharic,
-                            onRoleSelected = { demoPhone ->
-                                onPhoneChange(demoPhone)
-                                onPasswordChange("1234")
-                                onQuickRoleLogin(demoPhone)
+                            onRoleSelected = { identifier, isEmail, pass ->
+                                onToggleAdminMode(isEmail)
+                                if (isEmail) {
+                                    onEmailChange(identifier)
+                                } else {
+                                    onPhoneChange(identifier)
+                                }
+                                onPasswordChange(pass)
+                                onQuickRoleLogin(identifier, isEmail, pass)
                             }
                         )
 
@@ -747,8 +765,12 @@ fun LoginScreen(
                             }
                         }
 
-                        // Form fields
+                        // Form fields (Email for Admin, Phone for others)
                         LoginFormFields(
+                            isAdminMode = isAdminMode,
+                            onToggleAdminMode = onToggleAdminMode,
+                            email = email,
+                            onEmailChange = onEmailChange,
                             phone = phone,
                             onPhoneChange = onPhoneChange,
                             password = password,
@@ -778,10 +800,15 @@ fun LoginScreen(
                             roles = availableDemoRoles,
                             columns = 2,
                             isAmharic = isAmharic,
-                            onRoleSelected = { demoPhone ->
-                                onPhoneChange(demoPhone)
-                                onPasswordChange("1234")
-                                onQuickRoleLogin(demoPhone)
+                            onRoleSelected = { identifier, isEmail, pass ->
+                                onToggleAdminMode(isEmail)
+                                if (isEmail) {
+                                    onEmailChange(identifier)
+                                } else {
+                                    onPhoneChange(identifier)
+                                }
+                                onPasswordChange(pass)
+                                onQuickRoleLogin(identifier, isEmail, pass)
                             }
                         )
 
@@ -827,6 +854,10 @@ fun LoginScreen(
  */
 @Composable
 private fun LoginFormFields(
+    isAdminMode: Boolean,
+    onToggleAdminMode: (Boolean) -> Unit,
+    email: String,
+    onEmailChange: (String) -> Unit,
     phone: String,
     onPhoneChange: (String) -> Unit,
     password: String,
@@ -843,29 +874,142 @@ private fun LoginFormFields(
     val focusManager = LocalFocusManager.current
 
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        // Phone Input
-        OutlinedTextField(
-            value = phone,
-            onValueChange = onPhoneChange,
-            label = { Text(if (isAmharic) "የስልክ ቁጥር" else "Phone Number") },
-            placeholder = { Text("09XXXXXXXX") },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Phone,
-                    contentDescription = null,
-                    tint = NavyPrimary
-                )
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Phone,
-                imeAction = ImeAction.Next
-            ),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp),
+        // Mode Switcher Toggle (👑 Admin by Email vs 📱 Other Users by Phone)
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .testTag("input_login_phone")
-        )
+                .clip(RoundedCornerShape(12.dp))
+                .background(NavyPrimary.copy(alpha = 0.08f))
+                .border(1.dp, NavyPrimary.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
+                .padding(4.dp)
+        ) {
+            // Admin Tab (Email)
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(if (isAdminMode) NavyPrimary else Color.Transparent)
+                    .clickable { onToggleAdminMode(true) }
+                    .padding(vertical = 8.dp)
+                    .testTag("tab_login_mode_admin")
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = "👑", fontSize = 13.sp)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = if (isAmharic) "አድሚን (በኢሜል)" else "Admin (Email)",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isAdminMode) GoldAccent else NavyPrimary
+                    )
+                }
+            }
+
+            // Other Users Tab (Phone)
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .weight(1.3f)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(if (!isAdminMode) NavyPrimary else Color.Transparent)
+                    .clickable { onToggleAdminMode(false) }
+                    .padding(vertical = 8.dp)
+                    .testTag("tab_login_mode_phone")
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = "📱", fontSize = 13.sp)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = if (isAmharic) "መምህራን/ተማሪዎች (በስልክ)" else "Teachers/Students (Phone)",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (!isAdminMode) GoldAccent else NavyPrimary
+                    )
+                }
+            }
+        }
+
+        // Mode Explanatory Notice
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            color = if (isAdminMode) GoldAccent.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = if (isAdminMode) Icons.Default.Security else Icons.Default.Phone,
+                    contentDescription = null,
+                    tint = if (isAdminMode) Color(0xFFB45309) else NavyPrimary,
+                    modifier = Modifier.size(14.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = if (isAdminMode) {
+                        if (isAmharic) "የሲስተም አድሚን ብቻ በኢሜልና በይለፍ ቃል ይገባል (admin@dilijent.edu.et)"
+                        else "System Admin only logs in via Email & Password"
+                    } else {
+                        if (isAmharic) "ርዕሰ መምህር፣ መምህራን፣ ተማሪዎች እና ሰራተኞች በስልክ ቁጥር ይገባሉ"
+                        else "Principal, Teachers, Students & Staff log in via Phone Number"
+                    },
+                    fontSize = 10.sp,
+                    color = if (isAdminMode) Color(0xFFB45309) else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        if (isAdminMode) {
+            // Admin Email Input
+            OutlinedTextField(
+                value = email,
+                onValueChange = onEmailChange,
+                label = { Text(if (isAmharic) "የአድሚን ኢሜል አድራሻ" else "Admin Email Address") },
+                placeholder = { Text("admin@dilijent.edu.et") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Email,
+                        contentDescription = null,
+                        tint = NavyPrimary
+                    )
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                ),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("input_login_admin_email")
+            )
+        } else {
+            // Other Users Phone Input
+            OutlinedTextField(
+                value = phone,
+                onValueChange = onPhoneChange,
+                label = { Text(if (isAmharic) "የስልክ ቁጥር (Phone Number)" else "Phone Number") },
+                placeholder = { Text("09XXXXXXXX") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Phone,
+                        contentDescription = null,
+                        tint = NavyPrimary
+                    )
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Phone,
+                    imeAction = ImeAction.Next
+                ),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("input_login_phone")
+            )
+        }
 
         // Password Input
         OutlinedTextField(
@@ -896,7 +1040,9 @@ private fun LoginFormFields(
             keyboardActions = KeyboardActions(
                 onDone = {
                     focusManager.clearFocus()
-                    if (phone.isNotBlank() && password.isNotBlank()) onLoginClick()
+                    val isValid = if (isAdminMode) email.isNotBlank() && password.isNotBlank()
+                                  else phone.isNotBlank() && password.isNotBlank()
+                    if (isValid) onLoginClick()
                 }
             ),
             singleLine = true,
@@ -909,9 +1055,10 @@ private fun LoginFormFields(
         Spacer(modifier = Modifier.height(4.dp))
 
         // Sign In Button (Stretches Full Width)
+        val canSubmit = !isLoading && password.isNotBlank() && (if (isAdminMode) email.isNotBlank() else phone.isNotBlank())
         Button(
             onClick = onLoginClick,
-            enabled = !isLoading && phone.isNotBlank() && password.isNotBlank(),
+            enabled = canSubmit,
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary),
             modifier = Modifier
@@ -927,11 +1074,46 @@ private fun LoginFormFields(
                 )
             } else {
                 Text(
-                    text = if (isAmharic) "ወደ ስርዓቱ ግባ" else "Sign In",
+                    text = if (isAdminMode) (if (isAmharic) "እንደ ሲስተም አድሚን ግባ" else "Sign In as Admin")
+                           else (if (isAmharic) "ወደ ስርዓቱ ግባ" else "Sign In"),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
+            }
+        }
+
+        // Fast Quick Admin Login shortcut button
+        if (isAdminMode) {
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = GoldAccent.copy(alpha = 0.2f),
+                border = androidx.compose.foundation.BorderStroke(1.dp, GoldAccent),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .clickable {
+                        onEmailChange("admin@dilijent.edu.et")
+                        onPasswordChange("admin123")
+                        onLoginClick()
+                    }
+                    .testTag("btn_quick_admin_login")
+            ) {
+                Row(
+                    modifier = Modifier.padding(10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(text = "👑", fontSize = 16.sp)
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = if (isAmharic) "⚡ ፈጣን የአድሚን መግቢያ (admin@dilijent.edu.et / admin123)"
+                               else "⚡ Quick Admin Login (admin@dilijent.edu.et / admin123)",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = NavyPrimary
+                    )
+                }
             }
         }
 
@@ -1012,7 +1194,7 @@ private fun RoleSelectorGrid(
     roles: List<DemoRoleProfile>,
     columns: Int,
     isAmharic: Boolean,
-    onRoleSelected: (String) -> Unit
+    onRoleSelected: (identifier: String, isEmail: Boolean, pass: String) -> Unit
 ) {
     val chunked = roles.chunked(columns)
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -1029,8 +1211,10 @@ private fun RoleSelectorGrid(
                         modifier = Modifier
                             .weight(1f)
                             .clip(RoundedCornerShape(10.dp))
-                            .clickable { onRoleSelected(roleProfile.phone) }
-                            .testTag("btn_role_${roleProfile.phone}")
+                            .clickable {
+                                onRoleSelected(roleProfile.identifier, roleProfile.isEmail, roleProfile.defaultPass)
+                            }
+                            .testTag("btn_role_${roleProfile.identifier}")
                     ) {
                         Column(
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 7.dp)
@@ -1043,9 +1227,10 @@ private fun RoleSelectorGrid(
                                 maxLines = 1
                             )
                             Text(
-                                text = roleProfile.phone,
+                                text = roleProfile.identifier,
                                 fontSize = 9.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1
                             )
                         }
                     }

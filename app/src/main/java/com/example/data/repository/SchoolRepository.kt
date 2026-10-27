@@ -175,11 +175,23 @@ class SchoolRepository(
     suspend fun authenticate(phone: String, password: String): UserAccount? =
         userAccountDao.authenticate(phone, password)
 
+    suspend fun authenticateByEmail(email: String, password: String): UserAccount? =
+        userAccountDao.authenticateByEmail(email, password)
+
     suspend fun getUserByPhone(phone: String): UserAccount? =
         userAccountDao.getUserByPhone(phone)
 
+    suspend fun getUserByEmail(email: String): UserAccount? =
+        userAccountDao.getUserByEmail(email)
+
     suspend fun registerUser(user: UserAccount): Long =
         userAccountDao.insertUser(user)
+
+    suspend fun updatePassword(userId: Long, newPassword: String) =
+        userAccountDao.updatePassword(userId, newPassword)
+
+    suspend fun updateUser(user: UserAccount) =
+        userAccountDao.updateUser(user)
 
     val allUsers: Flow<List<UserAccount>> = userAccountDao.getAllUsers()
 

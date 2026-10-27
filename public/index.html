@@ -82,11 +82,117 @@
     .btn-accent { background: var(--accent); color: #78350F; border: none; padding: 0.5rem 0.9rem; border-radius: 8px; font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: inherit; }
     .btn-accent:hover { background: #D97706; color: white; }
 
-    .table-responsive { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
-    th { background: #F8FAFC; color: #475569; padding: 0.65rem 0.8rem; font-weight: 600; font-size: 0.78rem; border-bottom: 2px solid var(--border); }
-    td { padding: 0.65rem 0.8rem; border-bottom: 1px solid var(--border); }
-    tr:hover td { background: #F8FAFC; }
+    /* 4-Directional Scrollable Table Container (2D bidirectional pan/scroll for mobile & desktop) */
+    .table-responsive {
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: 520px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary-light) #F1F5F9;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      position: relative;
+      touch-action: pan-x pan-y;
+    }
+    .table-responsive::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .table-responsive::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 4px;
+    }
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-light);
+    }
+    .table-responsive::-webkit-scrollbar-track {
+      background: #F8FAFC;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 0.85rem;
+      text-align: left;
+      min-width: 640px;
+    }
+    thead th {
+      background: #F8FAFC;
+      color: #334155;
+      padding: 0.7rem 0.85rem;
+      font-weight: 700;
+      font-size: 0.78rem;
+      border-bottom: 2px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+    td {
+      padding: 0.65rem 0.85rem;
+      border-bottom: 1px solid var(--border);
+      background: white;
+      white-space: nowrap;
+    }
+    tr:hover td {
+      background: #F8FAFC;
+    }
+
+    /* 4-Direction Mobile Scroll Affordance */
+    .mobile-scroll-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #EFF6FF;
+      color: #1E40AF;
+      border: 1px solid #BFDBFE;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+    }
+
+    /* Roster table specific sticky headers & pinned first columns */
+    #rosterTable thead th {
+      position: sticky;
+      top: 0;
+      z-index: 12;
+      background: #1E3A8A;
+      color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+    }
+    #rosterTable thead th:nth-child(1),
+    #rosterTable thead th:nth-child(2) {
+      position: sticky;
+      z-index: 22;
+      background: #1E3A8A;
+    }
+    #rosterTable thead th:nth-child(1) { left: 0; }
+    #rosterTable thead th:nth-child(2) { left: 55px; }
+
+    #rosterTable td:nth-child(1),
+    #rosterTable td:nth-child(2) {
+      position: sticky;
+      z-index: 8;
+      background: white;
+    }
+    #rosterTable td:nth-child(1) {
+      left: 0;
+      background: #F8FAFC;
+      text-align: center;
+      font-weight: 700;
+    }
+    #rosterTable td:nth-child(2) {
+      left: 55px;
+      box-shadow: 2px 0 4px rgba(0,0,0,0.06);
+    }
+    #rosterTable tr:hover td:nth-child(1),
+    #rosterTable tr:hover td:nth-child(2) {
+      background: #EFF6FF;
+    }
 
     .badge { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.72rem; font-weight: 600; }
     .badge-success { background: #DCFCE7; color: #15803D; }
@@ -132,7 +238,12 @@
         </div>
       </div>
       <div class="header-actions">
-        <div class="user-pill" id="currentRoleDisplay">👤 ኃላፊ (Admin)</div>
+        <div class="user-pill" id="currentRoleDisplay" onclick="openLoginModal()" style="cursor:pointer;" title="ግባ / መለያ ቀይር">
+          👑 ሲስተም አድሚን (admin@dilijent.edu.et)
+        </div>
+        <button id="btnAdminPassManager" class="apk-btn" style="background:#FDE047; color:#78350F; border:none; cursor:pointer;" onclick="openPasswordManagerModal()">
+          <span>🔐</span><span>የይለፍ ቃል</span>
+        </button>
         <a href="dilijent-school.apk" class="apk-btn" download>
           <span>📲</span><span>APK አውርድ</span>
         </a>
@@ -149,8 +260,9 @@
         <p>ይህ ድረ-ገጽ በማንኛውም ስልክ እና ኮምፒውተር ላይ በብሮውዘር ይሰራል! አዳዲስ መረጃዎችን መመዝገብና መመልከት ይችላሉ።</p>
       </div>
       <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-        <button class="btn-accent" onclick="openSchemeModal()">⚙️ የውጤት አሰጣጥ ማዋቀሪያ (ርዕሰ መ/ር)</button>
-        <button class="btn-secondary" onclick="openRoleModal()">🔄 ሚና ቀይር (Role)</button>
+        <button class="btn-primary" onclick="openLoginModal()">🔑 የመግቢያ ገጽ (Login)</button>
+        <button id="btnBannerPassManager" class="btn-accent" onclick="openPasswordManagerModal()">🔐 የይለፍ ቃል መቆጣጠሪያ</button>
+        <button class="btn-secondary" onclick="openSchemeModal()">⚙️ የውጤት አሰጣጥ (ርዕሰ መ/ር)</button>
         <button class="btn-secondary" onclick="shareWebsiteLink()">🔗 ሊንክ ኮፒ</button>
       </div>
     </div>
@@ -175,8 +287,8 @@
       <button class="tab-btn active" onclick="switchTab('dashboard')">📊 ዳሽቦርድ (Overview)</button>
       <button class="tab-btn" onclick="switchTab('students')">👨‍🎓 የተማሪዎች ዝርዝር (Students)</button>
       <button class="tab-btn" onclick="switchTab('teachers')">👩‍🏫 መምህራን (Teachers)</button>
-      <button class="tab-btn" onclick="switchTab('grades')">📝 ውጤት እና ምዘና (Grades)</button>
-      <button class="tab-btn" onclick="switchTab('roster')">📋 የክፍል ኃላፊ ሮስተር (Homeroom Roster)</button>
+      <button class="tab-btn" onclick="switchTab('grades')">📝 የመምህራን ማርክ ሊስት (Mark List)</button>
+      <button class="tab-btn" onclick="switchTab('roster')">📋 የክፍል ኃላፊ ሮስተር (Composite Roster)</button>
       <button class="tab-btn" onclick="switchTab('attendance')">📅 የዕለት አቴንዳንስ (Attendance)</button>
       <button class="tab-btn" onclick="switchTab('report')">📜 የውጤት ካርድ (Report Card)</button>
     </div>
@@ -295,14 +407,14 @@
       </div>
     </div>
 
-    <!-- TAB 4: GRADES -->
+    <!-- TAB 4: GRADES / SUBJECT MARK LIST -->
     <div id="tab-grades" class="tab-content" style="display:none;">
       <div class="panel-card">
         <div class="panel-header">
           <div>
-            <h3 class="panel-title">የኢትዮጵያ ስርዓተ-ትምህርት ምዘና እና ውጤት (100%)</h3>
+            <h3 class="panel-title">📝 የመምህራን የትምህርት ዓይነት ማርክ ሊስት (Subject Mark List)</h3>
             <p id="gradeTableSubLabel" style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem;">
-              እንደ ርዕሰ መ/ር ምርጫ የሚሰላ
+              ምዘና 1 (10%) + የቤት ስራ (10%) + አጋማሽ (30%) + ማጠቃለያ (50%) = የማርክ ሊስት ድምር (100%)
             </p>
           </div>
           <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
@@ -310,6 +422,12 @@
             <button class="btn-accent" onclick="openSchemeModal()">⚙️ ስርዓተ-ትምህርት አዋቅር (ርዕሰ መ/ር)</button>
           </div>
         </div>
+
+        <!-- Mark List Distinction Banner -->
+        <div style="background:#EDE9FE; border:1px solid #DDD6FE; border-radius:8px; padding:0.65rem 0.95rem; margin-bottom:0.85rem; font-size:0.78rem; color:#5B21B6; line-height:1.4;">
+          💡 <strong>የማርክ ሊስት እና የሮስተር ልዩነት፦</strong> ይህ ሰንጠረዥ የመምህሩ ራሱን የቻለ ዝርዝር ተከታታይ ምዘና ማርክ ሊስት ነው። የክፍል ኃላፊው ሮስተር ከዚህ ማርክ ሊስት ላይ <strong>የ100% ድምር ውጤትን ብቻ</strong> በመውሰድ አጠቃላይ የክፍል ደረጃ፣ ጠቅላላ ድምር እና አማካይ ያሰላል።
+        </div>
+
         <div style="margin-bottom:0.85rem; display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
           <label style="font-size:0.8rem; font-weight:600; color:#475569;">የትምህርት ዓይነት ምረጥ (Filter Subject):</label>
           <select id="gradeSubjectFilter" class="form-control" style="width:auto; min-width:200px;" onchange="renderGrades()">
@@ -389,20 +507,29 @@
           </div>
         </div>
 
-        <!-- Master Roster Table -->
-        <div class="table-responsive" style="max-height:600px; overflow-y:auto; border:1px solid var(--border); border-radius:8px;">
-          <table style="width:100%; border-collapse:collapse; min-width:920px;">
+        <!-- Roster Distinction Banner -->
+        <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:0.65rem 0.95rem; margin-bottom:0.85rem; font-size:0.78rem; color:#1E40AF; line-height:1.4;">
+          📌 <strong>የሮስተር ደንብ፦</strong> ሮስተር የእያንዳንዱን የትምህርት ዓይነት ከየመምህራኑ ማርክ ሊስት ላይ <strong>የ100% ድምር ውጤታቸውን ብቻ</strong> በመውሰድ አጠቃላይ ድምር (ከ 600)፣ አማካይ (%)፣ የክፍል ደረጃ (Rank) እና የማለፊያ ሁኔታ ያሰላል። የፈተናዎች ዝርዝር ምዘና በ«መምህራን ማርክ ሊስት» ገፅ ይገኛል።
+        </div>
+
+        <!-- Master Roster Table (4-Directional Bidirectional Scrolling) -->
+        <div class="mobile-scroll-hint">
+          <span>↔ ↕</span>
+          <span>በስልክዎ ሰንጠረዡን ወደ ግራ/ቀኝ ↔ እንዲሁም ወደ ላይ/ታች ↕ በማንሸራተት ሙሉ መረጃውን ይመልከቱ (Pan in 4 directions)</span>
+        </div>
+        <div class="table-responsive" style="max-height:560px;">
+          <table id="rosterTable" style="width:100%; border-collapse:separate; border-spacing:0; min-width:960px;">
             <thead>
               <tr style="background:#1E3A8A; color:white; font-size:0.78rem;">
                 <th style="padding:10px 8px; text-align:center; width:55px;">ደረጃ</th>
                 <th style="padding:10px 8px;">ተማሪ (ስም እና ፎቶ)</th>
                 <th style="padding:10px 8px; text-align:center; width:80px;">መለያ ቁጥር</th>
-                <th style="padding:10px 8px; text-align:center;">ሒሳብ</th>
-                <th style="padding:10px 8px; text-align:center;">እንግሊዝኛ</th>
-                <th style="padding:10px 8px; text-align:center;">ፊዚክስ</th>
-                <th style="padding:10px 8px; text-align:center;">ኬሚስትሪ</th>
-                <th style="padding:10px 8px; text-align:center;">ባዮሎጂ</th>
-                <th style="padding:10px 8px; text-align:center;">ስነ-ዜጋ</th>
+                <th style="padding:10px 8px; text-align:center;">ሒሳብ<br><small style="color:var(--accent); font-weight:600;">(ከ 100)</small></th>
+                <th style="padding:10px 8px; text-align:center;">እንግሊዝኛ<br><small style="color:var(--accent); font-weight:600;">(ከ 100)</small></th>
+                <th style="padding:10px 8px; text-align:center;">ፊዚክስ<br><small style="color:var(--accent); font-weight:600;">(ከ 100)</small></th>
+                <th style="padding:10px 8px; text-align:center;">ኬሚስትሪ<br><small style="color:var(--accent); font-weight:600;">(ከ 100)</small></th>
+                <th style="padding:10px 8px; text-align:center;">ባዮሎጂ<br><small style="color:var(--accent); font-weight:600;">(ከ 100)</small></th>
+                <th style="padding:10px 8px; text-align:center;">ስነ-ዜጋ<br><small style="color:var(--accent); font-weight:600;">(ከ 100)</small></th>
                 <th style="padding:10px 8px; text-align:center; background:#172554;">ጠቅላላ (600)</th>
                 <th style="padding:10px 8px; text-align:center; background:#172554;">አማካይ %</th>
                 <th style="padding:10px 8px; text-align:center;">ሁኔታ</th>
@@ -764,24 +891,108 @@
     </div>
   </div>
 
-  <!-- Modal: Switch Role -->
-  <div id="roleModal" class="modal-overlay">
-    <div class="modal-box">
-      <div class="modal-title">🔄 ሚና ይምረጡ (Select Role)</div>
-      <p style="font-size:0.85rem; color:#475569; margin-bottom:1rem;">እንደየትኛው ተጠቃሚ መግባት ይፈልጋሉ?</p>
-      <div style="display:flex; flex-direction:column; gap:0.5rem;">
-        <button class="btn-secondary" style="text-align:left; padding:0.8rem;" onclick="setRole('admin')">
-          <strong>👑 የትምህርት ቤት ኃላፊ (Admin)</strong><br><small>ሙሉ የመቆጣጠር፣ የተማሪና መምህራን የመመዝገብ፣ ስርዓተ-ትምህርት የማዋቀር መብት</small>
+  <!-- Modal: Dual Login Gate (Admin Email vs Others Phone) -->
+  <div id="loginModal" class="modal-overlay">
+    <div class="modal-box" style="max-width:480px; width:95%;">
+      <div class="modal-title">🔐 ወደ ስርዓቱ መግቢያ (Sign In)</div>
+      
+      <!-- Mode Toggle: Admin by Email vs Others by Phone -->
+      <div style="display:flex; background:#F1F5F9; border-radius:10px; padding:4px; margin-bottom:1rem; border:1px solid #E2E8F0;">
+        <button type="button" id="tabLoginAdmin" onclick="setWebLoginMode('admin')" style="flex:1; border:none; padding:8px; border-radius:8px; font-weight:700; font-size:0.8rem; cursor:pointer; background:var(--primary); color:white; font-family:inherit;">
+          👑 አድሚን (Email)
         </button>
-        <button class="btn-secondary" style="text-align:left; padding:0.8rem;" onclick="setRole('teacher')">
-          <strong>👩‍🏫 መምህር (Teacher)</strong><br><small>የክፍል አቴንዳንስ መመዝገብ እና ውጤት ማስገባት</small>
-        </button>
-        <button class="btn-secondary" style="text-align:left; padding:0.8rem;" onclick="setRole('student')">
-          <strong>👨‍🎓 ተማሪ / ወላጅ (Student/Parent)</strong><br><small>የራስን ውጤት ካርድ እና የክፍል መርሃ-ግብር ማየት</small>
+        <button type="button" id="tabLoginPhone" onclick="setWebLoginMode('phone')" style="flex:1.2; border:none; padding:8px; border-radius:8px; font-weight:700; font-size:0.8rem; cursor:pointer; background:transparent; color:var(--text-muted); font-family:inherit;">
+          📱 መምህራን/ተማሪዎች (ስልክ)
         </button>
       </div>
-      <div class="modal-actions">
-        <button type="button" class="btn-secondary" onclick="closeRoleModal()">ዝጋ</button>
+
+      <!-- Mode explanation banner -->
+      <div id="loginModeNotice" style="background:#FEF3C7; border:1px solid #FCD34D; border-radius:8px; padding:8px 12px; margin-bottom:1rem; font-size:0.75rem; color:#92400E;">
+        👑 የሲስተም አድሚን ብቻ በኢሜል እና በይለፍ ቃል ይገባል (admin@dilijent.edu.et / admin123)
+      </div>
+
+      <form id="webLoginForm" onsubmit="handleWebLoginSubmit(event)">
+        <!-- Admin Email Field -->
+        <div id="loginEmailGroup" class="form-group">
+          <label>የአድሚን ኢሜል አድራሻ *</label>
+          <input type="email" id="inputWebLoginEmail" class="form-control" value="admin@dilijent.edu.et" placeholder="admin@dilijent.edu.et">
+        </div>
+
+        <!-- Phone Field for Teachers, Students & Staff -->
+        <div id="loginPhoneGroup" class="form-group" style="display:none;">
+          <label>የስልክ ቁጥር (Phone Number) *</label>
+          <input type="tel" id="inputWebLoginPhone" class="form-control" placeholder="09XXXXXXXX" value="0911000000">
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+          <label>የይለፍ ቃል (Password) *</label>
+          <input type="password" id="inputWebLoginPass" class="form-control" value="admin123" required placeholder="••••••••">
+        </div>
+
+        <button type="submit" class="btn-primary" style="width:100%; padding:0.65rem; font-size:0.9rem; margin-top:0.5rem;">
+          ወደ ስርዓቱ ግባ (Sign In)
+        </button>
+      </form>
+
+      <!-- Quick Fast Demo Roles -->
+      <div style="margin-top:1.25rem; border-top:1px solid #E2E8F0; padding-top:0.75rem;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--primary); margin-bottom:0.4rem;">
+          ⚡ ፈጣን የመግቢያ ሚና ይምረጡ (Select to Login):
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem; font-size:0.75rem;">
+          <button type="button" class="btn-secondary" style="text-align:left; padding:6px 8px; border-color:#F59E0B; background:#FEF3C7; color:#92400E;" onclick="quickWebLogin('admin')">
+            <strong>👑 ሲስተም አድሚን (እኔ)</strong><br><small>admin@dilijent.edu.et</small>
+          </button>
+          <button type="button" class="btn-secondary" style="text-align:left; padding:6px 8px;" onclick="quickWebLogin('principal')">
+            <strong>🎓 ርዕሰ መምህር</strong><br><small>0911000000</small>
+          </button>
+          <button type="button" class="btn-secondary" style="text-align:left; padding:6px 8px;" onclick="quickWebLogin('math_teacher')">
+            <strong>👨‍🏫 መምህር (ሒሳብ)</strong><br><small>0911223344</small>
+          </button>
+          <button type="button" class="btn-secondary" style="text-align:left; padding:6px 8px;" onclick="quickWebLogin('student')">
+            <strong>👨‍🎓 ተማሪ (ዮናስ)</strong><br><small>0911002233</small>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top:1rem;">
+        <button type="button" class="btn-secondary" onclick="closeLoginModal()">ዝጋ (Close)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Admin Password Manager (የተጠቃሚዎች የይለፍ ቃል መቆጣጠሪያ) -->
+  <div id="passwordManagerModal" class="modal-overlay">
+    <div class="modal-box" style="max-width:720px; width:95%;">
+      <div class="modal-title" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>🔐 የተጠቃሚዎች የይለፍ ቃል መቆጣጠሪያ (Credentials Manager)</span>
+        <span class="badge badge-primary">አድሚን ብቻ</span>
+      </div>
+      
+      <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:0.6rem 0.9rem; font-size:0.78rem; color:#1E40AF; margin-bottom:1rem;">
+        👑 <strong>የአድሚን ማስተር ኮንትሮል፦</strong> አድሚኑ የሁሉንም መምህራን፣ ተማሪዎች እና ሰራተኞች የይለፍ ቃል ማየት፣ ማስተካከል እና አዲስ የይለፍ ቃል መመደብ ይችላል።
+      </div>
+
+      <div class="table-responsive" style="max-height:400px;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
+          <thead>
+            <tr style="background:var(--primary); color:white;">
+              <th style="padding:8px;">ስም (Full Name)</th>
+              <th style="padding:8px;">ሚና (Role)</th>
+              <th style="padding:8px;">መግቢያ (Email / Phone)</th>
+              <th style="padding:8px; text-align:center;">የይለፍ ቃል (Password)</th>
+              <th style="padding:8px; text-align:center;">እርምጃ</th>
+            </tr>
+          </thead>
+          <tbody id="userAccountsTableBody">
+            <!-- Rendered dynamically via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="modal-actions" style="margin-top:1rem;">
+        <button type="button" class="btn-primary" onclick="closePasswordManagerModal()">ጨርስ እና ዝጋ (Done)</button>
       </div>
     </div>
   </div>
@@ -832,9 +1043,13 @@
         <div><strong>አማካይ ውጤት:</strong> <span id="cardModalAvg" style="color:#078930; font-weight:800; font-size:0.9rem;">-</span></div>
       </div>
 
-      <!-- Subject Marks Breakdown Table -->
-      <div class="table-responsive" style="margin-bottom:1rem; border:1px solid #CBD5E1; border-radius:6px; overflow:hidden;">
-        <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
+      <!-- Subject Marks Breakdown Table (4-Directional Scroll) -->
+      <div class="mobile-scroll-hint" style="margin-bottom:0.4rem;">
+        <span>↔ ↕</span>
+        <span>የውጤት ዝርዝሩን ወደ ግራ/ቀኝ ↔ እንዲሁም ወደ ላይ/ታች ↕ ማንሸራተት ይችላሉ</span>
+      </div>
+      <div class="table-responsive" style="margin-bottom:1rem; border:1px solid #CBD5E1; border-radius:6px; max-height:360px;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.8rem; min-width:680px;">
           <thead>
             <tr style="background:#1E3A8A; color:white; font-size:0.75rem;">
               <th style="padding:7px 8px;">የትምህርት ዓይነት</th>
@@ -1135,9 +1350,9 @@
         <th>${currentScheme.asLabel} (${currentScheme.asWeight}%)</th>
         <th>${currentScheme.midLabel} (${currentScheme.midWeight}%)</th>
         <th>${currentScheme.finalLabel} (${currentScheme.finalWeight}%)</th>
-        <th>ድምር (100%)</th>
-        <th>ደረጃ</th>
-        <th>እርምጃ</th>
+        <th style="background:#1E3A8A; color:white; text-align:center;">የማርክ ሊስቱ ድምር (100%)</th>
+        <th style="text-align:center;">ደረጃ</th>
+        <th style="text-align:center;">እርምጃ</th>
       `;
 
       const tbody = document.getElementById('gradesTableBody');

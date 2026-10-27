@@ -112,7 +112,7 @@ fun GradesScreen(
     var activeReportCardRank by remember { mutableStateOf(1) }
     var activeReportCardTotal by remember { mutableStateOf(1) }
 
-    // Tab switcher between Individual Student View and Homeroom Roster Table
+    // Tab switcher: 0 = Subject Mark List, 1 = Homeroom Roster Table, 2 = Individual Student Card
     val isHomeroomTeacher = currentTeacher?.isHomeroomTeacher == true
     var gradesViewMode by remember { mutableStateOf(if (isHomeroomTeacher && !isAdmin) 1 else 0) }
 
@@ -289,7 +289,7 @@ fun GradesScreen(
                 }
             }
 
-            // Mode Switcher: Single Student Card vs Homeroom Roster Table (Teachers & Admin)
+            // Mode Switcher: 0 = Subject Mark List, 1 = Homeroom Roster Table, 2 = Individual Student Card
             if (!isStudent) {
                 TabRow(
                     selectedTabIndex = gradesViewMode,
@@ -306,10 +306,10 @@ fun GradesScreen(
                         onClick = { gradesViewMode = 0 },
                         text = {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("👤 ", fontSize = 13.sp)
+                                Text("📝 ", fontSize = 13.sp)
                                 Text(
-                                    if (isAmharic) "የተማሪ ውጤት (ካርድ)" else "Student Report",
-                                    fontSize = 12.sp,
+                                    if (isAmharic) "ማርክ ሊስት" else "Mark List",
+                                    fontSize = 11.5.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
@@ -322,8 +322,8 @@ fun GradesScreen(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text("📋 ", fontSize = 13.sp)
                                 Text(
-                                    if (isAmharic) "የክፍል ኃላፊ ሮስተር ቴብል" else "Homeroom Roster",
-                                    fontSize = 12.sp,
+                                    if (isAmharic) "የክፍል ኃላፊ ሮስተር" else "Roster",
+                                    fontSize = 11.5.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                                 if (isHomeroomTeacher) {
@@ -344,29 +344,63 @@ fun GradesScreen(
                             }
                         }
                     )
+                    Tab(
+                        selected = gradesViewMode == 2,
+                        onClick = { gradesViewMode = 2 },
+                        text = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("👤 ", fontSize = 13.sp)
+                                Text(
+                                    if (isAmharic) "የተማሪ ካርድ" else "Student Card",
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    )
                 }
             }
 
-            if (gradesViewMode == 1 && !isStudent) {
-                // Dedicated Homeroom Roster View
-                HomeroomRosterView(
-                    students = students,
-                    allGrades = allGrades,
-                    subjects = subjects,
-                    assessmentScheme = assessmentScheme,
-                    isAmharic = isAmharic,
-                    isAdmin = isAdmin,
-                    currentTeacher = currentTeacher,
-                    onViewReportCard = { student, stGrades, rank, total ->
-                        activeReportCardStudent = student
-                        activeReportCardGrades = stGrades
-                        activeReportCardRank = rank
-                        activeReportCardTotal = total
-                    },
-                    modifier = Modifier.fillMaxSize()
-                )
-            } else {
-                // Individual Student Report View
+            when {
+                gradesViewMode == 0 && !isStudent -> {
+                    // Dedicated Subject Continuous Assessment Mark List (Quiz + Homework + Mid + Final = 100)
+                    SubjectMarkListView(
+                        students = students,
+                        allGrades = allGrades,
+                        subjects = subjects,
+                        assessmentScheme = assessmentScheme,
+                        isAmharic = isAmharic,
+                        isAdmin = isAdmin,
+                        currentTeacher = currentTeacher,
+                        teacherWorkloads = teacherWorkloads,
+                        onAddGradeForStudent = { student, _ ->
+                            onSelectStudent(student)
+                            onAddGradeClick()
+                        },
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+                gradesViewMode == 1 && !isStudent -> {
+                    // Dedicated Homeroom Roster View (Strictly aggregates each subject's 100% total from the Mark List)
+                    HomeroomRosterView(
+                        students = students,
+                        allGrades = allGrades,
+                        subjects = subjects,
+                        assessmentScheme = assessmentScheme,
+                        isAmharic = isAmharic,
+                        isAdmin = isAdmin,
+                        currentTeacher = currentTeacher,
+                        onViewReportCard = { student, stGrades, rank, total ->
+                            activeReportCardStudent = student
+                            activeReportCardGrades = stGrades
+                            activeReportCardRank = rank
+                            activeReportCardTotal = total
+                        },
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+                else -> {
+                    // Individual Student Report View
                 // Student Picker Dropdown
                 ExposedDropdownMenuBox(
                     expanded = studentDropdownExpanded,
@@ -611,6 +645,7 @@ fun GradesScreen(
                     }
                 }
             }
+        }
         }
 
         val canAddGrade = (isAdmin || (isTeacherRole && assignedSubjectNames.isNotEmpty())) && !isStudent && gradesViewMode == 0
