@@ -994,13 +994,88 @@ class MainActivity : ComponentActivity() {
                             contentWindowInsets = WindowInsets(0, 0, 0, 0),
                             modifier = Modifier.fillMaxSize()
                         ) { innerPadding ->
-                            Box(
+                            Column(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(top = innerPadding.calculateTopPadding())
                                     .then(if (!isFullScreen) Modifier.navigationBarsPadding() else Modifier)
                             ) {
-                                SchoolContentPane()
+                                // Prominent Active User & Logout Banner (Always visible on all screens)
+                                val activeUser = currentUser
+                                Surface(
+                                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.weight(1f)
+                                        ) {
+                                            Text(
+                                                text = if (isAdmin || isSuperAdmin) "👑" else if (isTeacher) "👨‍🏫" else "🎓",
+                                                fontSize = 15.sp
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Column {
+                                                Text(
+                                                    text = activeUser?.fullName ?: (if (isAmharic) "ተጠቃሚ" else "User"),
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 12.sp,
+                                                    color = NavyPrimary,
+                                                    maxLines = 1
+                                                )
+                                                val contactInfo = if (activeUser != null && activeUser.email.isNotBlank()) activeUser.email else (activeUser?.phone ?: "")
+                                                Text(
+                                                    text = "${activeUser?.role ?: ""} • $contactInfo",
+                                                    fontSize = 10.sp,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    maxLines = 1
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.width(8.dp))
+
+                                        // RED LOGOUT BUTTON (ውጣ)
+                                        Surface(
+                                            shape = RoundedCornerShape(16.dp),
+                                            color = Color(0xFFDC2626),
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(16.dp))
+                                                .clickable { viewModel.logout() }
+                                                .testTag("btn_strip_logout")
+                                        ) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.ExitToApp,
+                                                    contentDescription = "Logout",
+                                                    tint = Color.White,
+                                                    modifier = Modifier.size(13.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Text(
+                                                    text = if (isAmharic) "ውጣ" else "Logout",
+                                                    color = Color.White,
+                                                    fontSize = 11.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                                    SchoolContentPane()
+                                }
                             }
                         }
                     }

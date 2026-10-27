@@ -244,6 +244,9 @@
         <button id="btnAdminPassManager" class="apk-btn" style="background:#FDE047; color:#78350F; border:none; cursor:pointer;" onclick="openPasswordManagerModal()">
           <span>🔐</span><span>የይለፍ ቃል</span>
         </button>
+        <button id="btnWebLogoutHeader" class="apk-btn" style="background:#EF4444; color:white; border:none; cursor:pointer; font-weight:700;" onclick="logoutWeb()">
+          <span>🚪</span><span>ውጣ (Logout)</span>
+        </button>
         <a href="dilijent-school.apk" class="apk-btn" download>
           <span>📲</span><span>APK አውርድ</span>
         </a>
@@ -259,8 +262,9 @@
         <h3>🌐 የትምህርት ቤቱ የቀጥታ ዌብሳይት (Web Application)</h3>
         <p>ይህ ድረ-ገጽ በማንኛውም ስልክ እና ኮምፒውተር ላይ በብሮውዘር ይሰራል! አዳዲስ መረጃዎችን መመዝገብና መመልከት ይችላሉ።</p>
       </div>
-      <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+      <div style="display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center;">
         <button class="btn-primary" onclick="openLoginModal()">🔑 የመግቢያ ገጽ (Login)</button>
+        <button class="btn-primary" style="background:#EF4444; border-color:#DC2626;" onclick="logoutWeb()">🚪 ውጣ (Logout)</button>
         <button id="btnBannerPassManager" class="btn-accent" onclick="openPasswordManagerModal()">🔐 የይለፍ ቃል መቆጣጠሪያ</button>
         <button class="btn-secondary" onclick="openSchemeModal()">⚙️ የውጤት አሰጣጥ (ርዕሰ መ/ር)</button>
         <button class="btn-secondary" onclick="shareWebsiteLink()">🔗 ሊንክ ኮፒ</button>
@@ -1038,9 +1042,25 @@
         <div><strong>ክፍል እና ክፍልፋይ:</strong> <span id="cardModalGrade" style="font-weight:700;">-</span></div>
         <div><strong>ጾታ:</strong> <span id="cardModalGender">-</span></div>
         <div><strong>የትምህርት ዘመን:</strong> <span>2017 ዓ.ም (2025/26)</span></div>
-        <div><strong>ወሰነ-ትምህርት:</strong> <span>1ኛ ሴሚስተር (Semester I)</span></div>
+        <div><strong>ወሰነ-ትምህርት:</strong> <span id="cardModalTermDisplay">1ኛ እና 2ኛ ሴሚስተር (Semesters I & II)</span></div>
         <div><strong>የክፍል ደረጃ (Rank):</strong> <span id="cardModalRank" class="badge badge-warning" style="font-size:0.8rem; font-weight:800;">-</span></div>
         <div><strong>አማካይ ውጤት:</strong> <span id="cardModalAvg" style="color:#078930; font-weight:800; font-size:0.9rem;">-</span></div>
+      </div>
+
+      <!-- Term Selector: Semester vs Quarter -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; background:#F1F5F9; border:1px solid #CBD5E1; border-radius:8px; padding:0.5rem 0.85rem; flex-wrap:wrap; gap:0.5rem;">
+        <div style="font-size:0.82rem; font-weight:700; color:#1E3A8A; display:flex; align-items:center; gap:0.4rem;">
+          <span>📊 የካርድ የውጤት አቀራረብ፡</span>
+          <span style="font-weight:normal; color:#64748B; font-size:0.75rem;">(ምዘናዎች በማርክ ሊስት ተጠቃለው ከ100 ይቀርባሉ)</span>
+        </div>
+        <div style="display:flex; background:#E2E8F0; border-radius:6px; padding:2px; gap:4px;">
+          <button type="button" id="btnReportSemMode" onclick="setCardTermMode('semester')" style="border:none; padding:5px 12px; border-radius:5px; font-size:0.78rem; font-weight:700; cursor:pointer; background:#1E3A8A; color:white; font-family:inherit;">
+            🔹 በሴሚስተር (1ኛ እና 2ኛ)
+          </button>
+          <button type="button" id="btnReportQuarterMode" onclick="setCardTermMode('quarter')" style="border:none; padding:5px 12px; border-radius:5px; font-size:0.78rem; font-weight:700; cursor:pointer; background:transparent; color:#475569; font-family:inherit;">
+            🔸 በኳርተር (Q1, Q2, Q3, Q4)
+          </button>
+        </div>
       </div>
 
       <!-- Subject Marks Breakdown Table (4-Directional Scroll) -->
@@ -1051,16 +1071,8 @@
       <div class="table-responsive" style="margin-bottom:1rem; border:1px solid #CBD5E1; border-radius:6px; max-height:360px;">
         <table style="width:100%; border-collapse:collapse; font-size:0.8rem; min-width:680px;">
           <thead>
-            <tr style="background:#1E3A8A; color:white; font-size:0.75rem;">
-              <th style="padding:7px 8px;">የትምህርት ዓይነት</th>
-              <th style="padding:7px 6px; text-align:center;" id="cardModalThQuiz">ምዘና 1 (10%)</th>
-              <th style="padding:7px 6px; text-align:center;" id="cardModalThAssig">የቤት ስራ (10%)</th>
-              <th style="padding:7px 6px; text-align:center;" id="cardModalThMid">አጋማሽ (30%)</th>
-              <th style="padding:7px 6px; text-align:center;" id="cardModalThFinal">ማጠቃለያ (50%)</th>
-              <th style="padding:7px 6px; text-align:center; background:#172554;">ድምር (100%)</th>
-              <th style="padding:7px 6px; text-align:center;">ፊደል</th>
-              <th style="padding:7px 6px; text-align:center;">ደረጃ</th>
-              <th style="padding:7px 8px;">አስተያየት</th>
+            <tr id="cardModalHeaderRow" style="background:#1E3A8A; color:white; font-size:0.75rem;">
+              <!-- Dynamically populated via JS: Semester 1 & 2 or Quarter Q1-Q4 -->
             </tr>
           </thead>
           <tbody id="cardModalSubjectsBody">
@@ -1389,42 +1401,37 @@
       const headerRow = document.getElementById('reportCardHeaderRow');
       headerRow.innerHTML = `
         <th>የትምህርት ዓይነት</th>
-        <th>${currentScheme.t1Label} (${currentScheme.t1Weight}%)</th>
-        <th>${currentScheme.asLabel} (${currentScheme.asWeight}%)</th>
-        <th>${currentScheme.midLabel} (${currentScheme.midWeight}%)</th>
-        <th>${currentScheme.finalLabel} (${currentScheme.finalWeight}%)</th>
-        <th>ድምር (100%)</th>
-        <th>ደረጃ</th>
+        <th style="text-align:center;">1ኛ ሴሚስተር (100)</th>
+        <th style="text-align:center;">2ኛ ሴሚስተር (100)</th>
+        <th style="text-align:center; background:#172554; color:white;">ዓመታዊ አማካይ (100)</th>
+        <th style="text-align:center;">ፊደል</th>
+        <th style="text-align:center;">ደረጃ</th>
         <th>አስተያየት</th>
       `;
 
       const sampleSubjects = [
-        { name: 'Mathematics (ሒሳብ)', s: [9.5, 9.5, 28.5, 47.0] },
-        { name: 'Physics (ፊዚክስ)', s: [8.5, 9.0, 26.0, 44.0] },
-        { name: 'Chemistry (ኬሚስትሪ)', s: [9.0, 8.5, 25.5, 43.5] },
-        { name: 'English (እንግሊዝኛ)', s: [9.5, 9.5, 27.0, 46.0] },
-        { name: 'Civics (ስነ-ዜጋ)', s: [9.0, 9.0, 28.0, 45.0] }
+        { name: 'Mathematics (ሒሳብ)', sem1: 94.5, sem2: 92.0 },
+        { name: 'Physics (ፊዚክስ)', sem1: 87.5, sem2: 89.0 },
+        { name: 'Chemistry (ኬሚስትሪ)', sem1: 86.5, sem2: 88.0 },
+        { name: 'English (እንግሊዝኛ)', sem1: 92.0, sem2: 94.0 },
+        { name: 'Civics (ስነ-ዜጋ)', sem1: 91.0, sem2: 90.0 }
       ];
 
       const tbody = document.getElementById('reportCardBody');
-      tbody.innerHTML = sampleSubjects.map(sub => {
-        const s1 = (sub.s[0] * (currentScheme.t1Weight / 10)).toFixed(1);
-        const s2 = (sub.s[1] * (currentScheme.asWeight / 10)).toFixed(1);
-        const s3 = (sub.s[2] * (currentScheme.midWeight / 30)).toFixed(1);
-        const s4 = (sub.s[3] * (currentScheme.finalWeight / 50)).toFixed(1);
-        const total = (parseFloat(s1) + parseFloat(s2) + parseFloat(s3) + parseFloat(s4)).toFixed(1);
-        const letter = getLetter(total);
+      tbody.innerHTML = sampleSubjects.map((sub, idx) => {
+        const avg = ((sub.sem1 + sub.sem2) / 2).toFixed(1);
+        const letter = getLetter(avg);
+        const remark = parseFloat(avg) >= 85 ? 'እጅግ በጣም ጥሩ' : 'ጥሩ';
 
         return `
           <tr>
             <td><strong>${sub.name}</strong></td>
-            <td>${s1}</td>
-            <td>${s2}</td>
-            <td>${s3}</td>
-            <td>${s4}</td>
-            <td><strong>${total}%</strong></td>
-            <td><span class="badge ${parseFloat(total) >= 50 ? 'badge-success' : 'badge-danger'}">${letter}</span></td>
-            <td>${parseFloat(total) >= 85 ? 'እጅግ በጣም ጥሩ' : 'ጥሩ'}</td>
+            <td style="text-align:center; font-weight:600;">${sub.sem1.toFixed(1)}</td>
+            <td style="text-align:center; font-weight:600;">${sub.sem2.toFixed(1)}</td>
+            <td style="text-align:center; font-weight:800; color:var(--primary); background:#F8FAFC;">${avg}%</td>
+            <td style="text-align:center;"><span class="badge ${parseFloat(avg) >= 50 ? 'badge-success' : 'badge-danger'}">${letter}</span></td>
+            <td style="text-align:center; font-size:0.75rem;">${idx + 1}ኛ</td>
+            <td>${remark}</td>
           </tr>
         `;
       }).join('');
@@ -1600,8 +1607,39 @@
       }).join('');
     }
 
+    // Report Card Term Mode: 'semester' (Sem 1 & Sem 2 from 100) or 'quarter' (Q1, Q2, Q3, Q4 from 100)
+    let currentCardTermMode = 'semester';
+    let currentReportStudentId = null;
+
+    function setCardTermMode(mode) {
+      currentCardTermMode = mode;
+      const semBtn = document.getElementById('btnReportSemMode');
+      const qtrBtn = document.getElementById('btnReportQuarterMode');
+      const termDisplay = document.getElementById('cardModalTermDisplay');
+
+      if (mode === 'semester') {
+        if (semBtn) { semBtn.style.background = '#1E3A8A'; semBtn.style.color = 'white'; }
+        if (qtrBtn) { qtrBtn.style.background = 'transparent'; qtrBtn.style.color = '#475569'; }
+        if (termDisplay) termDisplay.innerText = '1ኛ እና 2ኛ ሴሚስተር (Semesters I & II)';
+      } else {
+        if (semBtn) { semBtn.style.background = 'transparent'; semBtn.style.color = '#475569'; }
+        if (qtrBtn) { qtrBtn.style.background = '#1E3A8A'; qtrBtn.style.color = 'white'; }
+        if (termDisplay) termDisplay.innerText = 'አራቱም ኳርተሮች (Quarters Q1, Q2, Q3, Q4)';
+      }
+
+      if (currentReportStudentId) {
+        renderStudentReportCardDetails(currentReportStudentId);
+      }
+    }
+
     // Dedicated Ethiopian Curriculum Report Card Dialog Handler
     function openStudentReportCard(studentId) {
+      currentReportStudentId = studentId;
+      renderStudentReportCardDetails(studentId);
+      document.getElementById('ethiopianReportCardModal').style.display = 'flex';
+    }
+
+    function renderStudentReportCardDetails(studentId) {
       const student = students.find(s => s.id === studentId) || students[0];
       if (!student) return;
 
@@ -1628,50 +1666,94 @@
         }
       }
 
-      // Update Table Headers based on Current Scheme
-      document.getElementById('cardModalThQuiz').innerText = `${currentScheme.t1Label} (${currentScheme.t1Weight}%)`;
-      document.getElementById('cardModalThAssig').innerText = `${currentScheme.asLabel} (${currentScheme.asWeight}%)`;
-      document.getElementById('cardModalThMid').innerText = `${currentScheme.midLabel} (${currentScheme.midWeight}%)`;
-      document.getElementById('cardModalThFinal').innerText = `${currentScheme.finalLabel} (${currentScheme.finalWeight}%)`;
-
-      // Subjects Breakdown for this student
+      // Calculate base subject totals (from 100%) - NO CW, HW, Mid, Final!
       const subjects = [
-        { name: 'ሒሳብ (Mathematics)', base: [student.scores[0], student.scores[1], student.scores[2], student.scores[3]] },
-        { name: 'እንግሊዝኛ (English)', base: [student.scores[0] * 0.95, student.scores[1] * 0.98, student.scores[2] * 0.92, student.scores[3] * 0.96] },
-        { name: 'ፊዚክስ (Physics)', base: [student.scores[0] * 0.9, student.scores[1] * 0.92, student.scores[2] * 0.88, student.scores[3] * 0.9] },
-        { name: 'ኬሚስትሪ (Chemistry)', base: [student.scores[0] * 0.92, student.scores[1] * 0.9, student.scores[2] * 0.91, student.scores[3] * 0.93] },
-        { name: 'ባዮሎጂ (Biology)', base: [student.scores[0] * 0.96, student.scores[1] * 0.95, student.scores[2] * 0.93, student.scores[3] * 0.95] },
-        { name: 'ስነ-ዜጋ (Civics)', base: [student.scores[0] * 0.98, student.scores[1] * 0.97, student.scores[2] * 0.95, student.scores[3] * 0.97] }
+        { name: 'ሒሳብ (Mathematics)', base: (student.scores[0] + student.scores[1] + student.scores[2] + student.scores[3]) },
+        { name: 'እንግሊዝኛ (English)', base: (student.scores[0] + student.scores[1] + student.scores[2] + student.scores[3]) * 0.95 },
+        { name: 'ፊዚክስ (Physics)', base: (student.scores[0] + student.scores[1] + student.scores[2] + student.scores[3]) * 0.91 },
+        { name: 'ኬሚስትሪ (Chemistry)', base: (student.scores[0] + student.scores[1] + student.scores[2] + student.scores[3]) * 0.92 },
+        { name: 'ባዮሎጂ (Biology)', base: (student.scores[0] + student.scores[1] + student.scores[2] + student.scores[3]) * 0.94 },
+        { name: 'ስነ-ዜጋ (Civics)', base: (student.scores[0] + student.scores[1] + student.scores[2] + student.scores[3]) * 0.96 }
       ];
 
+      const headerRow = document.getElementById('cardModalHeaderRow');
+      const tbody = document.getElementById('cardModalSubjectsBody');
       let grandTotalSum = 0;
 
-      const tbody = document.getElementById('cardModalSubjectsBody');
-      tbody.innerHTML = subjects.map((sub, idx) => {
-        const q = Math.min(currentScheme.t1Weight, ((sub.base[0] || 9) * (currentScheme.t1Weight / 10))).toFixed(1);
-        const a = Math.min(currentScheme.asWeight, ((sub.base[1] || 9) * (currentScheme.asWeight / 10))).toFixed(1);
-        const m = Math.min(currentScheme.midWeight, ((sub.base[2] || 27) * (currentScheme.midWeight / 30))).toFixed(1);
-        const f = Math.min(currentScheme.finalWeight, ((sub.base[3] || 45) * (currentScheme.finalWeight / 50))).toFixed(1);
-        const tot = (parseFloat(q) + parseFloat(a) + parseFloat(m) + parseFloat(f)).toFixed(1);
-        grandTotalSum += parseFloat(tot);
-        const lettr = getLetter(tot);
-        const subRank = (idx + 1) + 'ኛ';
-        const remark = parseFloat(tot) >= 85 ? 'እጅግ በጣም ጥሩ' : parseFloat(tot) >= 70 ? 'በጣም ጥሩ' : parseFloat(tot) >= 50 ? 'አጥጋቢ' : 'ድጋፍ ያስፈልጋል';
-
-        return `
-          <tr style="border-bottom:1px solid #E2E8F0;">
-            <td style="padding:6px 8px; font-weight:700;">${sub.name}</td>
-            <td style="padding:6px; text-align:center;">${q}</td>
-            <td style="padding:6px; text-align:center;">${a}</td>
-            <td style="padding:6px; text-align:center;">${m}</td>
-            <td style="padding:6px; text-align:center;">${f}</td>
-            <td style="padding:6px; text-align:center; font-weight:800; background:#F8FAFC; color:#1E3A8A;">${tot}%</td>
-            <td style="padding:6px; text-align:center;"><span class="badge ${parseFloat(tot) >= 50 ? 'badge-success' : 'badge-danger'}">${lettr}</span></td>
-            <td style="padding:6px; text-align:center; font-size:0.75rem;">${subRank}</td>
-            <td style="padding:6px 8px; font-size:0.75rem; color:#475569;">${remark}</td>
-          </tr>
+      if (currentCardTermMode === 'semester') {
+        // SEMESTER MODE: 1ኛ ሴሚስተር እና 2ኛ ሴሚስተር
+        headerRow.innerHTML = `
+          <th style="padding:7px 8px;">የትምህርት ዓይነት</th>
+          <th style="padding:7px 6px; text-align:center;">1ኛ ሴሚስተር (100)</th>
+          <th style="padding:7px 6px; text-align:center;">2ኛ ሴሚስተር (100)</th>
+          <th style="padding:7px 6px; text-align:center; background:#172554;">ዓመታዊ አማካይ (100)</th>
+          <th style="padding:7px 6px; text-align:center;">ፊደል</th>
+          <th style="padding:7px 6px; text-align:center;">ደረጃ</th>
+          <th style="padding:7px 8px;">አስተያየት</th>
         `;
-      }).join('');
+
+        tbody.innerHTML = subjects.map((sub, idx) => {
+          const s1 = Math.min(100, Math.max(40, sub.base)).toFixed(1);
+          const s2 = Math.min(100, Math.max(40, sub.base * 0.98 + 1.2)).toFixed(1);
+          const avg = ((parseFloat(s1) + parseFloat(s2)) / 2).toFixed(1);
+          grandTotalSum += parseFloat(avg);
+          const lettr = getLetter(avg);
+          const subRank = (idx + 1) + 'ኛ';
+          const remark = parseFloat(avg) >= 85 ? 'እጅግ በጣም ጥሩ' : parseFloat(avg) >= 70 ? 'በጣም ጥሩ' : parseFloat(avg) >= 50 ? 'አጥጋቢ' : 'ድጋፍ ያስፈልጋል';
+
+          return `
+            <tr style="border-bottom:1px solid #E2E8F0;">
+              <td style="padding:6px 8px; font-weight:700;">${sub.name}</td>
+              <td style="padding:6px; text-align:center; font-weight:600;">${s1}</td>
+              <td style="padding:6px; text-align:center; font-weight:600;">${s2}</td>
+              <td style="padding:6px; text-align:center; font-weight:800; background:#F8FAFC; color:#1E3A8A;">${avg}%</td>
+              <td style="padding:6px; text-align:center;"><span class="badge ${parseFloat(avg) >= 50 ? 'badge-success' : 'badge-danger'}">${lettr}</span></td>
+              <td style="padding:6px; text-align:center; font-size:0.75rem;">${subRank}</td>
+              <td style="padding:6px 8px; font-size:0.75rem; color:#475569;">${remark}</td>
+            </tr>
+          `;
+        }).join('');
+      } else {
+        // QUARTER MODE: Q1, Q2, Q3, Q4
+        headerRow.innerHTML = `
+          <th style="padding:7px 8px;">የትምህርት ዓይነት</th>
+          <th style="padding:7px 6px; text-align:center;">Q1 (100)</th>
+          <th style="padding:7px 6px; text-align:center;">Q2 (100)</th>
+          <th style="padding:7px 6px; text-align:center;">Q3 (100)</th>
+          <th style="padding:7px 6px; text-align:center;">Q4 (100)</th>
+          <th style="padding:7px 6px; text-align:center; background:#172554;">ዓመታዊ አማካይ</th>
+          <th style="padding:7px 6px; text-align:center;">ፊደል</th>
+          <th style="padding:7px 6px; text-align:center;">ደረጃ</th>
+          <th style="padding:7px 8px;">አስተያየት</th>
+        `;
+
+        tbody.innerHTML = subjects.map((sub, idx) => {
+          const base = Math.min(100, Math.max(40, sub.base));
+          const q1 = (base + 1.2).toFixed(1);
+          const q2 = (base - 0.8).toFixed(1);
+          const q3 = (base + 0.5).toFixed(1);
+          const q4 = (base * 0.99).toFixed(1);
+          const avg = ((parseFloat(q1) + parseFloat(q2) + parseFloat(q3) + parseFloat(q4)) / 4).toFixed(1);
+          grandTotalSum += parseFloat(avg);
+          const lettr = getLetter(avg);
+          const subRank = (idx + 1) + 'ኛ';
+          const remark = parseFloat(avg) >= 85 ? 'እጅግ በጣም ጥሩ' : parseFloat(avg) >= 70 ? 'በጣም ጥሩ' : parseFloat(avg) >= 50 ? 'አጥጋቢ' : 'ድጋፍ ያስፈልጋል';
+
+          return `
+            <tr style="border-bottom:1px solid #E2E8F0;">
+              <td style="padding:6px 8px; font-weight:700;">${sub.name}</td>
+              <td style="padding:6px; text-align:center; font-weight:600;">${q1}</td>
+              <td style="padding:6px; text-align:center; font-weight:600;">${q2}</td>
+              <td style="padding:6px; text-align:center; font-weight:600;">${q3}</td>
+              <td style="padding:6px; text-align:center; font-weight:600;">${q4}</td>
+              <td style="padding:6px; text-align:center; font-weight:800; background:#F8FAFC; color:#1E3A8A;">${avg}%</td>
+              <td style="padding:6px; text-align:center;"><span class="badge ${parseFloat(avg) >= 50 ? 'badge-success' : 'badge-danger'}">${lettr}</span></td>
+              <td style="padding:6px; text-align:center; font-size:0.75rem;">${subRank}</td>
+              <td style="padding:6px 8px; font-size:0.75rem; color:#475569;">${remark}</td>
+            </tr>
+          `;
+        }).join('');
+      }
 
       const avg = (grandTotalSum / subjects.length).toFixed(1);
       document.getElementById('cardModalAvg').innerText = `${avg}% (አልፏል)`;
@@ -1687,8 +1769,6 @@
       // Homeroom Teacher name
       const hrTeacher = staffList.find(s => s.role.includes('የክፍል ኃላፊ')) || { name: 'መምህር ዳዊት በቀለ' };
       document.getElementById('cardModalHomeroomTeacher').innerText = hrTeacher.name;
-
-      document.getElementById('ethiopianReportCardModal').style.display = 'flex';
     }
 
     function closeReportCardModal() {
@@ -2049,16 +2129,176 @@
       }
     }
 
-    function shareWebsiteLink() {
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(window.location.href);
-        alert('የድረ-ገጹ ሊንክ ኮፒ ተደርጓል! ለተማሪዎችና መምህራን መላክ ይችላሉ።');
+    // ==========================================
+    // USER ACCOUNTS, AUTHENTICATION & LOGOUT
+    // ==========================================
+    const DEFAULT_ACCOUNTS = [
+      { name: 'እኔ (System Administrator)', role: '👑 ሲስተም አድሚን', email: 'admin@dilijent.edu.et', phone: '0911999999', pass: 'admin123', isAdmin: true },
+      { name: 'አቶ ሙሉጌታ ከበደ', role: '🎓 ርዕሰ መምህር', email: '', phone: '0911000000', pass: 'p123456', isAdmin: false },
+      { name: 'መምህር ዳዊት በቀለ', role: '👨‍🏫 መምህር (ሒሳብ)', email: '', phone: '0911223344', pass: 't123456', isAdmin: false },
+      { name: 'መምህርት ሳራ መኮንን', role: '👩‍🏫 መምህርት (ፊዚክስ)', email: '', phone: '0922334455', pass: 't123456', isAdmin: false },
+      { name: 'ተማሪ አቤል ታደሰ', role: '👨‍🎓 ተማሪ (12A)', email: '', phone: '0911002233', pass: 's123456', isAdmin: false }
+    ];
+
+    let userAccounts = JSON.parse(localStorage.getItem('dilijent_user_accounts')) || DEFAULT_ACCOUNTS;
+    let currentWebUser = JSON.parse(localStorage.getItem('dilijent_current_user')) || userAccounts[0];
+    let currentLoginMode = 'admin'; // 'admin' (email) or 'phone' (teachers/students)
+
+    function updateCurrentUserUI() {
+      const pill = document.getElementById('currentRoleDisplay');
+      if (!pill) return;
+      if (currentWebUser) {
+        pill.innerHTML = `${currentWebUser.role} (${currentWebUser.isAdmin ? currentWebUser.email : currentWebUser.phone})`;
+        pill.style.background = '#EFF6FF';
+        pill.style.color = '#1E40AF';
       } else {
-        alert(window.location.href);
+        pill.innerHTML = '👤 እንግዳ (አልገቡም - እዚህ ይጫኑ)';
+        pill.style.background = '#FEE2E2';
+        pill.style.color = '#991B1B';
       }
     }
 
+    function logoutWeb() {
+      localStorage.removeItem('dilijent_current_user');
+      currentWebUser = null;
+      updateCurrentUserUI();
+      alert('🚪 በተሳካ ሁኔታ ከስርዓቱ ወጥተዋል! (Logged out successfully)');
+      openLoginModal();
+    }
+
+    function openLoginModal() {
+      document.getElementById('loginModal').style.display = 'flex';
+      setWebLoginMode(currentLoginMode);
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').style.display = 'none';
+    }
+
+    function setWebLoginMode(mode) {
+      currentLoginMode = mode;
+      const tabAdmin = document.getElementById('tabLoginAdmin');
+      const tabPhone = document.getElementById('tabLoginPhone');
+      const emailGroup = document.getElementById('loginEmailGroup');
+      const phoneGroup = document.getElementById('loginPhoneGroup');
+      const notice = document.getElementById('loginModeNotice');
+
+      if (mode === 'admin') {
+        tabAdmin.style.background = 'var(--primary)';
+        tabAdmin.style.color = 'white';
+        tabPhone.style.background = 'transparent';
+        tabPhone.style.color = 'var(--text-muted)';
+        emailGroup.style.display = 'block';
+        phoneGroup.style.display = 'none';
+        notice.innerHTML = '👑 <strong>የሲስተም አድሚን ብቻ</strong> በኢሜል እና በይለፍ ቃል ይገባል (admin@dilijent.edu.et / admin123)';
+      } else {
+        tabAdmin.style.background = 'transparent';
+        tabAdmin.style.color = 'var(--text-muted)';
+        tabPhone.style.background = 'var(--primary)';
+        tabPhone.style.color = 'white';
+        emailGroup.style.display = 'none';
+        phoneGroup.style.display = 'block';
+        notice.innerHTML = '📱 <strong>መምህራን፣ ተማሪዎች እና ሰራተኞች</strong> በስልክ ቁጥር እና በይለፍ ቃል ይገባሉ (ምሳሌ፦ 0911000000 / p123456)';
+      }
+    }
+
+    function handleWebLoginSubmit(e) {
+      e.preventDefault();
+      const pass = document.getElementById('inputWebLoginPass').value.trim();
+
+      if (currentLoginMode === 'admin') {
+        const email = document.getElementById('inputWebLoginEmail').value.trim().toLowerCase();
+        const found = userAccounts.find(u => u.isAdmin && u.email.toLowerCase() === email && u.pass === pass);
+        if (found) {
+          currentWebUser = found;
+          localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
+          updateCurrentUserUI();
+          closeLoginModal();
+          alert(`እንኳን ደህና መጡ! ወደ አድሚን ገጽ በ${found.email} ገብተዋል።`);
+        } else {
+          alert('የተሳሳተ የአድሚን ኢሜል ወይም የይለፍ ቃል! (ትክክለኛ፦ admin@dilijent.edu.et / admin123)');
+        }
+      } else {
+        const phone = document.getElementById('inputWebLoginPhone').value.trim();
+        const found = userAccounts.find(u => !u.isAdmin && (u.phone === phone || u.phone.includes(phone.slice(-9))) && u.pass === pass);
+        if (found) {
+          currentWebUser = found;
+          localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
+          updateCurrentUserUI();
+          closeLoginModal();
+          alert(`እንኳን ደህና መጡ! ${found.name} (${found.role}) በስልክ ቁጥር ገብተዋል።`);
+        } else {
+          alert('የተሳሳተ የስልክ ቁጥር ወይም የይለፍ ቃል! የአድሚን የይለፍ ቃል መቆጣጠሪያውን በመጠቀም ማረጋገጥ ይችላሉ።');
+        }
+      }
+    }
+
+    function quickWebLogin(roleKey) {
+      let target = null;
+      if (roleKey === 'admin') {
+        target = userAccounts.find(u => u.isAdmin) || userAccounts[0];
+      } else if (roleKey === 'principal') {
+        target = userAccounts.find(u => u.role.includes('ርዕሰ መምህር'));
+      } else if (roleKey === 'math_teacher') {
+        target = userAccounts.find(u => u.role.includes('መምህር'));
+      } else if (roleKey === 'student') {
+        target = userAccounts.find(u => u.role.includes('ተማሪ'));
+      }
+
+      if (target) {
+        currentWebUser = target;
+        localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
+        updateCurrentUserUI();
+        closeLoginModal();
+        alert(`በፈጣን ሁኔታ በ${target.name} (${target.role}) ገብተዋል!`);
+      }
+    }
+
+    function openPasswordManagerModal() {
+      renderUserAccountsTable();
+      document.getElementById('passwordManagerModal').style.display = 'flex';
+    }
+
+    function closePasswordManagerModal() {
+      document.getElementById('passwordManagerModal').style.display = 'none';
+    }
+
+    function renderUserAccountsTable() {
+      const tbody = document.getElementById('userAccountsTableBody');
+      if (!tbody) return;
+
+      tbody.innerHTML = userAccounts.map((acc, idx) => `
+        <tr style="border-bottom:1px solid #E2E8F0;">
+          <td style="padding:7px 8px; font-weight:700;">${acc.name}</td>
+          <td style="padding:7px 8px;"><span class="badge ${acc.isAdmin ? 'badge-primary' : 'badge-warning'}">${acc.role}</span></td>
+          <td style="padding:7px 8px; font-family:monospace; font-size:0.8rem; color:#1E40AF;">${acc.isAdmin ? acc.email : acc.phone}</td>
+          <td style="padding:7px 8px; text-align:center;">
+            <input type="text" id="accPassInput_${idx}" value="${acc.pass}" style="width:110px; padding:3px 6px; font-size:0.8rem; border:1px solid #CBD5E1; border-radius:4px; font-family:monospace; text-align:center;">
+          </td>
+          <td style="padding:7px 8px; text-align:center;">
+            <button class="btn-primary" style="padding:3px 8px; font-size:0.75rem;" onclick="saveAccountPassword(${idx})">💾 ቀይር</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function saveAccountPassword(idx) {
+      const newPass = document.getElementById(`accPassInput_${idx}`).value.trim();
+      if (!newPass) {
+        alert('እባክዎ የይለፍ ቃል ያስገቡ!');
+        return;
+      }
+      userAccounts[idx].pass = newPass;
+      localStorage.setItem('dilijent_user_accounts', JSON.stringify(userAccounts));
+      if (currentWebUser && currentWebUser.name === userAccounts[idx].name) {
+        currentWebUser.pass = newPass;
+        localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
+      }
+      alert(`የ${userAccounts[idx].name} የይለፍ ቃል ወደ "${newPass}" በተሳካ ሁኔታ ተቀይሯል!`);
+    }
+
     // Initialize
+    updateCurrentUserUI();
     saveState();
   </script>
 </body>
