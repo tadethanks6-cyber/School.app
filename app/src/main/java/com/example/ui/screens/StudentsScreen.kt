@@ -95,6 +95,7 @@ fun StudentsScreen(
     onEditStudentClick: (Student) -> Unit,
     onDeleteStudentClick: (Student) -> Unit,
     onViewGradesClick: (Student) -> Unit,
+    onOpenImportExportClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var selectedStudentForDetail by remember { mutableStateOf<Student?>(null) }
@@ -157,6 +158,29 @@ fun StudentsScreen(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
+
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable { onOpenImportExportClick() }
+                        .testTag("btn_students_import_export")
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(text = "📥", fontSize = 11.sp)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = if (isAmharic) "ከExcel / CSV አስመጣ" else "Import Excel/CSV",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = NavyPrimary
+                        )
+                    }
+                }
             }
 
             if (students.isEmpty()) {

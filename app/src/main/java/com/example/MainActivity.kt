@@ -105,6 +105,7 @@ import com.example.ui.screens.SubjectFormDialog
 import com.example.ui.screens.SubjectsScreen
 import com.example.ui.screens.TeacherDetailDialog
 import com.example.ui.screens.TeacherFormDialog
+import com.example.ui.screens.ImportExportCenterDialog
 import com.example.ui.screens.TeachersScreen
 import com.example.ui.screens.WorkloadFormDialog
 import com.example.ui.screens.WorkloadScreen
@@ -178,6 +179,8 @@ class MainActivity : ComponentActivity() {
                 val showAddGrade by viewModel.showAddGradeDialog.collectAsStateWithLifecycle()
                 val showAssessmentSchemeDialog by viewModel.showAssessmentSchemeDialog.collectAsStateWithLifecycle()
                 val assessmentScheme by viewModel.assessmentScheme.collectAsStateWithLifecycle()
+                val showImportExport by viewModel.showImportExportDialog.collectAsStateWithLifecycle()
+                val importExportTargetTab by viewModel.importExportTargetTab.collectAsStateWithLifecycle()
                 val selectedStudentForGrades by viewModel.selectedStudentForGrades.collectAsStateWithLifecycle()
                 val gradesList by viewModel.studentGrades.collectAsStateWithLifecycle()
                 val allGradesList by viewModel.allGrades.collectAsStateWithLifecycle()
@@ -348,6 +351,9 @@ class MainActivity : ComponentActivity() {
                                     onViewGradesClick = { student ->
                                         viewModel.selectStudentForGrades(student)
                                         viewModel.navigateTo(SchoolNavTab.GRADES)
+                                    },
+                                    onOpenImportExportClick = {
+                                        viewModel.openImportExportDialog("students")
                                     }
                                 )
                             }
@@ -382,6 +388,9 @@ class MainActivity : ComponentActivity() {
                                             section = "A"
                                         )
                                         viewModel.showAddWorkloadDialog.value = true
+                                    },
+                                    onOpenImportExportClick = {
+                                        viewModel.openImportExportDialog("teachers")
                                     }
                                 )
                             }
@@ -1245,6 +1254,22 @@ class MainActivity : ComponentActivity() {
                         onUpdatePassword = { userId, newPass ->
                             viewModel.updateUserPassword(userId, newPass)
                         }
+                    )
+                }
+
+                if (showImportExport) {
+                    ImportExportCenterDialog(
+                        initialTarget = importExportTargetTab,
+                        isAmharic = isAmharic,
+                        onImportStudents = { csv, onDone ->
+                            viewModel.importStudentsFromCsv(csv, onDone)
+                        },
+                        onImportTeachers = { csv, onDone ->
+                            viewModel.importTeachersFromCsv(csv, onDone)
+                        },
+                        onExportStudents = { viewModel.exportStudentsToCsv() },
+                        onExportTeachers = { viewModel.exportTeachersToCsv() },
+                        onDismiss = { viewModel.closeImportExportDialog() }
                     )
                 }
                 } // End of else (isLoggedIn)

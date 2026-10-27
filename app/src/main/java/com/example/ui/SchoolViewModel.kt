@@ -880,4 +880,136 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
             firestoreRepository.saveAttendance(authUid, record)
         }
     }
+
+    // ==========================================
+    // EXCEL / CSV / PDF AUTO-IMPORT & EXPORT CENTER
+    // ==========================================
+    val showImportExportDialog = MutableStateFlow(false)
+    val importExportTargetTab = MutableStateFlow("students") // "students" or "teachers"
+
+    fun openImportExportDialog(target: String = "students") {
+        importExportTargetTab.value = target
+        showImportExportDialog.value = true
+    }
+
+    fun closeImportExportDialog() {
+        showImportExportDialog.value = false
+    }
+
+    fun importStudentsFromCsv(csvText: String, onComplete: (Int, String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val lines = csvText.lines().map { it.trim() }.filter { it.isNotBlank() }
+                if (lines.isEmpty()) {
+                    onComplete(0, "ምንም መረጃ በፋይሉ ውስጥ አልተገኘም!")
+                    return@launch
+                }
+                val first = lines.first().lowercase()
+                val hasHeader = first.contains("ስም") || first.contains("name") || first.contains("ክፍል") || first.contains("grade") || first.contains("phone") || first.contains("ስልክ")
+                val dataLines = if (hasHeader) lines.drop(1) else lines
+
+                var count = 0
+                val baseCount = allStudents.value.size
+                dataLines.forEachIndexed { idx, line ->
+                    val cols = line.split(Regex("[,;\t]")).map { it.trim().removeSurrounding("\"").removeSurrounding("'") }
+                    if (cols.isNotEmpty() && cols[0].isNotBlank()) {
+                        val name = cols[0]
+                        val gender = if (cols.size > 1 && (cols[1].contains("ሴት") || cols[1].equals("Female", ignoreCase = true) || cols[1].equals("F", ignoreCase = true))) "ሴት" else "ወንድ"
+                        val grade = if (cols.size > 2 && cols[2].isNotBlank()) cols[2] else "12ኛ ክፍል"
+                        val phone = if (cols.size > 3 && cols[3].isNotBlank()) cols[3] else "+251 911 000000"
+                        val section = if (cols.size > 4 && cols[4].isNotBlank()) cols[4] else "A"
+                        val studentId = "ET-2017-${String.format("%03d", baseCount + idx + 1)}"
+
+                        val student = Student(
+                            studentIdNumber = studentId,
+                            fullName = name,
+                            gender = gender,
+                            age = 17,
+                            grade = grade,
+                            section = section,
+                            academicYear = "2017 ዓ.ም",
+                            parentName = "የተማሪ አሳዳጊ",
+                            parentPhone = phone,
+                            address = "አዲስ አበባ",
+                            status = "ንቁ"
+                        )
+                        val id = repository.insertStudent(student)
+                        firestoreRepository.saveStudent(authUid, student.copy(id = id))
+                        count++
+                    }
+                }
+                onComplete(count, "$count አዳዲስ ተማሪዎች ወደ ሲስተሙ ተመዝግበዋል!")
+            } catch (e: Exception) {
+                onComplete(0, "ስህተት ተከስቷል: ${e.message}")
+            }
+        }
+    }
+
+    fun importTeachersFromCsv(csvText: String, onComplete: (Int, String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val lines = csvText.lines().map { it.trim() }.filter { it.isNotBlank() }
+                if (lines.isEmpty()) {
+                    onComplete(0, "ምንም መረጃ በፋይሉ ውስጥ አልተገኘም!")
+                    return@launch
+                }
+                val first = lines.first().lowercase()
+                val hasHeader = first.contains("ስም") || first.contains("name") || first.contains("role") || first.contains("phone") || first.contains("ስልክ")
+                val dataLines = if (hasHeader) lines.drop(1) else lines
+
+                var count = 0
+                val baseCount = allTeachers.value.size
+                dataLines.forEachIndexed { idx, line ->
+                    val cols = line.split(Regex("[,;\t]")).map { it.trim().removeSurrounding("\"").removeSurrounding("'") }
+                    if (cols.isNotEmpty() && cols[0].isNotBlank()) {
+                        val name = cols[0]
+                        val title = if (name.startsWith("መምህርት") || name.startsWith("ወ/ሮ") || name.startsWith("ወ/ሪት")) "ወ/ሮ" else "አቶ"
+                        val gender = if (title == "ወ/ሮ" || (cols.size > 1 && cols[1].contains("ሴት"))) "ሴት" else "ወንድ"
+                        val dept = if (cols.size > 1 && cols[1].isNotBlank()) cols[1] else "አጠቃላይ የትምህርት ክፍል"
+                        val phone = if (cols.size > 2 && cols[2].isNotBlank()) cols[2] else "+251 911 000000"
+                        val qual = if (cols.size > 3 && cols[3].isNotBlank()) cols[3] else "ባችለር ዲግሪ"
+                        val teacherCode = "T-${String.format("%03d", 100 + baseCount + idx + 1)}"
+
+                        val teacher = Teacher(
+                            teacherCode = teacherCode,
+                            fullName = name,
+                            title = title,
+                            gender = gender,
+                            phone = phone,
+                            qualification = qual,
+                            specialization = dept,
+                            department = dept,
+                            status = "ንቁ"
+                        )
+                        val id = repository.insertTeacher(teacher)
+                        firestoreRepository.saveTeacher(authUid, teacher.copy(id = id))
+                        count++
+                    }
+                }
+                onComplete(count, "$count አዳዲስ መምህራን ወደ ሲስተሙ ተመዝግበዋል!")
+            } catch (e: Exception) {
+                onComplete(0, "ስህተት ተከስቷል: ${e.message}")
+            }
+        }
+    }
+
+    fun exportStudentsToCsv(): String {
+        val students = allStudents.value
+        val sb = StringBuilder()
+        sb.append("መለያ ቁጥር,ሙሉ ስም,ጾታ,ክፍል,ክፍልፋይ,የአሳዳጊ ስልክ,ሁኔታ\n")
+        students.forEach { s ->
+            sb.append("\"${s.studentIdNumber}\",\"${s.fullName}\",\"${s.gender}\",\"${s.grade}\",\"${s.section}\",\"${s.parentPhone}\",\"${s.status}\"\n")
+        }
+        return sb.toString()
+    }
+
+    fun exportTeachersToCsv(): String {
+        val teachers = allTeachers.value
+        val sb = StringBuilder()
+        sb.append("የመምህር መለያ,ሙሉ ስም,ጾታ,ዲፓርትመንት,ስልክ ቁጥር,የትምህርት ደረጃ,ሁኔታ\n")
+        teachers.forEach { t ->
+            sb.append("\"${t.teacherCode}\",\"${t.fullName}\",\"${t.gender}\",\"${t.department}\",\"${t.phone}\",\"${t.qualification}\",\"${t.status}\"\n")
+        }
+        return sb.toString()
+    }
 }
