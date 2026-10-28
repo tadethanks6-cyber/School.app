@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -64,8 +65,9 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
             userAccountDao = db.userAccountDao()
         )
 
-        // Ensure System Admin account exists for Email login
+        // Ensure System Admin account exists for Email login and seed Primary 1-8 data if missing
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            seedPrimarySchoolDataIfNeeded()
             val adminUser = repository.getUserByEmail("admin@dilijent.edu.et")
             if (adminUser == null) {
                 repository.registerUser(
@@ -199,9 +201,111 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
 
     val sectionOptions = listOf("A", "B", "C", "D")
 
-    // Reactive Data Sources
-    val allStudents: StateFlow<List<Student>> = repository.allStudents
+    // Strict School Level Data Segregation Helpers (ዳታ እንዳይቀላቀል ጥብቅ ማጣሪያ)
+    fun isGradeInLevel(grade: String, level: String): Boolean {
+        if (level == "ALL") return true
+        val clean = grade.trim()
+        val numbers = Regex("\\d+").findAll(clean).map { it.value.toIntOrNull() }.filterNotNull().toList()
+        return if (level == "1_8") {
+            if (numbers.any { it in 9..12 }) return false
+            if (clean.contains("9ኛ") || clean.contains("10ኛ") || clean.contains("11ኛ") || clean.contains("12ኛ")) return false
+            if (clean.startsWith("9") || clean.startsWith("10") || clean.startsWith("11") || clean.startsWith("12")) return false
+            if (numbers.any { it in 1..8 }) return true
+            if (clean.contains("1ኛ") || clean.contains("2ኛ") || clean.contains("3ኛ") || clean.contains("4ኛ") ||
+                clean.contains("5ኛ") || clean.contains("6ኛ") || clean.contains("7ኛ") || clean.contains("8ኛ") ||
+                clean.contains("KG") || clean.contains("መሰረታዊ") || clean.contains("መካከለኛ")) return true
+            true
+        } else if (level == "9_12") {
+            if (numbers.any { it in 9..12 }) return true
+            if (clean.contains("9ኛ") || clean.contains("10ኛ") || clean.contains("11ኛ") || clean.contains("12ኛ")) return true
+            if (clean.startsWith("9") || clean.startsWith("10") || clean.startsWith("11") || clean.startsWith("12")) return true
+            if (clean.contains("Natural") || clean.contains("Social") || clean.contains("ሁለተኛ ደረጃ") || clean.contains("High")) return true
+            false
+        } else {
+            true
+        }
+    }
+
+    fun isTeacherInLevel(teacher: Teacher, workloads: List<TeacherWorkload>, level: String): Boolean {
+        if (level == "ALL") return true
+        if (teacher.homeroomClass.isNotBlank()) {
+            if (isGradeInLevel(teacher.homeroomClass, level)) return true
+            val otherLevel = if (level == "1_8") "9_12" else "1_8"
+            if (isGradeInLevel(teacher.homeroomClass, otherLevel)) return false
+        }
+        val teacherWls = workloads.filter { it.teacherId == teacher.id }
+        if (teacherWls.isNotEmpty()) {
+            return teacherWls.any { isGradeInLevel(it.grade, level) }
+        }
+        val text = "${teacher.specialization} ${teacher.department}"
+        if (level == "1_8") {
+            if (text.contains("9") || text.contains("10") || text.contains("11") || text.contains("12") || text.contains("ሁለተኛ ደረጃ")) return false
+            return true
+        } else if (level == "9_12") {
+            if (text.contains("1-8") || text.contains("መሰረታዊ") || text.contains("መካከለኛ") || text.contains("Primary")) return false
+            return true
+        }
+        return true
+    }
+
+    fun isSubjectInLevel(subject: Subject, level: String): Boolean {
+        if (level == "ALL") return true
+        if (subject.gradeLevel == "ሁሉም") return true
+        return isGradeInLevel(subject.gradeLevel, level)
+    }
+
+    // Raw Database Flows
+    val rawStudents: StateFlow<List<Student>> = repository.allStudents
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val rawTeachers: StateFlow<List<Teacher>> = repository.allTeachers
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val rawSubjects: StateFlow<List<Subject>> = repository.allSubjects
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val rawWorkloads: StateFlow<List<TeacherWorkload>> = repository.allWorkloads
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val rawGrades: StateFlow<List<StudentGrade>> = repository.allGrades
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    // Strictly Segregated Level-Specific Flows (ዳታ በፍፁም አይቀላቀልም)
+    val allStudents: StateFlow<List<Student>> = combine(
+        rawStudents,
+        _schoolGradeLevel
+    ) { list, level ->
+        list.filter { isGradeInLevel(it.grade, level) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val allWorkloads: StateFlow<List<TeacherWorkload>> = combine(
+        rawWorkloads,
+        _schoolGradeLevel
+    ) { list, level ->
+        list.filter { isGradeInLevel(it.grade, level) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val allTeachers: StateFlow<List<Teacher>> = combine(
+        rawTeachers,
+        rawWorkloads,
+        _schoolGradeLevel
+    ) { teachers, workloads, level ->
+        teachers.filter { isTeacherInLevel(it, workloads, level) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val allSubjects: StateFlow<List<Subject>> = combine(
+        rawSubjects,
+        _schoolGradeLevel
+    ) { list, level ->
+        list.filter { isSubjectInLevel(it, level) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val allGrades: StateFlow<List<StudentGrade>> = combine(
+        rawGrades,
+        _schoolGradeLevel
+    ) { list, level ->
+        list.filter { isGradeInLevel(it.grade, level) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val filteredStudents: StateFlow<List<Student>> = combine(
         allStudents,
@@ -219,9 +323,6 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
             matchesQuery && matchesGrade && matchesSection
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    val allTeachers: StateFlow<List<Teacher>> = repository.allTeachers
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val teacherDepartmentFilter = MutableStateFlow("ሁሉም")
 
@@ -245,9 +346,6 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
             matchesQuery && matchesDept
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    val allSubjects: StateFlow<List<Subject>> = repository.allSubjects
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val filteredSubjects: StateFlow<List<Subject>> = combine(
         allSubjects,
@@ -282,9 +380,6 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
             matchesQuery && matchesRole && matchesDept
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    val allWorkloads: StateFlow<List<TeacherWorkload>> = repository.allWorkloads
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     // School statistics calculation
     val schoolStats: StateFlow<SchoolStats> = combine(
@@ -809,9 +904,172 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         showSchoolSettingsDialog.value = false
     }
 
-    // All Grades and Grades for selected student
-    val allGrades: StateFlow<List<StudentGrade>> = repository.allGrades
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    private suspend fun seedPrimarySchoolDataIfNeeded() {
+        try {
+            val existing = repository.allStudents.first()
+            if (existing.none { isGradeInLevel(it.grade, "1_8") }) {
+                val primaryStudents = listOf(
+                    Student(
+                        studentIdNumber = "ET-2017-101",
+                        fullName = "ናታን ዳንኤል ዘለቀ",
+                        gender = "ወንድ",
+                        age = 13,
+                        grade = "7ኛ ክፍል",
+                        section = "A",
+                        academicYear = "2017 ዓ.ም",
+                        parentName = "ዳንኤል ዘለቀ",
+                        parentPhone = "0911334455",
+                        address = "አዲስ አበባ፣ የካ ክፍለ ከተማ ወረዳ 04",
+                        status = "ንቁ"
+                    ),
+                    Student(
+                        studentIdNumber = "ET-2017-102",
+                        fullName = "ኤልሳቤጥ ተክሌ መንግስቱ",
+                        gender = "ሴት",
+                        age = 13,
+                        grade = "7ኛ ክፍል",
+                        section = "A",
+                        academicYear = "2017 ዓ.ም",
+                        parentName = "ተክሌ መንግስቱ",
+                        parentPhone = "0912445566",
+                        address = "አዲስ አበባ፣ ቦሌ ክፍለ ከተማ ወረዳ 05",
+                        status = "ንቁ"
+                    ),
+                    Student(
+                        studentIdNumber = "ET-2017-103",
+                        fullName = "ዮሴፍ ከበደ ታደለ",
+                        gender = "ወንድ",
+                        age = 14,
+                        grade = "8ኛ ክፍል",
+                        section = "A",
+                        academicYear = "2017 ዓ.ም",
+                        parentName = "ከበደ ታደለ",
+                        parentPhone = "0913556677",
+                        address = "አዲስ አበባ፣ ቂርቆስ ክፍለ ከተማ ወረዳ 01",
+                        status = "ንቁ"
+                    ),
+                    Student(
+                        studentIdNumber = "ET-2017-104",
+                        fullName = "ሃና ፍቃዱ ገብሬ",
+                        gender = "ሴት",
+                        age = 14,
+                        grade = "8ኛ ክፍል",
+                        section = "B",
+                        academicYear = "2017 ዓ.ም",
+                        parentName = "ፍቃዱ ገብሬ",
+                        parentPhone = "0914667788",
+                        address = "አዲስ አበባ፣ አራዳ ክፍለ ከተማ ወረዳ 02",
+                        status = "ንቁ"
+                    ),
+                    Student(
+                        studentIdNumber = "ET-2017-105",
+                        fullName = "አቤኔዘር ዮሐንስ ሃይሌ",
+                        gender = "ወንድ",
+                        age = 11,
+                        grade = "5ኛ ክፍል",
+                        section = "A",
+                        academicYear = "2017 ዓ.ም",
+                        parentName = "ዮሐንስ ሃይሌ",
+                        parentPhone = "0915778899",
+                        address = "አዲስ አበባ፣ ንፋስ ስልክ ወረዳ 03",
+                        status = "ንቁ"
+                    ),
+                    Student(
+                        studentIdNumber = "ET-2017-106",
+                        fullName = "ሩት ግርማ ወልዴ",
+                        gender = "ሴት",
+                        age = 12,
+                        grade = "6ኛ ክፍል",
+                        section = "A",
+                        academicYear = "2017 ዓ.ም",
+                        parentName = "ግርማ ወልዴ",
+                        parentPhone = "0916889900",
+                        address = "አዲስ አበባ፣ ጉለሌ ወረዳ 07",
+                        status = "ንቁ"
+                    )
+                )
+                primaryStudents.forEach { repository.insertStudent(it) }
+
+                val primaryTeachers = listOf(
+                    Teacher(
+                        teacherCode = "T-101",
+                        fullName = "አቶ ግርማቸው አሰፋ",
+                        title = "አቶ",
+                        gender = "ወንድ",
+                        phone = "0911778899",
+                        email = "girmachew.a@ethioschool.edu.et",
+                        qualification = "ዲፕሎማ",
+                        specialization = "አጠቃላይ ሳይንስ (General Science 1-8)",
+                        department = "የመሰረታዊ ሳይንስ ክፍል",
+                        isHomeroomTeacher = true,
+                        homeroomClass = "7ኛ ክፍል-A"
+                    ),
+                    Teacher(
+                        teacherCode = "T-102",
+                        fullName = "ወ/ሮ ሰላማዊት አበራ",
+                        title = "ወ/ሮ",
+                        gender = "ሴት",
+                        phone = "0922889900",
+                        email = "selamawit.a@ethioschool.edu.et",
+                        qualification = "ባችለር ዲግሪ (BEd)",
+                        specialization = "ሂሳብ (Mathematics 1-8)",
+                        department = "የሂሳብ ክፍል",
+                        isHomeroomTeacher = true,
+                        homeroomClass = "8ኛ ክፍል-A"
+                    ),
+                    Teacher(
+                        teacherCode = "T-103",
+                        fullName = "አቶ በየነ ኃይሉ",
+                        title = "አቶ",
+                        gender = "ወንድ",
+                        phone = "0933990011",
+                        email = "beyene.h@ethioschool.edu.et",
+                        qualification = "ባችለር ዲግሪ (BA)",
+                        specialization = "እንግሊዝኛ (English 1-8)",
+                        department = "የቋንቋዎች ክፍል",
+                        isHomeroomTeacher = false,
+                        homeroomClass = ""
+                    ),
+                    Teacher(
+                        teacherCode = "T-104",
+                        fullName = "ወ/ሪት ትዕግስት ወርቄ",
+                        title = "ወ/ሪት",
+                        gender = "ሴት",
+                        phone = "0944001122",
+                        email = "tigist.w@ethioschool.edu.et",
+                        qualification = "ዲፕሎማ",
+                        specialization = "ህብረተሰብ ጥናት (Social Studies 1-8)",
+                        department = "የማህበራዊ ሳይንስ ክፍል",
+                        isHomeroomTeacher = true,
+                        homeroomClass = "6ኛ ክፍል-A"
+                    )
+                )
+                primaryTeachers.forEach { repository.insertTeacher(it) }
+
+                val primarySubjects = listOf(
+                    Subject(name = "አጠቃላይ ሳይንስ (General Science)", code = "GSCI-07", gradeLevel = "7ኛ ክፍል", periodsPerWeek = 4, passingScore = 50),
+                    Subject(name = "አጠቃላይ ሳይንስ (General Science)", code = "GSCI-08", gradeLevel = "8ኛ ክፍል", periodsPerWeek = 4, passingScore = 50),
+                    Subject(name = "አካባቢ ሳይንስ (Environmental Science)", code = "ENVS-05", gradeLevel = "5ኛ ክፍል", periodsPerWeek = 4, passingScore = 50),
+                    Subject(name = "ህብረተሰብ ጥናት (Social Studies)", code = "SST-07", gradeLevel = "7ኛ ክፍል", periodsPerWeek = 3, passingScore = 50),
+                    Subject(name = "ዜግነት ትምህርት (Citizenship)", code = "CTZ-08", gradeLevel = "8ኛ ክፍል", periodsPerWeek = 2, passingScore = 50),
+                    Subject(name = "ሂሳብ (Mathematics)", code = "MTH-07", gradeLevel = "7ኛ ክፍል", periodsPerWeek = 5, passingScore = 50),
+                    Subject(name = "እንግሊዝኛ (English)", code = "ENG-07", gradeLevel = "7ኛ ክፍል", periodsPerWeek = 5, passingScore = 50),
+                    Subject(name = "አማርኛ ቋንቋ (Amharic)", code = "AMH-07", gradeLevel = "7ኛ ክፍል", periodsPerWeek = 4, passingScore = 50),
+                    Subject(name = "የሙያ እና የቴክኒክ ትምህርት (CTE)", code = "CTE-08", gradeLevel = "8ኛ ክፍል", periodsPerWeek = 2, passingScore = 50)
+                )
+                primarySubjects.forEach { repository.insertSubject(it) }
+
+                val primaryWorkloads = listOf(
+                    TeacherWorkload(teacherId = 6, teacherName = "አቶ ግርማቸው አሰፋ", subjectId = 11, subjectName = "አጠቃላይ ሳይንስ (General Science)", grade = "7ኛ ክፍል", section = "A", periodsPerWeek = 4),
+                    TeacherWorkload(teacherId = 7, teacherName = "ወ/ሮ ሰላማዊት አበራ", subjectId = 16, subjectName = "ሂሳብ (Mathematics)", grade = "8ኛ ክፍል", section = "A", periodsPerWeek = 5),
+                    TeacherWorkload(teacherId = 8, teacherName = "አቶ በየነ ኃይሉ", subjectId = 17, subjectName = "እንግሊዝኛ (English)", grade = "7ኛ ክፍል", section = "A", periodsPerWeek = 5)
+                )
+                primaryWorkloads.forEach { repository.insertWorkload(it) }
+            }
+        } catch (_: Exception) {}
+    }
+
+    // Grades for selected student
 
     val studentGrades = MutableStateFlow<List<StudentGrade>>(emptyList())
 

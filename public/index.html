@@ -313,13 +313,13 @@
         </div>
         <div class="stat-card">
           <div class="stat-icon">👩‍🏫</div>
-          <div class="stat-val">54</div>
-          <div class="stat-label">መምህራን</div>
+          <div class="stat-val" id="dashboardTeachersCount">6</div>
+          <div class="stat-label">መምህራን እና ሰራተኞች</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon">🏫</div>
-          <div class="stat-val">32</div>
-          <div class="stat-label">ክፍሎች (9-12)</div>
+          <div class="stat-val" id="dashboardClassesCount">16</div>
+          <div class="stat-label" id="dashboardClassesLabel">ክፍሎች (1-8)</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon">✅</div>
@@ -537,7 +537,7 @@
         <div class="table-responsive" style="max-height:560px;">
           <table id="rosterTable" style="width:100%; border-collapse:separate; border-spacing:0; min-width:960px;">
             <thead>
-              <tr style="background:#1E3A8A; color:white; font-size:0.78rem;">
+              <tr id="rosterTableHeaderRow" style="background:#1E3A8A; color:white; font-size:0.78rem;">
                 <th style="padding:10px 8px; text-align:center; width:55px;">ደረጃ</th>
                 <th style="padding:10px 8px;">ተማሪ (ስም እና ፎቶ)</th>
                 <th style="padding:10px 8px; text-align:center; width:80px;">መለያ ቁጥር</th>
@@ -1375,33 +1375,144 @@
 
     let currentScheme = JSON.parse(localStorage.getItem('dilijent_assessment_scheme')) || SCHEME_PRESETS[0];
 
-    // Initial Seed Data with LocalStorage persistence
-    let students = JSON.parse(localStorage.getItem('dilijent_students')) || [
-      { id: 'DIL-001', name: 'አቤል ታደሰ', gender: 'ወንድ', grade: '12A', phone: '+251 911 234567', scores: [9.5, 9.5, 28.5, 47.0], photo: '', status: 'ንቁ' },
-      { id: 'DIL-002', name: 'ሄለን ገብሬ', gender: 'ሴት', grade: '11B', phone: '+251 922 345678', scores: [9.0, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
-      { id: 'DIL-003', name: 'ናሆም በቀለ', gender: 'ወንድ', grade: '10C', phone: '+251 933 456789', scores: [7.5, 8.0, 22.0, 38.0], photo: '', status: 'ንቁ' },
-      { id: 'DIL-004', name: 'ቤተልሔም ሰለሞን', gender: 'ሴት', grade: '9A', phone: '+251 944 567890', scores: [9.0, 9.0, 27.5, 46.0], photo: '', status: 'ንቁ' },
-      { id: 'DIL-005', name: 'ዮናስ አለሙ', gender: 'ወንድ', grade: '12B', phone: '+251 955 678901', scores: [8.5, 8.0, 24.0, 42.0], photo: '', status: 'ንቁ' }
+    // Initial Seed Data with strict separation for Primary/Middle (1-8) and High School (9-12)
+    const SEED_STUDENTS_PRIMARY = [
+      { id: 'DIL-P01', name: 'ዮናስ ተስፋዬ', gender: 'ወንድ', grade: '8A', phone: '+251 911 334455', scores: [9.5, 9.5, 29.0, 48.0], photo: '', status: 'ንቁ' },
+      { id: 'DIL-P02', name: 'ሶፊያ ጌታቸው', gender: 'ሴት', grade: '7B', phone: '+251 922 445566', scores: [9.0, 9.5, 27.0, 46.5], photo: '', status: 'ንቁ' },
+      { id: 'DIL-P03', name: 'ሚካኤል ዳዊት', gender: 'ወንድ', grade: '5A', phone: '+251 933 556677', scores: [8.5, 8.5, 26.0, 44.0], photo: '', status: 'ንቁ' },
+      { id: 'DIL-P04', name: 'ሩት አበበ', gender: 'ሴት', grade: '3B', phone: '+251 944 667788', scores: [9.0, 9.0, 28.0, 47.0], photo: '', status: 'ንቁ' },
+      { id: 'DIL-P05', name: 'ሳሙኤል ታደሰ', gender: 'ወንድ', grade: '1A', phone: '+251 955 778899', scores: [9.5, 9.0, 28.5, 49.0], photo: '', status: 'ንቁ' },
+      { id: 'DIL-P06', name: 'ትዕግስት ወርቁ', gender: 'ሴት', grade: '8B', phone: '+251 966 889900', scores: [8.0, 8.5, 25.0, 43.0], photo: '', status: 'ንቁ' },
+      { id: 'DIL-P07', name: 'ኪሩቤል ሰለሞን', gender: 'ወንድ', grade: '6A', phone: '+251 977 990011', scores: [9.0, 9.0, 26.5, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'DIL-P08', name: 'ኤልሳቤጥ ካሳ', gender: 'ሴት', grade: '4B', phone: '+251 988 001122', scores: [8.5, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' }
     ];
 
-    let staffList = JSON.parse(localStorage.getItem('dilijent_staff_list')) || [
+    const SEED_STUDENTS_HIGH = [
+      { id: 'DIL-001', name: 'አቤል ታደሰ', gender: 'ወንድ', grade: '12A', phone: '+251 911 234567', scores: [9.5, 9.5, 28.5, 47.0], photo: '', status: 'ንቁ' },
+      { id: 'DIL-002', name: 'ሄለን ገብሬ', gender: 'ሴት', grade: '11B', phone: '+251 922 345678', scores: [9.0, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
+      { id: 'DIL-003', name: 'ናሆም በቀለ', gender: 'ወንድ', grade: '10A', phone: '+251 933 456789', scores: [7.5, 8.0, 22.0, 38.0], photo: '', status: 'ንቁ' },
+      { id: 'DIL-004', name: 'ቤተልሔም ሰለሞን', gender: 'ሴት', grade: '9A', phone: '+251 944 567890', scores: [9.0, 9.0, 27.5, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'DIL-005', name: 'ዮናስ አለሙ', gender: 'ወንድ', grade: '12B', phone: '+251 955 678901', scores: [8.5, 8.0, 24.0, 42.0], photo: '', status: 'ንቁ' },
+      { id: 'DIL-006', name: 'ሰላም ተስፋዬ', gender: 'ሴት', grade: '11A', phone: '+251 966 789012', scores: [9.0, 9.5, 28.0, 47.0], photo: '', status: 'ንቁ' }
+    ];
+
+    const SEED_STAFF_PRIMARY = [
+      { id: 'STF-P01', name: 'መምህርት አስቴር ከበደ', role: 'የክፍል ኃላፊ (8A)', dept: 'አጠቃላይ ሳይንስ (General Science)', phone: '+251 911 881122', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' },
+      { id: 'STF-P02', name: 'መምህር በለጠ ታምሩ', role: 'የክፍል ኃላፊ (5A)', dept: 'ሒሳብ (Mathematics)', phone: '+251 922 882233', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' },
+      { id: 'STF-P03', name: 'መምህርት ቅድስት አባተ', role: 'መምህርት (3B)', dept: 'እንግሊዝኛ (English)', phone: '+251 933 883344', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' },
+      { id: 'STF-P04', name: 'መምህር ዮሴፍ ተክሌ', role: 'መምህር (7B)', dept: 'ማህበራዊ ሳይንስ (Social Science)', phone: '+251 944 884455', qual: 'ዲፕሎማ', photo: '', status: 'ንቁ' }
+    ];
+
+    const SEED_STAFF_HIGH = [
       { id: 'STF-001', name: 'መምህር ዳዊት በቀለ', role: 'የክፍል ኃላፊ (12A)', dept: 'Mathematics (ሒሳብ)', phone: '+251 911 112233', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' },
-      { id: 'STF-002', name: 'መምህርት ሳራ መኮንን', role: 'የት/ክፍል ኃላፊ', dept: 'Physics (ፊዚክስ)', phone: '+251 922 223344', qual: 'ማስተርስ', photo: '', status: 'ንቁ' },
-      { id: 'STF-003', name: 'መምህር ዮሴፍ ሀይሉ', role: 'መምህር', dept: 'Chemistry (ኬሚስትሪ)', phone: '+251 933 334455', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' },
-      { id: 'STF-004', name: 'መምህርት ራሔል ተክሌ', role: 'መምህርት', dept: 'English (እንግሊዝኛ)', phone: '+251 944 445566', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' },
+      { id: 'STF-002', name: 'መምህርት ሳራ መኮንን', role: 'የት/ክፍል ኃላፊ (11A)', dept: 'Physics (ፊዚክስ)', phone: '+251 922 223344', qual: 'ማስተርስ', photo: '', status: 'ንቁ' },
+      { id: 'STF-003', name: 'መምህር ዮሴፍ ሀይሉ', role: 'መምህር (10A)', dept: 'Chemistry (ኬሚስትሪ)', phone: '+251 933 334455', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' },
+      { id: 'STF-004', name: 'መምህርት ራሔል ተክሌ', role: 'መምህርት (9A)', dept: 'English (እንግሊዝኛ)', phone: '+251 944 445566', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' }
+    ];
+
+    const SEED_STAFF_COMMON = [
       { id: 'STF-005', name: 'ወ/ሮ አለምነሽ ካሳሁን', role: 'ዋና ጸሐፊ', dept: 'አስተዳደር እና ፋይናንስ', phone: '+251 955 556677', qual: 'ዲፕሎማ', photo: '', status: 'ንቁ' },
       { id: 'STF-006', name: 'አቶ አበራ ተፈራ', role: 'የጥበቃ ኃላፊ', dept: 'አገልግሎትና ደህንነት', phone: '+251 966 667788', qual: '12ኛ ያጠናቀቀ', photo: '', status: 'ንቁ' }
     ];
 
-    let attendance = JSON.parse(localStorage.getItem('dilijent_attendance')) || [
+    // Seed attendance
+    const SEED_ATTENDANCE = [
+      { name: 'ዮናስ ተስፋዬ', grade: '8A', status: 'Present', note: 'በሰዓቱ ገብቷል' },
+      { name: 'ሶፊያ ጌታቸው', grade: '7B', status: 'Present', note: 'በሰዓቱ ገብቷል' },
+      { name: 'ሚካኤል ዳዊት', grade: '5A', status: 'Present', note: 'በሰዓቱ ገብቷል' },
+      { name: 'ሩት አበበ', grade: '3B', status: 'Late', note: '10 ደቂቃ ዘግይቷል' },
+      { name: 'ሳሙኤል ታደሰ', grade: '1A', status: 'Present', note: 'በሰዓቱ ገብቷል' },
       { name: 'አቤል ታደሰ', grade: '12A', status: 'Present', note: 'በሰዓቱ ገብቷል' },
       { name: 'ሄለን ገብሬ', grade: '11B', status: 'Present', note: 'በሰዓቱ ገብቷል' },
-      { name: 'ናሆም በቀለ', grade: '10C', status: 'Late', note: '15 ደቂቃ ዘግይቷል' },
+      { name: 'ናሆም በቀለ', grade: '10A', status: 'Late', note: '15 ደቂቃ ዘግይቷል' },
       { name: 'ቤተልሔም ሰለሞን', grade: '9A', status: 'Absent', note: 'የሕመም ፈቃድ' }
     ];
 
+    // Initialize state
+    let storedStudents = JSON.parse(localStorage.getItem('dilijent_students'));
+    let students = storedStudents || [...SEED_STUDENTS_PRIMARY, ...SEED_STUDENTS_HIGH];
+    // Guarantee that both levels have sample records available so switching is rich and uncorrupted
+    if (!students.some(s => isGradeInLevelWeb(s.grade, '1_8'))) {
+      students.unshift(...SEED_STUDENTS_PRIMARY);
+    }
+    if (!students.some(s => isGradeInLevelWeb(s.grade, '9_12'))) {
+      students.push(...SEED_STUDENTS_HIGH);
+    }
+
+    let storedStaff = JSON.parse(localStorage.getItem('dilijent_staff_list'));
+    let staffList = storedStaff || [...SEED_STAFF_PRIMARY, ...SEED_STAFF_HIGH, ...SEED_STAFF_COMMON];
+    if (!staffList.some(st => isStaffInLevelWeb(st, '1_8') && !st.role.includes('ጸሐፊ') && !st.role.includes('ጥበቃ'))) {
+      staffList.unshift(...SEED_STAFF_PRIMARY);
+    }
+    if (!staffList.some(st => isStaffInLevelWeb(st, '9_12') && !st.role.includes('ጸሐፊ') && !st.role.includes('ጥበቃ'))) {
+      staffList.splice(SEED_STAFF_PRIMARY.length, 0, ...SEED_STAFF_HIGH);
+    }
+
+    let attendance = JSON.parse(localStorage.getItem('dilijent_attendance')) || SEED_ATTENDANCE;
+
+    // Strict Level-Segregation Filters
+    function isGradeInLevelWeb(grade, level) {
+      if (!level || level === 'ALL') return true;
+      const g = (grade || '').trim();
+      const nums = (g.match(/\d+/g) || []).map(Number);
+      if (level === '1_8') {
+        if (nums.some(n => n >= 9 && n <= 12)) return false;
+        if (g.includes('Natural') || g.includes('Social') || g.includes('12') || g.includes('11') || g.includes('10') || g.includes('9')) return false;
+        return true;
+      } else if (level === '9_12') {
+        if (nums.some(n => n >= 9 && n <= 12)) return true;
+        if (g.includes('Natural') || g.includes('Social') || g.includes('12') || g.includes('11') || g.includes('10') || g.includes('9')) return true;
+        return false;
+      }
+      return true;
+    }
+
+    function isStaffInLevelWeb(staff, level) {
+      if (!level || level === 'ALL') return true;
+      const role = staff.role || '';
+      const dept = staff.dept || '';
+      // Support & Administration belong to all levels
+      if (role.includes('ጸሐፊ') || role.includes('ጥበቃ') || dept.includes('አስተዳደር') || dept.includes('አገልግሎት') || role.includes('ርዕሰ')) {
+        return true;
+      }
+      const combined = role + ' ' + dept;
+      const nums = (combined.match(/\d+/g) || []).map(Number);
+      if (level === '1_8') {
+        if (nums.some(n => n >= 9 && n <= 12)) return false;
+        if (combined.includes('Natural') || combined.includes('Social') || combined.includes('12') || combined.includes('11') || combined.includes('10') || combined.includes('9')) return false;
+        return true;
+      } else if (level === '9_12') {
+        if (nums.some(n => n >= 9 && n <= 12)) return true;
+        if (combined.includes('Natural') || combined.includes('Social') || combined.includes('12') || combined.includes('11') || combined.includes('10') || combined.includes('9')) return true;
+        return false;
+      }
+      return true;
+    }
+
+    function getFilteredStudentsWeb() {
+      const lvl = (schoolSettings && schoolSettings.gradeLevel) ? schoolSettings.gradeLevel : '1_8';
+      return students.filter(s => isGradeInLevelWeb(s.grade, lvl));
+    }
+
+    function getFilteredStaffWeb() {
+      const lvl = (schoolSettings && schoolSettings.gradeLevel) ? schoolSettings.gradeLevel : '1_8';
+      return staffList.filter(st => isStaffInLevelWeb(st, lvl));
+    }
+
+    function getFilteredAttendanceWeb() {
+      const lvl = (schoolSettings && schoolSettings.gradeLevel) ? schoolSettings.gradeLevel : '1_8';
+      return attendance.filter(a => isGradeInLevelWeb(a.grade, lvl));
+    }
+
+    function getSubjectsForGradeLevel(level) {
+      if (level === '1_8') {
+        return ['ሒሳብ', 'አማርኛ', 'እንግሊዝኛ', 'አጠቃላይ ሳይንስ', 'ማህበራዊ ሳይንስ', 'ስነ-ዜጋ'];
+      } else {
+        return ['ሒሳብ', 'እንግሊዝኛ', 'ፊዚክስ', 'ኬሚስትሪ', 'ባዮሎጂ', 'ስነ-ዜጋ'];
+      }
+    }
+
     function calculateTotal(scores) {
-      // Scale scores to current scheme weights
       const t1 = Math.min(scores[0] || 0, currentScheme.t1Weight);
       const as = Math.min(scores[1] || 0, currentScheme.asWeight);
       const mid = Math.min(scores[2] || 0, currentScheme.midWeight);
@@ -1459,8 +1570,11 @@
     }
 
     function renderDashboard() {
+      const activeStudents = getFilteredStudentsWeb();
+      const activeStaff = getFilteredStaffWeb();
+
       const tbody = document.getElementById('dashboardRecentTable');
-      tbody.innerHTML = students.slice(0, 5).map(s => {
+      tbody.innerHTML = activeStudents.slice(0, 5).map(s => {
         const total = calculateTotal(s.scores);
         const letter = getLetter(total);
         const avatar = s.photo
@@ -1475,21 +1589,34 @@
               </div>
             </td>
             <td>${s.id}</td>
-            <td>${s.grade}</td>
+            <td><span class="badge badge-primary">${s.grade}</span></td>
             <td><strong>${total}%</strong></td>
             <td><span class="badge ${parseFloat(total) >= 50 ? 'badge-success' : 'badge-danger'}">${letter}</span></td>
           </tr>
         `;
       }).join('');
-      document.getElementById('totalStudentsCount').innerText = students.length;
+
+      document.getElementById('totalStudentsCount').innerText = activeStudents.length;
+      if (document.getElementById('dashboardTeachersCount')) {
+        document.getElementById('dashboardTeachersCount').innerText = activeStaff.length;
+      }
+      if (document.getElementById('dashboardClassesCount')) {
+        const classes = getClassesForGradeLevel(schoolSettings.gradeLevel);
+        document.getElementById('dashboardClassesCount').innerText = classes.length;
+      }
+      if (document.getElementById('dashboardClassesLabel')) {
+        const lvlText = schoolSettings.gradeLevel === '1_8' ? 'ክፍሎች (1-8)' : (schoolSettings.gradeLevel === '9_12' ? 'ክፍሎች (9-12)' : 'ክፍሎች (KG-12)');
+        document.getElementById('dashboardClassesLabel').innerText = lvlText;
+      }
       if (document.getElementById('totalStaffBadge')) {
-        document.getElementById('totalStaffBadge').innerText = `ጠቅላላ ${staffList.length} ሰራተኞች`;
+        document.getElementById('totalStaffBadge').innerText = `ጠቅላላ ${activeStaff.length} ሰራተኞች`;
       }
     }
 
     function renderStudents() {
+      const activeStudents = getFilteredStudentsWeb();
       const tbody = document.getElementById('studentsTableBody');
-      tbody.innerHTML = students.map((s, idx) => {
+      tbody.innerHTML = activeStudents.map(s => {
         const avatar = s.photo
           ? `<img src="${s.photo}" alt="${s.name}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid var(--accent); vertical-align:middle; margin-right:8px; box-shadow:0 1px 4px rgba(0,0,0,0.1);">`
           : `<span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; background:${s.gender === 'ሴት' ? '#FCE7F3' : '#DBEAFE'}; color:${s.gender === 'ሴት' ? '#BE185D' : '#1E40AF'}; font-weight:bold; font-size:0.85rem; margin-right:8px; vertical-align:middle;">${s.name.charAt(0)}</span>`;
@@ -1506,20 +1633,21 @@
             </div>
           </td>
           <td>${s.gender}</td>
-          <td>${s.grade}</td>
+          <td><span class="badge badge-primary">${s.grade}</span></td>
           <td>${s.phone}</td>
           <td><span class="badge badge-success">${s.status}</span></td>
           <td>
-            <button class="btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.75rem;" onclick="removeStudent(${idx})">🗑️ ሰርዝ</button>
+            <button class="btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.75rem;" onclick="removeStudent('${s.id}')">🗑️ ሰርዝ</button>
           </td>
         </tr>
       `}).join('');
     }
 
     function renderStaff() {
+      const activeStaff = getFilteredStaffWeb();
       const tbody = document.getElementById('staffTableBody');
       if (!tbody) return;
-      tbody.innerHTML = staffList.map((st, idx) => {
+      tbody.innerHTML = activeStaff.map(st => {
         const avatar = st.photo
           ? `<img src="${st.photo}" alt="${st.name}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid var(--accent); vertical-align:middle; margin-right:8px; box-shadow:0 1px 4px rgba(0,0,0,0.1);">`
           : `<span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; background:#FEF3C7; color:#B45309; font-weight:bold; font-size:0.85rem; margin-right:8px; vertical-align:middle;">${st.name.replace('መምህር ', '').replace('መምህርት ', '').replace('አቶ ', '').replace('ወ/ሮ ', '').charAt(0)}</span>`;
@@ -1540,18 +1668,18 @@
           <td><span class="badge badge-warning">${st.qual}</span></td>
           <td><span class="badge badge-success">${st.status}</span></td>
           <td>
-            <button class="btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.75rem; color:var(--danger);" onclick="removeStaff(${idx})">🗑️ ሰርዝ</button>
+            <button class="btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.75rem; color:var(--danger);" onclick="removeStaff('${st.id}')">🗑️ ሰርዝ</button>
           </td>
         </tr>
       `}).join('');
       if (document.getElementById('totalStaffBadge')) {
-        document.getElementById('totalStaffBadge').innerText = `ጠቅላላ ${staffList.length} ሰራተኞች`;
+        document.getElementById('totalStaffBadge').innerText = `ጠቅላላ ${activeStaff.length} ሰራተኞች`;
       }
     }
 
     function renderGrades() {
+      const activeStudents = getFilteredStudentsWeb();
       const subjectFilter = document.getElementById('gradeSubjectFilter') ? document.getElementById('gradeSubjectFilter').value : 'Mathematics';
-      // Dynamic Header
       const thead = document.getElementById('gradesTableHeadRow');
       thead.innerHTML = `
         <th>ተማሪ</th>
@@ -1566,7 +1694,7 @@
       `;
 
       const tbody = document.getElementById('gradesTableBody');
-      tbody.innerHTML = students.map(s => {
+      tbody.innerHTML = activeStudents.map(s => {
         let sc = (s.subjectGrades && s.subjectGrades[subjectFilter]) ? s.subjectGrades[subjectFilter] : s.scores;
         if (!sc || sc.length < 4) sc = [0, 0, 0, 0];
 
@@ -1579,7 +1707,7 @@
 
         return `
           <tr>
-            <td><strong>${s.name}</strong> <small style="color:#64748B;">(${s.id})</small></td>
+            <td><strong>${s.name}</strong> <small style="color:#64748B;">(${s.id} - ${s.grade})</small></td>
             <td><span class="badge badge-primary">${subjectFilter}</span></td>
             <td>${s1.toFixed(1)}</td>
             <td>${s2.toFixed(1)}</td>
@@ -1596,6 +1724,10 @@
     }
 
     function renderReportCard() {
+      const activeStudents = getFilteredStudentsWeb();
+      const targetStudent = activeStudents[0] || { name: 'ተማሪ', id: 'DIL-001', grade: (schoolSettings.gradeLevel === '1_8' ? '8A' : '12A'), scores: [9, 9, 28, 46] };
+      const subjects = getSubjectsForGradeLevel(schoolSettings.gradeLevel);
+
       const headerRow = document.getElementById('reportCardHeaderRow');
       headerRow.innerHTML = `
         <th>የትምህርት ዓይነት</th>
@@ -1607,25 +1739,20 @@
         <th>አስተያየት</th>
       `;
 
-      const sampleSubjects = [
-        { name: 'Mathematics (ሒሳብ)', sem1: 94.5, sem2: 92.0 },
-        { name: 'Physics (ፊዚክስ)', sem1: 87.5, sem2: 89.0 },
-        { name: 'Chemistry (ኬሚስትሪ)', sem1: 86.5, sem2: 88.0 },
-        { name: 'English (እንግሊዝኛ)', sem1: 92.0, sem2: 94.0 },
-        { name: 'Civics (ስነ-ዜጋ)', sem1: 91.0, sem2: 90.0 }
-      ];
-
       const tbody = document.getElementById('reportCardBody');
-      tbody.innerHTML = sampleSubjects.map((sub, idx) => {
-        const avg = ((sub.sem1 + sub.sem2) / 2).toFixed(1);
+      tbody.innerHTML = subjects.map((subName, idx) => {
+        const base = (targetStudent.scores[0] + targetStudent.scores[1] + targetStudent.scores[2] + targetStudent.scores[3]);
+        const s1 = Math.min(100, Math.max(40, base - (idx * 1.5))).toFixed(1);
+        const s2 = Math.min(100, Math.max(40, base - (idx * 1.2) + 0.8)).toFixed(1);
+        const avg = ((parseFloat(s1) + parseFloat(s2)) / 2).toFixed(1);
         const letter = getLetter(avg);
         const remark = parseFloat(avg) >= 85 ? 'እጅግ በጣም ጥሩ' : 'ጥሩ';
 
         return `
           <tr>
-            <td><strong>${sub.name}</strong></td>
-            <td style="text-align:center; font-weight:600;">${sub.sem1.toFixed(1)}</td>
-            <td style="text-align:center; font-weight:600;">${sub.sem2.toFixed(1)}</td>
+            <td><strong>${subName}</strong></td>
+            <td style="text-align:center; font-weight:600;">${s1}</td>
+            <td style="text-align:center; font-weight:600;">${s2}</td>
             <td style="text-align:center; font-weight:800; color:var(--primary); background:#F8FAFC;">${avg}%</td>
             <td style="text-align:center;"><span class="badge ${parseFloat(avg) >= 50 ? 'badge-success' : 'badge-danger'}">${letter}</span></td>
             <td style="text-align:center; font-size:0.75rem;">${idx + 1}ኛ</td>
@@ -1634,8 +1761,6 @@
         `;
       }).join('');
 
-      // Display student photo and info in report card header
-      const targetStudent = students[0] || { name: 'አቤል ታደሰ', id: 'DIL-001', grade: '12A' };
       document.getElementById('reportStudentNameDisplay').innerText = targetStudent.name;
       document.getElementById('reportStudentIdDisplay').innerText = targetStudent.id;
       document.getElementById('reportStudentGradeDisplay').innerText = targetStudent.grade;
@@ -1659,11 +1784,12 @@
     }
 
     function renderAttendance() {
+      const activeAttendance = getFilteredAttendanceWeb();
       const tbody = document.getElementById('attendanceTableBody');
-      tbody.innerHTML = attendance.map((a, i) => `
+      tbody.innerHTML = activeAttendance.map((a, i) => `
         <tr>
           <td><strong>${a.name}</strong></td>
-          <td>${a.grade}</td>
+          <td><span class="badge badge-primary">${a.grade}</span></td>
           <td>
             <span class="badge ${a.status === 'Present' ? 'badge-success' : a.status === 'Late' ? 'badge-warning' : 'badge-danger'}">
               ${a.status === 'Present' ? 'ተገኝቷል' : a.status === 'Late' ? 'ዘግይቷል' : 'ቀሪ'}
@@ -1678,20 +1804,38 @@
     }
 
     function toggleAttendance(index) {
+      const activeAttendance = getFilteredAttendanceWeb();
+      if (!activeAttendance[index]) return;
       const order = ['Present', 'Late', 'Absent'];
-      const curr = order.indexOf(attendance[index].status);
-      attendance[index].status = order[(curr + 1) % order.length];
+      const curr = order.indexOf(activeAttendance[index].status);
+      activeAttendance[index].status = order[(curr + 1) % order.length];
       saveState();
     }
 
-    // Homeroom Master Roster Generator (የክፍል ኃላፊ ሮስተር ማመንጫ)
+    // Homeroom Master Roster Generator (የክፍል ኃላፊ ሮስተር ማመንጫ - Strictly Segregated)
     function renderHomeroomRoster() {
-      const select = document.getElementById('rosterGradeSelect');
-      const selectedGrade = select ? select.value : '12A';
+      const activeStudents = getFilteredStudentsWeb();
+      const activeStaff = getFilteredStaffWeb();
+      const availableClasses = getClassesForGradeLevel(schoolSettings.gradeLevel);
+      const subjects = getSubjectsForGradeLevel(schoolSettings.gradeLevel);
 
-      // Find homeroom teacher assigned to this grade
-      const hrTeacher = staffList.find(s => s.role.includes('የክፍል ኃላፊ') && (s.role.includes(selectedGrade) || s.dept.includes(selectedGrade)))
-        || staffList.find(s => s.role.includes('የክፍል ኃላፊ'))
+      const select = document.getElementById('rosterGradeSelect');
+      if (select) {
+        // Ensure options in dropdown match the active level
+        const curSelected = select.value;
+        const optionsHtml = availableClasses.map(c => `<option value="${c}" ${c === curSelected ? 'selected' : ''}>${c}</option>`).join('');
+        select.innerHTML = optionsHtml;
+        if (!availableClasses.includes(curSelected) && availableClasses.length > 0) {
+          select.value = availableClasses[0];
+        }
+      }
+
+      const selectedGrade = select ? select.value : (availableClasses[0] || '8A');
+
+      // Find homeroom teacher matching this section or level
+      const hrTeacher = activeStaff.find(s => s.role.includes('የክፍል ኃላፊ') && (s.role.includes(selectedGrade) || s.dept.includes(selectedGrade)))
+        || activeStaff.find(s => s.role.includes('የክፍል ኃላፊ'))
+        || activeStaff[0]
         || { name: 'መምህር ዳዊት በቀለ' };
       
       const badge = document.getElementById('rosterHomeroomBadge');
@@ -1699,16 +1843,32 @@
         badge.innerText = `👨‍🏫 የክፍል ኃላፊ፦ ${hrTeacher.name} (${selectedGrade})`;
       }
 
-      // Filter students of this grade or all students if class has few
-      let classStudents = students.filter(s => s.grade === selectedGrade);
+      // Filter students strictly belonging to this grade/level
+      let classStudents = activeStudents.filter(s => s.grade === selectedGrade);
       if (classStudents.length === 0) {
-        classStudents = students;
+        classStudents = activeStudents;
       }
 
-      // Standard subject list for Ethiopian curriculum
-      const subjects = ['ሒሳብ', 'እንግሊዝኛ', 'ፊዚክስ', 'ኬሚስትሪ', 'ባዮሎጂ', 'ስነ-ዜጋ'];
+      // Dynamic Roster Header per Grade Level
+      const theadRow = document.getElementById('rosterTableHeaderRow');
+      if (theadRow) {
+        const subHeadersHtml = subjects.map(s => 
+          `<th style="padding:10px 8px; text-align:center;">${s}<br><small style="color:var(--accent); font-weight:600;">(ከ 100)</small></th>`
+        ).join('');
 
-      // Generate composite scores for each student
+        theadRow.innerHTML = `
+          <th style="padding:10px 8px; text-align:center; width:55px;">ደረጃ</th>
+          <th style="padding:10px 8px;">ተማሪ (ስም እና ፎቶ)</th>
+          <th style="padding:10px 8px; text-align:center; width:80px;">መለያ ቁጥር</th>
+          ${subHeadersHtml}
+          <th style="padding:10px 8px; text-align:center; background:#172554;">ጠቅላላ (${subjects.length * 100})</th>
+          <th style="padding:10px 8px; text-align:center; background:#172554;">አማካይ %</th>
+          <th style="padding:10px 8px; text-align:center;">ሁኔታ</th>
+          <th style="padding:10px 8px; text-align:center; width:110px;">የተማሪ ካርድ</th>
+        `;
+      }
+
+      // Generate composite scores for each student strictly
       const rosterData = classStudents.map(student => {
         const baseTotal = parseFloat(calculateTotal(student.scores));
         const subScores = subjects.map((sub, idx) => {
@@ -1730,15 +1890,11 @@
         };
       });
 
-      // Sort by average descending to determine rank
       rosterData.sort((a, b) => b.avg - a.avg);
-
-      // Assign ranks
       rosterData.forEach((row, i) => {
         row.rank = i + 1;
       });
 
-      // Summary statistics
       if (document.getElementById('rosterTotalCount')) {
         document.getElementById('rosterTotalCount').innerText = `${rosterData.length} ተማሪዎች`;
       }
@@ -1752,7 +1908,6 @@
         document.getElementById('rosterPassRate').innerText = `${rate}%`;
       }
 
-      // Render table rows
       const tbody = document.getElementById('rosterTableBody');
       if (!tbody) return;
 
@@ -1865,13 +2020,22 @@
       }
 
       // Calculate base subject totals (from 100%) - NO CW, HW, Mid, Final!
-      const subjects = [
-        { name: 'ሒሳብ (Mathematics)', base: (student.scores[0] + student.scores[1] + student.scores[2] + student.scores[3]) },
-        { name: 'እንግሊዝኛ (English)', base: (student.scores[0] + student.scores[1] + student.scores[2] + student.scores[3]) * 0.95 },
-        { name: 'ፊዚክስ (Physics)', base: (student.scores[0] + student.scores[1] + student.scores[2] + student.scores[3]) * 0.91 },
-        { name: 'ኬሚስትሪ (Chemistry)', base: (student.scores[0] + student.scores[1] + student.scores[2] + student.scores[3]) * 0.92 },
-        { name: 'ባዮሎጂ (Biology)', base: (student.scores[0] + student.scores[1] + student.scores[2] + student.scores[3]) * 0.94 },
-        { name: 'ስነ-ዜጋ (Civics)', base: (student.scores[0] + student.scores[1] + student.scores[2] + student.scores[3]) * 0.96 }
+      const isPrimary = (schoolSettings.gradeLevel === '1_8');
+      const baseScore = (student.scores[0] + student.scores[1] + student.scores[2] + student.scores[3]);
+      const subjects = isPrimary ? [
+        { name: 'ሒሳብ (Mathematics)', base: baseScore },
+        { name: 'አማርኛ (Amharic)', base: baseScore * 0.97 },
+        { name: 'እንግሊዝኛ (English)', base: baseScore * 0.95 },
+        { name: 'አጠቃላይ ሳይንስ (General Science)', base: baseScore * 0.92 },
+        { name: 'ማህበራዊ ሳይንስ (Social Science)', base: baseScore * 0.94 },
+        { name: 'ስነ-ዜጋ (Civics)', base: baseScore * 0.96 }
+      ] : [
+        { name: 'ሒሳብ (Mathematics)', base: baseScore },
+        { name: 'እንግሊዝኛ (English)', base: baseScore * 0.95 },
+        { name: 'ፊዚክስ (Physics)', base: baseScore * 0.91 },
+        { name: 'ኬሚስትሪ (Chemistry)', base: baseScore * 0.92 },
+        { name: 'ባዮሎጂ (Biology)', base: baseScore * 0.94 },
+        { name: 'ስነ-ዜጋ (Civics)', base: baseScore * 0.96 }
       ];
 
       const headerRow = document.getElementById('cardModalHeaderRow');
@@ -1956,16 +2120,20 @@
       const avg = (grandTotalSum / subjects.length).toFixed(1);
       document.getElementById('cardModalAvg').innerText = `${avg}% (አልፏል)`;
 
-      // Calculate class rank
-      const select = document.getElementById('rosterGradeSelect');
-      const selectedGrade = select ? select.value : student.grade;
-      const classStudents = students.filter(s => s.grade === selectedGrade);
-      const studentIdx = students.findIndex(s => s.id === student.id);
+      // Calculate class rank strictly within segregated class
+      const activeStudents = getFilteredStudentsWeb();
+      const activeStaff = getFilteredStaffWeb();
+      const selectedGrade = student.grade;
+      const classStudents = activeStudents.filter(s => s.grade === selectedGrade);
+      const studentIdx = classStudents.findIndex(s => s.id === student.id);
       const rank = (studentIdx >= 0 ? studentIdx + 1 : 1);
-      document.getElementById('cardModalRank').innerText = `${rank}ኛ ደረጃ (ከ ${classStudents.length || students.length} ተማሪዎች)`;
+      document.getElementById('cardModalRank').innerText = `${rank}ኛ ደረጃ (ከ ${classStudents.length || activeStudents.length} ተማሪዎች)`;
 
-      // Homeroom Teacher name
-      const hrTeacher = staffList.find(s => s.role.includes('የክፍል ኃላፊ')) || { name: 'መምህር ዳዊት በቀለ' };
+      // Homeroom Teacher name strictly matching active level
+      const hrTeacher = activeStaff.find(s => s.role.includes('የክፍል ኃላፊ') && (s.role.includes(selectedGrade) || s.dept.includes(selectedGrade)))
+        || activeStaff.find(s => s.role.includes('የክፍል ኃላፊ'))
+        || activeStaff[0]
+        || { name: 'መምህር ዳዊት በቀለ' };
       document.getElementById('cardModalHomeroomTeacher').innerText = hrTeacher.name;
     }
 
@@ -1973,9 +2141,13 @@
       document.getElementById('ethiopianReportCardModal').style.display = 'none';
     }
 
-    function removeStudent(idx) {
+    function removeStudent(idOrIdx) {
       if (confirm('ተማሪውን ከመዝገብ መሰረዝ ይፈልጋሉ?')) {
-        students.splice(idx, 1);
+        if (typeof idOrIdx === 'string') {
+          students = students.filter(s => s.id !== idOrIdx);
+        } else {
+          students.splice(idOrIdx, 1);
+        }
         saveState();
       }
     }
@@ -1996,7 +2168,8 @@
     // Add Grade Modal Handlers
     function openAddGradeModal(studentId, subject) {
       const studentSelect = document.getElementById('gradeStudentSelect');
-      studentSelect.innerHTML = students.map(s => `
+      const activeStudents = getFilteredStudentsWeb();
+      studentSelect.innerHTML = activeStudents.map(s => `
         <option value="${s.id}" ${s.id === studentId ? 'selected' : ''}>${s.name} (${s.id} - ${s.grade})</option>
       `).join('');
 
@@ -2320,9 +2493,13 @@
       alert(`መምህር/ሰራተኛ ${name} ከፎቶ ጋር በተሳካ ሁኔታ በLocal Storage ተመዝግቧል!`);
     }
 
-    function removeStaff(idx) {
+    function removeStaff(idOrIdx) {
       if (confirm('ሰራተኛውን/መምህሩን ከዝርዝር መሰረዝ ይፈልጋሉ?')) {
-        staffList.splice(idx, 1);
+        if (typeof idOrIdx === 'string') {
+          staffList = staffList.filter(st => st.id !== idOrIdx);
+        } else {
+          staffList.splice(idOrIdx, 1);
+        }
         saveState();
       }
     }
@@ -2797,19 +2974,22 @@
     function exportDataToCsv(target) {
       let content = '';
       let filename = '';
+      const activeStudents = getFilteredStudentsWeb();
+      const activeStaff = getFilteredStaffWeb();
+      const lvl = schoolSettings.gradeLevel || 'all';
 
       if (target === 'students') {
         content = "መለያ ቁጥር,የተማሪ ስም,ጾታ,ክፍል,ስልክ ቁጥር,ሁኔታ\n";
-        students.forEach(s => {
+        activeStudents.forEach(s => {
           content += `"${s.id}","${s.name}","${s.gender}","${s.grade}","${s.phone}","${s.status}"\n`;
         });
-        filename = 'dilijent_students_export.csv';
+        filename = `dilijent_students_${lvl}_export.csv`;
       } else {
         content = "መለያ ቁጥር,ሙሉ ስም,የስራ መደብ,ክፍል/ዲፓርትመንት,ስልክ ቁጥር,የትምህርት ደረጃ,ሁኔታ\n";
-        staffList.forEach(st => {
+        activeStaff.forEach(st => {
           content += `"${st.id}","${st.name}","${st.role}","${st.dept}","${st.phone}","${st.qual}","${st.status}"\n`;
         });
-        filename = 'dilijent_teachers_staff_export.csv';
+        filename = `dilijent_teachers_staff_${lvl}_export.csv`;
       }
 
       const blob = new Blob(["\uFEFF" + content], { type: 'text/csv;charset=utf-8;' });
@@ -2899,14 +3079,32 @@
         if (classes.includes(curVal)) classFilter.value = curVal;
       }
 
-      // Add student class select
-      const studentClass = document.getElementById('studentClass');
-      if (studentClass) {
+      // Add student class select (both studentClass and newStudentGrade)
+      ['studentClass', 'newStudentGrade'].forEach(elemId => {
+        const el = document.getElementById(elemId);
+        if (el) {
+          let html = '';
+          classes.forEach(c => {
+            html += `<option value="${c}">${c}</option>`;
+          });
+          el.innerHTML = html;
+        }
+      });
+
+      // Roster grade select
+      const rosterSelect = document.getElementById('rosterGradeSelect');
+      if (rosterSelect) {
+        const curVal = rosterSelect.value;
         let html = '';
         classes.forEach(c => {
           html += `<option value="${c}">${c}</option>`;
         });
-        studentClass.innerHTML = html;
+        rosterSelect.innerHTML = html;
+        if (classes.includes(curVal)) {
+          rosterSelect.value = curVal;
+        } else if (classes.length > 0) {
+          rosterSelect.value = classes[0];
+        }
       }
 
       // Workload class select
@@ -2994,8 +3192,9 @@
       localStorage.setItem('school_name_en', schoolSettings.nameEn);
 
       applySchoolSettingsWeb();
+      saveState();
       closeSchoolSettingsModal();
-      alert('✅ የትምህርት ቤት ቅንብር እና አርማ በተሳካ ሁኔታ ተቀምጧል!');
+      alert('✅ የትምህርት ቤት ቅንብር እና አርማ በተሳካ ሁኔታ ተቀምጧል! መረጃዎች በሙሉ ወደ ተመረጠው የክፍል ደረጃ ተዋቅረዋል።');
     }
 
     // Initialize
