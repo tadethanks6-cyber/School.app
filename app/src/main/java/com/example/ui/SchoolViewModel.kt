@@ -42,6 +42,7 @@ enum class SchoolNavTab(val titleAm: String, val titleEn: String) {
 
 class SchoolViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val prefs = application.getSharedPreferences("dilijent_school_prefs", Context.MODE_PRIVATE)
     private val repository: SchoolRepository
     private val firestoreRepository: FirestoreSchoolRepository = FirestoreSchoolRepository(application)
     val cloudSyncStatus: StateFlow<CloudStatus> = firestoreRepository.syncStatus
@@ -145,16 +146,57 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
     val teacherSearchQuery = MutableStateFlow("")
     val subjectGradeFilter = MutableStateFlow("ሁሉም")
 
-    // Grade and Section lists standard in Ethiopian schools
-    val availableGrades = listOf(
-        "ሁሉም",
-        "KG 1", "KG 2", "KG 3",
-        "1ኛ ክፍል", "2ኛ ክፍል", "3ኛ ክፍል", "4ኛ ክፍል", "5ኛ ክፍል", "6ኛ ክፍል",
-        "7ኛ ክፍል", "8ኛ ክፍል",
-        "9ኛ ክፍል", "10ኛ ክፍል", "11ኛ ክፍል", "12ኛ ክፍል"
-    )
+    // Dynamic School Settings & Profile
+    val showSchoolSettingsDialog = MutableStateFlow(false)
+    private val _schoolLogoUri = MutableStateFlow(loadInitialLogo())
+    val schoolLogoUri: StateFlow<String> = _schoolLogoUri.asStateFlow()
 
-    val formGradeOptions = availableGrades.filter { it != "ሁሉም" }
+    private val _schoolGradeLevel = MutableStateFlow(prefs.getString("school_grade_level", "1_8") ?: "1_8")
+    val schoolGradeLevel: StateFlow<String> = _schoolGradeLevel.asStateFlow()
+
+    private val _schoolName = MutableStateFlow(prefs.getString("school_name", "ዲሊጀንት ትምህርት ቤት") ?: "ዲሊጀንት ትምህርት ቤት")
+    val schoolName: StateFlow<String> = _schoolName.asStateFlow()
+
+    private val _schoolNameEn = MutableStateFlow(prefs.getString("school_name_en", "Dilijent School") ?: "Dilijent School")
+    val schoolNameEn: StateFlow<String> = _schoolNameEn.asStateFlow()
+
+    private fun loadInitialLogo(): String {
+        val saved = prefs.getString("school_logo_uri", "") ?: ""
+        if (saved.isNotEmpty()) {
+            try {
+                val file = java.io.File(getApplication<Application>().filesDir, "custom_school_logo.png")
+                if (file.exists()) return file.toURI().toString()
+            } catch (_: Exception) {}
+        }
+        return saved
+    }
+
+    private fun getGradesForLevel(level: String, includeAll: Boolean): List<String> {
+        val list = when (level) {
+            "1_8" -> listOf(
+                "1ኛ ክፍል", "2ኛ ክፍል", "3ኛ ክፍል", "4ኛ ክፍል", "5ኛ ክፍል", "6ኛ ክፍል", "7ኛ ክፍል", "8ኛ ክፍል"
+            )
+            "9_12" -> listOf(
+                "9ኛ ክፍል", "10ኛ ክፍል", "11ኛ ክፍል", "12ኛ ክፍል"
+            )
+            else -> listOf(
+                "KG 1", "KG 2", "KG 3",
+                "1ኛ ክፍል", "2ኛ ክፍል", "3ኛ ክፍል", "4ኛ ክፍል", "5ኛ ክፍል", "6ኛ ክፍል", "7ኛ ክፍል", "8ኛ ክፍል",
+                "9ኛ ክፍል", "10ኛ ክፍል", "11ኛ ክፍል", "12ኛ ክፍል"
+            )
+        }
+        return if (includeAll) listOf("ሁሉም") + list else list
+    }
+
+    // Dynamic Grade and Section lists standard in Ethiopian schools
+    val availableGrades: StateFlow<List<String>> = _schoolGradeLevel.map { level ->
+        getGradesForLevel(level, true)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, getGradesForLevel(prefs.getString("school_grade_level", "1_8") ?: "1_8", true))
+
+    val formGradeOptions: StateFlow<List<String>> = _schoolGradeLevel.map { level ->
+        getGradesForLevel(level, false)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, getGradesForLevel(prefs.getString("school_grade_level", "1_8") ?: "1_8", false))
+
     val sectionOptions = listOf("A", "B", "C", "D")
 
     // Reactive Data Sources
@@ -680,7 +722,6 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
     val selectedStudentForGrades = MutableStateFlow<Student?>(null)
 
     // Dynamic Assessment Scheme (የኢትዮጵያ ስርዓተ-ትምህርት ውጤት አሰጣጥ ማዋቀሪያ)
-    private val prefs = application.getSharedPreferences("dilijent_school_prefs", Context.MODE_PRIVATE)
     private val _assessmentScheme = MutableStateFlow(loadAssessmentScheme())
     val assessmentScheme: StateFlow<AssessmentScheme> = _assessmentScheme.asStateFlow()
 
@@ -724,6 +765,48 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
             .putFloat("scheme_final_weight", newScheme.finalExamWeight)
             .apply()
         showAssessmentSchemeDialog.value = false
+    }
+
+    // Dynamic School Settings Management
+    fun saveSchoolLogo(sourceUri: android.net.Uri): String {
+        return try {
+            val context = getApplication<Application>()
+            val inputStream = context.contentResolver.openInputStream(sourceUri)
+            val file = java.io.File(context.filesDir, "custom_school_logo.png")
+            file.outputStream().use { output ->
+                inputStream?.copyTo(output)
+            }
+            val fileUri = file.toURI().toString()
+            _schoolLogoUri.value = fileUri
+            prefs.edit().putString("school_logo_uri", fileUri).apply()
+            fileUri
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ""
+        }
+    }
+
+    fun resetSchoolLogo() {
+        _schoolLogoUri.value = ""
+        prefs.edit().putString("school_logo_uri", "").apply()
+        try {
+            val file = java.io.File(getApplication<Application>().filesDir, "custom_school_logo.png")
+            if (file.exists()) file.delete()
+        } catch (_: Exception) {}
+    }
+
+    fun updateSchoolSettings(gradeLevel: String, nameAm: String, nameEn: String) {
+        _schoolGradeLevel.value = gradeLevel
+        _schoolName.value = nameAm
+        _schoolNameEn.value = nameEn
+        prefs.edit()
+            .putString("school_grade_level", gradeLevel)
+            .putString("school_name", nameAm)
+            .putString("school_name_en", nameEn)
+            .apply()
+        selectedGradeFilter.value = "ሁሉም"
+        subjectGradeFilter.value = "ሁሉም"
+        showSchoolSettingsDialog.value = false
     }
 
     // All Grades and Grades for selected student

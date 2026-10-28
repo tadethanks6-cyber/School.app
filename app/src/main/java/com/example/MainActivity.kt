@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -113,6 +114,11 @@ import com.example.ui.theme.EthioGreen
 import com.example.ui.theme.GoldAccent
 import com.example.ui.theme.MyApplicationTheme
 import com.example.ui.theme.NavyPrimary
+import com.example.ui.theme.NavyLight
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.material.icons.filled.Settings
+import coil.compose.AsyncImage
+import com.example.ui.screens.AdminSchoolSettingsDialog
 
 class MainActivity : ComponentActivity() {
 
@@ -215,6 +221,15 @@ class MainActivity : ComponentActivity() {
                 val showAdminPasswordManager by viewModel.showAdminPasswordManagerDialog.collectAsStateWithLifecycle()
                 val allUsers by viewModel.allUsers.collectAsStateWithLifecycle()
 
+                // School Settings & Profile
+                val availableGrades by viewModel.availableGrades.collectAsStateWithLifecycle()
+                val formGradeOptions by viewModel.formGradeOptions.collectAsStateWithLifecycle()
+                val schoolLogoUri by viewModel.schoolLogoUri.collectAsStateWithLifecycle()
+                val schoolGradeLevel by viewModel.schoolGradeLevel.collectAsStateWithLifecycle()
+                val schoolName by viewModel.schoolName.collectAsStateWithLifecycle()
+                val schoolNameEn by viewModel.schoolNameEn.collectAsStateWithLifecycle()
+                val showSchoolSettingsDialog by viewModel.showSchoolSettingsDialog.collectAsStateWithLifecycle()
+
                 // Dynamically sync fullscreen state with system bars
                 LaunchedEffect(isFullScreen) {
                     val controller = WindowCompat.getInsetsController(window, window.decorView)
@@ -269,7 +284,11 @@ class MainActivity : ComponentActivity() {
                         },
                         onGoogleSignInError = { errorMsg ->
                             viewModel.onGoogleSignInError(errorMsg)
-                        }
+                        },
+                        schoolLogoUri = schoolLogoUri,
+                        schoolNameAm = schoolName,
+                        schoolNameEn = schoolNameEn,
+                        schoolGradeLevel = schoolGradeLevel
                     )
                 } else {
                     // Proper Back navigation handler
@@ -301,7 +320,11 @@ class MainActivity : ComponentActivity() {
                                 onAddSubjectClick = { viewModel.showAddSubjectDialog.value = true },
                                 onAssignWorkloadClick = { viewModel.showAddWorkloadDialog.value = true },
                                 onAddGradeClick = { viewModel.showAddGradeDialog.value = true },
-                                onTakeAttendanceClick = { viewModel.navigateTo(SchoolNavTab.ATTENDANCE) }
+                                onTakeAttendanceClick = { viewModel.navigateTo(SchoolNavTab.ATTENDANCE) },
+                                schoolLogoUri = schoolLogoUri,
+                                schoolNameAm = schoolName,
+                                schoolNameEn = schoolNameEn,
+                                schoolGradeLevel = schoolGradeLevel
                             )
                         } else {
                             when (currentTab) {
@@ -323,7 +346,11 @@ class MainActivity : ComponentActivity() {
                                         onAddSubjectClick = { viewModel.showAddSubjectDialog.value = true },
                                         onAssignWorkloadClick = { viewModel.showAddWorkloadDialog.value = true },
                                         onAddGradeClick = { viewModel.showAddGradeDialog.value = true },
-                                        onTakeAttendanceClick = { viewModel.navigateTo(SchoolNavTab.ATTENDANCE) }
+                                        onTakeAttendanceClick = { viewModel.navigateTo(SchoolNavTab.ATTENDANCE) },
+                                        schoolLogoUri = schoolLogoUri,
+                                        schoolNameAm = schoolName,
+                                        schoolNameEn = schoolNameEn,
+                                        schoolGradeLevel = schoolGradeLevel
                                     )
                                 }
 
@@ -336,8 +363,8 @@ class MainActivity : ComponentActivity() {
                                     onGradeFilterChange = { viewModel.selectedGradeFilter.value = it },
                                     sectionFilter = studentSectionFilter,
                                     onSectionFilterChange = { viewModel.selectedSectionFilter.value = it },
-                                    availableGrades = viewModel.availableGrades,
-                                    formGradeOptions = viewModel.formGradeOptions,
+                                    availableGrades = availableGrades,
+                                    formGradeOptions = formGradeOptions,
                                     sectionOptions = viewModel.sectionOptions,
                                     isAmharic = isAmharic,
                                     onAddStudentClick = { viewModel.showAddStudentDialog.value = true },
@@ -424,7 +451,7 @@ class MainActivity : ComponentActivity() {
                                     subjects = subjects,
                                     gradeFilter = subjectGradeFilter,
                                     onGradeFilterChange = { viewModel.subjectGradeFilter.value = it },
-                                    availableGrades = viewModel.availableGrades,
+                                    availableGrades = availableGrades,
                                     isAmharic = isAmharic,
                                     onAddSubjectClick = { viewModel.showAddSubjectDialog.value = true },
                                     onEditSubjectClick = { subject ->
@@ -475,14 +502,17 @@ class MainActivity : ComponentActivity() {
                                     onAddGradeClick = { viewModel.showAddGradeDialog.value = true },
                                     onDeleteGradeClick = { grade ->
                                         viewModel.deleteGrade(grade)
-                                    }
+                                    },
+                                    schoolLogoUri = schoolLogoUri,
+                                    schoolNameAm = schoolName,
+                                    schoolNameEn = schoolNameEn
                                 )
                             }
 
                             SchoolNavTab.ATTENDANCE -> {
                                 AttendanceScreen(
                                     students = students,
-                                    availableGrades = viewModel.availableGrades,
+                                    availableGrades = availableGrades,
                                     sectionOptions = viewModel.sectionOptions,
                                     isAmharic = isAmharic,
                                     isAdmin = isAdmin,
@@ -520,26 +550,40 @@ class MainActivity : ComponentActivity() {
                                         Box(
                                             contentAlignment = Alignment.Center,
                                             modifier = Modifier
-                                                .size(42.dp)
+                                                .size(46.dp)
                                                 .clip(CircleShape)
+                                                .border(2.dp, GoldAccent, CircleShape)
                                                 .background(GoldAccent)
                                         ) {
-                                            Icon(
-                                                imageVector = Icons.Default.School,
-                                                contentDescription = null,
-                                                tint = Color.Black,
-                                                modifier = Modifier.size(24.dp)
-                                            )
+                                            if (schoolLogoUri.isNotEmpty()) {
+                                                AsyncImage(
+                                                    model = schoolLogoUri,
+                                                    contentDescription = "School Logo",
+                                                    modifier = Modifier.fillMaxSize(),
+                                                    contentScale = ContentScale.Crop
+                                                )
+                                            } else {
+                                                Icon(
+                                                    imageVector = Icons.Default.School,
+                                                    contentDescription = null,
+                                                    tint = Color.Black,
+                                                    modifier = Modifier.size(24.dp)
+                                                )
+                                            }
                                         }
                                         Spacer(modifier = Modifier.height(6.dp))
                                         Text(
-                                            text = if (isAmharic) "ዲሊጀንት" else "Dilijent",
+                                            text = if (isAmharic) schoolName else schoolNameEn,
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 13.sp,
                                             color = Color.White
                                         )
                                         Text(
-                                            text = if (isAmharic) "2017 ዓ.ም" else "2017 E.C.",
+                                            text = when (schoolGradeLevel) {
+                                                "1_8" -> "1-8"
+                                                "9_12" -> "9-12"
+                                                else -> "K-12"
+                                            },
                                             fontSize = 10.sp,
                                             color = GoldAccent
                                         )
@@ -664,6 +708,29 @@ class MainActivity : ComponentActivity() {
                                         }
                                         Spacer(modifier = Modifier.height(6.dp))
                                     }
+
+                                    // Rail School Settings Button for Admin
+                                    if (isAdmin || isSuperAdmin) {
+                                        Surface(
+                                            shape = RoundedCornerShape(12.dp),
+                                            color = NavyLight,
+                                            border = androidx.compose.foundation.BorderStroke(1.dp, GoldAccent),
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .clickable { viewModel.showSchoolSettingsDialog.value = true }
+                                                .testTag("btn_rail_school_settings")
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Settings,
+                                                contentDescription = "School Settings",
+                                                tint = GoldAccent,
+                                                modifier = Modifier
+                                                    .size(28.dp)
+                                                    .padding(5.dp)
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                    }
                                     // Rail Share Web Link Button
                                     Surface(
                                         shape = RoundedCornerShape(12.dp),
@@ -722,7 +789,7 @@ class MainActivity : ComponentActivity() {
                                             .padding(horizontal = 16.dp, vertical = 10.dp)
                                     ) {
                                         Text(
-                                            text = if (isAmharic) "ዲሊጀንት ትምህርት ቤት • ${currentTab.titleAm}" else "Dilijent School • ${currentTab.titleEn}",
+                                            text = if (isAmharic) "${schoolName} • ${currentTab.titleAm}" else "${schoolNameEn} • ${currentTab.titleEn}",
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 16.sp,
                                             color = Color.White
@@ -767,32 +834,48 @@ class MainActivity : ComponentActivity() {
                                         title = {
                                             Row(
                                                 verticalAlignment = Alignment.CenterVertically,
-                                                modifier = Modifier.padding(vertical = 2.dp)
+                                                modifier = Modifier
+                                                    .padding(vertical = 2.dp)
+                                                    .clickable { viewModel.navigateTo(SchoolNavTab.DASHBOARD) }
                                             ) {
                                                 Box(
                                                     contentAlignment = Alignment.Center,
                                                     modifier = Modifier
-                                                        .size(34.dp)
+                                                        .size(36.dp)
                                                         .clip(CircleShape)
+                                                        .border(1.5.dp, GoldAccent, CircleShape)
                                                         .background(GoldAccent)
                                                 ) {
-                                                    Icon(
-                                                        imageVector = Icons.Default.School,
-                                                        contentDescription = null,
-                                                        tint = Color.Black,
-                                                        modifier = Modifier.size(20.dp)
-                                                    )
+                                                    if (schoolLogoUri.isNotEmpty()) {
+                                                        AsyncImage(
+                                                            model = schoolLogoUri,
+                                                            contentDescription = "School Logo",
+                                                            modifier = Modifier.fillMaxSize(),
+                                                            contentScale = ContentScale.Crop
+                                                        )
+                                                    } else {
+                                                        Icon(
+                                                            imageVector = Icons.Default.School,
+                                                            contentDescription = null,
+                                                            tint = Color.Black,
+                                                            modifier = Modifier.size(20.dp)
+                                                        )
+                                                    }
                                                 }
                                                 Spacer(modifier = Modifier.width(8.dp))
                                                 Column {
                                                     Text(
-                                                        text = if (isAmharic) "ዲሊጀንት ትምህርት ቤት" else "Dilijent School",
+                                                        text = if (isAmharic) schoolName else schoolNameEn,
                                                         fontWeight = FontWeight.Bold,
-                                                        fontSize = 16.sp,
+                                                        fontSize = 15.sp,
                                                         color = Color.White
                                                     )
                                                     Text(
-                                                        text = if (isAmharic) "2017 ዓ.ም • መረጃ አያያዝ" else "2017 E.C. • MIS",
+                                                        text = when (schoolGradeLevel) {
+                                                            "1_8" -> if (isAmharic) "1ኛ - 8ኛ ክፍል • 2017 ዓ.ም" else "Grade 1-8 • 2017 E.C."
+                                                            "9_12" -> if (isAmharic) "9ኛ - 12ኛ ክፍል • 2017 ዓ.ም" else "Grade 9-12 • 2017 E.C."
+                                                            else -> if (isAmharic) "KG - 12ኛ ክፍል • 2017 ዓ.ም" else "K-12 • 2017 E.C."
+                                                        },
                                                         fontSize = 10.sp,
                                                         color = Color.White.copy(alpha = 0.85f)
                                                     )
@@ -860,6 +943,39 @@ class MainActivity : ComponentActivity() {
                                             }
 
                                             Spacer(modifier = Modifier.width(6.dp))
+
+                                            // Mobile Admin School Profile & Settings Button
+                                            if (isAdmin || isSuperAdmin) {
+                                                Surface(
+                                                    shape = RoundedCornerShape(16.dp),
+                                                    color = NavyLight,
+                                                    border = androidx.compose.foundation.BorderStroke(1.dp, GoldAccent),
+                                                    modifier = Modifier
+                                                        .clip(RoundedCornerShape(16.dp))
+                                                        .clickable { viewModel.showSchoolSettingsDialog.value = true }
+                                                        .testTag("btn_topbar_school_settings_mobile")
+                                                ) {
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 5.dp)
+                                                    ) {
+                                                        Icon(
+                                                            imageVector = Icons.Default.Settings,
+                                                            contentDescription = "Settings",
+                                                            tint = GoldAccent,
+                                                            modifier = Modifier.size(13.dp)
+                                                        )
+                                                        Spacer(modifier = Modifier.width(3.dp))
+                                                        Text(
+                                                            text = if (isAmharic) "ቅንብር" else "Settings",
+                                                            fontSize = 11.sp,
+                                                            fontWeight = FontWeight.Bold,
+                                                            color = GoldAccent
+                                                        )
+                                                    }
+                                                }
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                            }
 
                                             // Mobile Admin Password Manager Button
                                             if (isAdmin || isSuperAdmin) {
@@ -1094,7 +1210,7 @@ class MainActivity : ComponentActivity() {
                 if (showAddStudent) {
                     StudentFormDialog(
                         initialStudent = studentToEdit,
-                        availableGrades = viewModel.formGradeOptions,
+                        availableGrades = formGradeOptions,
                         availableSections = viewModel.sectionOptions,
                         isAmharic = isAmharic,
                         onDismiss = {
@@ -1160,7 +1276,7 @@ class MainActivity : ComponentActivity() {
                 if (showAddSubject) {
                     SubjectFormDialog(
                         initialSubject = subjectToEdit,
-                        availableGrades = viewModel.availableGrades,
+                        availableGrades = availableGrades,
                         isAmharic = isAmharic,
                         onDismiss = {
                             viewModel.showAddSubjectDialog.value = false
@@ -1177,7 +1293,7 @@ class MainActivity : ComponentActivity() {
                         initialWorkload = workloadToEdit,
                         teachers = teachers,
                         subjects = subjects,
-                        availableGrades = viewModel.availableGrades,
+                        availableGrades = availableGrades,
                         availableSections = viewModel.sectionOptions,
                         isAmharic = isAmharic,
                         onDismiss = {
@@ -1270,6 +1386,13 @@ class MainActivity : ComponentActivity() {
                         onExportStudents = { viewModel.exportStudentsToCsv() },
                         onExportTeachers = { viewModel.exportTeachersToCsv() },
                         onDismiss = { viewModel.closeImportExportDialog() }
+                    )
+                }
+
+                if (showSchoolSettingsDialog) {
+                    AdminSchoolSettingsDialog(
+                        viewModel = viewModel,
+                        onDismiss = { viewModel.showSchoolSettingsDialog.value = false }
                     )
                 }
                 } // End of else (isLoggedIn)

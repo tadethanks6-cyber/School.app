@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.VerifiedUser
+import coil.compose.AsyncImage
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -101,6 +102,10 @@ fun DashboardScreen(
     onAddGradeClick: () -> Unit = {},
     onTakeAttendanceClick: () -> Unit = {},
     onAddStaffClick: () -> Unit = {},
+    schoolLogoUri: String = "",
+    schoolNameAm: String = "ዲሊጀንት ትምህርት ቤት",
+    schoolNameEn: String = "Dilijent School",
+    schoolGradeLevel: String = "1_8",
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -192,17 +197,46 @@ fun DashboardScreen(
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
                             )
                         }
-                        Text(
-                            text = if (isAmharic) "ዲሊጀንት ትምህርት ቤት (Dilijent School)" else "Dilijent School Management System",
-                            fontSize = 19.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                        Text(
-                            text = if (isAmharic) "የተጠቃሚ መረጃ እና የስራ ድርሻ ስርዓት" else "Role-Based School Operations Portal",
-                            fontSize = 12.sp,
-                            color = Color.White.copy(alpha = 0.9f)
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            if (schoolLogoUri.isNotEmpty()) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(46.dp)
+                                        .clip(CircleShape)
+                                        .border(2.dp, GoldAccent, CircleShape)
+                                        .background(Color.White.copy(alpha = 0.15f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    AsyncImage(
+                                        model = schoolLogoUri,
+                                        contentDescription = "School Logo",
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                            }
+                            Column {
+                                Text(
+                                    text = if (isAmharic) "$schoolNameAm ($schoolNameEn)" else "$schoolNameEn Management System",
+                                    fontSize = 19.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                                Text(
+                                    text = when (schoolGradeLevel) {
+                                        "1_8" -> if (isAmharic) "1ኛ - 8ኛ ክፍል • የተጠቃሚ መረጃ እና የስራ ድርሻ ስርዓት" else "Grade 1-8 • School Operations Portal"
+                                        "9_12" -> if (isAmharic) "9ኛ - 12ኛ ክፍል • የተጠቃሚ መረጃ እና የስራ ድርሻ ስርዓት" else "Grade 9-12 • School Operations Portal"
+                                        else -> if (isAmharic) "KG - 12ኛ ክፍል • የተጠቃሚ መረጃ እና የስራ ድርሻ ስርዓት" else "K-12 • School Operations Portal"
+                                    },
+                                    fontSize = 12.sp,
+                                    color = Color.White.copy(alpha = 0.9f)
+                                )
+                            }
+                        }
                     }
                 }
                 EthiopianFlagAccent()

@@ -100,6 +100,9 @@ fun GradesScreen(
     onConfigureSchemeClick: (() -> Unit)? = null,
     onAddGradeClick: () -> Unit,
     onDeleteGradeClick: (StudentGrade) -> Unit,
+    schoolLogoUri: String = "",
+    schoolNameAm: String = "ዲሊጀንት ትምህርት ቤት",
+    schoolNameEn: String = "Dilijent School",
     modifier: Modifier = Modifier
 ) {
     var selectedSemester by remember { mutableStateOf("1ኛ ሴሚስተር") }
@@ -678,6 +681,9 @@ fun GradesScreen(
             assessmentScheme = assessmentScheme,
             isAmharic = isAmharic,
             homeroomTeacherName = currentTeacher?.fullName ?: "አቶ ሙሉጌታ ታከለ",
+            schoolLogoUri = schoolLogoUri,
+            schoolNameAm = schoolNameAm,
+            schoolNameEn = schoolNameEn,
             onDismiss = { activeReportCardStudent = null }
         )
     }

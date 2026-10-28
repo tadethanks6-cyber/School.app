@@ -232,17 +232,20 @@
   <!-- Header -->
   <header>
     <div class="header-content">
-      <div class="logo-group">
-        <div class="logo-badge">🎓</div>
+      <div class="logo-group" onclick="openSchoolSettingsModal()" style="cursor:pointer;" title="የትምህርት ቤት አርማ እና ቅንብር ለመቀየር ይጫኑ">
+        <div class="logo-badge" id="headerLogoBadge" style="overflow:hidden;">🎓</div>
         <div class="logo-text">
-          <h1>ዲሊጀንት ትምህርት ቤት</h1>
-          <p>Dilijent School Management System • Addis Ababa</p>
+          <h1 id="headerSchoolName">ዲሊጀንት ትምህርት ቤት</h1>
+          <p id="headerSchoolSubtitle">Dilijent School Management System • Addis Ababa</p>
         </div>
       </div>
       <div class="header-actions">
         <div class="user-pill" id="currentRoleDisplay" onclick="openLoginModal()" style="cursor:pointer;" title="ግባ / መለያ ቀይር">
           👑 ሲስተም አድሚን (admin@dilijent.edu.et)
         </div>
+        <button id="btnSchoolSettingsHeader" class="apk-btn" style="background:#0284C7; color:white; border:none; cursor:pointer;" onclick="openSchoolSettingsModal()">
+          <span>⚙️</span><span>ቅንብር (Settings)</span>
+        </button>
         <button id="btnAdminPassManager" class="apk-btn" style="background:#FDE047; color:#78350F; border:none; cursor:pointer;" onclick="openPasswordManagerModal()">
           <span>🔐</span><span>የይለፍ ቃል</span>
         </button>
@@ -267,6 +270,7 @@
       <div style="display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center;">
         <button class="btn-primary" onclick="openLoginModal()">🔑 የመግቢያ ገጽ (Login)</button>
         <button class="btn-primary" style="background:#EF4444; border-color:#DC2626;" onclick="logoutWeb()">🚪 ውጣ (Logout)</button>
+        <button id="btnBannerSchoolSettings" class="btn-accent" style="background:#0284C7; border-color:#0284C7;" onclick="openSchoolSettingsModal()">⚙️ የት/ቤት ቅንብር & አርማ</button>
         <button id="btnBannerPassManager" class="btn-accent" onclick="openPasswordManagerModal()">🔐 የይለፍ ቃል መቆጣጠሪያ</button>
         <button class="btn-secondary" onclick="openSchemeModal()">⚙️ የውጤት አሰጣጥ (ርዕሰ መ/ር)</button>
         <button class="btn-secondary" onclick="shareWebsiteLink()">🔗 ሊንክ ኮፒ</button>
@@ -592,10 +596,13 @@
         </div>
         <div class="report-card-view">
           <div class="report-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
-            <div>
-              <h2 style="color:var(--primary); font-size:1.25rem;">ዲሊጀንት አካዳሚ (Dilijent Academy)</h2>
-              <p style="font-size:0.85rem; color:#475569;">የ2017 ዓ.ም የመጀመሪያ ወሰነ-ትምህርት (Semester I) የተማሪ ውጤት መግለጫ</p>
-              <span id="reportCardSchemePill" class="badge badge-primary" style="margin-top:0.3rem;"></span>
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+              <div id="reportSchoolLogoBadge" class="logo-badge" style="width:52px; height:52px; font-size:1.6rem; border-color:var(--accent); overflow:hidden;">🎓</div>
+              <div>
+                <h2 id="reportSchoolNameDisplay" style="color:var(--primary); font-size:1.25rem;">ዲሊጀንት አካዳሚ (Dilijent Academy)</h2>
+                <p id="reportSchoolSubtitle" style="font-size:0.85rem; color:#475569;">የ2017 ዓ.ም የመጀመሪያ ወሰነ-ትምህርት (Semester I) የተማሪ ውጤት መግለጫ</p>
+                <span id="reportCardSchemePill" class="badge badge-primary" style="margin-top:0.3rem;"></span>
+              </div>
             </div>
             <div id="reportStudentPhotoBadge">
               <!-- Rendered via JS -->
@@ -985,9 +992,110 @@
     </div>
   </div>
 
+  <!-- Modal: School Profile & Dynamic Logo / Grade Level Settings (የትምህርት ቤት ቅንብር) -->
+  <div id="schoolSettingsModal" class="modal-overlay">
+    <div class="modal-box" style="max-width:550px; width:95%;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+        <div class="modal-title" style="margin-bottom:0;">⚙️ የትምህርት ቤት ቅንብር (School Settings)</div>
+        <button type="button" style="background:none; border:none; font-size:1.2rem; cursor:pointer;" onclick="closeSchoolSettingsModal()">✖</button>
+      </div>
+      <div class="modal-subtitle">የአድሚን ገፅ፦ የትምህርት ቤቱን አርማ (Logo) በፎቶ ይቀይሩ፣ የትምህርት ደረጃውን (1-8 ክፍል ወይም 9-12 ክፍል) እና መጠሪያ ስሙን ያዋቅሩ።</div>
+
+      <!-- Section 1: Dynamic Logo Upload -->
+      <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:1rem; margin-bottom:1rem;">
+        <label style="font-weight:700; color:var(--primary); font-size:0.9rem; display:block; margin-bottom:0.35rem;">
+          1. የትምህርት ቤቱ አርማ / Logo
+        </label>
+        <p style="font-size:0.75rem; color:#64748B; margin-bottom:0.75rem;">
+          ከኮምፒውተርዎ ወይም ከስልክዎ ማንኛውንም የትምህርት ቤቱን አርማ ፎቶ (PNG/JPG) ይምረጡ። ወዲያውኑ በሁሉም ገፆችና ካርዶች ላይ ይታያል!
+        </p>
+
+        <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
+          <div id="settingsLogoPreviewBox" style="width:72px; height:72px; border-radius:50%; border:2px solid var(--accent); background:white; display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:2rem; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+            <span id="settingsLogoPlaceholder">🎓</span>
+          </div>
+          <div style="flex:1; min-width:180px;">
+            <input type="file" id="inputSchoolLogoFile" accept="image/*" style="display:none;" onchange="handleSchoolLogoUpload(event)">
+            <button type="button" class="btn-primary" style="font-size:0.8rem; padding:0.45rem 0.85rem;" onclick="document.getElementById('inputSchoolLogoFile').click()">
+              📁 አዲስ አርማ ምረጥ (Choose Logo)
+            </button>
+            <button type="button" id="btnResetLogo" class="btn-secondary" style="font-size:0.75rem; padding:0.45rem 0.65rem; margin-top:0.4rem; color:#DC2626;" onclick="resetSchoolLogoWeb()">
+              🔄 ወደ ነባሪ መልስ (Reset)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: School Grade Level Selection -->
+      <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:1rem; margin-bottom:1rem;">
+        <label style="font-weight:700; color:var(--primary); font-size:0.9rem; display:block; margin-bottom:0.35rem;">
+          2. የትምህርት ቤቱ ደረጃ (School Grade Level)
+        </label>
+        <p style="font-size:0.75rem; color:#64748B; margin-bottom:0.65rem;">
+          የትምህርት ቤቱን ደረጃ በመምረጥ የተማሪዎች ምዝገባን፣ ማርክ ሊስትን እና ክፍሎችን ይወስኑ፦
+        </p>
+
+        <div style="display:flex; flex-direction:column; gap:0.5rem;">
+          <label style="display:flex; align-items:center; gap:0.65rem; padding:0.6rem 0.85rem; border-radius:8px; border:1px solid #CBD5E1; cursor:pointer; background:white;">
+            <input type="radio" name="schoolGradeLevelRadio" value="1_8" onchange="previewGradeLevel('1_8')">
+            <div>
+              <strong style="color:var(--primary); font-size:0.85rem;">🔵 1ኛ - 8ኛ ክፍል (Primary & Middle School)</strong>
+              <div style="font-size:0.72rem; color:#64748B;">የ1ኛ እስከ 8ኛ ክፍል ተማሪዎች፣ የክፍል መዝገብ እና የትምህርት ዓይነቶች</div>
+            </div>
+          </label>
+
+          <label style="display:flex; align-items:center; gap:0.65rem; padding:0.6rem 0.85rem; border-radius:8px; border:1px solid #CBD5E1; cursor:pointer; background:white;">
+            <input type="radio" name="schoolGradeLevelRadio" value="9_12" onchange="previewGradeLevel('9_12')">
+            <div>
+              <strong style="color:var(--primary); font-size:0.85rem;">🟢 9ኛ - 12ኛ ክፍል (High School)</strong>
+              <div style="font-size:0.72rem; color:#64748B;">የ9ኛ እስከ 12ኛ ክፍል ተማሪዎች፣ የተፈጥሮ እና ማህበራዊ ሳይንስ</div>
+            </div>
+          </label>
+
+          <label style="display:flex; align-items:center; gap:0.65rem; padding:0.6rem 0.85rem; border-radius:8px; border:1px solid #CBD5E1; cursor:pointer; background:white;">
+            <input type="radio" name="schoolGradeLevelRadio" value="ALL" onchange="previewGradeLevel('ALL')">
+            <div>
+              <strong style="color:var(--primary); font-size:0.85rem;">🟣 KG - 12ኛ ክፍል (ሙሉ አጠቃላይ ትምህርት ቤት)</strong>
+              <div style="font-size:0.72rem; color:#64748B;">ከመዋዕለ ህፃናት እስከ 12ኛ ክፍል ሙሉ ደረጃ</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Section 3: School Name -->
+      <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:1rem; margin-bottom:1rem;">
+        <label style="font-weight:700; color:var(--primary); font-size:0.9rem; display:block; margin-bottom:0.35rem;">
+          3. የትምህርት ቤቱ መጠሪያ ስም (School Name)
+        </label>
+        <div class="form-group" style="margin-bottom:0.5rem;">
+          <label style="font-size:0.75rem;">የትምህርት ቤቱ ስም (በአማርኛ)</label>
+          <input type="text" id="inputSettingsSchoolNameAm" class="form-control" value="ዲሊጀንት ትምህርት ቤት">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="font-size:0.75rem;">የትምህርት ቤቱ ስም (በእንግሊዝኛ)</label>
+          <input type="text" id="inputSettingsSchoolNameEn" class="form-control" value="Dilijent School">
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:0.5rem;">
+        <button type="button" class="btn-secondary" onclick="closeSchoolSettingsModal()">ሰርዝ (Cancel)</button>
+        <button type="button" class="btn-primary" style="background:#16A34A; border-color:#15803D;" onclick="saveSchoolSettingsWeb()">
+          💾 አስቀምጥ (Save Settings)
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal: Dual Login Gate (Admin Email vs Others Phone) -->
   <div id="loginModal" class="modal-overlay">
     <div class="modal-box" style="max-width:480px; width:95%;">
+      <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.85rem;">
+        <div id="loginSchoolLogoBadge" class="logo-badge" style="width:48px; height:48px; font-size:1.5rem; border-color:var(--accent); overflow:hidden;">🎓</div>
+        <div>
+          <div id="loginSchoolName" style="font-weight:700; color:var(--primary); font-size:1.05rem;">ዲሊጀንት ትምህርት ቤት</div>
+          <div id="loginSchoolSubtitle" style="font-size:0.75rem; color:var(--text-muted);">የአስተዳደር እና መረጃ አያያዝ ስርዓት</div>
+        </div>
+      </div>
       <div class="modal-title">🔐 ወደ ስርዓቱ መግቢያ (Sign In)</div>
       
       <!-- Mode Toggle: Admin by Email vs Others by Phone -->
@@ -2714,8 +2822,185 @@
       alert(`📤 ${target === 'students' ? 'የተማሪዎች' : 'የመምህራን/ሰራተኞች'} መዝገብ ወደ ${filename} በስኬት ወርዷል!`);
     }
 
+    // School Profile & Dynamic Logo / Grade Level Management
+    let schoolSettings = {
+      logoData: localStorage.getItem('school_logo_data') || '',
+      gradeLevel: localStorage.getItem('school_grade_level') || '1_8',
+      nameAm: localStorage.getItem('school_name_am') || 'ዲሊጀንት ትምህርት ቤት',
+      nameEn: localStorage.getItem('school_name_en') || 'Dilijent School'
+    };
+
+    function getClassesForGradeLevel(level) {
+      if (level === '1_8') {
+        return [
+          '1A', '1B', '2A', '2B', '3A', '3B', '4A', '4B',
+          '5A', '5B', '6A', '6B', '7A', '7B', '8A', '8B'
+        ];
+      } else if (level === '9_12') {
+        return [
+          '9A (General)', '9B (General)', '10A (General)', '10B (General)',
+          '11A (Natural Science)', '11B (Social Science)',
+          '12A (Natural Science)', '12B (Social Science)'
+        ];
+      } else {
+        return [
+          'KG 1', 'KG 2', 'KG 3',
+          '1A', '2A', '3A', '4A', '5A', '6A', '7A', '8A',
+          '9A', '10A', '11A (Natural)', '11B (Social)', '12A (Natural)', '12B (Social)'
+        ];
+      }
+    }
+
+    function applySchoolSettingsWeb() {
+      // 1. Logo Badges
+      const logoBadges = document.querySelectorAll('.logo-badge, #headerLogoBadge, #reportSchoolLogoBadge, #loginSchoolLogoBadge');
+      logoBadges.forEach(badge => {
+        if (schoolSettings.logoData) {
+          badge.innerHTML = `<img src="${schoolSettings.logoData}" alt="School Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />`;
+        } else {
+          badge.innerHTML = '🎓';
+        }
+      });
+
+      // 2. School Name
+      const h1El = document.getElementById('headerSchoolName');
+      if (h1El) h1El.innerText = schoolSettings.nameAm;
+
+      const repName = document.getElementById('reportSchoolNameDisplay');
+      if (repName) repName.innerText = `${schoolSettings.nameAm} (${schoolSettings.nameEn})`;
+
+      const loginName = document.getElementById('loginSchoolName');
+      if (loginName) loginName.innerText = schoolSettings.nameAm;
+
+      // 3. Subtitles and levels
+      const levelText = schoolSettings.gradeLevel === '1_8' ? '1ኛ - 8ኛ ክፍል' : (schoolSettings.gradeLevel === '9_12' ? '9ኛ - 12ኛ ክፍል' : 'KG - 12ኛ ክፍል');
+      const subEl = document.getElementById('headerSchoolSubtitle');
+      if (subEl) subEl.innerText = `${schoolSettings.nameEn} • ${levelText} • Addis Ababa`;
+
+      const loginSub = document.getElementById('loginSchoolSubtitle');
+      if (loginSub) loginSub.innerText = `${levelText} • የአስተዳደር እና መረጃ አያያዝ ስርዓት`;
+
+      // 4. Update dynamic dropdowns for classes
+      updateClassDropdowns();
+    }
+
+    function updateClassDropdowns() {
+      const classes = getClassesForGradeLevel(schoolSettings.gradeLevel);
+
+      // Student class filter
+      const classFilter = document.getElementById('classFilter');
+      if (classFilter) {
+        const curVal = classFilter.value;
+        let html = '<option value="">ሁሉም ክፍሎች (All Classes)</option>';
+        classes.forEach(c => {
+          html += `<option value="${c}">${c}</option>`;
+        });
+        classFilter.innerHTML = html;
+        if (classes.includes(curVal)) classFilter.value = curVal;
+      }
+
+      // Add student class select
+      const studentClass = document.getElementById('studentClass');
+      if (studentClass) {
+        let html = '';
+        classes.forEach(c => {
+          html += `<option value="${c}">${c}</option>`;
+        });
+        studentClass.innerHTML = html;
+      }
+
+      // Workload class select
+      const workloadClass = document.getElementById('workloadClass');
+      if (workloadClass) {
+        let html = '';
+        classes.forEach(c => {
+          html += `<option value="${c}">${c}</option>`;
+        });
+        workloadClass.innerHTML = html;
+      }
+
+      // Grade class filter
+      const gradeClassFilter = document.getElementById('gradeClassFilter');
+      if (gradeClassFilter) {
+        let html = '';
+        classes.forEach(c => {
+          html += `<option value="${c}">${c}</option>`;
+        });
+        gradeClassFilter.innerHTML = html;
+      }
+    }
+
+    function openSchoolSettingsModal() {
+      document.getElementById('inputSettingsSchoolNameAm').value = schoolSettings.nameAm;
+      document.getElementById('inputSettingsSchoolNameEn').value = schoolSettings.nameEn;
+
+      const radios = document.getElementsByName('schoolGradeLevelRadio');
+      radios.forEach(r => {
+        r.checked = (r.value === schoolSettings.gradeLevel);
+      });
+
+      const previewBox = document.getElementById('settingsLogoPreviewBox');
+      if (schoolSettings.logoData) {
+        previewBox.innerHTML = `<img src="${schoolSettings.logoData}" alt="Logo Preview" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />`;
+      } else {
+        previewBox.innerHTML = '<span>🎓</span>';
+      }
+
+      document.getElementById('schoolSettingsModal').style.display = 'flex';
+    }
+
+    function closeSchoolSettingsModal() {
+      document.getElementById('schoolSettingsModal').style.display = 'none';
+    }
+
+    function handleSchoolLogoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64 = e.target.result;
+        schoolSettings.logoData = base64;
+        localStorage.setItem('school_logo_data', base64);
+        const previewBox = document.getElementById('settingsLogoPreviewBox');
+        previewBox.innerHTML = `<img src="${base64}" alt="Logo Preview" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />`;
+        applySchoolSettingsWeb();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resetSchoolLogoWeb() {
+      schoolSettings.logoData = '';
+      localStorage.removeItem('school_logo_data');
+      const previewBox = document.getElementById('settingsLogoPreviewBox');
+      previewBox.innerHTML = '<span>🎓</span>';
+      applySchoolSettingsWeb();
+    }
+
+    function previewGradeLevel(level) {
+      schoolSettings.gradeLevel = level;
+    }
+
+    function saveSchoolSettingsWeb() {
+      const radios = document.getElementsByName('schoolGradeLevelRadio');
+      radios.forEach(r => {
+        if (r.checked) schoolSettings.gradeLevel = r.value;
+      });
+
+      schoolSettings.nameAm = document.getElementById('inputSettingsSchoolNameAm').value.trim() || 'ዲሊጀንት ትምህርት ቤት';
+      schoolSettings.nameEn = document.getElementById('inputSettingsSchoolNameEn').value.trim() || 'Dilijent School';
+
+      localStorage.setItem('school_grade_level', schoolSettings.gradeLevel);
+      localStorage.setItem('school_name_am', schoolSettings.nameAm);
+      localStorage.setItem('school_name_en', schoolSettings.nameEn);
+
+      applySchoolSettingsWeb();
+      closeSchoolSettingsModal();
+      alert('✅ የትምህርት ቤት ቅንብር እና አርማ በተሳካ ሁኔታ ተቀምጧል!');
+    }
+
     // Initialize
     updateCurrentUserUI();
+    applySchoolSettingsWeb();
     saveState();
   </script>
 </body>

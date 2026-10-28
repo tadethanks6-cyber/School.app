@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.School
+import coil.compose.AsyncImage
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -136,7 +137,11 @@ fun LoginScreen(
     onQuickRoleLogin: (identifier: String, isEmail: Boolean, pass: String) -> Unit = { _, _, _ -> },
     onRegisterNewUser: (name: String, phone: String, pass: String, role: String) -> Unit,
     onGoogleSignInSuccess: (name: String, email: String, uid: String) -> Unit = { _, _, _ -> },
-    onGoogleSignInError: (String) -> Unit = {}
+    onGoogleSignInError: (String) -> Unit = {},
+    schoolLogoUri: String = "",
+    schoolNameAm: String = "ዲሊጀንት ትምህርት ቤት",
+    schoolNameEn: String = "Dilijent School",
+    schoolGradeLevel: String = "1_8"
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
     var showRegisterDialog by remember { mutableStateOf(false) }
@@ -196,23 +201,36 @@ fun LoginScreen(
                                         .clip(CircleShape)
                                         .background(GoldAccent)
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.School,
-                                        contentDescription = null,
-                                        tint = Color.Black,
-                                        modifier = Modifier.size(32.dp)
-                                    )
+                                    if (schoolLogoUri.isNotEmpty()) {
+                                        AsyncImage(
+                                            model = schoolLogoUri,
+                                            contentDescription = "School Logo",
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                    } else {
+                                        Icon(
+                                            imageVector = Icons.Default.School,
+                                            contentDescription = null,
+                                            tint = Color.Black,
+                                            modifier = Modifier.size(32.dp)
+                                        )
+                                    }
                                 }
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Text(
-                                        text = if (isAmharic) "ዲሊጀንት ትምህርት ቤት" else "Dilijent School",
+                                        text = if (isAmharic) schoolNameAm else schoolNameEn,
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.ExtraBold,
                                         color = Color.White
                                     )
                                     Text(
-                                        text = if (isAmharic) "የአስተዳደር እና መረጃ አያያዝ ስርዓት" else "School Information Management System",
+                                        text = when (schoolGradeLevel) {
+                                            "1_8" -> if (isAmharic) "1ኛ - 8ኛ ክፍል • የመረጃ አያያዝ ስርዓት" else "Grade 1-8 • School Management System"
+                                            "9_12" -> if (isAmharic) "9ኛ - 12ኛ ክፍል • የመረጃ አያያዝ ስርዓት" else "Grade 9-12 • School Management System"
+                                            else -> if (isAmharic) "KG - 12ኛ ክፍል • የመረጃ አያያዝ ስርዓት" else "K-12 • School Management System"
+                                        },
                                         fontSize = 11.sp,
                                         color = GoldAccent
                                     )
@@ -586,27 +604,40 @@ fun LoginScreen(
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
-                                .size(34.dp)
+                                .size(36.dp)
                                 .clip(CircleShape)
                                 .background(GoldAccent)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.School,
-                                contentDescription = null,
-                                tint = Color.Black,
-                                modifier = Modifier.size(20.dp)
-                            )
+                            if (schoolLogoUri.isNotEmpty()) {
+                                AsyncImage(
+                                    model = schoolLogoUri,
+                                    contentDescription = "School Logo",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.School,
+                                    contentDescription = null,
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         Column {
                             Text(
-                                text = if (isAmharic) "ዲሊጀንት ትምህርት ቤት" else "Dilijent School",
+                                text = if (isAmharic) schoolNameAm else schoolNameEn,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )
                             Text(
-                                text = if (isAmharic) "2017 ዓ.ም • መግቢያ" else "2017 E.C. • Login",
+                                text = when (schoolGradeLevel) {
+                                    "1_8" -> if (isAmharic) "1ኛ - 8ኛ ክፍል • መግቢያ" else "Grade 1-8 • Login"
+                                    "9_12" -> if (isAmharic) "9ኛ - 12ኛ ክፍል • መግቢያ" else "Grade 9-12 • Login"
+                                    else -> if (isAmharic) "KG - 12ኛ ክፍል • መግቢያ" else "K-12 • Login"
+                                },
                                 fontSize = 10.sp,
                                 color = GoldAccent
                             )

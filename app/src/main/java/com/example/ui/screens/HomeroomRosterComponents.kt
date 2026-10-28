@@ -35,6 +35,8 @@ import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -821,6 +823,9 @@ fun EthiopianReportCardDialog(
     assessmentScheme: AssessmentScheme,
     isAmharic: Boolean,
     homeroomTeacherName: String = "አቶ ሙሉጌታ ታከለ",
+    schoolLogoUri: String = "",
+    schoolNameAm: String = "ዲሊጀንት ትምህርት ቤት",
+    schoolNameEn: String = "Dilijent School",
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
@@ -889,7 +894,7 @@ fun EthiopianReportCardDialog(
     val shareReportCard = {
         val sb = StringBuilder()
         sb.append("═══════════════════════════════════════\n")
-        sb.append("      ዲሊጀንት አካዳሚ (DILIJENT ACADEMY)     \n")
+        sb.append("      ${schoolNameAm} (${schoolNameEn})     \n")
         sb.append("   የኢትዮጵያ ስርዓተ-ትምህርት የተማሪ ውጤት መግለጫ   \n")
         sb.append("═══════════════════════════════════════\n")
         sb.append("የተማሪ ስም: ${student.fullName}\n")
@@ -984,10 +989,38 @@ fun EthiopianReportCardDialog(
                     ) {
                         // School Header
                         EthiopianFlagAccent()
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        // Dynamic School Logo & Crest
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(60.dp)
+                                .clip(CircleShape)
+                                .border(2.dp, GoldAccent, CircleShape)
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            if (schoolLogoUri.isNotEmpty()) {
+                                AsyncImage(
+                                    model = schoolLogoUri,
+                                    contentDescription = "School Logo",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.School,
+                                    contentDescription = null,
+                                    tint = NavyPrimary,
+                                    modifier = Modifier.size(36.dp)
+                                )
+                            }
+                        }
+
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "ዲሊጀንት አካዳሚ • DILIJENT ACADEMY",
+                            text = "${schoolNameAm.uppercase()} • ${schoolNameEn.uppercase()}",
                             fontSize = 17.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = NavyPrimary,
