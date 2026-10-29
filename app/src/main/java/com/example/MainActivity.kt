@@ -208,6 +208,9 @@ class MainActivity : ComponentActivity() {
                 val currentStaff by viewModel.currentStaff.collectAsStateWithLifecycle()
                 val currentStudent by viewModel.currentStudent.collectAsStateWithLifecycle()
                 val isAdmin by viewModel.isAdmin.collectAsStateWithLifecycle()
+                val isVicePrincipal by viewModel.isVicePrincipal.collectAsStateWithLifecycle()
+                val canAccessStaffAttendance by viewModel.canAccessStaffAttendance.collectAsStateWithLifecycle()
+                val staffAttendanceList by viewModel.staffAttendanceList.collectAsStateWithLifecycle()
                 val isSuperAdmin by viewModel.isSuperAdmin.collectAsStateWithLifecycle()
                 val isTeacher by viewModel.isTeacher.collectAsStateWithLifecycle()
                 val isStudent by viewModel.isStudent.collectAsStateWithLifecycle()
@@ -516,13 +519,19 @@ class MainActivity : ComponentActivity() {
                                     sectionOptions = viewModel.sectionOptions,
                                     isAmharic = isAmharic,
                                     isAdmin = isAdmin,
+                                    isVicePrincipal = isVicePrincipal,
+                                    canAccessStaffAttendance = canAccessStaffAttendance,
                                     isTeacher = isTeacher,
                                     isStudent = isStudent,
                                     currentTeacher = currentTeacher,
                                     currentStudent = currentStudent,
                                     teacherWorkloads = teacherWorkloads,
+                                    staffAttendanceList = staffAttendanceList,
                                     onRecordAttendance = { record ->
                                         viewModel.recordAttendance(record)
+                                    },
+                                    onRecordStaffAttendance = { id, status, remarks ->
+                                        viewModel.updateStaffAttendance(id, status, remarks)
                                     }
                                 )
                             }

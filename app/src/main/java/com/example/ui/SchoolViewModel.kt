@@ -7,6 +7,7 @@ import com.example.data.database.SchoolDatabase
 import com.example.data.model.AttendanceRecord
 import com.example.data.model.SchoolStats
 import com.example.data.model.Staff
+import com.example.data.model.StaffAttendanceItem
 import com.example.data.model.Student
 import com.example.data.model.AssessmentScheme
 import android.content.Context
@@ -559,9 +560,24 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         role.contains("ርዕሰ መምህር") || role.contains("Admin") || role.contains("አስተዳዳሪ") || role.contains("ሲስተም")
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val isVicePrincipal: StateFlow<Boolean> = _currentUser.map {
+        val role = it?.role ?: ""
+        role.contains("ምክትል") || role.contains("Vice")
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    // Staff Attendance access is strictly reserved for Vice Principal and Admin / Principal
+    val canAccessStaffAttendance: StateFlow<Boolean> = _currentUser.map {
+        val role = it?.role ?: ""
+        val email = it?.email ?: ""
+        role.contains("ምክትል") || role.contains("Vice") ||
+        role.contains("ርዕሰ መምህር") || role.contains("Principal") ||
+        role.contains("Admin") || role.contains("አስተዳዳሪ") || role.contains("ሲስተም") ||
+        email.equals("admin@dilijent.edu.et", ignoreCase = true)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     val isTeacher: StateFlow<Boolean> = _currentUser.map {
         val role = it?.role ?: ""
-        role.contains("መምህር") && !role.contains("ርዕሰ")
+        role.contains("መምህር") && !role.contains("ርዕሰ") && !role.contains("ምክትል")
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     val isStudent: StateFlow<Boolean> = _currentUser.map {
@@ -576,6 +592,67 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         val role = user?.role ?: ""
         admin || role.contains("ጸሐፊ") || role.contains("መዝጋቢ") || role.contains("ምክትል")
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    // Staff Attendance Tracking (Strictly controlled by Vice Principal and Admin)
+    private val _staffAttendanceOverrides = MutableStateFlow<Map<Long, Pair<String, String>>>(emptyMap())
+
+    val staffAttendanceList: StateFlow<List<StaffAttendanceItem>> = combine(
+        filteredTeachers,
+        filteredStaff,
+        _staffAttendanceOverrides
+    ) { teachers, staffList, overrides ->
+        val list = mutableListOf<StaffAttendanceItem>()
+        // Teachers
+        teachers.forEach { t ->
+            val override = overrides[t.id]
+            list.add(
+                StaffAttendanceItem(
+                    id = t.id,
+                    name = t.fullName,
+                    role = if (t.isHomeroomTeacher) "መምህር (የክፍል ኃላፊ - ${t.homeroomClass})" else "መምህር (${t.specialization})",
+                    department = t.department,
+                    phone = t.phone,
+                    isTeacher = true,
+                    status = override?.first ?: "ተገኝቷል",
+                    checkInTime = "02:15 ጧት",
+                    remarks = override?.second ?: "በሰዓቱ ተገኝቷል"
+                )
+            )
+        }
+        // Staff
+        staffList.forEach { s ->
+            val staffKey = -(s.id) // Negative ID to prevent collision with teachers
+            val override = overrides[staffKey]
+            list.add(
+                StaffAttendanceItem(
+                    id = staffKey,
+                    name = s.fullName,
+                    role = s.role,
+                    department = s.department,
+                    phone = s.phone,
+                    isTeacher = false,
+                    status = override?.first ?: "ተገኝቷል",
+                    checkInTime = "02:10 ጧት",
+                    remarks = override?.second ?: "በሰዓቱ ተገኝቷል"
+                )
+            )
+        }
+        list
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun updateStaffAttendance(id: Long, newStatus: String, remarks: String = "") {
+        val current = _staffAttendanceOverrides.value.toMutableMap()
+        current[id] = Pair(newStatus, remarks.ifBlank {
+            when (newStatus) {
+                "ተገኝቷል" -> "በሰዓቱ ተገኝቷል"
+                "ቀርቷል" -> "ያልተገኘ"
+                "አርፍዷል" -> "15 ደቂቃ ዘግይቷል"
+                "በፍቃድ" -> "የህመም/የስራ ፍቃድ"
+                else -> ""
+            }
+        })
+        _staffAttendanceOverrides.value = current
+    }
 
     // Login Form State
     val isAdminLoginMode = MutableStateFlow(false) // false = Phone mode (Teacher/Student/Staff), true = Email mode (Admin)

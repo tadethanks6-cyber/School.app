@@ -563,26 +563,136 @@
 
     <!-- TAB 5: ATTENDANCE -->
     <div id="tab-attendance" class="tab-content" style="display:none;">
-      <div class="panel-card">
-        <div class="panel-header">
-          <h3 class="panel-title">የዕለት ተዕለት አቴንዳንስ (Daily Attendance)</h3>
-          <span class="badge badge-success">ዛሬ፡ ጥቅምት 14/2017 ዓ.ም</span>
+      <!-- Attendance Sub Mode Switcher -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;">
+        <div style="display:flex; gap:0.4rem; background:#E2E8F0; padding:4px; border-radius:10px;">
+          <button id="btnAttendanceSubStudents" class="btn-primary" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="setAttendanceSubMode('students')">
+            👨‍🎓 የተማሪዎች ክትትል (Students)
+          </button>
+          <button id="btnAttendanceSubStaff" class="btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="setAttendanceSubMode('staff')">
+            👩‍🏫 የሰራተኞች ክትትል (ምክትል & አድሚን 🔒)
+          </button>
         </div>
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>ተማሪ</th>
-                <th>ክፍል</th>
-                <th>ሁኔታ</th>
-                <th>ማስታወሻ</th>
-                <th>አቴንዳንስ ቀይር</th>
-              </tr>
-            </thead>
-            <tbody id="attendanceTableBody">
-              <!-- Rendered via JS -->
-            </tbody>
-          </table>
+        <div id="attendanceSubBadge" class="badge badge-primary">
+          👨‍🎓 የተማሪዎች ክትትል እይታ
+        </div>
+      </div>
+
+      <!-- STUDENT ATTENDANCE SECTION -->
+      <div id="attendanceStudentsSection">
+        <div class="panel-card">
+          <div class="panel-header">
+            <h3 class="panel-title">የተማሪዎች ዕለት ተዕለት አቴንዳንስ (Daily Student Attendance)</h3>
+            <span class="badge badge-success">ዛሬ፡ ጥቅምት 14/2017 ዓ.ም</span>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>ተማሪ</th>
+                  <th>ክፍል</th>
+                  <th>ሁኔታ</th>
+                  <th>ማስታወሻ</th>
+                  <th>አቴንዳንስ ቀይር</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAFF ATTENDANCE SECTION (RESTRICTED TO VICE PRINCIPAL & ADMIN) -->
+      <div id="attendanceStaffSection" style="display:none;">
+        <div id="staffAttendanceRestrictedBanner" class="panel-card" style="display:none; background:#FEF2F2; border:2px dashed #EF4444; text-align:center; padding:2rem 1rem;">
+          <div style="font-size:3rem; margin-bottom:0.5rem;">🔒</div>
+          <h3 style="color:#991B1B; margin-bottom:0.5rem;">የተከለከለ ፈቃድ! (Access Denied)</h3>
+          <p style="color:#B91C1C; font-size:0.95rem; max-width:550px; margin:0 auto;">
+            የትምህርት ቤቱ ሰራተኞች እና መምህራን አቴንዳንስ በ<strong>ምክትል ርዕሰ መምህር</strong> እና በ<strong>ሲስተም አድሚን</strong> ገፅ ብቻ የሚገኝ ሚስጥራዊ የስራ አመራር መረጃ ነው።
+          </p>
+          <p style="color:#64748B; font-size:0.8rem; margin-top:0.75rem;">
+            የተፈቀደላቸው መለያዎች፦ ምክትል ርዕሰ መምህር (0918000000 / vp1234) ወይም ሲስተም አድሚን (admin@dilijent.edu.et / admin123)
+          </p>
+          <button class="btn-primary" style="margin-top:1rem;" onclick="openLoginModal()">🔑 በሚፈቀድለት መለያ ይግቡ</button>
+        </div>
+
+        <div id="staffAttendanceAuthorizedContent">
+          <!-- Executive Staff Header & Metrics -->
+          <div class="panel-card" style="margin-bottom:1rem; border-left:4px solid #0284C7; background:#F0F9FF;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+              <div>
+                <h3 style="color:#0369A1; font-size:1.1rem; margin-bottom:0.25rem;">👩‍🏫 የመምህራን እና የሰራተኞች የክትትል መዝገብ</h3>
+                <p style="color:#0C4A6E; font-size:0.82rem; margin:0;">
+                  🔒 የተፈቀደ ገጽ፡ <strong>ምክትል ርዕሰ መምህር</strong> እና <strong>ሲስተም አድሚን</strong> ብቻ ማየት እና መመዝገብ ይችላሉ።
+                </p>
+              </div>
+              <span class="badge badge-primary" style="background:#0284C7; color:white;">የስራ ሰዓት፡ 02:00 ጧት - 10:30 ከሰዓት</span>
+            </div>
+          </div>
+
+          <!-- Staff Attendance Stats Grid -->
+          <div class="stats-grid" style="margin-bottom:1rem;">
+            <div class="stat-card" style="border-top:3px solid #0284C7;">
+              <div class="stat-icon">👥</div>
+              <div class="stat-val" id="staffAttStatTotal">0</div>
+              <div class="stat-label">ጠቅላላ ሰራተኞች</div>
+            </div>
+            <div class="stat-card" style="border-top:3px solid #10B981;">
+              <div class="stat-icon">✓</div>
+              <div class="stat-val" style="color:#059669;" id="staffAttStatPresent">0</div>
+              <div class="stat-label">በሰዓቱ የተገኙ</div>
+            </div>
+            <div class="stat-card" style="border-top:3px solid #EF4444;">
+              <div class="stat-icon">✕</div>
+              <div class="stat-val" style="color:#DC2626;" id="staffAttStatAbsent">0</div>
+              <div class="stat-label">ያልተገኙ (ቀሪ)</div>
+            </div>
+            <div class="stat-card" style="border-top:3px solid #F59E0B;">
+              <div class="stat-icon">⏱</div>
+              <div class="stat-val" style="color:#D97706;" id="staffAttStatLate">0</div>
+              <div class="stat-label">ያረፈዱ</div>
+            </div>
+            <div class="stat-card" style="border-top:3px solid #8B5CF6;">
+              <div class="stat-icon">📝</div>
+              <div class="stat-val" style="color:#7C3AED;" id="staffAttStatLeave">0</div>
+              <div class="stat-label">በፍቃድ</div>
+            </div>
+          </div>
+
+          <!-- Filter & Search Toolbar -->
+          <div class="panel-card" style="padding:0.75rem 1rem; margin-bottom:1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+              <input type="text" id="staffAttSearchInput" placeholder="🔍 የሰራተኛ ወይም የመምህር ስም ፈልግ..." style="padding:0.4rem 0.6rem; border:1px solid #CBD5E1; border-radius:6px; font-size:0.85rem; min-width:240px;" oninput="renderStaffAttendanceWeb()">
+              <div style="display:flex; gap:0.3rem; flex-wrap:wrap;">
+                <button id="btnStaffAttAll" class="btn-secondary staff-dept-filter active" style="font-size:0.75rem; padding:0.3rem 0.6rem; background:var(--primary); color:white;" onclick="filterStaffAttCategory('all', this)">ሁሉም</button>
+                <button id="btnStaffAttTeachers" class="btn-secondary staff-dept-filter" style="font-size:0.75rem; padding:0.3rem 0.6rem;" onclick="filterStaffAttCategory('teachers', this)">መምህራን ብቻ</button>
+                <button id="btnStaffAttAdmin" class="btn-secondary staff-dept-filter" style="font-size:0.75rem; padding:0.3rem 0.6rem;" onclick="filterStaffAttCategory('admin_sec', this)">አስተዳደርና ደህንነት</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Staff Attendance Table -->
+          <div class="panel-card">
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ሰራተኛ / መምህር</th>
+                    <th>የስራ ድርሻ / ዲፓርትመንት</th>
+                    <th>የገቡበት ሰዓት</th>
+                    <th>ሁኔታ (Status)</th>
+                    <th>ማስታወሻ (Remarks)</th>
+                    <th>አቴንዳንስ መዝግብ (ምክትል/አድሚን)</th>
+                  </tr>
+                </thead>
+                <tbody id="staffAttendanceTableBody">
+                  <!-- Rendered via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1145,6 +1255,9 @@
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem; font-size:0.75rem;">
           <button type="button" class="btn-secondary" style="text-align:left; padding:6px 8px; border-color:#F59E0B; background:#FEF3C7; color:#92400E;" onclick="quickWebLogin('admin')">
             <strong>👑 ሲስተም አድሚን (እኔ)</strong><br><small>admin@dilijent.edu.et</small>
+          </button>
+          <button type="button" class="btn-secondary" style="text-align:left; padding:6px 8px; border-color:#0284C7; background:#E0F2FE; color:#0369A1;" onclick="quickWebLogin('vice_principal')">
+            <strong>🎓 ምክትል ርዕሰ መምህር</strong><br><small>0918000000</small>
           </button>
           <button type="button" class="btn-secondary" style="text-align:left; padding:6px 8px;" onclick="quickWebLogin('principal')">
             <strong>🎓 ርዕሰ መምህር</strong><br><small>0911000000</small>
@@ -1783,24 +1896,217 @@
       }
     }
 
+    // ==========================================
+    // ATTENDANCE & STAFF ATTENDANCE (VICE PRINCIPAL & ADMIN RBAC)
+    // ==========================================
+    let currentAttendanceSubMode = 'students';
+    let currentStaffAttCategory = 'all';
+
+    const DEFAULT_STAFF_ATTENDANCE = [
+      { id: 1, name: 'መምህር ዳዊት በቀለ', role: 'የሒሳብ መምህር', dept: 'የተፈጥሮ ሳይንስ', isTeacher: true, status: 'ተገኝቷል', time: '02:15 ጧት', remarks: 'በሰዓቱ ገብተዋል' },
+      { id: 2, name: 'መምህርት ሳራ መኮንን', role: 'የፊዚክስ መምህርት', dept: 'የተፈጥሮ ሳይንስ', isTeacher: true, status: 'ተገኝቷል', time: '02:10 ጧት', remarks: 'በሰዓቱ ገብተዋል' },
+      { id: 3, name: 'መምህር ዮናስ አለሙ', role: 'የእንግሊዝኛ መምህር', dept: 'ቋንቋዎች', isTeacher: true, status: 'ዘግይቷል', time: '02:45 ጧት', remarks: 'የትራፊክ መጨናነቅ' },
+      { id: 4, name: 'መምህርት ቤቴልሔም ግርማ', role: 'የስነ-ዜጋ መምህርት', dept: 'ማህበራዊ ሳይንስ', isTeacher: true, status: 'ተገኝቷል', time: '02:05 ጧት', remarks: 'በሰዓቱ ገብተዋል' },
+      { id: 5, name: 'ወ/ሮ ትዕግስት አስፋው', role: 'ዋና ፀሐፊ', dept: 'አስተዳደርና ፋይናንስ', isTeacher: false, status: 'ተገኝቷል', time: '02:00 ጧት', remarks: 'በሰዓቱ ገብተዋል' },
+      { id: 6, name: 'አቶ ታምራት በቀለ', role: 'የደህንነትና ጥበቃ ኃላፊ', dept: 'ደህንነት', isTeacher: false, status: 'ተገኝቷል', time: '01:30 ጧት', remarks: 'የሌሊት ሺፍት ርክክብ' },
+      { id: 7, name: 'አቶ አበበ ካሳሁን', role: 'የቴክኒክና ጥገና ሰራተኛ', dept: 'አገልግሎትና ጥገና', isTeacher: false, status: 'ፍቃድ', time: '-', remarks: 'የህክምና ፍቃድ' },
+      { id: 8, name: 'ወ/ሮ ሮዛ ሀይሌ', role: 'የካፍቴሪያና ምግብ አዘጋጅ', dept: 'አገልግሎት', isTeacher: false, status: 'ተገኝቷል', time: '01:45 ጧት', remarks: 'በሰዓቱ ገብተዋል' }
+    ];
+
+    let staffAttendanceListWeb = JSON.parse(localStorage.getItem('dilijent_staff_attendance')) || DEFAULT_STAFF_ATTENDANCE;
+
+    function saveStaffAttendanceWeb() {
+      localStorage.setItem('dilijent_staff_attendance', JSON.stringify(staffAttendanceListWeb));
+    }
+
+    function setAttendanceSubMode(mode) {
+      currentAttendanceSubMode = mode;
+      const btnStudents = document.getElementById('btnAttendanceSubStudents');
+      const btnStaff = document.getElementById('btnAttendanceSubStaff');
+      const secStudents = document.getElementById('attendanceStudentsSection');
+      const secStaff = document.getElementById('attendanceStaffSection');
+      const badge = document.getElementById('attendanceSubBadge');
+
+      if (mode === 'students') {
+        if (btnStudents) { btnStudents.className = 'btn-primary'; btnStudents.style.background = 'var(--primary)'; btnStudents.style.color = 'white'; }
+        if (btnStaff) { btnStaff.className = 'btn-secondary'; btnStaff.style.background = 'transparent'; btnStaff.style.color = 'var(--text-muted)'; }
+        if (secStudents) secStudents.style.display = 'block';
+        if (secStaff) secStaff.style.display = 'none';
+        if (badge) {
+          badge.innerHTML = '👨‍🎓 የተማሪዎች ክትትል እይታ';
+          badge.className = 'badge badge-primary';
+        }
+      } else {
+        if (btnStudents) { btnStudents.className = 'btn-secondary'; btnStudents.style.background = 'transparent'; btnStudents.style.color = 'var(--text-muted)'; }
+        if (btnStaff) { btnStaff.className = 'btn-primary'; btnStaff.style.background = '#0284C7'; btnStaff.style.color = 'white'; }
+        if (secStudents) secStudents.style.display = 'none';
+        if (secStaff) secStaff.style.display = 'block';
+        if (badge) {
+          badge.innerHTML = '👩‍🏫 የሰራተኞች ክትትል (ምክትል/አድሚን 🔒)';
+          badge.className = 'badge badge-success';
+        }
+        renderStaffAttendanceWeb();
+      }
+    }
+
+    function filterStaffAttCategory(cat, btn) {
+      currentStaffAttCategory = cat;
+      document.querySelectorAll('.staff-dept-filter').forEach(b => {
+        b.style.background = 'transparent';
+        b.style.color = 'var(--text-muted)';
+      });
+      if (btn) {
+        btn.style.background = 'var(--primary)';
+        btn.style.color = 'white';
+      }
+      renderStaffAttendanceWeb();
+    }
+
+    function renderStaffAttendanceWeb() {
+      const authorized = canAccessStaffAttendanceWeb();
+      const restrictedBanner = document.getElementById('staffAttendanceRestrictedBanner');
+      const authorizedContent = document.getElementById('staffAttendanceAuthorizedContent');
+
+      if (!authorized) {
+        if (restrictedBanner) restrictedBanner.style.display = 'block';
+        if (authorizedContent) authorizedContent.style.display = 'none';
+        return;
+      }
+
+      if (restrictedBanner) restrictedBanner.style.display = 'none';
+      if (authorizedContent) authorizedContent.style.display = 'block';
+
+      // Update counters
+      const total = staffAttendanceListWeb.length;
+      const present = staffAttendanceListWeb.filter(s => s.status === 'ተገኝቷል').length;
+      const absent = staffAttendanceListWeb.filter(s => s.status === 'ቀርቷል').length;
+      const late = staffAttendanceListWeb.filter(s => s.status === 'ዘግይቷል').length;
+      const leave = staffAttendanceListWeb.filter(s => s.status === 'ፍቃድ').length;
+
+      const elTotal = document.getElementById('staffAttStatTotal');
+      const elPresent = document.getElementById('staffAttStatPresent');
+      const elAbsent = document.getElementById('staffAttStatAbsent');
+      const elLate = document.getElementById('staffAttStatLate');
+      const elLeave = document.getElementById('staffAttStatLeave');
+
+      if (elTotal) elTotal.innerText = total;
+      if (elPresent) elPresent.innerText = present;
+      if (elAbsent) elAbsent.innerText = absent;
+      if (elLate) elLate.innerText = late;
+      if (elLeave) elLeave.innerText = leave;
+
+      // Filter list
+      const query = (document.getElementById('staffAttSearchInput')?.value || '').trim().toLowerCase();
+      let filtered = staffAttendanceListWeb.filter(s => {
+        const matchesQuery = !query || s.name.toLowerCase().includes(query) || s.role.toLowerCase().includes(query) || s.dept.toLowerCase().includes(query);
+        let matchesCat = true;
+        if (currentStaffAttCategory === 'teachers') {
+          matchesCat = s.isTeacher || s.role.includes('መምህር');
+        } else if (currentStaffAttCategory === 'admin_sec') {
+          matchesCat = !s.isTeacher && !s.role.includes('መምህር');
+        }
+        return matchesQuery && matchesCat;
+      });
+
+      const tbody = document.getElementById('staffAttendanceTableBody');
+      if (!tbody) return;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align:center; padding:1.5rem; color:#64748B;">
+              ምንም የተገኘ ሰራተኛ የለም (No staff found)
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(item => {
+        let badgeClass = 'badge-success';
+        if (item.status === 'ቀርቷል') badgeClass = 'badge-danger';
+        else if (item.status === 'ዘግይቷል') badgeClass = 'badge-warning';
+        else if (item.status === 'ፍቃድ') badgeClass = 'badge-primary';
+
+        return `
+          <tr style="border-bottom:1px solid #E2E8F0;">
+            <td style="padding:8px 10px;">
+              <strong>${item.name}</strong>
+              <div style="font-size:0.75rem; color:#64748B;">${item.isTeacher ? '👨‍🏫 መምህር' : '💼 ሰራተኛ'}</div>
+            </td>
+            <td style="padding:8px 10px;">
+              <span class="badge badge-primary">${item.role}</span>
+              <div style="font-size:0.75rem; color:#475569; margin-top:2px;">${item.dept}</div>
+            </td>
+            <td style="padding:8px 10px; font-weight:600; color:#1E293B;">
+              ${item.status === 'ቀርቷል' ? '-' : item.time}
+            </td>
+            <td style="padding:8px 10px;">
+              <span class="badge ${badgeClass}" style="font-weight:700;">${item.status}</span>
+            </td>
+            <td style="padding:8px 10px; font-size:0.8rem; color:#475569;">
+              ${item.remarks || '-'}
+            </td>
+            <td style="padding:8px 10px;">
+              <div style="display:flex; gap:0.25rem; flex-wrap:wrap;">
+                <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#10B981; color:#065F46; background:#ECFDF5;" onclick="updateStaffAttendanceStatus(${item.id}, 'ተገኝቷል')">✓ ተገኝቷል</button>
+                <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#EF4444; color:#991B1B; background:#FEF2F2;" onclick="updateStaffAttendanceStatus(${item.id}, 'ቀርቷል')">✕ ቀርቷል</button>
+                <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#F59E0B; color:#92400E; background:#FFFBEB;" onclick="updateStaffAttendanceStatus(${item.id}, 'ዘግይቷል')">⏱ ዘግይቷል</button>
+                <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#8B5CF6; color:#5B21B6; background:#F5F3FF;" onclick="updateStaffAttendanceStatus(${item.id}, 'ፍቃድ')">📝 ፍቃድ</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function updateStaffAttendanceStatus(id, newStatus) {
+      if (!canAccessStaffAttendanceWeb()) {
+        alert('🔒 የተከለከለ ፈቃድ! የሰራተኞች አቴንዳንስ መመዝገብ የሚችሉት ምክትል ርዕሰ መምህር ወይም ሲስተም አድሚን ብቻ ናቸው።');
+        return;
+      }
+      const item = staffAttendanceListWeb.find(s => s.id === id);
+      if (!item) return;
+
+      item.status = newStatus;
+      if (newStatus === 'ተገኝቷል') {
+        item.time = '02:15 ጧት';
+        item.remarks = 'በሰዓቱ ገብተዋል';
+      } else if (newStatus === 'ዘግይቷል') {
+        item.time = '02:40 ጧት';
+        item.remarks = 'በዘግይቶ መግባት ተመዝግቧል';
+      } else if (newStatus === 'ቀርቷል') {
+        item.time = '-';
+        item.remarks = 'ያለፈቃድ ቀርተዋል';
+      } else if (newStatus === 'ፍቃድ') {
+        item.time = '-';
+        item.remarks = 'በፍቃድ ላይ ናቸው';
+      }
+      saveStaffAttendanceWeb();
+      renderStaffAttendanceWeb();
+    }
+
     function renderAttendance() {
       const activeAttendance = getFilteredAttendanceWeb();
       const tbody = document.getElementById('attendanceTableBody');
-      tbody.innerHTML = activeAttendance.map((a, i) => `
-        <tr>
-          <td><strong>${a.name}</strong></td>
-          <td><span class="badge badge-primary">${a.grade}</span></td>
-          <td>
-            <span class="badge ${a.status === 'Present' ? 'badge-success' : a.status === 'Late' ? 'badge-warning' : 'badge-danger'}">
-              ${a.status === 'Present' ? 'ተገኝቷል' : a.status === 'Late' ? 'ዘግይቷል' : 'ቀሪ'}
-            </span>
-          </td>
-          <td>${a.note}</td>
-          <td>
-            <button class="btn-secondary" style="padding:0.2rem 0.4rem; font-size:0.72rem;" onclick="toggleAttendance(${i})">ቀይር</button>
-          </td>
-        </tr>
-      `).join('');
+      if (tbody) {
+        tbody.innerHTML = activeAttendance.map((a, i) => `
+          <tr>
+            <td><strong>${a.name}</strong></td>
+            <td><span class="badge badge-primary">${a.grade}</span></td>
+            <td>
+              <span class="badge ${a.status === 'Present' ? 'badge-success' : a.status === 'Late' ? 'badge-warning' : 'badge-danger'}">
+                ${a.status === 'Present' ? 'ተገኝቷል' : a.status === 'Late' ? 'ዘግይቷል' : 'ቀሪ'}
+              </span>
+            </td>
+            <td>${a.note}</td>
+            <td>
+              <button class="btn-secondary" style="padding:0.2rem 0.4rem; font-size:0.72rem;" onclick="toggleAttendance(${i})">ቀይር</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+      renderStaffAttendanceWeb();
     }
 
     function toggleAttendance(index) {
@@ -2508,16 +2814,31 @@
     // USER ACCOUNTS, AUTHENTICATION & LOGOUT
     // ==========================================
     const DEFAULT_ACCOUNTS = [
-      { name: 'እኔ (System Administrator)', role: '👑 ሲስተም አድሚን', email: 'admin@dilijent.edu.et', phone: '0911999999', pass: 'admin123', isAdmin: true },
-      { name: 'አቶ ሙሉጌታ ከበደ', role: '🎓 ርዕሰ መምህር', email: '', phone: '0911000000', pass: 'p123456', isAdmin: false },
-      { name: 'መምህር ዳዊት በቀለ', role: '👨‍🏫 መምህር (ሒሳብ)', email: '', phone: '0911223344', pass: 't123456', isAdmin: false },
-      { name: 'መምህርት ሳራ መኮንን', role: '👩‍🏫 መምህርት (ፊዚክስ)', email: '', phone: '0922334455', pass: 't123456', isAdmin: false },
-      { name: 'ተማሪ አቤል ታደሰ', role: '👨‍🎓 ተማሪ (12A)', email: '', phone: '0911002233', pass: 's123456', isAdmin: false }
+      { name: 'እኔ (System Administrator)', role: '👑 ሲስተም አድሚን', email: 'admin@dilijent.edu.et', phone: '0911999999', pass: 'admin123', isAdmin: true, isVicePrincipal: false },
+      { name: 'አቶ ከበደ ለማ', role: '🎓 ምክትል ርዕሰ መምህር', email: '', phone: '0918000000', pass: 'vp1234', isAdmin: false, isVicePrincipal: true },
+      { name: 'አቶ ሙሉጌታ ከበደ', role: '🎓 ርዕሰ መምህር', email: '', phone: '0911000000', pass: 'p123456', isAdmin: false, isVicePrincipal: false },
+      { name: 'መምህር ዳዊት በቀለ', role: '👨‍🏫 መምህር (ሒሳብ)', email: '', phone: '0911223344', pass: 't123456', isAdmin: false, isVicePrincipal: false },
+      { name: 'መምህርት ሳራ መኮንን', role: '👩‍🏫 መምህርት (ፊዚክስ)', email: '', phone: '0922334455', pass: 't123456', isAdmin: false, isVicePrincipal: false },
+      { name: 'ተማሪ አቤል ታደሰ', role: '👨‍🎓 ተማሪ (12A)', email: '', phone: '0911002233', pass: 's123456', isAdmin: false, isVicePrincipal: false }
     ];
 
     let userAccounts = JSON.parse(localStorage.getItem('dilijent_user_accounts')) || DEFAULT_ACCOUNTS;
+    // Ensure vice principal account exists if previously saved to local storage
+    if (!userAccounts.some(u => u.phone === '0918000000' || (u.role && u.role.includes('ምክትል')))) {
+      userAccounts.splice(1, 0, DEFAULT_ACCOUNTS[1]);
+      localStorage.setItem('dilijent_user_accounts', JSON.stringify(userAccounts));
+    }
     let currentWebUser = JSON.parse(localStorage.getItem('dilijent_current_user')) || userAccounts[0];
     let currentLoginMode = 'admin'; // 'admin' (email) or 'phone' (teachers/students)
+
+    function canAccessStaffAttendanceWeb() {
+      if (!currentWebUser) return false;
+      if (currentWebUser.isAdmin) return true;
+      if (currentWebUser.isVicePrincipal) return true;
+      const r = (currentWebUser.role || '').toLowerCase();
+      const email = (currentWebUser.email || '').toLowerCase();
+      return r.includes('ምክትል') || r.includes('vice') || r.includes('ርዕሰ መምህር') || r.includes('principal') || r.includes('አድሚን') || r.includes('admin') || email.includes('admin');
+    }
 
     function updateCurrentUserUI() {
       const pill = document.getElementById('currentRoleDisplay');
@@ -2612,10 +2933,12 @@
       let target = null;
       if (roleKey === 'admin') {
         target = userAccounts.find(u => u.isAdmin) || userAccounts[0];
+      } else if (roleKey === 'vice_principal') {
+        target = userAccounts.find(u => u.isVicePrincipal || u.role.includes('ምክትል')) || userAccounts.find(u => u.phone === '0918000000');
       } else if (roleKey === 'principal') {
-        target = userAccounts.find(u => u.role.includes('ርዕሰ መምህር'));
+        target = userAccounts.find(u => u.role.includes('ርዕሰ መምህር') && !u.role.includes('ምክትል'));
       } else if (roleKey === 'math_teacher') {
-        target = userAccounts.find(u => u.role.includes('መምህር'));
+        target = userAccounts.find(u => u.role.includes('መምህር') && !u.role.includes('ርዕሰ'));
       } else if (roleKey === 'student') {
         target = userAccounts.find(u => u.role.includes('ተማሪ'));
       }
@@ -2624,6 +2947,8 @@
         currentWebUser = target;
         localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
         updateCurrentUserUI();
+        if (typeof renderAttendance === 'function') renderAttendance();
+        if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
         closeLoginModal();
         alert(`በፈጣን ሁኔታ በ${target.name} (${target.role}) ገብተዋል!`);
       }

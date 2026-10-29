@@ -167,3 +167,15 @@ data class SchoolStats(
     val activeGradesCount: Int = 0
 )
 
+data class StaffAttendanceItem(
+    val id: Long,
+    val name: String,
+    val role: String,
+    val department: String,
+    val phone: String,
+    val isTeacher: Boolean,
+    val status: String = "ተገኝቷል", // "ተገኝቷል" (Present), "ቀርቷል" (Absent), "አርፍዷል" (Late), "በፍቃድ" (Leave)
+    val checkInTime: String = "02:15 ጧት",
+    val remarks: String = ""
+)
+
