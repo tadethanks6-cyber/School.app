@@ -211,6 +211,8 @@ class MainActivity : ComponentActivity() {
                 val isVicePrincipal by viewModel.isVicePrincipal.collectAsStateWithLifecycle()
                 val canAccessStaffAttendance by viewModel.canAccessStaffAttendance.collectAsStateWithLifecycle()
                 val staffAttendanceList by viewModel.staffAttendanceList.collectAsStateWithLifecycle()
+                val currentStaffSession by viewModel.currentStaffAttendanceSession.collectAsStateWithLifecycle()
+                val staffRoleSchedules by viewModel.staffRoleSchedules.collectAsStateWithLifecycle()
                 val isSuperAdmin by viewModel.isSuperAdmin.collectAsStateWithLifecycle()
                 val isTeacher by viewModel.isTeacher.collectAsStateWithLifecycle()
                 val isStudent by viewModel.isStudent.collectAsStateWithLifecycle()
@@ -527,11 +529,26 @@ class MainActivity : ComponentActivity() {
                                     currentStudent = currentStudent,
                                     teacherWorkloads = teacherWorkloads,
                                     staffAttendanceList = staffAttendanceList,
+                                    staffRoleSchedules = staffRoleSchedules,
+                                    activeStaffSession = currentStaffSession,
+                                    onSelectStaffSession = { session -> viewModel.currentStaffAttendanceSession.value = session },
                                     onRecordAttendance = { record ->
                                         viewModel.recordAttendance(record)
                                     },
                                     onRecordStaffAttendance = { id, status, remarks ->
                                         viewModel.updateStaffAttendance(id, status, remarks)
+                                    },
+                                    onAutoTickStaffAttendance = { id, session, status ->
+                                        viewModel.autoTickStaffAttendance(id, session, status)
+                                    },
+                                    onSaveStaffAttendanceManual = { id, session, status, time, remarks ->
+                                        viewModel.saveStaffAttendanceManual(id, session, status, time, remarks)
+                                    },
+                                    onUpdateRoleSchedule = { cat, eS, eE, xS, xE, desc ->
+                                        viewModel.updateStaffRoleSchedule(cat, eS, eE, xS, xE, desc)
+                                    },
+                                    onResetRoleSchedules = {
+                                        viewModel.resetStaffRoleSchedulesToDefault()
                                     }
                                 )
                             }

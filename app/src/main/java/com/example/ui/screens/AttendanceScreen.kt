@@ -23,20 +23,29 @@ import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -53,6 +62,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.AttendanceRecord
 import com.example.data.model.StaffAttendanceItem
+import com.example.data.model.StaffAttendanceSession
+import com.example.data.model.StaffRoleSchedule
 import com.example.data.model.Student
 import com.example.data.model.Teacher
 import com.example.data.model.TeacherWorkload
@@ -83,12 +94,29 @@ fun AttendanceScreen(
     currentStudent: Student? = null,
     teacherWorkloads: List<TeacherWorkload> = emptyList(),
     staffAttendanceList: List<StaffAttendanceItem> = emptyList(),
+    staffRoleSchedules: List<StaffRoleSchedule> = emptyList(),
+    activeStaffSession: StaffAttendanceSession = StaffAttendanceSession.CHECK_IN,
+    onSelectStaffSession: (StaffAttendanceSession) -> Unit = {},
     onRecordAttendance: (AttendanceRecord) -> Unit,
     onRecordStaffAttendance: (Long, String, String) -> Unit = { _, _, _ -> },
+    onAutoTickStaffAttendance: (Long, StaffAttendanceSession, String?) -> Unit = { _, _, _ -> },
+    onSaveStaffAttendanceManual: (Long, StaffAttendanceSession, String, String, String) -> Unit = { _, _, _, _, _ -> },
+    onUpdateRoleSchedule: (String, String, String, String, String, String) -> Unit = { _, _, _, _, _, _ -> },
+    onResetRoleSchedules: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     // Mode switcher: Default to STUDENTS unless user explicitly switches to STAFF
     var activeSubMode by remember { mutableStateOf(AttendanceSubMode.STUDENTS) }
+
+    // Dialog state for manually editing staff attendance time & status
+    var editingStaffItem by remember { mutableStateOf<StaffAttendanceItem?>(null) }
+    var editSession by remember { mutableStateOf(activeStaffSession) }
+    var editTime by remember { mutableStateOf("") }
+    var editStatus by remember { mutableStateOf("ተገኝቷል") }
+    var editRemarks by remember { mutableStateOf("") }
+
+    // Dialog state for configuring role schedules
+    var showRoleScheduleDialog by remember { mutableStateOf(false) }
 
     val assignedGrades = remember(teacherWorkloads) {
         val list = teacherWorkloads.map { it.grade }.distinct()
@@ -636,6 +664,170 @@ fun AttendanceScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
+                // Two Attendance Sessions Switcher: የመግቢያ (Check-In) & የመውጫ (Check-Out)
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = Color.White,
+                    shadowElevation = 2.dp,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(10.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = if (isAmharic) "የዕለቱ የክትትል ክፍለ-ጊዜ ይምረጡ (Shift):" else "Select Shift Session:",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = NavyPrimary
+                            )
+
+                            if (isAdmin || isVicePrincipal) {
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = GoldAccent.copy(alpha = 0.25f),
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .clickable { showRoleScheduleDialog = true }
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Tune,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(13.dp),
+                                            tint = Color(0xFF78350F)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = if (isAmharic) "⚙️ የሰዓት ገደብ አዋቅር" else "⚙️ Shift Schedules",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            color = Color(0xFF78350F)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            val isEntryActive = activeStaffSession == StaffAttendanceSession.CHECK_IN
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (isEntryActive) NavyPrimary else Color(0xFFF1F5F9),
+                                contentColor = if (isEntryActive) Color.White else Color(0xFF334155),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .clickable { onSelectStaffSession(StaffAttendanceSession.CHECK_IN) }
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center,
+                                    modifier = Modifier.padding(vertical = 10.dp, horizontal = 6.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.WbSunny,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp),
+                                        tint = if (isEntryActive) GoldAccent else Color(0xFFD97706)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Column {
+                                        Text(
+                                            text = if (isAmharic) "🚪 የመግቢያ አቴንዳንስ" else "Check-In (Arrival)",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 12.sp
+                                        )
+                                        Text(
+                                            text = if (isAmharic) "እንደየሰራተኛው የስራ ሰዓት" else "By Staff Shift Schedule",
+                                            fontSize = 10.sp,
+                                            color = if (isEntryActive) GoldAccent else Color(0xFF64748B)
+                                        )
+                                    }
+                                }
+                            }
+
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (!isEntryActive) NavyPrimary else Color(0xFFF1F5F9),
+                                contentColor = if (!isEntryActive) Color.White else Color(0xFF334155),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .clickable { onSelectStaffSession(StaffAttendanceSession.CHECK_OUT) }
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center,
+                                    modifier = Modifier.padding(vertical = 10.dp, horizontal = 6.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.NightsStay,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp),
+                                        tint = if (!isEntryActive) GoldAccent else Color(0xFF2563EB)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Column {
+                                        Text(
+                                            text = if (isAmharic) "🚶‍♂️ የመውጫ አቴንዳንስ" else "Check-Out (Departure)",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 12.sp
+                                        )
+                                        Text(
+                                            text = if (isAmharic) "እንደየሰራተኛው የስራ ሰዓት" else "By Staff Shift Schedule",
+                                            fontSize = 10.sp,
+                                            color = if (!isEntryActive) GoldAccent else Color(0xFF64748B)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        // Auto-time notice banner
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = if (activeStaffSession == StaffAttendanceSession.CHECK_IN) Color(0xFFFEF3C7) else Color(0xFFEFF6FF),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Schedule,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(14.dp),
+                                    tint = if (activeStaffSession == StaffAttendanceSession.CHECK_IN) Color(0xFF92400E) else Color(0xFF1E40AF)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = if (activeStaffSession == StaffAttendanceSession.CHECK_IN)
+                                        "⚡ የመግቢያ አቴንዳንስ፦ ም/ር ወይም አድሚን ቲክ ሲያደርግ የአሁን ሰዓት ይመዘገባል • ከገደቡ ካለፈ 'አርፍዷል' ይባላል"
+                                    else
+                                        "⚡ የመውጫ አቴንዳንስ፦ ም/ር ወይም አድሚን ቲክ ሲያደርግ የአሁን ሰዓት ይመዘገባል • ቀድሞ/ዘግይቶ መውጣት በእራሱ ይወሰናል",
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = if (activeStaffSession == StaffAttendanceSession.CHECK_IN) Color(0xFF92400E) else Color(0xFF1E40AF)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 // Staff Attendance Statistics Badges
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -667,7 +859,7 @@ fun AttendanceScreen(
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 6.dp)
+                        .padding(vertical = 4.dp)
                 )
 
                 if (filteredStaffAttendance.isEmpty()) {
@@ -680,6 +872,14 @@ fun AttendanceScreen(
                         modifier = Modifier.fillMaxSize()
                     ) {
                         items(filteredStaffAttendance, key = { it.id }) { staffItem ->
+                            val isEntry = activeStaffSession == StaffAttendanceSession.CHECK_IN
+                            val currentStatus = if (isEntry) staffItem.entryStatus else staffItem.exitStatus
+                            val currentTime = if (isEntry) staffItem.entryTime else staffItem.exitTime
+                            val currentRemarks = if (isEntry) staffItem.entryRemarks else staffItem.exitRemarks
+
+                            // Role schedule for this staff category
+                            val roleSched = staffRoleSchedules.firstOrNull { it.roleCategory == staffItem.roleCategory }
+
                             Card(
                                 shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -707,34 +907,55 @@ fun AttendanceScreen(
                                         }
                                         Spacer(modifier = Modifier.width(10.dp))
                                         Column(modifier = Modifier.weight(1f)) {
-                                            Text(
-                                                text = staffItem.name,
-                                                fontWeight = FontWeight.Bold,
-                                                fontSize = 14.sp
-                                            )
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Text(
+                                                    text = staffItem.name,
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 14.sp
+                                                )
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Surface(
+                                                    shape = RoundedCornerShape(4.dp),
+                                                    color = Color(0xFFF1F5F9)
+                                                ) {
+                                                    Text(
+                                                        text = staffItem.roleCategory,
+                                                        fontSize = 10.sp,
+                                                        fontWeight = FontWeight.SemiBold,
+                                                        color = Color(0xFF475569),
+                                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                                                    )
+                                                }
+                                            }
                                             Text(
                                                 text = "${staffItem.role} • ${staffItem.department}",
                                                 fontSize = 11.sp,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
                                         }
+
+                                        // Status Pill for current active session
                                         Surface(
                                             shape = RoundedCornerShape(6.dp),
-                                            color = when (staffItem.status) {
+                                            color = when (currentStatus) {
                                                 "ተገኝቷል" -> EthioGreen.copy(alpha = 0.15f)
                                                 "ቀርቷል" -> EthioRed.copy(alpha = 0.15f)
                                                 "አርፍዷል" -> Color(0xFFD97706).copy(alpha = 0.15f)
+                                                "ቀድሞ ወጥቷል" -> Color(0xFFD97706).copy(alpha = 0.15f)
+                                                "ዘግይቶ ወጥቷል" -> Color(0xFF2563EB).copy(alpha = 0.15f)
                                                 else -> Color(0xFF2563EB).copy(alpha = 0.15f)
                                             }
                                         ) {
                                             Text(
-                                                text = staffItem.status,
+                                                text = currentStatus,
                                                 fontSize = 11.sp,
                                                 fontWeight = FontWeight.ExtraBold,
-                                                color = when (staffItem.status) {
+                                                color = when (currentStatus) {
                                                     "ተገኝቷል" -> EthioGreen
                                                     "ቀርቷል" -> EthioRed
                                                     "አርፍዷል" -> Color(0xFFD97706)
+                                                    "ቀድሞ ወጥቷል" -> Color(0xFFD97706)
+                                                    "ዘግይቶ ወጥቷል" -> Color(0xFF2563EB)
                                                     else -> Color(0xFF2563EB)
                                                 },
                                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -742,46 +963,180 @@ fun AttendanceScreen(
                                         }
                                     }
 
+                                    // Role Schedule Time Window Badge
+                                    if (roleSched != null) {
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Surface(
+                                            shape = RoundedCornerShape(4.dp),
+                                            color = Color(0xFFF8FAFC),
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                text = "⏱ የ${staffItem.roleCategory} ሰዓት ገደብ፦ መግቢያ፡ ${roleSched.entryStart} - ${roleSched.entryEnd} | መውጫ፡ ${roleSched.exitStart} - ${roleSched.exitEnd}",
+                                                fontSize = 9.sp,
+                                                color = Color(0xFF64748B),
+                                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                                            )
+                                        }
+                                    }
+
                                     Spacer(modifier = Modifier.height(8.dp))
 
-                                    // Action buttons for Vice Principal & Admin
+                                    // Display Both Sessions History Bar (መግቢያ & መውጫ)
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(Color(0xFFF8FAFC))
+                                            .padding(horizontal = 8.dp, vertical = 5.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "🚪 መግቢያ: ${staffItem.entryTime} (${staffItem.entryStatus})",
+                                            fontSize = 10.sp,
+                                            fontWeight = if (isEntry) FontWeight.Bold else FontWeight.Normal,
+                                            color = if (isEntry) NavyPrimary else Color(0xFF64748B)
+                                        )
+                                        Text(
+                                            text = "🚶‍♂️ መውጫ: ${staffItem.exitTime} (${staffItem.exitStatus})",
+                                            fontSize = 10.sp,
+                                            fontWeight = if (!isEntry) FontWeight.Bold else FontWeight.Normal,
+                                            color = if (!isEntry) NavyPrimary else Color(0xFF64748B)
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(6.dp))
+
+                                    // Check-in / Check-out Time & Remarks
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                                             Icon(Icons.Default.AccessTime, contentDescription = null, modifier = Modifier.size(13.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                                             Spacer(modifier = Modifier.width(4.dp))
-                                            Text(text = staffItem.checkInTime, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Text(text = "• ${staffItem.remarks}", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            Text(
+                                                text = currentTime,
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(
+                                                text = "• $currentRemarks",
+                                                fontSize = 10.sp,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                maxLines = 1
+                                            )
                                         }
 
-                                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                        // Edit Button for manual correction
+                                        Surface(
+                                            shape = RoundedCornerShape(6.dp),
+                                            color = Color(0xFFE0F2FE),
+                                            contentColor = Color(0xFF0369A1),
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .clickable {
+                                                    editingStaffItem = staffItem
+                                                    editSession = activeStaffSession
+                                                    editTime = if (activeStaffSession == StaffAttendanceSession.CHECK_IN) staffItem.entryTime else staffItem.exitTime
+                                                    editStatus = if (activeStaffSession == StaffAttendanceSession.CHECK_IN) staffItem.entryStatus else staffItem.exitStatus
+                                                    editRemarks = if (activeStaffSession == StaffAttendanceSession.CHECK_IN) staffItem.entryRemarks else staffItem.exitRemarks
+                                                }
+                                        ) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp)
+                                            ) {
+                                                Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(11.dp))
+                                                Spacer(modifier = Modifier.width(3.dp))
+                                                Text(
+                                                    text = if (isAmharic) "ሰዓት አርም" else "Edit Time",
+                                                    fontSize = 10.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    // Action buttons for Vice Principal & Admin
+                                    // Clicking automatically records exact current time and checks role limits
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        if (isEntry) {
+                                            // CHECK-IN BUTTONS
                                             AttendanceStatusButton(
-                                                label = "✓ ተገኝቷል",
-                                                isSelected = staffItem.status == "ተገኝቷል",
+                                                label = "✓ በሰዓቱ ገብቷል",
+                                                isSelected = currentStatus == "ተገኝቷል",
                                                 color = EthioGreen,
-                                                onClick = { onRecordStaffAttendance(staffItem.id, "ተገኝቷል", "በሰዓቱ ተገኝቷል") }
-                                            )
-                                            AttendanceStatusButton(
-                                                label = "✕ ቀርቷል",
-                                                isSelected = staffItem.status == "ቀርቷል",
-                                                color = EthioRed,
-                                                onClick = { onRecordStaffAttendance(staffItem.id, "ቀርቷል", "ያለፈቃድ የቀረ") }
+                                                onClick = {
+                                                    onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "ተገኝቷል")
+                                                }
                                             )
                                             AttendanceStatusButton(
                                                 label = "⏱ አርፍዷል",
-                                                isSelected = staffItem.status == "አርፍዷል",
+                                                isSelected = currentStatus == "አርፍዷል",
                                                 color = Color(0xFFD97706),
-                                                onClick = { onRecordStaffAttendance(staffItem.id, "አርፍዷል", "15 ደቂቃ ዘግይቷል") }
+                                                onClick = {
+                                                    onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "አርፍዷል")
+                                                }
+                                            )
+                                            AttendanceStatusButton(
+                                                label = "✕ ቀርቷል",
+                                                isSelected = currentStatus == "ቀርቷል",
+                                                color = EthioRed,
+                                                onClick = {
+                                                    onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "ቀርቷል")
+                                                }
                                             )
                                             AttendanceStatusButton(
                                                 label = "📝 ፍቃድ",
-                                                isSelected = staffItem.status == "በፍቃድ",
+                                                isSelected = currentStatus == "በፍቃድ",
                                                 color = Color(0xFF2563EB),
-                                                onClick = { onRecordStaffAttendance(staffItem.id, "በፍቃድ", "የህመም/ስራ ፍቃድ") }
+                                                onClick = {
+                                                    onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "በፍቃድ")
+                                                }
+                                            )
+                                        } else {
+                                            // CHECK-OUT BUTTONS
+                                            AttendanceStatusButton(
+                                                label = "✓ በሰዓቱ ወጥቷል",
+                                                isSelected = currentStatus == "ተገኝቷል",
+                                                color = EthioGreen,
+                                                onClick = {
+                                                    onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "ተገኝቷል")
+                                                }
+                                            )
+                                            AttendanceStatusButton(
+                                                label = "🏃‍♂️ ቀድሞ ወጥቷል",
+                                                isSelected = currentStatus == "ቀድሞ ወጥቷል",
+                                                color = Color(0xFFD97706),
+                                                onClick = {
+                                                    onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "ቀድሞ ወጥቷል")
+                                                }
+                                            )
+                                            AttendanceStatusButton(
+                                                label = "⌛ ዘግይቶ ወጥቷል",
+                                                isSelected = currentStatus == "ዘግይቶ ወጥቷል",
+                                                color = Color(0xFF2563EB),
+                                                onClick = {
+                                                    onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "ዘግይቶ ወጥቷል")
+                                                }
+                                            )
+                                            AttendanceStatusButton(
+                                                label = "✕ ቀርቷል",
+                                                isSelected = currentStatus == "ቀርቷል",
+                                                color = EthioRed,
+                                                onClick = {
+                                                    onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "ቀርቷል")
+                                                }
                                             )
                                         }
                                     }
@@ -793,9 +1148,473 @@ fun AttendanceScreen(
                         }
                     }
                 }
+
+                // =========================================================================
+                // DIALOG: EDIT STAFF ATTENDANCE TIME & STATUS (እረስቶት ዘግይቶ ቲክ ለማድረግ)
+                // =========================================================================
+                editingStaffItem?.let { staffItem ->
+                    val isDialogEntry = editSession == StaffAttendanceSession.CHECK_IN
+                    val roleSched = staffRoleSchedules.firstOrNull { it.roleCategory == staffItem.roleCategory }
+
+                    AlertDialog(
+                        onDismissRequest = { editingStaffItem = null },
+                        title = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Schedule, contentDescription = null, tint = NavyPrimary)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = if (isAmharic) "የአቴንዳንስ ሰዓት ማረሚያ" else "Edit Attendance Time",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        },
+                        text = {
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                Text(
+                                    text = "${staffItem.name} (${staffItem.role} • ${staffItem.roleCategory})",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 13.sp,
+                                    color = NavyPrimary
+                                )
+                                if (roleSched != null) {
+                                    Text(
+                                        text = "የስራ ሰዓት፦ መግቢያ ${roleSched.entryStart}-${roleSched.entryEnd} | መውጫ ${roleSched.exitStart}-${roleSched.exitEnd}",
+                                        fontSize = 10.sp,
+                                        color = Color(0xFF64748B)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                // Session switcher inside dialog
+                                Text(
+                                    text = if (isAmharic) "ክፍለ-ጊዜ (Shift):" else "Session:",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Surface(
+                                        shape = RoundedCornerShape(6.dp),
+                                        color = if (isDialogEntry) NavyPrimary else Color(0xFFF1F5F9),
+                                        contentColor = if (isDialogEntry) Color.White else Color(0xFF334155),
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .clickable {
+                                                editSession = StaffAttendanceSession.CHECK_IN
+                                                editTime = staffItem.entryTime
+                                                editStatus = staffItem.entryStatus
+                                                editRemarks = staffItem.entryRemarks
+                                            }
+                                    ) {
+                                        Text(
+                                            text = "🚪 የመግቢያ (Check-In)",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp),
+                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                        )
+                                    }
+                                    Surface(
+                                        shape = RoundedCornerShape(6.dp),
+                                        color = if (!isDialogEntry) NavyPrimary else Color(0xFFF1F5F9),
+                                        contentColor = if (!isDialogEntry) Color.White else Color(0xFF334155),
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .clickable {
+                                                editSession = StaffAttendanceSession.CHECK_OUT
+                                                editTime = staffItem.exitTime
+                                                editStatus = staffItem.exitStatus
+                                                editRemarks = staffItem.exitRemarks
+                                            }
+                                    ) {
+                                        Text(
+                                            text = "🚶‍♂️ የመውጫ (Check-Out)",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp),
+                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                // Time Field
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = if (isDialogEntry)
+                                            (if (isAmharic) "የገቡበት ሰዓት (Check-In Time):" else "Check-In Time:")
+                                        else
+                                            (if (isAmharic) "የወጡበት ሰዓት (Check-Out Time):" else "Check-Out Time:"),
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Surface(
+                                        shape = RoundedCornerShape(4.dp),
+                                        color = GoldAccent.copy(alpha = 0.25f),
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(4.dp))
+                                            .clickable {
+                                                editTime = if (isDialogEntry) (roleSched?.entryStart ?: "01:42 ጧት") else (roleSched?.exitStart ?: "09:25 ከሰዓት")
+                                            }
+                                    ) {
+                                        Text(
+                                            text = "🕒 መደበኛ ሰዓት",
+                                            fontSize = 10.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF78350F),
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(4.dp))
+                                OutlinedTextField(
+                                    value = editTime,
+                                    onValueChange = { editTime = it },
+                                    placeholder = { Text(if (isDialogEntry) "ምሳሌ፡ 01:40 ጧት" else "ምሳሌ፡ 09:20 ከሰዓት") },
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                // Status Picker
+                                Text(
+                                    text = if (isAmharic) "ሁኔታ (Status):" else "Status:",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    if (isDialogEntry) {
+                                        AttendanceStatusButton(
+                                            label = "ተገኝቷል",
+                                            isSelected = editStatus == "ተገኝቷል",
+                                            color = EthioGreen,
+                                            onClick = { editStatus = "ተገኝቷል" }
+                                        )
+                                        AttendanceStatusButton(
+                                            label = "አርፍዷል",
+                                            isSelected = editStatus == "አርፍዷል",
+                                            color = Color(0xFFD97706),
+                                            onClick = { editStatus = "አርፍዷል" }
+                                        )
+                                        AttendanceStatusButton(
+                                            label = "ቀርቷል",
+                                            isSelected = editStatus == "ቀርቷል",
+                                            color = EthioRed,
+                                            onClick = { editStatus = "ቀርቷል" }
+                                        )
+                                        AttendanceStatusButton(
+                                            label = "ፍቃድ",
+                                            isSelected = editStatus == "በፍቃድ",
+                                            color = Color(0xFF2563EB),
+                                            onClick = { editStatus = "በፍቃድ" }
+                                        )
+                                    } else {
+                                        AttendanceStatusButton(
+                                            label = "ተገኝቷል",
+                                            isSelected = editStatus == "ተገኝቷል",
+                                            color = EthioGreen,
+                                            onClick = { editStatus = "ተገኝቷል" }
+                                        )
+                                        AttendanceStatusButton(
+                                            label = "ቀድሞ ወጥቷል",
+                                            isSelected = editStatus == "ቀድሞ ወጥቷል",
+                                            color = Color(0xFFD97706),
+                                            onClick = { editStatus = "ቀድሞ ወጥቷል" }
+                                        )
+                                        AttendanceStatusButton(
+                                            label = "ዘግይቶ ወጥቷል",
+                                            isSelected = editStatus == "ዘግይቶ ወጥቷል",
+                                            color = Color(0xFF2563EB),
+                                            onClick = { editStatus = "ዘግይቶ ወጥቷል" }
+                                        )
+                                        AttendanceStatusButton(
+                                            label = "ቀርቷል",
+                                            isSelected = editStatus == "ቀርቷል",
+                                            color = EthioRed,
+                                            onClick = { editStatus = "ቀርቷል" }
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                // Remarks input
+                                Text(
+                                    text = if (isAmharic) "ማስታወሻ / ምክንያት (Remarks):" else "Remarks / Reason:",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                OutlinedTextField(
+                                    value = editRemarks,
+                                    onValueChange = { editRemarks = it },
+                                    placeholder = { Text(if (isAmharic) "ምሳሌ፡ ዘግይቶ በምክትል ር/መ ተመዝግቧል" else "Reason...") },
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    onSaveStaffAttendanceManual(
+                                        staffItem.id,
+                                        editSession,
+                                        editStatus,
+                                        editTime,
+                                        editRemarks.ifBlank { "በም/ር ተስተካክሎ ተመዝግቧል" }
+                                    )
+                                    editingStaffItem = null
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary)
+                            ) {
+                                Text(if (isAmharic) "አስቀምጥ" else "Save")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { editingStaffItem = null }) {
+                                Text(if (isAmharic) "ሰርዝ" else "Cancel")
+                            }
+                        }
+                    )
+                }
+
+                // =========================================================================
+                // DIALOG: CONFIGURE STAFF SHIFT SCHEDULES (ተለዋዋጭ የሰዓት ገደብ ማዋቀሪያ)
+                // =========================================================================
+                if (showRoleScheduleDialog) {
+                    StaffRoleScheduleConfigDialog(
+                        schedules = staffRoleSchedules,
+                        isAmharic = isAmharic,
+                        onSaveSchedule = { cat, eStart, eEnd, xStart, xEnd, desc ->
+                            onUpdateRoleSchedule(cat, eStart, eEnd, xStart, xEnd, desc)
+                        },
+                        onResetDefaults = onResetRoleSchedules,
+                        onDismiss = { showRoleScheduleDialog = false }
+                    )
+                }
             }
         }
     }
+}
+
+@Composable
+fun StaffRoleScheduleConfigDialog(
+    schedules: List<StaffRoleSchedule>,
+    isAmharic: Boolean,
+    onSaveSchedule: (String, String, String, String, String, String) -> Unit,
+    onResetDefaults: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    val categories = remember {
+        listOf("መምህራን", "ፅዳት ሰራተኞች", "ደህንነትና ጥበቃ", "አስተዳደርና ፋይናንስ", "ሌሎች ሰራተኞች")
+    }
+    var selectedCat by remember { mutableStateOf(categories.first()) }
+
+    val activeSched = schedules.firstOrNull { it.roleCategory == selectedCat }
+
+    var entryStartInput by remember(selectedCat, activeSched) {
+        mutableStateOf(activeSched?.entryStart ?: "01:30 ጧት")
+    }
+    var entryEndInput by remember(selectedCat, activeSched) {
+        mutableStateOf(activeSched?.entryEnd ?: "01:51 ጧት")
+    }
+    var exitStartInput by remember(selectedCat, activeSched) {
+        mutableStateOf(activeSched?.exitStart ?: "09:15 ከሰዓት")
+    }
+    var exitEndInput by remember(selectedCat, activeSched) {
+        mutableStateOf(activeSched?.exitEnd ?: "09:40 ከሰዓት")
+    }
+    var descInput by remember(selectedCat, activeSched) {
+        mutableStateOf(activeSched?.description ?: "")
+    }
+
+    var savedMessage by remember { mutableStateOf<String?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Tune, contentDescription = null, tint = NavyPrimary)
+                Spacer(modifier = Modifier.width(8.dp))
+                Column {
+                    Text(
+                        text = if (isAmharic) "የሰራተኞች የስራ ሰዓት ገደብ ማዋቀሪያ" else "Configure Staff Shift Schedules",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = if (isAmharic) "ምክትል ር/መምህር እና አድሚን ብቻ የሚወስኑት" else "Vice Principal & Admin Configuration",
+                        fontSize = 11.sp,
+                        color = Color(0xFF64748B)
+                    )
+                }
+            }
+        },
+        text = {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // Category Selector
+                Text(
+                    text = if (isAmharic) "የሰራተኛ አይነት ይምረጡ፦" else "Select Staff Category:",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = NavyPrimary
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                FilterChipRow(
+                    options = categories,
+                    selectedOption = selectedCat,
+                    onSelectOption = {
+                        selectedCat = it
+                        savedMessage = null
+                    },
+                    testTagPrefix = "sched_cat"
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Entry time group
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = Color(0xFFFEF3C7),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(10.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.WbSunny, contentDescription = null, tint = Color(0xFFB45309), modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = if (isAmharic) "🚪 የመግቢያ ሰዓት ገደብ (Check-In)" else "Check-In Window",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                color = Color(0xFF92400E)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+                            OutlinedTextField(
+                                value = entryStartInput,
+                                onValueChange = { entryStartInput = it },
+                                label = { Text("መጀመሪያ", fontSize = 10.sp) },
+                                singleLine = true,
+                                modifier = Modifier.weight(1f)
+                            )
+                            OutlinedTextField(
+                                value = entryEndInput,
+                                onValueChange = { entryEndInput = it },
+                                label = { Text("ገደብ/ማብቂያ", fontSize = 10.sp) },
+                                singleLine = true,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        Text(
+                            text = "💡 ከ'${entryEndInput}' በኋላ የገባ ሰራተኛ እንደ 'አርፍዷል' ይመዘገባል።",
+                            fontSize = 10.sp,
+                            color = Color(0xFF92400E),
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Exit time group
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = Color(0xFFEFF6FF),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(10.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.NightsStay, contentDescription = null, tint = Color(0xFF1D4ED8), modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = if (isAmharic) "🚶‍♂️ የመውጫ ሰዓት ገደብ (Check-Out)" else "Check-Out Window",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                color = Color(0xFF1E40AF)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+                            OutlinedTextField(
+                                value = exitStartInput,
+                                onValueChange = { exitStartInput = it },
+                                label = { Text("መጀመሪያ", fontSize = 10.sp) },
+                                singleLine = true,
+                                modifier = Modifier.weight(1f)
+                            )
+                            OutlinedTextField(
+                                value = exitEndInput,
+                                onValueChange = { exitEndInput = it },
+                                label = { Text("ገደብ/ማብቂያ", fontSize = 10.sp) },
+                                singleLine = true,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        Text(
+                            text = "💡 ከ'${exitStartInput}' በፊት የወጣ 'ቀድሞ ወጥቷል'፤ ከ'${exitEndInput}' በኋላ 'ዘግይቶ ወጥቷል' ይሆናል።",
+                            fontSize = 10.sp,
+                            color = Color(0xFF1E40AF),
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                }
+
+                if (savedMessage != null) {
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = savedMessage ?: "",
+                        color = EthioGreen,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 11.sp
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                TextButton(
+                    onClick = {
+                        onResetDefaults()
+                        savedMessage = "ወደ ነባሪ ሰዓቶች ተመልሷል!"
+                    }
+                ) {
+                    Text(if (isAmharic) "ወደ ነባሪ መልስ" else "Reset Defaults", fontSize = 11.sp)
+                }
+                Button(
+                    onClick = {
+                        onSaveSchedule(selectedCat, entryStartInput, entryEndInput, exitStartInput, exitEndInput, descInput)
+                        savedMessage = "የ${selectedCat} የሰዓት ገደብ በተሳካ ሁኔታ ተቀምጧል!"
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary)
+                ) {
+                    Text(if (isAmharic) "ለውጡን አስቀምጥ" else "Save Schedule")
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(if (isAmharic) "ዝጋ" else "Close")
+            }
+        }
+    )
 }
 
 @Composable

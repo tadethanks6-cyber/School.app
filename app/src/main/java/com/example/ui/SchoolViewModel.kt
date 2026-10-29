@@ -8,6 +8,8 @@ import com.example.data.model.AttendanceRecord
 import com.example.data.model.SchoolStats
 import com.example.data.model.Staff
 import com.example.data.model.StaffAttendanceItem
+import com.example.data.model.StaffAttendanceSession
+import com.example.data.model.StaffRoleSchedule
 import com.example.data.model.Student
 import com.example.data.model.AssessmentScheme
 import android.content.Context
@@ -593,18 +595,171 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         admin || role.contains("ጸሐፊ") || role.contains("መዝጋቢ") || role.contains("ምክትል")
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    // Staff Attendance Tracking (Strictly controlled by Vice Principal and Admin)
-    private val _staffAttendanceOverrides = MutableStateFlow<Map<Long, Pair<String, String>>>(emptyMap())
+    // Default Shift Schedules per staff category (የሰራተኛ የስራ ሰዓት ገደብ ማዋቀሪያ)
+    val defaultStaffRoleSchedules = listOf(
+        StaffRoleSchedule(
+            roleCategory = "መምህራን",
+            entryStart = "01:30 ጧት",
+            entryEnd = "01:51 ጧት",
+            exitStart = "09:15 ከሰዓት",
+            exitEnd = "09:40 ከሰዓት",
+            description = "የመማር ማስተማር መደበኛ ክፍለ ጊዜያት"
+        ),
+        StaffRoleSchedule(
+            roleCategory = "ፅዳት ሰራተኞች",
+            entryStart = "12:30 ጧት",
+            entryEnd = "01:15 ጧት",
+            exitStart = "08:30 ከሰዓት",
+            exitEnd = "09:00 ከሰዓት",
+            description = "የትምህርት ቤቱን ግቢና ክፍሎች ቀድመው ማዘጋጀት"
+        ),
+        StaffRoleSchedule(
+            roleCategory = "ደህንነትና ጥበቃ",
+            entryStart = "12:00 ጧት",
+            entryEnd = "12:45 ጧት",
+            exitStart = "11:30 ከሰዓት",
+            exitEnd = "12:00 ከሰዓት",
+            description = "የበርና የግቢ ጥበቃ የስራ ፈረቃ"
+        ),
+        StaffRoleSchedule(
+            roleCategory = "አስተዳደርና ፋይናንስ",
+            entryStart = "01:45 ጧት",
+            entryEnd = "02:00 ጧት",
+            exitStart = "10:00 ከሰዓት",
+            exitEnd = "10:30 ከሰዓት",
+            description = "የጽህፈት ቤት፣ የሂሳብና የሰው ኃይል ሰዓት"
+        ),
+        StaffRoleSchedule(
+            roleCategory = "ሌሎች ሰራተኞች",
+            entryStart = "01:30 ጧት",
+            entryEnd = "02:00 ጧት",
+            exitStart = "09:00 ከሰዓት",
+            exitEnd = "09:30 ከሰዓት",
+            description = "አጠቃላይ ድጋፍ ሰጪ ሰራተኞች"
+        )
+    )
+
+    private fun loadStaffRoleSchedules(): List<StaffRoleSchedule> {
+        val raw = prefs.getString("staff_role_schedules_data", null) ?: return defaultStaffRoleSchedules
+        return try {
+            val lines = raw.split("###")
+            val result = lines.mapNotNull { line ->
+                val parts = line.split("|||")
+                if (parts.size >= 5) {
+                    StaffRoleSchedule(
+                        roleCategory = parts[0],
+                        entryStart = parts[1],
+                        entryEnd = parts[2],
+                        exitStart = parts[3],
+                        exitEnd = parts[4],
+                        description = parts.getOrNull(5) ?: ""
+                    )
+                } else null
+            }
+            if (result.isNotEmpty()) result else defaultStaffRoleSchedules
+        } catch (e: Exception) {
+            defaultStaffRoleSchedules
+        }
+    }
+
+    private fun saveStaffRoleSchedulesToPrefs(list: List<StaffRoleSchedule>) {
+        val serialized = list.joinToString("###") {
+            "${it.roleCategory}|||${it.entryStart}|||${it.entryEnd}|||${it.exitStart}|||${it.exitEnd}|||${it.description}"
+        }
+        prefs.edit().putString("staff_role_schedules_data", serialized).apply()
+    }
+
+    private val _staffRoleSchedules = MutableStateFlow<List<StaffRoleSchedule>>(loadStaffRoleSchedules())
+    val staffRoleSchedules: StateFlow<List<StaffRoleSchedule>> = _staffRoleSchedules.asStateFlow()
+
+    val showStaffScheduleDialog = MutableStateFlow(false)
+
+    fun updateStaffRoleSchedule(
+        category: String,
+        entryStart: String,
+        entryEnd: String,
+        exitStart: String,
+        exitEnd: String,
+        description: String = ""
+    ) {
+        val current = _staffRoleSchedules.value.toMutableList()
+        val index = current.indexOfFirst { it.roleCategory == category }
+        val updated = StaffRoleSchedule(
+            roleCategory = category,
+            entryStart = entryStart.trim(),
+            entryEnd = entryEnd.trim(),
+            exitStart = exitStart.trim(),
+            exitEnd = exitEnd.trim(),
+            description = description
+        )
+        if (index >= 0) {
+            current[index] = updated
+        } else {
+            current.add(updated)
+        }
+        _staffRoleSchedules.value = current
+        saveStaffRoleSchedulesToPrefs(current)
+    }
+
+    fun resetStaffRoleSchedulesToDefault() {
+        _staffRoleSchedules.value = defaultStaffRoleSchedules
+        saveStaffRoleSchedulesToPrefs(defaultStaffRoleSchedules)
+    }
+
+    fun getStaffRoleCategory(isTeacher: Boolean, role: String, department: String): String {
+        if (isTeacher) return "መምህራን"
+        val combined = "$role $department".lowercase()
+        return when {
+            combined.contains("ፅዳት") || combined.contains("cleaner") -> "ፅዳት ሰራተኞች"
+            combined.contains("ጥበቃ") || combined.contains("ደህንነት") || combined.contains("guard") || combined.contains("security") -> "ደህንነትና ጥበቃ"
+            combined.contains("አስተዳደር") || combined.contains("ፋይናንስ") || combined.contains("ሂሳብ") || combined.contains("ጸሐፊ") || combined.contains("መዝጋቢ") || combined.contains("admin") || combined.contains("finance") || combined.contains("accountant") || combined.contains("hr") -> "አስተዳደርና ፋይናንስ"
+            else -> "ሌሎች ሰራተኞች"
+        }
+    }
+
+    fun getRoleSchedule(roleCategory: String): StaffRoleSchedule {
+        return _staffRoleSchedules.value.firstOrNull { it.roleCategory == roleCategory }
+            ?: defaultStaffRoleSchedules.firstOrNull { it.roleCategory == roleCategory }
+            ?: defaultStaffRoleSchedules.first()
+    }
+
+    // Staff Attendance Tracking: Two Sessions (የመግቢያ Check-In እና የመውጫ Check-Out)
+    data class StaffSessionRecord(
+        val entryStatus: String = "ተገኝቷል",
+        val entryTime: String = "01:42 ጧት",
+        val entryRemarks: String = "በሰዓቱ ገብተዋል",
+        val exitStatus: String = "ተገኝቷል",
+        val exitTime: String = "09:25 ከሰዓት",
+        val exitRemarks: String = "በሰዓቱ ወጥተዋል",
+        val morningStatus: String = entryStatus,
+        val morningTime: String = entryTime,
+        val morningRemarks: String = entryRemarks,
+        val afternoonStatus: String = exitStatus,
+        val afternoonTime: String = exitTime,
+        val afternoonRemarks: String = exitRemarks
+    )
+
+    val currentStaffAttendanceSession = MutableStateFlow(StaffAttendanceSession.CHECK_IN)
+    private val _staffAttendanceRecords = MutableStateFlow<Map<Long, StaffSessionRecord>>(emptyMap())
 
     val staffAttendanceList: StateFlow<List<StaffAttendanceItem>> = combine(
         filteredTeachers,
         filteredStaff,
-        _staffAttendanceOverrides
-    ) { teachers, staffList, overrides ->
+        _staffAttendanceRecords,
+        currentStaffAttendanceSession,
+        _staffRoleSchedules
+    ) { teachers, staffList, records, activeSession, _ ->
         val list = mutableListOf<StaffAttendanceItem>()
+        val isEntry = activeSession == StaffAttendanceSession.CHECK_IN
+
         // Teachers
         teachers.forEach { t ->
-            val override = overrides[t.id]
+            val roleCat = "መምህራን"
+            val rec = records[t.id] ?: StaffSessionRecord()
+            val activeStatus = if (isEntry) rec.entryStatus else rec.exitStatus
+            val activeTime = if (isEntry) rec.entryTime else rec.exitTime
+            val activeRemarks = if (isEntry) rec.entryRemarks else rec.exitRemarks
+
             list.add(
                 StaffAttendanceItem(
                     id = t.id,
@@ -613,16 +768,34 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                     department = t.department,
                     phone = t.phone,
                     isTeacher = true,
-                    status = override?.first ?: "ተገኝቷል",
-                    checkInTime = "02:15 ጧት",
-                    remarks = override?.second ?: "በሰዓቱ ተገኝቷል"
+                    roleCategory = roleCat,
+                    entryStatus = rec.entryStatus,
+                    entryTime = rec.entryTime,
+                    entryRemarks = rec.entryRemarks,
+                    exitStatus = rec.exitStatus,
+                    exitTime = rec.exitTime,
+                    exitRemarks = rec.exitRemarks,
+                    morningStatus = rec.entryStatus,
+                    morningTime = rec.entryTime,
+                    morningRemarks = rec.entryRemarks,
+                    afternoonStatus = rec.exitStatus,
+                    afternoonTime = rec.exitTime,
+                    afternoonRemarks = rec.exitRemarks,
+                    status = activeStatus,
+                    checkInTime = activeTime,
+                    remarks = activeRemarks
                 )
             )
         }
         // Staff
         staffList.forEach { s ->
             val staffKey = -(s.id) // Negative ID to prevent collision with teachers
-            val override = overrides[staffKey]
+            val roleCat = getStaffRoleCategory(false, s.role, s.department)
+            val rec = records[staffKey] ?: StaffSessionRecord()
+            val activeStatus = if (isEntry) rec.entryStatus else rec.exitStatus
+            val activeTime = if (isEntry) rec.entryTime else rec.exitTime
+            val activeRemarks = if (isEntry) rec.entryRemarks else rec.exitRemarks
+
             list.add(
                 StaffAttendanceItem(
                     id = staffKey,
@@ -631,27 +804,172 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                     department = s.department,
                     phone = s.phone,
                     isTeacher = false,
-                    status = override?.first ?: "ተገኝቷል",
-                    checkInTime = "02:10 ጧት",
-                    remarks = override?.second ?: "በሰዓቱ ተገኝቷል"
+                    roleCategory = roleCat,
+                    entryStatus = rec.entryStatus,
+                    entryTime = rec.entryTime,
+                    entryRemarks = rec.entryRemarks,
+                    exitStatus = rec.exitStatus,
+                    exitTime = rec.exitTime,
+                    exitRemarks = rec.exitRemarks,
+                    morningStatus = rec.entryStatus,
+                    morningTime = rec.entryTime,
+                    morningRemarks = rec.entryRemarks,
+                    afternoonStatus = rec.exitStatus,
+                    afternoonTime = rec.exitTime,
+                    afternoonRemarks = rec.exitRemarks,
+                    status = activeStatus,
+                    checkInTime = activeTime,
+                    remarks = activeRemarks
                 )
             )
         }
         list
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    fun updateStaffAttendance(id: Long, newStatus: String, remarks: String = "") {
-        val current = _staffAttendanceOverrides.value.toMutableMap()
-        current[id] = Pair(newStatus, remarks.ifBlank {
-            when (newStatus) {
-                "ተገኝቷል" -> "በሰዓቱ ተገኝቷል"
-                "ቀርቷል" -> "ያልተገኘ"
-                "አርፍዷል" -> "15 ደቂቃ ዘግይቷል"
-                "በፍቃድ" -> "የህመም/የስራ ፍቃድ"
-                else -> ""
+    /**
+     * Converts current time into Ethiopian 12-hour clock (6-hour difference)
+     */
+    fun getNowEthiopianTime(isEntry: Boolean): String {
+        val cal = java.util.Calendar.getInstance()
+        val hour24 = cal.get(java.util.Calendar.HOUR_OF_DAY)
+        val min = cal.get(java.util.Calendar.MINUTE)
+        val ethHourRaw = (hour24 - 6 + 24) % 24
+        val ethHour = when (val h = ethHourRaw % 12) {
+            0 -> 12
+            else -> h
+        }
+        val period = if (isEntry) "ጧት" else "ከሰዓት"
+        return String.format(java.util.Locale.US, "%02d:%02d %s", ethHour, min, period)
+    }
+
+    /**
+     * Parses time string like "01:51 ጧት" or "09:40 ከሰዓት" into minutes of the day/period.
+     */
+    private fun parseTimeToMinutes(timeStr: String): Int {
+        val clean = timeStr.replace("ጧት", "").replace("ከሰዓት", "").trim()
+        val parts = clean.split(":")
+        val h = parts.getOrNull(0)?.toIntOrNull() ?: 0
+        val m = parts.getOrNull(1)?.toIntOrNull() ?: 0
+        val normalizedH = if (h == 12) 0 else h
+        return normalizedH * 60 + m
+    }
+
+    /**
+     * Evaluates attendance status based on the specific staff category schedule:
+     * - የመግቢያ (Check-In):
+     *   * Within or before role's entryEnd -> "ተገኝቷል" ("በሰዓቱ ገብተዋል")
+     *   * After role's entryEnd -> "አርፍዷል" ("ከ... በኋላ አርፍደዋል")
+     * - የመውጫ (Check-Out):
+     *   * Before role's exitStart -> "ቀድሞ ወጥቷል" ("ከ... በፊት ቀድመው ወጥተዋል")
+     *   * Between exitStart and exitEnd -> "ተገኝቷል" ("በሰዓቱ ወጥተዋል")
+     *   * After role's exitEnd -> "ዘግይቶ ወጥቷል" ("የትርፍ ሰዓት/ከ... በኋላ ወጥተዋል")
+     */
+    fun evaluateAttendanceStatus(
+        timeStr: String,
+        session: StaffAttendanceSession,
+        roleCategory: String
+    ): Pair<String, String> {
+        val sched = getRoleSchedule(roleCategory)
+        val isEntry = session == StaffAttendanceSession.CHECK_IN
+        val timeMin = parseTimeToMinutes(timeStr)
+
+        return if (isEntry) {
+            val entryEndMin = parseTimeToMinutes(sched.entryEnd)
+            if (timeMin <= entryEndMin) {
+                Pair("ተገኝቷል", "በሰዓቱ ገብተዋል (${sched.entryStart} - ${sched.entryEnd})")
+            } else {
+                Pair("አርፍዷል", "ከ${sched.entryEnd} በኋላ አርፍደዋል")
             }
-        })
-        _staffAttendanceOverrides.value = current
+        } else {
+            val exitStartMin = parseTimeToMinutes(sched.exitStart)
+            val exitEndMin = parseTimeToMinutes(sched.exitEnd)
+            when {
+                timeMin < exitStartMin -> {
+                    Pair("ቀድሞ ወጥቷል", "ከ${sched.exitStart} በፊት ቀድመው ወጥተዋል")
+                }
+                timeMin <= exitEndMin -> {
+                    Pair("ተገኝቷል", "በሰዓቱ ወጥተዋል (${sched.exitStart} - ${sched.exitEnd})")
+                }
+                else -> {
+                    Pair("ዘግይቶ ወጥቷል", "የትርፍ ሰዓት/ከ${sched.exitEnd} በኋላ ወጥተዋል")
+                }
+            }
+        }
+    }
+
+    /**
+     * Auto tick action: When Vice Principal / Admin ticks attendance,
+     * records EXACT current time automatically and checks against the staff member's role schedule.
+     */
+    fun autoTickStaffAttendance(id: Long, session: StaffAttendanceSession, statusOverride: String? = null) {
+        val isEntry = session == StaffAttendanceSession.CHECK_IN
+        val currentTime = getNowEthiopianTime(isEntry)
+
+        val currentItem = staffAttendanceList.value.firstOrNull { it.id == id }
+        val roleCat = currentItem?.roleCategory ?: "መምህራን"
+
+        val (calcStatus, defaultRemarks) = evaluateAttendanceStatus(currentTime, session, roleCat)
+        val finalStatus = statusOverride ?: calcStatus
+        val finalRemarks = when (finalStatus) {
+            "ተገኝቷል" -> defaultRemarks
+            "ቀርቷል" -> "ያለፈቃድ የቀረ"
+            "አርፍዷል" -> if (defaultRemarks.contains("አርፍደዋል")) defaultRemarks else "ዘግይቶ መግባት ተመዝግቧል"
+            "ቀድሞ ወጥቷል" -> defaultRemarks
+            "ዘግይቶ ወጥቷል" -> defaultRemarks
+            "በፍቃድ" -> "የህመም ወይም የስራ ፍቃድ"
+            else -> defaultRemarks
+        }
+
+        saveStaffAttendanceManual(
+            id = id,
+            session = session,
+            status = finalStatus,
+            time = currentTime,
+            remarks = finalRemarks
+        )
+    }
+
+    /**
+     * Manual edit action: For correcting forgotten records or manual adjustments.
+     */
+    fun saveStaffAttendanceManual(
+        id: Long,
+        session: StaffAttendanceSession,
+        status: String,
+        time: String,
+        remarks: String
+    ) {
+        val map = _staffAttendanceRecords.value.toMutableMap()
+        val current = map[id] ?: StaffSessionRecord()
+        val isEntry = session == StaffAttendanceSession.CHECK_IN
+        val formattedTime = time.ifBlank {
+            if (isEntry) "01:40 ጧት" else "09:25 ከሰዓት"
+        }
+
+        map[id] = if (isEntry) {
+            current.copy(
+                entryStatus = status,
+                entryTime = formattedTime,
+                entryRemarks = remarks.ifBlank { "በም/ር ተስተካክሎ ተመዝግቧል" },
+                morningStatus = status,
+                morningTime = formattedTime,
+                morningRemarks = remarks.ifBlank { "በም/ር ተስተካክሎ ተመዝግቧል" }
+            )
+        } else {
+            current.copy(
+                exitStatus = status,
+                exitTime = formattedTime,
+                exitRemarks = remarks.ifBlank { "በም/ር ተስተካክሎ ተመዝግቧል" },
+                afternoonStatus = status,
+                afternoonTime = formattedTime,
+                afternoonRemarks = remarks.ifBlank { "በም/ር ተስተካክሎ ተመዝግቧል" }
+            )
+        }
+        _staffAttendanceRecords.value = map
+    }
+
+    fun updateStaffAttendance(id: Long, newStatus: String, remarks: String = "") {
+        autoTickStaffAttendance(id, currentStaffAttendanceSession.value, newStatus)
     }
 
     // Login Form State

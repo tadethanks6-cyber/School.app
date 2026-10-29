@@ -620,7 +620,7 @@
 
         <div id="staffAttendanceAuthorizedContent">
           <!-- Executive Staff Header & Metrics -->
-          <div class="panel-card" style="margin-bottom:1rem; border-left:4px solid #0284C7; background:#F0F9FF;">
+          <div class="panel-card" style="margin-bottom:0.75rem; border-left:4px solid #0284C7; background:#F0F9FF;">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
               <div>
                 <h3 style="color:#0369A1; font-size:1.1rem; margin-bottom:0.25rem;">👩‍🏫 የመምህራን እና የሰራተኞች የክትትል መዝገብ</h3>
@@ -629,6 +629,31 @@
                 </p>
               </div>
               <span class="badge badge-primary" style="background:#0284C7; color:white;">የስራ ሰዓት፡ 02:00 ጧት - 10:30 ከሰዓት</span>
+            </div>
+          </div>
+
+          <!-- Dual Shift Switcher: የመግቢያ (Check-In) vs የመውጫ (Check-Out) -->
+          <div class="panel-card" style="padding:0.75rem 1rem; margin-bottom:0.75rem; background:white;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.5rem;">
+              <div style="font-size:0.85rem; font-weight:700; color:var(--primary);">
+                🕒 የዕለቱን የክትትል ክፍለ-ጊዜ ይምረጡ (Select Shift):
+              </div>
+              <button type="button" class="btn-secondary" style="padding:0.35rem 0.75rem; font-size:0.8rem; font-weight:700; border-color:#B45309; color:#78350F; background:#FEF3C7; border-radius:6px;" onclick="openRoleScheduleModalWeb()">
+                ⚙️ የሰዓት ገደብ አዋቅር (Shift Schedules)
+              </button>
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button id="btnWebShiftMorning" type="button" class="btn-primary" style="flex:1; min-width:200px; padding:0.55rem 0.8rem; text-align:left; background:var(--primary); color:white;" onclick="setStaffAttendanceWebShift('morning')">
+                <strong>🚪 የመግቢያ አቴንዳንስ (Check-In)</strong><br>
+                <small style="opacity:0.9;">እንደየሰራተኛው የስራ ሰዓት ገደብ</small>
+              </button>
+              <button id="btnWebShiftAfternoon" type="button" class="btn-secondary" style="flex:1; min-width:200px; padding:0.55rem 0.8rem; text-align:left; background:#F1F5F9; color:#334155;" onclick="setStaffAttendanceWebShift('afternoon')">
+                <strong>🚶‍♂️ የመውጫ አቴንዳንስ (Check-Out)</strong><br>
+                <small style="opacity:0.9;">እንደየሰራተኛው የስራ ሰዓት ገደብ</small>
+              </button>
+            </div>
+            <div id="webShiftNoticeBanner" style="margin-top:0.6rem; padding:0.45rem 0.75rem; border-radius:6px; background:#FEF3C7; color:#92400E; font-size:0.8rem; font-weight:600; display:flex; align-items:center; gap:0.4rem;">
+              <span>⚡ የመግቢያ አቴንዳንስ፦ ም/ር ወይም አድሚን ቲክ ሲያደርግ የአሁን ሰዓት ይመዘገባል • እንደ ሰራተኛው የስራ መደብ ገደብ ተገኝቷል/አርፍዷል ይወሰናል</span>
             </div>
           </div>
 
@@ -681,7 +706,8 @@
                   <tr>
                     <th>ሰራተኛ / መምህር</th>
                     <th>የስራ ድርሻ / ዲፓርትመንት</th>
-                    <th>የገቡበት ሰዓት</th>
+                    <th>የ2ቱ ክፍለ-ጊዜ ክትትል (ጧት & ከሰዓት)</th>
+                    <th>የነቃው ክፍለ-ጊዜ ሰዓት</th>
                     <th>ሁኔታ (Status)</th>
                     <th>ማስታወሻ (Remarks)</th>
                     <th>አቴንዳንስ መዝግብ (ምክትል/አድሚን)</th>
@@ -1438,6 +1464,138 @@
         <button type="button" class="btn-primary" onclick="window.print()">🖨️ ካርድ አትም (Print)</button>
       </div>
     </div>
+  <!-- Modal: Staff Attendance Edit (እረስቶት ዘግይቶ ቲክ ለማድረግ እና ሰዓት ለማረም) -->
+  <div id="staffAttendanceEditModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 480px; width: 95%;">
+      <div class="modal-title">⏱️ የሰራተኛ አቴንዳንስ እና ሰዓት ማረሚያ</div>
+      <div class="modal-subtitle">ምክትል ር/መምህር ወይም አድሚን በሰዓቱ ሳያደርጉ ቀርተው ቆይተው ሲመዘግቡ ትክክለኛውን ሰዓት እና ሁኔታ እዚህ ማስተካከል ይችላሉ።</div>
+
+      <input type="hidden" id="editStaffAttId" value="">
+
+      <div class="form-group">
+        <label>የሰራተኛ / የመምህር ስም</label>
+        <div id="editStaffAttNameDisplay" style="font-weight:700; color:var(--primary); padding:0.4rem 0.6rem; background:#F1F5F9; border-radius:6px;">-</div>
+      </div>
+
+      <div class="form-group">
+        <label>የክትትል ክፍለ-ጊዜ (Shift)</label>
+        <div style="display:flex; gap:0.5rem;">
+          <button type="button" id="btnEditShiftMorning" class="btn-primary" style="flex:1;" onclick="setEditModalShift('morning')">🚪 የመግቢያ (Check-In)</button>
+          <button type="button" id="btnEditShiftAfternoon" class="btn-secondary" style="flex:1;" onclick="setEditModalShift('afternoon')">🚶‍♂️ የመውጫ (Check-Out)</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <label id="editStaffAttTimeLabel">የገቡበት ሰዓት (Check-in Time)</label>
+          <button type="button" class="btn-secondary" style="padding:2px 6px; font-size:0.7rem; border-color:#0284C7; color:#0369A1;" onclick="setEditModalCurrentTime()">🕒 የአሁን ሰዓት አድርግ</button>
+        </div>
+        <input type="text" id="editStaffAttTime" placeholder="ምሳሌ፡ 01:42 ጧት ወይም 09:25 ከሰዓት" style="margin-top:0.25rem;">
+      </div>
+
+      <div class="form-group">
+        <label>ሁኔታ (Status)</label>
+        <select id="editStaffAttStatus" onchange="onEditModalStatusChange()">
+          <option value="ተገኝቷል">✓ ተገኝቷል / በሰዓቱ</option>
+          <option value="አርፍዷል">⏱ አርፍዷል (Late Check-in)</option>
+          <option value="ቀድሞ ወጥቷል">🏃‍♂️ ቀድሞ ወጥቷል (Early Departure)</option>
+          <option value="ዘግይቶ ወጥቷል">⌛ ዘግይቶ ወጥቷል (Overtime Departure)</option>
+          <option value="ቀርቷል">✕ ቀርቷል (Absent)</option>
+          <option value="ፍቃድ">📝 በፍቃድ (On Leave)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>ማስታወሻ / ምክንያት (Remarks)</label>
+        <input type="text" id="editStaffAttRemarks" placeholder="ምሳሌ፡ ዘግይቶ በምክትል ር/መ ተመዝግቧል">
+      </div>
+
+      <div class="modal-actions" style="margin-top:1rem;">
+        <button type="button" class="btn-secondary" onclick="closeStaffAttEditModal()">ሰርዝ (Cancel)</button>
+        <button type="button" class="btn-primary" onclick="saveStaffAttEditModal()">💾 አስቀምጥ & አድስ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Role Shift Schedule Configuration (ተለዋዋጭ የሰዓት ገደብ ማዋቀሪያ) -->
+  <div id="roleScheduleModalWeb" class="modal-overlay">
+    <div class="modal-box" style="max-width: 620px; width: 95%;">
+      <div class="modal-title" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>⚙️ የሰራተኞች የስራ ሰዓት ገደብ ማዋቀሪያ</span>
+        <span class="badge badge-primary">ምክትል / አድሚን</span>
+      </div>
+      <div class="modal-subtitle">
+        ለመምህራን፣ ለፅዳት፣ ለጥበቃ እና ለሌሎች ሰራተኞች የመግቢያ እና የመውጫ ሰዓት ገደቦችን እዚህ ማስተካከል ይችላሉ።
+      </div>
+
+      <!-- Category Filter Tabs -->
+      <div style="display:flex; gap:0.35rem; flex-wrap:wrap; margin-bottom:1rem; padding:4px; background:#F1F5F9; border-radius:8px;">
+        <button type="button" class="btn-secondary role-sched-tab active" style="flex:1; font-size:0.75rem; padding:0.35rem 0.5rem; background:var(--primary); color:white;" onclick="selectRoleScheduleTabWeb('መምህራን', this)">መምህራን</button>
+        <button type="button" class="btn-secondary role-sched-tab" style="flex:1; font-size:0.75rem; padding:0.35rem 0.5rem;" onclick="selectRoleScheduleTabWeb('ፅዳት ሰራተኞች', this)">ፅዳት</button>
+        <button type="button" class="btn-secondary role-sched-tab" style="flex:1; font-size:0.75rem; padding:0.35rem 0.5rem;" onclick="selectRoleScheduleTabWeb('ደህንነትና ጥበቃ', this)">ደህንነትና ጥበቃ</button>
+        <button type="button" class="btn-secondary role-sched-tab" style="flex:1; font-size:0.75rem; padding:0.35rem 0.5rem;" onclick="selectRoleScheduleTabWeb('አስተዳደርና ፋይናንስ', this)">አስተዳደር</button>
+        <button type="button" class="btn-secondary role-sched-tab" style="flex:1; font-size:0.75rem; padding:0.35rem 0.5rem;" onclick="selectRoleScheduleTabWeb('ሌሎች ሰራተኞች', this)">ሌሎች</button>
+      </div>
+
+      <input type="hidden" id="editSchedCategory" value="መምህራን">
+
+      <!-- Entry window box -->
+      <div style="background:#FEF3C7; border:1px solid #FDE68A; border-radius:8px; padding:0.75rem; margin-bottom:0.75rem;">
+        <div style="font-weight:700; color:#92400E; font-size:0.85rem; margin-bottom:0.4rem;">
+          🚪 የመግቢያ ሰዓት ገደብ (Check-In Window)
+        </div>
+        <div style="display:flex; gap:0.5rem;">
+          <div style="flex:1;">
+            <label style="font-size:0.75rem; color:#92400E;">መጀመሪያ ሰዓት</label>
+            <input type="text" id="editSchedEntryStart" value="01:30 ጧት" style="margin-top:2px;">
+          </div>
+          <div style="flex:1;">
+            <label style="font-size:0.75rem; color:#92400E;">ገደብ / ማብቂያ ሰዓት</label>
+            <input type="text" id="editSchedEntryEnd" value="01:51 ጧት" style="margin-top:2px;">
+          </div>
+        </div>
+        <div style="font-size:0.72rem; color:#B45309; margin-top:0.3rem;">
+          💡 ከገደቡ ሰዓት በኋላ የገባ ሰራተኛ ሲስተሙ አውቶማቲካሊ እንደ 'አርፍዷል' ይመዘግባል።
+        </div>
+      </div>
+
+      <!-- Exit window box -->
+      <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:0.75rem; margin-bottom:0.75rem;">
+        <div style="font-weight:700; color:#1E40AF; font-size:0.85rem; margin-bottom:0.4rem;">
+          🚶‍♂️ የመውጫ ሰዓት ገደብ (Check-Out Window)
+        </div>
+        <div style="display:flex; gap:0.5rem;">
+          <div style="flex:1;">
+            <label style="font-size:0.75rem; color:#1E40AF;">መጀመሪያ ሰዓት</label>
+            <input type="text" id="editSchedExitStart" value="09:15 ከሰዓት" style="margin-top:2px;">
+          </div>
+          <div style="flex:1;">
+            <label style="font-size:0.75rem; color:#1E40AF;">ገደብ / ማብቂያ ሰዓት</label>
+            <input type="text" id="editSchedExitEnd" value="09:40 ከሰዓት" style="margin-top:2px;">
+          </div>
+        </div>
+        <div style="font-size:0.72rem; color:#1D4ED8; margin-top:0.3rem;">
+          💡 ከመጀመሪያ ሰዓት በፊት የወጣ 'ቀድሞ ወጥቷል'፤ ከማብቂያ ሰዓት በኋላ 'ዘግይቶ ወጥቷል' ይሆናል።
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0.75rem;">
+        <label>የስራ ፈረቃ ማብራሪያ (Description)</label>
+        <input type="text" id="editSchedDescription" value="የመማር ማስተማር መደበኛ ክፍለ ጊዜያት">
+      </div>
+
+      <div id="schedSavedAlert" style="display:none; color:#059669; font-weight:700; font-size:0.8rem; margin-bottom:0.5rem;">
+        ✓ የሰዓት ገደቡ በተሳካ ሁኔታ ተቀምጧል!
+      </div>
+
+      <div class="modal-actions" style="margin-top:1rem; display:flex; justify-content:space-between; align-items:center;">
+        <button type="button" class="btn-secondary" style="font-size:0.75rem;" onclick="resetRoleSchedulesDefaultWeb()">ወደ ነባሪ መልስ (Reset Defaults)</button>
+        <div style="display:flex; gap:0.5rem;">
+          <button type="button" class="btn-secondary" onclick="closeRoleScheduleModalWeb()">ዝጋ (Close)</button>
+          <button type="button" class="btn-primary" onclick="saveRoleScheduleModalWeb()">💾 ለውጡን አስቀምጥ</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <footer>
@@ -1901,22 +2059,183 @@
     // ==========================================
     let currentAttendanceSubMode = 'students';
     let currentStaffAttCategory = 'all';
+    let currentStaffWebShift = 'morning'; // 'morning' (1:30 - 1:51) or 'afternoon' (9:15 - 9:40)
 
     const DEFAULT_STAFF_ATTENDANCE = [
-      { id: 1, name: 'መምህር ዳዊት በቀለ', role: 'የሒሳብ መምህር', dept: 'የተፈጥሮ ሳይንስ', isTeacher: true, status: 'ተገኝቷል', time: '02:15 ጧት', remarks: 'በሰዓቱ ገብተዋል' },
-      { id: 2, name: 'መምህርት ሳራ መኮንን', role: 'የፊዚክስ መምህርት', dept: 'የተፈጥሮ ሳይንስ', isTeacher: true, status: 'ተገኝቷል', time: '02:10 ጧት', remarks: 'በሰዓቱ ገብተዋል' },
-      { id: 3, name: 'መምህር ዮናስ አለሙ', role: 'የእንግሊዝኛ መምህር', dept: 'ቋንቋዎች', isTeacher: true, status: 'ዘግይቷል', time: '02:45 ጧት', remarks: 'የትራፊክ መጨናነቅ' },
-      { id: 4, name: 'መምህርት ቤቴልሔም ግርማ', role: 'የስነ-ዜጋ መምህርት', dept: 'ማህበራዊ ሳይንስ', isTeacher: true, status: 'ተገኝቷል', time: '02:05 ጧት', remarks: 'በሰዓቱ ገብተዋል' },
-      { id: 5, name: 'ወ/ሮ ትዕግስት አስፋው', role: 'ዋና ፀሐፊ', dept: 'አስተዳደርና ፋይናንስ', isTeacher: false, status: 'ተገኝቷል', time: '02:00 ጧት', remarks: 'በሰዓቱ ገብተዋል' },
-      { id: 6, name: 'አቶ ታምራት በቀለ', role: 'የደህንነትና ጥበቃ ኃላፊ', dept: 'ደህንነት', isTeacher: false, status: 'ተገኝቷል', time: '01:30 ጧት', remarks: 'የሌሊት ሺፍት ርክክብ' },
-      { id: 7, name: 'አቶ አበበ ካሳሁን', role: 'የቴክኒክና ጥገና ሰራተኛ', dept: 'አገልግሎትና ጥገና', isTeacher: false, status: 'ፍቃድ', time: '-', remarks: 'የህክምና ፍቃድ' },
-      { id: 8, name: 'ወ/ሮ ሮዛ ሀይሌ', role: 'የካፍቴሪያና ምግብ አዘጋጅ', dept: 'አገልግሎት', isTeacher: false, status: 'ተገኝቷል', time: '01:45 ጧት', remarks: 'በሰዓቱ ገብተዋል' }
+      {
+        id: 1, name: 'መምህር ዳዊት በቀለ', role: 'የሒሳብ መምህር', dept: 'የተፈጥሮ ሳይንስ', isTeacher: true,
+        morningStatus: 'ተገኝቷል', morningTime: '01:42 ጧት', morningRemarks: 'በሰዓቱ ገብተዋል',
+        afternoonStatus: 'ተገኝቷል', afternoonTime: '09:25 ከሰዓት', afternoonRemarks: 'በሰዓቱ ተገኝተዋል'
+      },
+      {
+        id: 2, name: 'መምህርት ሳራ መኮንን', role: 'የፊዚክስ መምህርት', dept: 'የተፈጥሮ ሳይንስ', isTeacher: true,
+        morningStatus: 'ተገኝቷል', morningTime: '01:38 ጧት', morningRemarks: 'በሰዓቱ ገብተዋል',
+        afternoonStatus: 'ተገኝቷል', afternoonTime: '09:20 ከሰዓት', afternoonRemarks: 'በሰዓቱ ተገኝተዋል'
+      },
+      {
+        id: 3, name: 'መምህር ዮናስ አለሙ', role: 'የእንግሊዝኛ መምህር', dept: 'ቋንቋዎች', isTeacher: true,
+        morningStatus: 'አርፍዷል', morningTime: '01:56 ጧት', morningRemarks: 'የትራፊክ መጨናነቅ',
+        afternoonStatus: 'ተገኝቷል', afternoonTime: '09:30 ከሰዓት', afternoonRemarks: 'በሰዓቱ ተገኝተዋል'
+      },
+      {
+        id: 4, name: 'መምህርት ቤቴልሔም ግርማ', role: 'የስነ-ዜጋ መምህርት', dept: 'ማህበራዊ ሳይንስ', isTeacher: true,
+        morningStatus: 'ተገኝቷል', morningTime: '01:45 ጧት', morningRemarks: 'በሰዓቱ ገብተዋል',
+        afternoonStatus: 'ተገኝቷል', afternoonTime: '09:22 ከሰዓት', afternoonRemarks: 'በሰዓቱ ተገኝተዋል'
+      },
+      {
+        id: 5, name: 'ወ/ሮ ትዕግስት አስፋው', role: 'ዋና ፀሐፊ', dept: 'አስተዳደርና ፋይናንስ', isTeacher: false,
+        morningStatus: 'ተገኝቷል', morningTime: '01:35 ጧት', morningRemarks: 'በሰዓቱ ገብተዋል',
+        afternoonStatus: 'ተገኝቷል', afternoonTime: '09:18 ከሰዓት', afternoonRemarks: 'በሰዓቱ ተገኝተዋል'
+      },
+      {
+        id: 6, name: 'አቶ ታምራት በቀለ', role: 'የደህንነትና ጥበቃ ኃላፊ', dept: 'ደህንነት', isTeacher: false,
+        morningStatus: 'ተገኝቷል', morningTime: '01:25 ጧት', morningRemarks: 'የሌሊት ሺፍት ርክክብ',
+        afternoonStatus: 'ተገኝቷል', afternoonTime: '09:15 ከሰዓት', afternoonRemarks: 'በሰዓቱ ተገኝተዋል'
+      },
+      {
+        id: 7, name: 'አቶ አበበ ካሳሁን', role: 'የቴክኒክና ጥገና ሰራተኛ', dept: 'አገልግሎትና ጥገና', isTeacher: false,
+        morningStatus: 'ፍቃድ', morningTime: '-', morningRemarks: 'የህክምና ፍቃድ',
+        afternoonStatus: 'ፍቃድ', afternoonTime: '-', afternoonRemarks: 'የህክምና ፍቃድ'
+      },
+      {
+        id: 8, name: 'ወ/ሮ ሮዛ ሀይሌ', role: 'የካፍቴሪያና ምግብ አዘጋጅ', dept: 'አገልግሎት', isTeacher: false,
+        morningStatus: 'ተገኝቷል', morningTime: '01:30 ጧት', morningRemarks: 'በሰዓቱ ገብተዋል',
+        afternoonStatus: 'ተገኝቷል', afternoonTime: '09:20 ከሰዓት', afternoonRemarks: 'በሰዓቱ ተገኝተዋል'
+      }
     ];
 
     let staffAttendanceListWeb = JSON.parse(localStorage.getItem('dilijent_staff_attendance')) || DEFAULT_STAFF_ATTENDANCE;
+    // Upgrade existing stored records if missing dual-shift fields
+    staffAttendanceListWeb = staffAttendanceListWeb.map(item => {
+      if (!item.morningStatus) {
+        return {
+          ...item,
+          morningStatus: item.status || 'ተገኝቷል',
+          morningTime: item.time || '01:42 ጧት',
+          morningRemarks: item.remarks || 'በሰዓቱ ገብተዋል',
+          afternoonStatus: item.status || 'ተገኝቷል',
+          afternoonTime: '09:25 ከሰዓት',
+          afternoonRemarks: 'በሰዓቱ ተገኝተዋል'
+        };
+      }
+      return item;
+    });
 
     function saveStaffAttendanceWeb() {
       localStorage.setItem('dilijent_staff_attendance', JSON.stringify(staffAttendanceListWeb));
+    }
+
+    // Default Staff Role Schedules (የስራ ሰዓት ገደብ)
+    const DEFAULT_STAFF_ROLE_SCHEDULES = [
+      { roleCategory: "መምህራን", entryStart: "01:30 ጧት", entryEnd: "01:51 ጧት", exitStart: "09:15 ከሰዓት", exitEnd: "09:40 ከሰዓት", description: "የመማር ማስተማር መደበኛ ክፍለ ጊዜያት" },
+      { roleCategory: "ፅዳት ሰራተኞች", entryStart: "12:30 ጧት", entryEnd: "01:15 ጧት", exitStart: "08:30 ከሰዓት", exitEnd: "09:00 ከሰዓት", description: "የትምህርት ቤቱን ግቢና ክፍሎች ቀድመው ማዘጋጀት" },
+      { roleCategory: "ደህንነትና ጥበቃ", entryStart: "12:00 ጧት", entryEnd: "12:45 ጧት", exitStart: "11:30 ከሰዓት", exitEnd: "12:00 ከሰዓት", description: "የበርና የግቢ ጥበቃ የስራ ፈረቃ" },
+      { roleCategory: "አስተዳደርና ፋይናንስ", entryStart: "01:45 ጧት", entryEnd: "02:00 ጧት", exitStart: "10:00 ከሰዓት", exitEnd: "10:30 ከሰዓት", description: "የጽህፈት ቤት፣ የሂሳብና የሰው ኃይል ሰዓት" },
+      { roleCategory: "ሌሎች ሰራተኞች", entryStart: "01:30 ጧት", entryEnd: "02:00 ጧት", exitStart: "09:00 ከሰዓት", exitEnd: "09:30 ከሰዓት", description: "አጠቃላይ ድጋፍ ሰጪ ሰራተኞች" }
+    ];
+
+    let staffRoleSchedulesWeb = JSON.parse(localStorage.getItem('dilijent_role_schedules') || 'null') || DEFAULT_STAFF_ROLE_SCHEDULES;
+
+    function saveStaffRoleSchedulesWeb() {
+      localStorage.setItem('dilijent_role_schedules', JSON.stringify(staffRoleSchedulesWeb));
+    }
+
+    function getStaffRoleCategoryWeb(isTeacher, role, dept) {
+      if (isTeacher) return "መምህራን";
+      const combined = ((role || '') + ' ' + (dept || '')).toLowerCase();
+      if (combined.includes('ፅዳት') || combined.includes('cleaner')) return "ፅዳት ሰራተኞች";
+      if (combined.includes('ጥበቃ') || combined.includes('ደህንነት') || combined.includes('guard') || combined.includes('security')) return "ደህንነትና ጥበቃ";
+      if (combined.includes('አስተዳደር') || combined.includes('ፋይናንስ') || combined.includes('ሂሳብ') || combined.includes('ጸሐፊ') || combined.includes('መዝጋቢ') || combined.includes('admin') || combined.includes('finance')) return "አስተዳደርና ፋይናንስ";
+      return "ሌሎች ሰራተኞች";
+    }
+
+    function getRoleScheduleWeb(category) {
+      return staffRoleSchedulesWeb.find(s => s.roleCategory === category) || DEFAULT_STAFF_ROLE_SCHEDULES[0];
+    }
+
+    function parseTimeToMinutesWeb(timeStr) {
+      const clean = (timeStr || '').replace('ጧት', '').replace('ከሰዓት', '').trim();
+      const parts = clean.split(':');
+      const h = parseInt(parts[0], 10) || 0;
+      const m = parseInt(parts[1], 10) || 0;
+      const normH = (h === 12) ? 0 : h;
+      return normH * 60 + m;
+    }
+
+    /**
+     * Real-time Ethiopian 12-hour clock (6 hours shifted)
+     */
+    function getEthiopianClockTime(isEntry) {
+      const now = new Date();
+      const h24 = now.getHours();
+      const m = now.getMinutes();
+      const ethHourRaw = (h24 - 6 + 24) % 24;
+      let ethHour = ethHourRaw % 12;
+      if (ethHour === 0) ethHour = 12;
+      const padM = m < 10 ? '0' + m : m;
+      const padH = ethHour < 10 ? '0' + ethHour : ethHour;
+      const period = isEntry ? 'ጧት' : 'ከሰዓት';
+      return `${padH}:${padM} ${period}`;
+    }
+
+    /**
+     * Evaluates attendance against official windows per staff category:
+     * - የመግቢያ (Check-In):
+     *   * Within or before role's entryEnd -> "ተገኝቷል" ("በሰዓቱ ገብተዋል")
+     *   * After role's entryEnd -> "አርፍዷል" ("ከ... በኋላ አርፍደዋል")
+     * - የመውጫ (Check-Out):
+     *   * Before role's exitStart -> "ቀድሞ ወጥቷል" ("ከ... በፊት ቀድመው ወጥተዋል")
+     *   * Between exitStart and exitEnd -> "ተገኝቷል" ("በሰዓቱ ወጥተዋል")
+     *   * After role's exitEnd -> "ዘግይቶ ወጥቷል" ("የትርፍ ሰዓት/ከ... በኋላ ወጥተዋል")
+     */
+    function evaluateStaffAttendanceTime(timeStr, isEntry, roleCategory) {
+      const sched = getRoleScheduleWeb(roleCategory);
+      const timeMin = parseTimeToMinutesWeb(timeStr);
+
+      if (isEntry) {
+        const entryEndMin = parseTimeToMinutesWeb(sched.entryEnd);
+        if (timeMin <= entryEndMin) {
+          return { status: 'ተገኝቷል', remarks: `በሰዓቱ ገብተዋል (${sched.entryStart} - ${sched.entryEnd})` };
+        } else {
+          return { status: 'አርፍዷል', remarks: `ከ${sched.entryEnd} በኋላ አርፍደዋል` };
+        }
+      } else {
+        const exitStartMin = parseTimeToMinutesWeb(sched.exitStart);
+        const exitEndMin = parseTimeToMinutesWeb(sched.exitEnd);
+        if (timeMin < exitStartMin) {
+          return { status: 'ቀድሞ ወጥቷል', remarks: `ከ${sched.exitStart} በፊት ቀድመው ወጥተዋል` };
+        } else if (timeMin <= exitEndMin) {
+          return { status: 'ተገኝቷል', remarks: `በሰዓቱ ወጥተዋል (${sched.exitStart} - ${sched.exitEnd})` };
+        } else {
+          return { status: 'ዘግይቶ ወጥቷል', remarks: `የትርፍ ሰዓት/ከ${sched.exitEnd} በኋላ ወጥተዋል` };
+        }
+      }
+    }
+
+    function setStaffAttendanceWebShift(shift) {
+      currentStaffWebShift = shift;
+      const btnM = document.getElementById('btnWebShiftMorning');
+      const btnA = document.getElementById('btnWebShiftAfternoon');
+      const banner = document.getElementById('webShiftNoticeBanner');
+
+      if (shift === 'morning' || shift === 'entry') {
+        if (btnM) { btnM.className = 'btn-primary'; btnM.style.background = 'var(--primary)'; btnM.style.color = 'white'; }
+        if (btnA) { btnA.className = 'btn-secondary'; btnA.style.background = '#F1F5F9'; btnA.style.color = '#334155'; }
+        if (banner) {
+          banner.style.background = '#FEF3C7';
+          banner.style.color = '#92400E';
+          banner.innerHTML = '<span>⚡ የመግቢያ አቴንዳንስ (Check-In)፦ ም/ር ወይም አድሚን ቲክ ሲያደርግ የአሁን ሰዓት ይመዘገባል • እንደየስራ መደቡ ገደብ ተገኝቷል/አርፍዷል ይወሰናል</span>';
+        }
+      } else {
+        if (btnM) { btnM.className = 'btn-secondary'; btnM.style.background = '#F1F5F9'; btnM.style.color = '#334155'; }
+        if (btnA) { btnA.className = 'btn-primary'; btnA.style.background = 'var(--primary)'; btnA.style.color = 'white'; }
+        if (banner) {
+          banner.style.background = '#EFF6FF';
+          banner.style.color = '#1E40AF';
+          banner.innerHTML = '<span>⚡ የመውጫ አቴንዳንስ (Check-Out)፦ ም/ር ወይም አድሚን ቲክ ሲያደርግ የአሁን ሰዓት ይመዘገባል • እንደየስራ መደቡ ገደብ በሰዓቱ/ቀድሞ/ዘግይቶ መውጣት ይወሰናል</span>';
+        }
+      }
+      renderStaffAttendanceWeb();
     }
 
     function setAttendanceSubMode(mode) {
@@ -1976,12 +2295,14 @@
       if (restrictedBanner) restrictedBanner.style.display = 'none';
       if (authorizedContent) authorizedContent.style.display = 'block';
 
-      // Update counters
+      const isMorning = currentStaffWebShift === 'morning';
+
+      // Update counters based on active shift
       const total = staffAttendanceListWeb.length;
-      const present = staffAttendanceListWeb.filter(s => s.status === 'ተገኝቷል').length;
-      const absent = staffAttendanceListWeb.filter(s => s.status === 'ቀርቷል').length;
-      const late = staffAttendanceListWeb.filter(s => s.status === 'ዘግይቷል').length;
-      const leave = staffAttendanceListWeb.filter(s => s.status === 'ፍቃድ').length;
+      const present = staffAttendanceListWeb.filter(s => (isMorning ? s.morningStatus : s.afternoonStatus) === 'ተገኝቷል').length;
+      const absent = staffAttendanceListWeb.filter(s => (isMorning ? s.morningStatus : s.afternoonStatus) === 'ቀርቷል').length;
+      const late = staffAttendanceListWeb.filter(s => (isMorning ? s.morningStatus : s.afternoonStatus) === 'አርፍዷል').length;
+      const leave = staffAttendanceListWeb.filter(s => (isMorning ? s.morningStatus : s.afternoonStatus) === 'ፍቃድ').length;
 
       const elTotal = document.getElementById('staffAttStatTotal');
       const elPresent = document.getElementById('staffAttStatPresent');
@@ -2014,7 +2335,7 @@
       if (filtered.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="6" style="text-align:center; padding:1.5rem; color:#64748B;">
+            <td colspan="7" style="text-align:center; padding:1.5rem; color:#64748B;">
               ምንም የተገኘ ሰራተኛ የለም (No staff found)
             </td>
           </tr>
@@ -2023,36 +2344,66 @@
       }
 
       tbody.innerHTML = filtered.map(item => {
+        const roleCat = getStaffRoleCategoryWeb(item.isTeacher, item.role, item.dept);
+        const sched = getRoleScheduleWeb(roleCat);
+
+        const curStatus = isMorning ? item.morningStatus : item.afternoonStatus;
+        const curTime = isMorning ? item.morningTime : item.afternoonTime;
+        const curRemarks = isMorning ? item.morningRemarks : item.afternoonRemarks;
+
         let badgeClass = 'badge-success';
-        if (item.status === 'ቀርቷል') badgeClass = 'badge-danger';
-        else if (item.status === 'ዘግይቷል') badgeClass = 'badge-warning';
-        else if (item.status === 'ፍቃድ') badgeClass = 'badge-primary';
+        if (curStatus === 'ቀርቷል') badgeClass = 'badge-danger';
+        else if (curStatus === 'አርፍዷል' || curStatus === 'ቀድሞ ወጥቷል') badgeClass = 'badge-warning';
+        else if (curStatus === 'ዘግይቶ ወጥቷል') badgeClass = 'badge-primary';
+        else if (curStatus === 'ፍቃድ') badgeClass = 'badge-primary';
+
+        const actionButtons = isMorning ? `
+          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#10B981; color:#065F46; background:#ECFDF5;" title="በሰዓቱ ገብቷል" onclick="autoTickStaffAttendanceWeb(${item.id}, 'ተገኝቷል')">✓ በሰዓቱ ገብቷል</button>
+          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#F59E0B; color:#92400E; background:#FFFBEB;" onclick="autoTickStaffAttendanceWeb(${item.id}, 'አርፍዷል')">⏱ አርፍዷል</button>
+          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#EF4444; color:#991B1B; background:#FEF2F2;" onclick="autoTickStaffAttendanceWeb(${item.id}, 'ቀርቷል')">✕ ቀርቷል</button>
+          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#8B5CF6; color:#5B21B6; background:#F5F3FF;" onclick="autoTickStaffAttendanceWeb(${item.id}, 'ፍቃድ')">📝 ፍቃድ</button>
+          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#0284C7; color:#0369A1; background:#E0F2FE; font-weight:700;" onclick="openStaffAttEditModal(${item.id})">✏️ ሰዓት አርም</button>
+        ` : `
+          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#10B981; color:#065F46; background:#ECFDF5;" title="በሰዓቱ ወጥቷል" onclick="autoTickStaffAttendanceWeb(${item.id}, 'ተገኝቷል')">✓ በሰዓቱ ወጥቷል</button>
+          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#F59E0B; color:#92400E; background:#FFFBEB;" onclick="autoTickStaffAttendanceWeb(${item.id}, 'ቀድሞ ወጥቷል')">🏃‍♂️ ቀድሞ ወጥቷል</button>
+          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#3B82F6; color:#1D4ED8; background:#EFF6FF;" onclick="autoTickStaffAttendanceWeb(${item.id}, 'ዘግይቶ ወጥቷል')">⌛ ዘግይቶ ወጥቷል</button>
+          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#EF4444; color:#991B1B; background:#FEF2F2;" onclick="autoTickStaffAttendanceWeb(${item.id}, 'ቀርቷል')">✕ ቀርቷል</button>
+          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#0284C7; color:#0369A1; background:#E0F2FE; font-weight:700;" onclick="openStaffAttEditModal(${item.id})">✏️ ሰዓት አርም</button>
+        `;
 
         return `
           <tr style="border-bottom:1px solid #E2E8F0;">
             <td style="padding:8px 10px;">
               <strong>${item.name}</strong>
-              <div style="font-size:0.75rem; color:#64748B;">${item.isTeacher ? '👨‍🏫 መምህር' : '💼 ሰራተኛ'}</div>
+              <div style="font-size:0.72rem; color:#64748B;">${roleCat} • ${item.isTeacher ? '👨‍🏫 መምህር' : '💼 ሰራተኛ'}</div>
+              <div style="font-size:0.7rem; color:#0284C7;">⏱ ገደብ፡ ${sched.entryStart}-${sched.entryEnd} | ${sched.exitStart}-${sched.exitEnd}</div>
             </td>
             <td style="padding:8px 10px;">
               <span class="badge badge-primary">${item.role}</span>
               <div style="font-size:0.75rem; color:#475569; margin-top:2px;">${item.dept}</div>
             </td>
-            <td style="padding:8px 10px; font-weight:600; color:#1E293B;">
-              ${item.status === 'ቀርቷል' ? '-' : item.time}
+            <td style="padding:8px 10px;">
+              <div style="display:flex; flex-direction:column; gap:2px; font-size:0.75rem;">
+                <span style="color:${isMorning ? '#1E3A8A' : '#64748B'}; font-weight:${isMorning ? '700' : '500'};">
+                  🚪 መግቢያ: <strong>${item.morningTime}</strong> (${item.morningStatus})
+                </span>
+                <span style="color:${!isMorning ? '#1E3A8A' : '#64748B'}; font-weight:${!isMorning ? '700' : '500'};">
+                  🚶‍♂️ መውጫ: <strong>${item.afternoonTime}</strong> (${item.afternoonStatus})
+                </span>
+              </div>
+            </td>
+            <td style="padding:8px 10px; font-weight:700; color:#1E293B;">
+              ${curStatus === 'ቀርቷል' ? '-' : curTime}
             </td>
             <td style="padding:8px 10px;">
-              <span class="badge ${badgeClass}" style="font-weight:700;">${item.status}</span>
+              <span class="badge ${badgeClass}" style="font-weight:700;">${curStatus}</span>
             </td>
             <td style="padding:8px 10px; font-size:0.8rem; color:#475569;">
-              ${item.remarks || '-'}
+              ${curRemarks || '-'}
             </td>
             <td style="padding:8px 10px;">
-              <div style="display:flex; gap:0.25rem; flex-wrap:wrap;">
-                <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#10B981; color:#065F46; background:#ECFDF5;" onclick="updateStaffAttendanceStatus(${item.id}, 'ተገኝቷል')">✓ ተገኝቷል</button>
-                <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#EF4444; color:#991B1B; background:#FEF2F2;" onclick="updateStaffAttendanceStatus(${item.id}, 'ቀርቷል')">✕ ቀርቷል</button>
-                <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#F59E0B; color:#92400E; background:#FFFBEB;" onclick="updateStaffAttendanceStatus(${item.id}, 'ዘግይቷል')">⏱ ዘግይቷል</button>
-                <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#8B5CF6; color:#5B21B6; background:#F5F3FF;" onclick="updateStaffAttendanceStatus(${item.id}, 'ፍቃድ')">📝 ፍቃድ</button>
+              <div style="display:flex; gap:0.25rem; flex-wrap:wrap; align-items:center;">
+                ${actionButtons}
               </div>
             </td>
           </tr>
@@ -2060,7 +2411,10 @@
       }).join('');
     }
 
-    function updateStaffAttendanceStatus(id, newStatus) {
+    /**
+     * Auto tick staff attendance with automatic Ethiopian clock time capture per role
+     */
+    function autoTickStaffAttendanceWeb(id, statusOverride) {
       if (!canAccessStaffAttendanceWeb()) {
         alert('🔒 የተከለከለ ፈቃድ! የሰራተኞች አቴንዳንስ መመዝገብ የሚችሉት ምክትል ርዕሰ መምህር ወይም ሲስተም አድሚን ብቻ ናቸው።');
         return;
@@ -2068,22 +2422,234 @@
       const item = staffAttendanceListWeb.find(s => s.id === id);
       if (!item) return;
 
-      item.status = newStatus;
-      if (newStatus === 'ተገኝቷል') {
-        item.time = '02:15 ጧት';
-        item.remarks = 'በሰዓቱ ገብተዋል';
-      } else if (newStatus === 'ዘግይቷል') {
-        item.time = '02:40 ጧት';
-        item.remarks = 'በዘግይቶ መግባት ተመዝግቧል';
-      } else if (newStatus === 'ቀርቷል') {
-        item.time = '-';
-        item.remarks = 'ያለፈቃድ ቀርተዋል';
-      } else if (newStatus === 'ፍቃድ') {
-        item.time = '-';
-        item.remarks = 'በፍቃድ ላይ ናቸው';
+      const isMorning = currentStaffWebShift === 'morning';
+      const roleCat = getStaffRoleCategoryWeb(item.isTeacher, item.role, item.dept);
+      const nowEthTime = getEthiopianClockTime(isMorning);
+      const evalResult = evaluateStaffAttendanceTime(nowEthTime, isMorning, roleCat);
+
+      let finalStatus = statusOverride || evalResult.status;
+      let finalRemarks = evalResult.remarks;
+
+      if (finalStatus === 'ተገኝቷል') {
+        finalRemarks = evalResult.remarks;
+      } else if (finalStatus === 'አርፍዷል') {
+        finalRemarks = evalResult.remarks.includes('አርፍደዋል') ? evalResult.remarks : 'ዘግይቶ መግባት ተመዝግቧል';
+      } else if (finalStatus === 'ቀድሞ ወጥቷል') {
+        finalRemarks = evalResult.remarks;
+      } else if (finalStatus === 'ዘግይቶ ወጥቷል') {
+        finalRemarks = evalResult.remarks;
+      } else if (finalStatus === 'ቀርቷል') {
+        finalRemarks = 'ያለፈቃድ የቀረ';
+      } else if (finalStatus === 'ፍቃድ') {
+        finalRemarks = 'የህመም ወይም የስራ ፍቃድ';
       }
+
+      const formattedTime = (finalStatus === 'ቀርቷል' || finalStatus === 'ፍቃድ') ? '-' : nowEthTime;
+
+      if (isMorning) {
+        item.morningStatus = finalStatus;
+        item.morningTime = formattedTime;
+        item.morningRemarks = finalRemarks;
+      } else {
+        item.afternoonStatus = finalStatus;
+        item.afternoonTime = formattedTime;
+        item.afternoonRemarks = finalRemarks;
+      }
+
       saveStaffAttendanceWeb();
       renderStaffAttendanceWeb();
+    }
+
+    /**
+     * Role Schedule Configuration Modal Functions
+     */
+    function openRoleScheduleModalWeb() {
+      if (!canAccessStaffAttendanceWeb()) {
+        alert('🔒 የተከለከለ ፈቃድ! የሰዓት ገደብ ማስተካከል የሚችሉት ምክትል ርዕሰ መምህር ወይም ሲስተም አድሚን ብቻ ናቸው።');
+        return;
+      }
+      const firstCat = 'መምህራን';
+      populateRoleScheduleFormWeb(firstCat);
+      document.getElementById('roleScheduleModalWeb').style.display = 'flex';
+    }
+
+    function closeRoleScheduleModalWeb() {
+      document.getElementById('roleScheduleModalWeb').style.display = 'none';
+      const alertEl = document.getElementById('schedSavedAlert');
+      if (alertEl) alertEl.style.display = 'none';
+    }
+
+    function selectRoleScheduleTabWeb(category, btn) {
+      document.querySelectorAll('.role-sched-tab').forEach(b => {
+        b.style.background = 'transparent';
+        b.style.color = '#334155';
+      });
+      if (btn) {
+        btn.style.background = 'var(--primary)';
+        btn.style.color = 'white';
+      }
+      populateRoleScheduleFormWeb(category);
+    }
+
+    function populateRoleScheduleFormWeb(category) {
+      const sched = getRoleScheduleWeb(category);
+      document.getElementById('editSchedCategory').value = category;
+      document.getElementById('editSchedEntryStart').value = sched.entryStart;
+      document.getElementById('editSchedEntryEnd').value = sched.entryEnd;
+      document.getElementById('editSchedExitStart').value = sched.exitStart;
+      document.getElementById('editSchedExitEnd').value = sched.exitEnd;
+      document.getElementById('editSchedDescription').value = sched.description || '';
+      const alertEl = document.getElementById('schedSavedAlert');
+      if (alertEl) alertEl.style.display = 'none';
+    }
+
+    function saveRoleScheduleModalWeb() {
+      const cat = document.getElementById('editSchedCategory').value;
+      const eStart = document.getElementById('editSchedEntryStart').value.trim();
+      const eEnd = document.getElementById('editSchedEntryEnd').value.trim();
+      const xStart = document.getElementById('editSchedExitStart').value.trim();
+      const xEnd = document.getElementById('editSchedExitEnd').value.trim();
+      const desc = document.getElementById('editSchedDescription').value.trim();
+
+      const existingIndex = staffRoleSchedulesWeb.findIndex(s => s.roleCategory === cat);
+      const updated = {
+        roleCategory: cat,
+        entryStart: eStart,
+        entryEnd: eEnd,
+        exitStart: xStart,
+        exitEnd: xEnd,
+        description: desc
+      };
+      if (existingIndex >= 0) {
+        staffRoleSchedulesWeb[existingIndex] = updated;
+      } else {
+        staffRoleSchedulesWeb.push(updated);
+      }
+      saveStaffRoleSchedulesWeb();
+
+      const alertEl = document.getElementById('schedSavedAlert');
+      if (alertEl) {
+        alertEl.style.display = 'block';
+        alertEl.innerText = `✓ የ${cat} የሰዓት ገደብ በተሳካ ሁኔታ ተቀምጧል!`;
+      }
+      renderStaffAttendanceWeb();
+    }
+
+    function resetRoleSchedulesDefaultWeb() {
+      if (confirm('የሰራተኞችን የስራ ሰዓት ገደቦች ወደ ነባሪው መመለስ ይፈልጋሉ?')) {
+        staffRoleSchedulesWeb = JSON.parse(JSON.stringify(DEFAULT_STAFF_ROLE_SCHEDULES));
+        saveStaffRoleSchedulesWeb();
+        const curCat = document.getElementById('editSchedCategory').value || 'መምህራን';
+        populateRoleScheduleFormWeb(curCat);
+        renderStaffAttendanceWeb();
+        const alertEl = document.getElementById('schedSavedAlert');
+        if (alertEl) {
+          alertEl.style.display = 'block';
+          alertEl.innerText = '✓ ወደ ነባሪ ሰዓቶች ተመልሷል!';
+        }
+      }
+    }
+
+    /**
+     * Edit Modal Functions: Allows Vice Principal to edit time & remarks when forgotten
+     */
+    let editingStaffAttItem = null;
+    let editingStaffAttShift = 'morning';
+
+    function openStaffAttEditModal(id) {
+      if (!canAccessStaffAttendanceWeb()) {
+        alert('🔒 የተከለከለ ፈቃድ! ሰዓት ማረም የሚችሉት ምክትል ርዕሰ መምህር ወይም ሲስተም አድሚን ብቻ ናቸው።');
+        return;
+      }
+      const item = staffAttendanceListWeb.find(s => s.id === id);
+      if (!item) return;
+
+      editingStaffAttItem = item;
+      editingStaffAttShift = currentStaffWebShift;
+
+      document.getElementById('editStaffAttId').value = item.id;
+      document.getElementById('editStaffAttNameDisplay').innerText = `${item.name} (${item.role} • ${item.dept})`;
+      setEditModalShift(currentStaffWebShift);
+
+      document.getElementById('staffAttendanceEditModal').style.display = 'flex';
+    }
+
+    function closeStaffAttEditModal() {
+      document.getElementById('staffAttendanceEditModal').style.display = 'none';
+      editingStaffAttItem = null;
+    }
+
+    function setEditModalShift(shift) {
+      editingStaffAttShift = shift;
+      const btnM = document.getElementById('btnEditShiftMorning');
+      const btnA = document.getElementById('btnEditShiftAfternoon');
+      const timeLabel = document.getElementById('editStaffAttTimeLabel');
+
+      if (shift === 'morning') {
+        if (btnM) { btnM.className = 'btn-primary'; btnM.style.background = 'var(--primary)'; btnM.style.color = 'white'; }
+        if (btnA) { btnA.className = 'btn-secondary'; btnA.style.background = '#F1F5F9'; btnA.style.color = '#334155'; }
+        if (timeLabel) timeLabel.innerText = 'የገቡበት ሰዓት (Check-in Time)';
+      } else {
+        if (btnM) { btnM.className = 'btn-secondary'; btnM.style.background = '#F1F5F9'; btnM.style.color = '#334155'; }
+        if (btnA) { btnA.className = 'btn-primary'; btnA.style.background = 'var(--primary)'; btnA.style.color = 'white'; }
+        if (timeLabel) timeLabel.innerText = 'የወጡበት ሰዓት (Check-out Time)';
+      }
+
+      if (editingStaffAttItem) {
+        const isMorning = shift === 'morning';
+        document.getElementById('editStaffAttTime').value = isMorning ? editingStaffAttItem.morningTime : editingStaffAttItem.afternoonTime;
+        document.getElementById('editStaffAttStatus').value = isMorning ? editingStaffAttItem.morningStatus : editingStaffAttItem.afternoonStatus;
+        document.getElementById('editStaffAttRemarks').value = isMorning ? editingStaffAttItem.morningRemarks : editingStaffAttItem.afternoonRemarks;
+      }
+    }
+
+    function setEditModalCurrentTime() {
+      const isMorning = editingStaffAttShift === 'morning';
+      const roleCat = editingStaffAttItem ? getStaffRoleCategoryWeb(editingStaffAttItem.isTeacher, editingStaffAttItem.role, editingStaffAttItem.dept) : 'መምህራን';
+      const nowTime = getEthiopianClockTime(isMorning);
+      document.getElementById('editStaffAttTime').value = nowTime;
+      const evalRes = evaluateStaffAttendanceTime(nowTime, isMorning, roleCat);
+      document.getElementById('editStaffAttStatus').value = evalRes.status;
+      document.getElementById('editStaffAttRemarks').value = evalRes.remarks;
+    }
+
+    function onEditModalStatusChange() {
+      const status = document.getElementById('editStaffAttStatus').value;
+      const remarksInput = document.getElementById('editStaffAttRemarks');
+      if (status === 'ቀርቷል') {
+        remarksInput.value = 'ያለፈቃድ የቀረ';
+      } else if (status === 'ፍቃድ') {
+        remarksInput.value = 'የህመም ወይም የስራ ፍቃድ';
+      } else if (status === 'አርፍዷል' && !remarksInput.value) {
+        remarksInput.value = 'በዘግይቶ መግባት ተመዝግቧል';
+      } else if (status === 'ቀድሞ ወጥቷል' && !remarksInput.value) {
+        remarksInput.value = 'ቀድሞ መውጣት ተመዝግቧል';
+      } else if (status === 'ዘግይቶ ወጥቷል' && !remarksInput.value) {
+        remarksInput.value = 'የትርፍ ሰዓት / ዘግይቶ መውጣት';
+      }
+    }
+
+    function saveStaffAttEditModal() {
+      if (!editingStaffAttItem) return;
+      const isMorning = editingStaffAttShift === 'morning';
+      const timeVal = document.getElementById('editStaffAttTime').value.trim() || (isMorning ? '01:40 ጧት' : '09:25 ከሰዓት');
+      const statusVal = document.getElementById('editStaffAttStatus').value;
+      const remarksVal = document.getElementById('editStaffAttRemarks').value.trim() || 'በም/ር ተስተካክሎ ተመዝግቧል';
+
+      if (isMorning) {
+        editingStaffAttItem.morningTime = timeVal;
+        editingStaffAttItem.morningStatus = statusVal;
+        editingStaffAttItem.morningRemarks = remarksVal;
+      } else {
+        editingStaffAttItem.afternoonTime = timeVal;
+        editingStaffAttItem.afternoonStatus = statusVal;
+        editingStaffAttItem.afternoonRemarks = remarksVal;
+      }
+
+      saveStaffAttendanceWeb();
+      renderStaffAttendanceWeb();
+      closeStaffAttEditModal();
+      alert(`✅ የ${editingStaffAttItem.name} ${isMorning ? 'የመግቢያ' : 'የመውጫ'} አቴንዳንስ ሰዓት (${timeVal}) እና ሁኔታ በተሳካ ሁኔታ ተስተካክሏል!`);
     }
 
     function renderAttendance() {

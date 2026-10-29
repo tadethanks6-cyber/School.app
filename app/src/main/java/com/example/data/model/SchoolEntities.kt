@@ -167,6 +167,25 @@ data class SchoolStats(
     val activeGradesCount: Int = 0
 )
 
+enum class StaffAttendanceSession(val titleAm: String, val titleEn: String, val typeKey: String) {
+    CHECK_IN("የመግቢያ አቴንዳንስ (Check-In)", "Check-In (Arrival)", "entry"),
+    CHECK_OUT("የመውጫ አቴንዳንስ (Check-Out)", "Check-Out (Departure)", "exit");
+
+    companion object {
+        val MORNING = CHECK_IN
+        val AFTERNOON = CHECK_OUT
+    }
+}
+
+data class StaffRoleSchedule(
+    val roleCategory: String, // "መምህራን", "ፅዳት ሰራተኞች", "ደህንነትና ጥበቃ", "አስተዳደርና ፋይናንስ", "ሌሎች ሰራተኞች"
+    val entryStart: String = "01:30 ጧት",
+    val entryEnd: String = "01:51 ጧት",
+    val exitStart: String = "09:15 ከሰዓት",
+    val exitEnd: String = "09:40 ከሰዓት",
+    val description: String = ""
+)
+
 data class StaffAttendanceItem(
     val id: Long,
     val name: String,
@@ -174,8 +193,24 @@ data class StaffAttendanceItem(
     val department: String,
     val phone: String,
     val isTeacher: Boolean,
-    val status: String = "ተገኝቷል", // "ተገኝቷል" (Present), "ቀርቷል" (Absent), "አርፍዷል" (Late), "በፍቃድ" (Leave)
-    val checkInTime: String = "02:15 ጧት",
-    val remarks: String = ""
+    val roleCategory: String = "መምህራን",
+    // Check-in (የመግቢያ)
+    val entryStatus: String = "ተገኝቷል", // "ተገኝቷል", "አርፍዷል", "ቀርቷል", "በፍቃድ"
+    val entryTime: String = "01:42 ጧት",
+    val entryRemarks: String = "በሰዓቱ ገብተዋል",
+    // Check-out (የመውጫ)
+    val exitStatus: String = "ተገኝቷል", // "ተገኝቷል", "ቀድሞ ወጥቷል", "በሰዓቱ ወጥቷል", "ዘግይቶ ወጥቷል", "ቀርቷል", "በፍቃድ"
+    val exitTime: String = "09:25 ከሰዓት",
+    val exitRemarks: String = "በሰዓቱ ወጥተዋል",
+    // Compatibility fields
+    val morningStatus: String = entryStatus,
+    val morningTime: String = entryTime,
+    val morningRemarks: String = entryRemarks,
+    val afternoonStatus: String = exitStatus,
+    val afternoonTime: String = exitTime,
+    val afternoonRemarks: String = exitRemarks,
+    val status: String = entryStatus,
+    val checkInTime: String = entryTime,
+    val remarks: String = entryRemarks
 )
 
