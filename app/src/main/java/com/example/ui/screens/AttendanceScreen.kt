@@ -1,5 +1,8 @@
 package com.example.ui.screens
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -96,6 +99,11 @@ fun AttendanceScreen(
     staffAttendanceList: List<StaffAttendanceItem> = emptyList(),
     staffRoleSchedules: List<StaffRoleSchedule> = emptyList(),
     activeStaffSession: StaffAttendanceSession = StaffAttendanceSession.CHECK_IN,
+    schoolNameAm: String = "ዲሊጀንት ትምህርት ቤት",
+    schoolNameEn: String = "Dilijent School",
+    schoolLogoUri: String = "",
+    academicYear: String = "2017 ዓ.ም",
+    allAttendanceRecords: List<AttendanceRecord> = emptyList(),
     onSelectStaffSession: (StaffAttendanceSession) -> Unit = {},
     onRecordAttendance: (AttendanceRecord) -> Unit,
     onRecordStaffAttendance: (Long, String, String) -> Unit = { _, _, _ -> },
@@ -103,10 +111,17 @@ fun AttendanceScreen(
     onSaveStaffAttendanceManual: (Long, StaffAttendanceSession, String, String, String) -> Unit = { _, _, _, _, _ -> },
     onUpdateRoleSchedule: (String, String, String, String, String, String) -> Unit = { _, _, _, _, _, _ -> },
     onResetRoleSchedules: () -> Unit = {},
+    onDownloadAttendanceReport: ((String, String) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     // Mode switcher: Default to STUDENTS unless user explicitly switches to STAFF
     var activeSubMode by remember { mutableStateOf(AttendanceSubMode.STUDENTS) }
+
+    // Automatic Parent SMS Notification on Absence State
+    var autoSmsEnabled by remember { mutableStateOf(true) }
+    var absentStudentForSms by remember { mutableStateOf<Student?>(null) }
+    var smsCustomMessage by remember { mutableStateOf("") }
 
     // Dialog state for manually editing staff attendance time & status
     var editingStaffItem by remember { mutableStateOf<StaffAttendanceItem?>(null) }
@@ -422,6 +437,116 @@ fun AttendanceScreen(
                         )
                     }
                 }
+
+                // Download Attendance Report (Monthly PDF) Bar
+                Surface(
+                    shape = RoundedCornerShape(bottomStart = 14.dp, bottomEnd = 14.dp),
+                    color = NavyPrimary.copy(alpha = 0.08f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(
+                                text = if (isAmharic) "📄 ወርሃዊ የተማሪዎች አቴንዳንስ ማጠቃለያ" else "📄 Monthly Attendance Summary",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = NavyPrimary
+                            )
+                            Text(
+                                text = if (isAmharic) "ተደጋጋሚ ቀሪዎችን (>3 ቀናት) በቀይ ቀለም ያደምቃል" else "Highlights frequent absentees (>3 days)",
+                                fontSize = 10.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        Button(
+                            onClick = {
+                                if (onDownloadAttendanceReport != null) {
+                                    onDownloadAttendanceReport(selectedGrade, selectedSection)
+                                } else {
+                                    com.example.ui.components.AttendancePdfGenerator.generateAndShareMonthlyReport(
+                                        context = context,
+                                        schoolNameAm = schoolNameAm,
+                                        schoolNameEn = schoolNameEn,
+                                        academicYear = academicYear,
+                                        selectedGrade = selectedGrade,
+                                        selectedSection = selectedSection,
+                                        students = students,
+                                        attendanceRecords = allAttendanceRecords,
+                                        isAmharic = isAmharic
+                                    )
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = EthioGreen),
+                            shape = RoundedCornerShape(8.dp),
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                            modifier = Modifier.testTag("btn_download_attendance_report")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Tune,
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = if (isAmharic) "📥 ሪፖርት አውርድ (PDF)" else "📥 Download PDF",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+
+                // Parent SMS Auto-Notification Banner
+                Surface(
+                    shape = RoundedCornerShape(0.dp),
+                    color = if (autoSmsEnabled) Color(0xFFEFF6FF) else Color(0xFFF1F5F9),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 7.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "📱",
+                                fontSize = 14.sp
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Column {
+                                Text(
+                                    text = if (isAmharic) "የወላጅ ፈጣን የኤስኤምኤስ (SMS) መልእክት" else "Parent Instant SMS Alerts",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (autoSmsEnabled) Color(0xFF1D4ED8) else Color(0xFF475569)
+                                )
+                                Text(
+                                    text = if (isAmharic)
+                                        (if (autoSmsEnabled) "ተማሪ ሲቀር ለወላጅ ወዲያውኑ የSMS ማሳወቂያ ይላካል (በርቷል)" else "የSMS ማሳወቂያ ጠፍቷል")
+                                    else
+                                        (if (autoSmsEnabled) "Auto SMS is triggered to parent when marked absent (ON)" else "SMS alerts disabled"),
+                                    fontSize = 10.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+
+                        androidx.compose.material3.Switch(
+                            checked = autoSmsEnabled,
+                            onCheckedChange = { autoSmsEnabled = it },
+                            modifier = Modifier.testTag("switch_auto_sms")
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -550,6 +675,22 @@ fun AttendanceScreen(
                                                     status = "ቀርቷል"
                                                 )
                                             )
+                                            // Automatically trigger SMS notification to parent
+                                            if (autoSmsEnabled) {
+                                                if (student.parentPhone.isNotBlank()) {
+                                                    smsCustomMessage = if (isAmharic)
+                                                        "ውድ ወላጅ/አሳዳጊ፡ ልጆ ${student.fullName} ዛሬ በቀን $currentDate ዓ.ም በ${schoolNameAm} ክፍል ውስጥ አልተገኘም (ቀርቷል)። ለተጨማሪ መረጃ ትምህርት ቤቱን ያነጋግሩ።"
+                                                    else
+                                                        "Dear Parent/Guardian: Your child ${student.fullName} was marked absent from ${schoolNameEn} on $currentDate. Please contact the school."
+                                                    absentStudentForSms = student
+                                                } else {
+                                                    Toast.makeText(
+                                                        context,
+                                                        if (isAmharic) "ለተማሪ ${student.fullName} የተመዘገበ የወላጅ ስልክ የለም" else "No parent phone number registered for ${student.fullName}",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
+                                            }
                                         }
                                     )
                                     AttendanceStatusButton(
@@ -657,6 +798,76 @@ fun AttendanceScreen(
                                 text = if (isAmharic) "ቀን: $currentDate ዓ.ም • በምክትል ርዕሰ መምህር እና በአድሚን የሚመራ" else "Date: $currentDate • Executive Oversight",
                                 fontSize = 11.sp,
                                 color = Color.White.copy(alpha = 0.85f)
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Action Bar for Staff Attendance: 30-Day PDF Report Download with School Logo
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = if (isAmharic) "📥 የሰራተኞች የ30 ቀናት አቴንዳንስ ሪፖርት" else "📥 Staff 30-Day Attendance Report",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp,
+                                    color = NavyPrimary
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Surface(
+                                    shape = RoundedCornerShape(4.dp),
+                                    color = EthioGreen.copy(alpha = 0.15f)
+                                ) {
+                                    Text(
+                                        text = "PDF",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = EthioGreen,
+                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                    )
+                                }
+                            }
+                            Text(
+                                text = if (isAmharic) "የት/ቤቱ ሎጎ (Logo)፣ የ30 ቀናት ክትትልና የፊርማ ማረጋገጫ የያዘ" else "With school logo header, 30-day KPIs & signatures",
+                                fontSize = 10.sp,
+                                color = Color(0xFF64748B)
+                            )
+                        }
+
+                        Button(
+                            onClick = {
+                                com.example.ui.components.AttendancePdfGenerator.generateAndShareStaff30DaysReport(
+                                    context = context,
+                                    schoolNameAm = schoolNameAm,
+                                    schoolNameEn = schoolNameEn,
+                                    schoolLogoUri = schoolLogoUri,
+                                    academicYear = academicYear,
+                                    staffList = staffAttendanceList,
+                                    isAmharic = isAmharic
+                                )
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = EthioGreen),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = if (isAmharic) "📄 PDF አውርድ" else "📄 Download PDF",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
                             )
                         }
                     }
@@ -1407,6 +1618,108 @@ fun AttendanceScreen(
                         },
                         onResetDefaults = onResetRoleSchedules,
                         onDismiss = { showRoleScheduleDialog = false }
+                    )
+                }
+                // =========================================================================
+                // DIALOG: AUTOMATIC PARENT SMS NOTIFICATION ON STUDENT ABSENCE
+                // =========================================================================
+                absentStudentForSms?.let { student ->
+                    AlertDialog(
+                        onDismissRequest = { absentStudentForSms = null },
+                        title = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("📱", fontSize = 20.sp)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = if (isAmharic) "ለወላጅ የSMS ማሳወቂያ መላኪያ" else "Send Absence SMS to Parent",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    color = NavyPrimary
+                                )
+                            }
+                        },
+                        text = {
+                            Column {
+                                Text(
+                                    text = if (isAmharic)
+                                        "ተማሪው ቀርቷል ተብሎ ተመዝግቧል። ለወላጁ/አሳዳጊው የሚከተለው አጭር የጽሁፍ መልዕክት (SMS) ወዲያውኑ ይላካል፦"
+                                    else
+                                        "The student was marked absent. The following SMS notification will be sent to the parent:",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(modifier = Modifier.padding(10.dp)) {
+                                        Text(
+                                            text = "ተቀባይ ወላጅ: ${student.parentName} (${student.parentPhone})",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 12.sp,
+                                            color = NavyPrimary
+                                        )
+                                        Text(
+                                            text = "ተማሪ: ${student.fullName} • ${student.grade} - ${student.section}",
+                                            fontSize = 11.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                OutlinedTextField(
+                                    value = smsCustomMessage,
+                                    onValueChange = { smsCustomMessage = it },
+                                    label = { Text(if (isAmharic) "የመልዕክቱ ይዘት" else "SMS Message Body") },
+                                    minLines = 3,
+                                    maxLines = 5,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    try {
+                                        val smsUri = Uri.parse("smsto:${student.parentPhone}")
+                                        val smsIntent = Intent(Intent.ACTION_SENDTO, smsUri).apply {
+                                            putExtra("sms_body", smsCustomMessage)
+                                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                        }
+                                        context.startActivity(smsIntent)
+                                        Toast.makeText(
+                                            context,
+                                            if (isAmharic) "የSMS መልዕክት መተግበሪያ ተከፍቷል!" else "SMS app opened!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } catch (e: Exception) {
+                                        Toast.makeText(
+                                            context,
+                                            "SMS መላክ አልተሳካም፦ ${e.message}",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                    absentStudentForSms = null
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = EthioGreen)
+                            ) {
+                                Text(
+                                    text = if (isAmharic) "📨 አሁን ላክ (Send SMS)" else "Send SMS",
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { absentStudentForSms = null }) {
+                                Text(if (isAmharic) "ሰርዝ (ይቅር)" else "Skip")
+                            }
+                        }
                     )
                 }
             }

@@ -165,6 +165,12 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
     private val _schoolNameEn = MutableStateFlow(prefs.getString("school_name_en", "Dilijent School") ?: "Dilijent School")
     val schoolNameEn: StateFlow<String> = _schoolNameEn.asStateFlow()
 
+    private val _academicYear = MutableStateFlow(prefs.getString("academic_year", "2017 ዓ.ም") ?: "2017 ዓ.ም")
+    val academicYear: StateFlow<String> = _academicYear.asStateFlow()
+
+    val allAttendanceRecords: StateFlow<List<AttendanceRecord>> = repository.allAttendance
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     private fun loadInitialLogo(): String {
         val saved = prefs.getString("school_logo_uri", "") ?: ""
         if (saved.isNotEmpty()) {
@@ -1185,6 +1191,63 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                 staff.id
             }
             firestoreRepository.saveStaff(authUid, staff.copy(id = id))
+
+            // Auto-sync with Teacher/Academics module if role is Teacher or Assistant Teacher
+            if (staff.role == "መምህር" || staff.role == "ረዳት መምህር") {
+                try {
+                    val existingTeachers = repository.allTeachers.first()
+                    val match = existingTeachers.find { it.fullName == staff.fullName || (it.phone.isNotBlank() && it.phone == staff.phone) }
+                    val teacherCode = match?.teacherCode ?: "T-${staff.staffCode.filter { it.isDigit() }.ifBlank { (100..999).random().toString() }}"
+                    val teacherObj = Teacher(
+                        id = match?.id ?: 0L,
+                        teacherCode = teacherCode,
+                        fullName = staff.fullName,
+                        title = staff.title,
+                        gender = staff.gender,
+                        phone = staff.phone,
+                        email = staff.email,
+                        qualification = staff.qualification,
+                        specialization = staff.teachingSubject.ifBlank { if (staff.role == "ረዳት መምህር") "ረዳት መምህርነት" else "አጠቃላይ መምህር" },
+                        department = if (staff.role == "ረዳት መምህር") "የመጀመሪያ ደረጃ ድጋፍ" else "አካዳሚክ",
+                        isHomeroomTeacher = staff.isHomeroomTeacher,
+                        homeroomClass = if (staff.isHomeroomTeacher) staff.homeroomClass else "",
+                        joinedYear = staff.hiringDate,
+                        photoUri = staff.photoUri,
+                        status = staff.status
+                    )
+                    val teacherId = if (teacherObj.id == 0L) {
+                        repository.insertTeacher(teacherObj)
+                    } else {
+                        repository.updateTeacher(teacherObj)
+                        teacherObj.id
+                    }
+                    firestoreRepository.saveTeacher(authUid, teacherObj.copy(id = teacherId))
+
+                    // If teaching subject, grade and section are provided, auto-create workload assignment
+                    if (staff.teachingSubject.isNotBlank() && staff.assignedGrade.isNotBlank() && staff.assignedSection.isNotBlank()) {
+                        val existingWorkloads = repository.allWorkloads.first()
+                        val hasWl = existingWorkloads.any {
+                            it.teacherId == teacherId && it.grade == staff.assignedGrade && it.section == staff.assignedSection && it.subjectName == staff.teachingSubject
+                        }
+                        if (!hasWl) {
+                            repository.insertWorkload(
+                                TeacherWorkload(
+                                    teacherId = teacherId,
+                                    teacherName = staff.fullName,
+                                    subjectId = 0L,
+                                    subjectName = staff.teachingSubject,
+                                    grade = staff.assignedGrade,
+                                    section = staff.assignedSection,
+                                    periodsPerWeek = 4
+                                )
+                            )
+                        }
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("SchoolViewModel", "Failed to sync staff teacher record: ${e.message}")
+                }
+            }
+
             showAddStaffDialog.value = false
             staffToEdit.value = null
         }
@@ -1285,14 +1348,16 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         } catch (_: Exception) {}
     }
 
-    fun updateSchoolSettings(gradeLevel: String, nameAm: String, nameEn: String) {
+    fun updateSchoolSettings(gradeLevel: String, nameAm: String, nameEn: String, year: String = "2017 ዓ.ም") {
         _schoolGradeLevel.value = gradeLevel
         _schoolName.value = nameAm
         _schoolNameEn.value = nameEn
+        _academicYear.value = year
         prefs.edit()
             .putString("school_grade_level", gradeLevel)
             .putString("school_name", nameAm)
             .putString("school_name_en", nameEn)
+            .putString("academic_year", year)
             .apply()
         selectedGradeFilter.value = "ሁሉም"
         subjectGradeFilter.value = "ሁሉም"

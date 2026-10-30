@@ -135,7 +135,14 @@ data class Staff(
     val responsibilities: String = "", // የስራ ድርሻ ዝርዝር መግለጫ
     val emergencyContact: String = "", // የአደጋ ጊዜ ተጠሪ ስልክ
     val photoUri: String = "",
-    val status: String = "ንቁ" // "ንቁ", "በእረፍት ላይ", "የተሰናበተ"
+    val status: String = "ንቁ", // "ንቁ", "በእረፍት ላይ", "የተሰናበተ"
+    val teachingSubject: String = "", // የሚያስተምረው የትምህርት አይነት (ለምሳሌ ሒሳብ፣ እንግሊዝኛ)
+    val assignedGrade: String = "", // የሚያስተምርበት ወይም ረዳት የሆነበት ክፍል
+    val assignedSection: String = "", // ሴክሽን
+    val isHomeroomTeacher: Boolean = false, // የክፍል ኃላፊ ነው? (አዎ / አይደለም)
+    val homeroomClass: String = "", // የስንተኛ ክፍል እና ሴክሽን ኃላፊ (ለምሳሌ 7ኛ ክፍል - A)
+    val dutyLocation: String = "", // የተመደበበት የስራ ግቢ/ህንጻ/ቦታ
+    val shift: String = "" // ፈረቃ (ጧት፣ ከሰዓት፣ ሙሉ ቀን፣ የሌሊት ጥበቃ)
 )
 
 @Entity(tableName = "user_accounts")

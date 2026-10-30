@@ -233,6 +233,8 @@ class MainActivity : ComponentActivity() {
                 val schoolGradeLevel by viewModel.schoolGradeLevel.collectAsStateWithLifecycle()
                 val schoolName by viewModel.schoolName.collectAsStateWithLifecycle()
                 val schoolNameEn by viewModel.schoolNameEn.collectAsStateWithLifecycle()
+                val academicYear by viewModel.academicYear.collectAsStateWithLifecycle()
+                val allAttendanceRecords by viewModel.allAttendanceRecords.collectAsStateWithLifecycle()
                 val showSchoolSettingsDialog by viewModel.showSchoolSettingsDialog.collectAsStateWithLifecycle()
 
                 // Dynamically sync fullscreen state with system bars
@@ -531,6 +533,11 @@ class MainActivity : ComponentActivity() {
                                     staffAttendanceList = staffAttendanceList,
                                     staffRoleSchedules = staffRoleSchedules,
                                     activeStaffSession = currentStaffSession,
+                                    schoolNameAm = schoolName,
+                                    schoolNameEn = schoolNameEn,
+                                    schoolLogoUri = schoolLogoUri,
+                                    academicYear = academicYear,
+                                    allAttendanceRecords = allAttendanceRecords,
                                     onSelectStaffSession = { session -> viewModel.currentStaffAttendanceSession.value = session },
                                     onRecordAttendance = { record ->
                                         viewModel.recordAttendance(record)
@@ -1360,6 +1367,9 @@ class MainActivity : ComponentActivity() {
                 if (showAddStaff) {
                     StaffFormDialog(
                         initialStaff = staffToEdit,
+                        availableGrades = formGradeOptions,
+                        availableSections = viewModel.sectionOptions,
+                        availableSubjects = subjects.map { it.name }.ifEmpty { listOf("ሂሳብ (Mathematics)", "እንግሊዝኛ (English)", "አማርኛ (Amharic)", "አጠቃላይ ሳይንስ", "ማህበራዊ ሳይንስ", "ስነ-ዜጋ") },
                         isAmharic = isAmharic,
                         onDismiss = {
                             viewModel.showAddStaffDialog.value = false

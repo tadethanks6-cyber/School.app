@@ -134,6 +134,8 @@ class SchoolRepository(
         gradeDao.deleteGrade(grade)
 
     // Attendance
+    val allAttendance: Flow<List<AttendanceRecord>> = attendanceDao.getAllAttendance()
+
     fun getAttendanceForDate(grade: String, section: String, date: String): Flow<List<AttendanceRecord>> =
         attendanceDao.getAttendanceForDate(grade, section, date)
 

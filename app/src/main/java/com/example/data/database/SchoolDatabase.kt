@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
         Staff::class,
         UserAccount::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 abstract class SchoolDatabase : RoomDatabase() {

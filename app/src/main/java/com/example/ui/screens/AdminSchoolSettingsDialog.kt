@@ -33,6 +33,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -76,10 +78,12 @@ fun AdminSchoolSettingsDialog(
     val currentGradeLevel by viewModel.schoolGradeLevel.collectAsStateWithLifecycle()
     val currentNameAm by viewModel.schoolName.collectAsStateWithLifecycle()
     val currentNameEn by viewModel.schoolNameEn.collectAsStateWithLifecycle()
+    val currentAcademicYear by viewModel.academicYear.collectAsStateWithLifecycle()
 
     var selectedGradeLevel by remember(currentGradeLevel) { mutableStateOf(currentGradeLevel) }
     var nameAm by remember(currentNameAm) { mutableStateOf(currentNameAm) }
     var nameEn by remember(currentNameEn) { mutableStateOf(currentNameEn) }
+    var academicYearState by remember(currentAcademicYear) { mutableStateOf(currentAcademicYear) }
     var logoUriState by remember(currentLogoUri) { mutableStateOf(currentLogoUri) }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
@@ -376,6 +380,64 @@ fun AdminSchoolSettingsDialog(
                     }
                 }
 
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Section 4: Academic Year (ዓመተ ምህረት)
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = if (isAmharic) "4. የትምህርት ዘመን / ዓመተ ምህረት (Academic Year)" else "4. Academic Year",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp,
+                                color = NavyPrimary
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        Text(
+                            text = if (isAmharic)
+                                "በአድሚኑ የሚሞላ ተለዋዋጭ የትምህርት ዘመን (በሪፖርት ካርድ፣ በክፍል መዝገብ እና በአቴንዳንስ ላይ በቀጥታ የሚንጸባረቅ)"
+                            else
+                                "Configurable school academic year reflected across reports, roster, and attendance records.",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        // Quick selection chips
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        ) {
+                            listOf("2016 ዓ.ም", "2017 ዓ.ም", "2018 ዓ.ም", "2019 ዓ.ም").forEach { yr ->
+                                FilterChip(
+                                    selected = academicYearState.trim() == yr,
+                                    onClick = { academicYearState = yr },
+                                    label = { Text(yr, fontSize = 12.sp) }
+                                )
+                            }
+                        }
+
+                        OutlinedTextField(
+                            value = academicYearState,
+                            onValueChange = { academicYearState = it },
+                            label = { Text(if (isAmharic) "ዓመተ ምህረት (Academic Year) *" else "Academic Year *") },
+                            placeholder = { Text("ለምሳሌ፡ 2017 ዓ.ም") },
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("input_school_academic_year")
+                        )
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(20.dp))
 
                 // Actions
@@ -398,7 +460,8 @@ fun AdminSchoolSettingsDialog(
                             viewModel.updateSchoolSettings(
                                 gradeLevel = selectedGradeLevel,
                                 nameAm = nameAm.ifBlank { "ዲሊጀንት ትምህርት ቤት" },
-                                nameEn = nameEn.ifBlank { "Dilijent School" }
+                                nameEn = nameEn.ifBlank { "Dilijent School" },
+                                year = academicYearState.ifBlank { "2017 ዓ.ም" }
                             )
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = EthioGreen),

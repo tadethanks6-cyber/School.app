@@ -139,6 +139,13 @@ class FirestoreSchoolRepository(
             "responsibilities" to staff.responsibilities,
             "emergencyContact" to staff.emergencyContact,
             "status" to staff.status,
+            "teachingSubject" to staff.teachingSubject,
+            "assignedGrade" to staff.assignedGrade,
+            "assignedSection" to staff.assignedSection,
+            "isHomeroomTeacher" to staff.isHomeroomTeacher,
+            "homeroomClass" to staff.homeroomClass,
+            "dutyLocation" to staff.dutyLocation,
+            "shift" to staff.shift,
             "userId" to userId,
             "createdAt" to FieldValue.serverTimestamp()
         )

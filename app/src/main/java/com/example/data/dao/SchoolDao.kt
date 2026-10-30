@@ -165,6 +165,9 @@ interface AttendanceDao {
     @Query("SELECT * FROM attendance_records WHERE grade = :grade AND section = :section AND date = :date")
     fun getAttendanceForDate(grade: String, section: String, date: String): Flow<List<AttendanceRecord>>
 
+    @Query("SELECT * FROM attendance_records ORDER BY date DESC")
+    fun getAllAttendance(): Flow<List<AttendanceRecord>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAttendance(record: AttendanceRecord): Long
 

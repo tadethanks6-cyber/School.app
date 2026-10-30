@@ -93,16 +93,19 @@ import com.example.ui.theme.GoldAccent
 import com.example.ui.theme.NavyPrimary
 
 val STAFF_ROLES = listOf(
+    "መምህር",
+    "ረዳት መምህር",
     "ርዕሰ መምህር",
     "ምክትል ርዕሰ መምህር",
     "ዋና ጸሐፊ",
+    "የተማሪዎች መዝጋቢ (Registrar)",
     "ፋይናንስ / ሂሳብ ሹም",
     "ንብረት ክፍል ኃላፊ",
     "የፅዳት ሰራተኛ",
     "የጥበቃ ኃላፊ",
     "መረጃ ቴክኖሎጂ (IT)",
     "ላይብረሪያን",
-    "የተማሪዎች መዝጋቢ (Registrar)",
+    "ላቦራቶሪ ረዳት",
     "ሌላ"
 )
 
@@ -692,10 +695,18 @@ fun StaffCardItem(
 @Composable
 fun StaffFormDialog(
     initialStaff: Staff? = null,
+    availableGrades: List<String> = emptyList(),
+    availableSections: List<String> = listOf("A", "B", "C", "D"),
+    availableSubjects: List<String> = listOf("ሂሳብ (Mathematics)", "እንግሊዝኛ (English)", "አማርኛ (Amharic)", "አጠቃላይ ሳይንስ (General Science)", "ማህበራዊ ሳይንስ (Social Studies)", "ስነ-ዜጋ (Civics)", "መረጃ ቴክኖሎጂ (IT)", "ስዕል እና ሙዚቃ (PVA)", "ስፖርት (HPE)"),
     isAmharic: Boolean,
     onDismiss: () -> Unit,
     onSave: (Staff) -> Unit
 ) {
+    val cleanGrades = remember(availableGrades) {
+        val list = availableGrades.filter { it != "ሁሉም" }
+        if (list.isEmpty()) listOf("1ኛ ክፍል", "2ኛ ክፍል", "3ኛ ክፍል", "4ኛ ክፍል", "5ኛ ክፍል", "6ኛ ክፍል", "7ኛ ክፍል", "8ኛ ክፍል") else list
+    }
+
     var title by remember { mutableStateOf(initialStaff?.title ?: "አቶ") }
     var photoUri by remember { mutableStateOf(initialStaff?.photoUri ?: "") }
     var fullName by remember { mutableStateOf(initialStaff?.fullName ?: "") }
@@ -703,19 +714,34 @@ fun StaffFormDialog(
     var gender by remember { mutableStateOf(initialStaff?.gender ?: "ወንድ") }
     var phone by remember { mutableStateOf(initialStaff?.phone ?: "") }
     var email by remember { mutableStateOf(initialStaff?.email ?: "") }
-    var role by remember { mutableStateOf(initialStaff?.role ?: "ዋና ጸሐፊ") }
-    var department by remember { mutableStateOf(initialStaff?.department ?: "አስተዳደር") }
-    var qualification by remember { mutableStateOf(initialStaff?.qualification ?: "ዲፕሎማ") }
+    var role by remember { mutableStateOf(initialStaff?.role ?: "መምህር") }
+    var department by remember { mutableStateOf(initialStaff?.department ?: "አካዳሚክ ድጋፍ") }
+    var qualification by remember { mutableStateOf(initialStaff?.qualification ?: "የመጀመሪያ ዲግሪ (BA/BSc)") }
     var employmentType by remember { mutableStateOf(initialStaff?.employmentType ?: "ቋሚ") }
     var salary by remember { mutableStateOf(initialStaff?.salary ?: "") }
     var hiringDate by remember { mutableStateOf(initialStaff?.hiringDate ?: "2017 ዓ.ም") }
     var responsibilities by remember { mutableStateOf(initialStaff?.responsibilities ?: "") }
     var emergencyContact by remember { mutableStateOf(initialStaff?.emergencyContact ?: "") }
 
+    // Role-specific fields
+    var teachingSubject by remember { mutableStateOf(initialStaff?.teachingSubject ?: "ሂሳብ (Mathematics)") }
+    var assignedGrade by remember { mutableStateOf(initialStaff?.assignedGrade.takeIf { !it.isNullOrBlank() } ?: cleanGrades.firstOrNull() ?: "7ኛ ክፍል") }
+    var assignedSection by remember { mutableStateOf(initialStaff?.assignedSection.takeIf { !it.isNullOrBlank() } ?: availableSections.firstOrNull() ?: "A") }
+    var isHomeroomTeacher by remember { mutableStateOf(initialStaff?.isHomeroomTeacher ?: false) }
+    var homeroomGrade by remember { mutableStateOf(initialStaff?.homeroomClass?.split("-")?.firstOrNull()?.trim() ?: cleanGrades.firstOrNull() ?: "7ኛ ክፍል") }
+    var homeroomSection by remember { mutableStateOf(initialStaff?.homeroomClass?.split("-")?.getOrNull(1)?.trim() ?: availableSections.firstOrNull() ?: "A") }
+    var dutyLocation by remember { mutableStateOf(initialStaff?.dutyLocation ?: "ዋናው ግቢ (Main Campus)") }
+    var shift by remember { mutableStateOf(initialStaff?.shift ?: "ሙሉ ቀን (Full Day)") }
+
     var roleDropdownExpanded by remember { mutableStateOf(false) }
     var deptDropdownExpanded by remember { mutableStateOf(false) }
     var qualDropdownExpanded by remember { mutableStateOf(false) }
     var empTypeDropdownExpanded by remember { mutableStateOf(false) }
+    var subjectDropdownExpanded by remember { mutableStateOf(false) }
+    var gradeDropdownExpanded by remember { mutableStateOf(false) }
+    var sectionDropdownExpanded by remember { mutableStateOf(false) }
+    var hrGradeDropdownExpanded by remember { mutableStateOf(false) }
+    var hrSectionDropdownExpanded by remember { mutableStateOf(false) }
 
     BackHandler(onBack = onDismiss)
 
@@ -1016,6 +1042,350 @@ fun StaffFormDialog(
                     }
                 }
 
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // =========================================================================
+                // DYNAMIC ROLE-SPECIFIC WORK SECTOR FIELDS (የስራ ምድቡ መሙያ)
+                // =========================================================================
+                val isTeacherRole = role == "መምህር"
+                val isAssistantTeacherRole = role == "ረዳት መምህር"
+                val isCleanerOrSecurityOrOther = !isTeacherRole && !isAssistantTeacherRole
+
+                Card(
+                    shape = RoundedCornerShape(14.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(14.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = when {
+                                    isTeacherRole -> if (isAmharic) "📚 የመምህር የስራ ምድብ እና የክፍል ድልድል" else "📚 Teaching Subject & Class Allocation"
+                                    isAssistantTeacherRole -> if (isAmharic) "🤝 የረዳት መምህር የተመደበበት ክፍል" else "🤝 Assistant Teacher Class Assignment"
+                                    else -> if (isAmharic) "🏢 የተመደበበት የስራ ዘርፍ፣ ግቢ እና ፈረቃ" else "🏢 Work Sector, Campus & Shift"
+                                },
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                color = NavyPrimary
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        if (isTeacherRole) {
+                            // 1. Teaching Subject (የሚያስተምረው የትምህርት አይነት)
+                            ExposedDropdownMenuBox(
+                                expanded = subjectDropdownExpanded,
+                                onExpandedChange = { subjectDropdownExpanded = it }
+                            ) {
+                                OutlinedTextField(
+                                    value = teachingSubject,
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text(if (isAmharic) "የሚያስተምረው የትምህርት አይነት *" else "Teaching Subject *") },
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = subjectDropdownExpanded) },
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier.fillMaxWidth().menuAnchor()
+                                )
+                                ExposedDropdownMenu(
+                                    expanded = subjectDropdownExpanded,
+                                    onDismissRequest = { subjectDropdownExpanded = false }
+                                ) {
+                                    availableSubjects.forEach { s ->
+                                        DropdownMenuItem(
+                                            text = { Text(s) },
+                                            onClick = {
+                                                teachingSubject = s
+                                                subjectDropdownExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            // 2. Teaching Grade & Section (የሚያስተምርበት ክፍል እና ሴክሽን)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                ExposedDropdownMenuBox(
+                                    expanded = gradeDropdownExpanded,
+                                    onExpandedChange = { gradeDropdownExpanded = it },
+                                    modifier = Modifier.weight(1.2f)
+                                ) {
+                                    OutlinedTextField(
+                                        value = assignedGrade,
+                                        onValueChange = {},
+                                        readOnly = true,
+                                        label = { Text(if (isAmharic) "የሚያስተምርበት ክፍል *" else "Grade *") },
+                                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = gradeDropdownExpanded) },
+                                        shape = RoundedCornerShape(12.dp),
+                                        modifier = Modifier.fillMaxWidth().menuAnchor()
+                                    )
+                                    ExposedDropdownMenu(
+                                        expanded = gradeDropdownExpanded,
+                                        onDismissRequest = { gradeDropdownExpanded = false }
+                                    ) {
+                                        cleanGrades.forEach { g ->
+                                            DropdownMenuItem(
+                                                text = { Text(g) },
+                                                onClick = {
+                                                    assignedGrade = g
+                                                    gradeDropdownExpanded = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+
+                                ExposedDropdownMenuBox(
+                                    expanded = sectionDropdownExpanded,
+                                    onExpandedChange = { sectionDropdownExpanded = it },
+                                    modifier = Modifier.weight(0.8f)
+                                ) {
+                                    OutlinedTextField(
+                                        value = assignedSection,
+                                        onValueChange = {},
+                                        readOnly = true,
+                                        label = { Text(if (isAmharic) "ሴክሽን *" else "Section *") },
+                                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sectionDropdownExpanded) },
+                                        shape = RoundedCornerShape(12.dp),
+                                        modifier = Modifier.fillMaxWidth().menuAnchor()
+                                    )
+                                    ExposedDropdownMenu(
+                                        expanded = sectionDropdownExpanded,
+                                        onDismissRequest = { sectionDropdownExpanded = false }
+                                    ) {
+                                        availableSections.forEach { sec ->
+                                            DropdownMenuItem(
+                                                text = { Text(sec) },
+                                                onClick = {
+                                                    assignedSection = sec
+                                                    sectionDropdownExpanded = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            // 3. Homeroom Teacher Toggle & Class (የክፍል ኃላፊ ነው? አዎ / አይደለም)
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = MaterialTheme.colorScheme.surface,
+                                tonalElevation = 1.dp,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(modifier = Modifier.padding(12.dp)) {
+                                    Text(
+                                        text = if (isAmharic) "የክፍል ኃላፊ (Homeroom Teacher) ነው?" else "Is Homeroom Teacher?",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                        modifier = Modifier.padding(vertical = 4.dp)
+                                    ) {
+                                        FilterChip(
+                                            selected = isHomeroomTeacher,
+                                            onClick = { isHomeroomTeacher = true },
+                                            label = { Text(if (isAmharic) "✅ አዎ የክፍል ኃላፊ ነው" else "Yes, Homeroom") }
+                                        )
+                                        FilterChip(
+                                            selected = !isHomeroomTeacher,
+                                            onClick = { isHomeroomTeacher = false },
+                                            label = { Text(if (isAmharic) "❌ አይደለም" else "No") }
+                                        )
+                                    }
+
+                                    if (isHomeroomTeacher) {
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                        Text(
+                                            text = if (isAmharic) "የስንተኛ ክፍል እና ሴክሽን ኃላፊ መሆኑን ይምረጡ፦" else "Select Homeroom Class & Section:",
+                                            fontSize = 11.sp,
+                                            color = NavyPrimary,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                        ) {
+                                            ExposedDropdownMenuBox(
+                                                expanded = hrGradeDropdownExpanded,
+                                                onExpandedChange = { hrGradeDropdownExpanded = it },
+                                                modifier = Modifier.weight(1.2f)
+                                            ) {
+                                                OutlinedTextField(
+                                                    value = homeroomGrade,
+                                                    onValueChange = {},
+                                                    readOnly = true,
+                                                    label = { Text(if (isAmharic) "ኃላፊ የሆነበት ክፍል" else "Homeroom Grade") },
+                                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = hrGradeDropdownExpanded) },
+                                                    shape = RoundedCornerShape(10.dp),
+                                                    modifier = Modifier.fillMaxWidth().menuAnchor()
+                                                )
+                                                ExposedDropdownMenu(
+                                                    expanded = hrGradeDropdownExpanded,
+                                                    onDismissRequest = { hrGradeDropdownExpanded = false }
+                                                ) {
+                                                    cleanGrades.forEach { g ->
+                                                        DropdownMenuItem(
+                                                            text = { Text(g) },
+                                                            onClick = {
+                                                                homeroomGrade = g
+                                                                hrGradeDropdownExpanded = false
+                                                            }
+                                                        )
+                                                    }
+                                                }
+                                            }
+
+                                            ExposedDropdownMenuBox(
+                                                expanded = hrSectionDropdownExpanded,
+                                                onExpandedChange = { hrSectionDropdownExpanded = it },
+                                                modifier = Modifier.weight(0.8f)
+                                            ) {
+                                                OutlinedTextField(
+                                                    value = homeroomSection,
+                                                    onValueChange = {},
+                                                    readOnly = true,
+                                                    label = { Text(if (isAmharic) "ሴክሽን" else "Section") },
+                                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = hrSectionDropdownExpanded) },
+                                                    shape = RoundedCornerShape(10.dp),
+                                                    modifier = Modifier.fillMaxWidth().menuAnchor()
+                                                )
+                                                ExposedDropdownMenu(
+                                                    expanded = hrSectionDropdownExpanded,
+                                                    onDismissRequest = { hrSectionDropdownExpanded = false }
+                                                ) {
+                                                    availableSections.forEach { sec ->
+                                                        DropdownMenuItem(
+                                                            text = { Text(sec) },
+                                                            onClick = {
+                                                                homeroomSection = sec
+                                                                hrSectionDropdownExpanded = false
+                                                            }
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else if (isAssistantTeacherRole) {
+                            // Assistant Teacher: Assigned Grade & Section (ረዳት ሆኖ የተመደበበት ክፍል እና ሴክሽን)
+                            Text(
+                                text = if (isAmharic) "ረዳት መምህሩ ድጋፍ የሚሰጥበትን ክፍል እና ሴክሽን ይምረጡ፦" else "Select the assigned grade and section for the assistant teacher:",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                ExposedDropdownMenuBox(
+                                    expanded = gradeDropdownExpanded,
+                                    onExpandedChange = { gradeDropdownExpanded = it },
+                                    modifier = Modifier.weight(1.2f)
+                                ) {
+                                    OutlinedTextField(
+                                        value = assignedGrade,
+                                        onValueChange = {},
+                                        readOnly = true,
+                                        label = { Text(if (isAmharic) "የተመደበበት ክፍል *" else "Assigned Grade *") },
+                                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = gradeDropdownExpanded) },
+                                        shape = RoundedCornerShape(12.dp),
+                                        modifier = Modifier.fillMaxWidth().menuAnchor()
+                                    )
+                                    ExposedDropdownMenu(
+                                        expanded = gradeDropdownExpanded,
+                                        onDismissRequest = { gradeDropdownExpanded = false }
+                                    ) {
+                                        cleanGrades.forEach { g ->
+                                            DropdownMenuItem(
+                                                text = { Text(g) },
+                                                onClick = {
+                                                    assignedGrade = g
+                                                    gradeDropdownExpanded = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+
+                                ExposedDropdownMenuBox(
+                                    expanded = sectionDropdownExpanded,
+                                    onExpandedChange = { sectionDropdownExpanded = it },
+                                    modifier = Modifier.weight(0.8f)
+                                ) {
+                                    OutlinedTextField(
+                                        value = assignedSection,
+                                        onValueChange = {},
+                                        readOnly = true,
+                                        label = { Text(if (isAmharic) "ሴክሽን *" else "Section *") },
+                                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sectionDropdownExpanded) },
+                                        shape = RoundedCornerShape(12.dp),
+                                        modifier = Modifier.fillMaxWidth().menuAnchor()
+                                    )
+                                    ExposedDropdownMenu(
+                                        expanded = sectionDropdownExpanded,
+                                        onDismissRequest = { sectionDropdownExpanded = false }
+                                    ) {
+                                        availableSections.forEach { sec ->
+                                            DropdownMenuItem(
+                                                text = { Text(sec) },
+                                                onClick = {
+                                                    assignedSection = sec
+                                                    sectionDropdownExpanded = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            // General Staff (ፅዳት፣ ጥበቃ፣ ፋይናንስ፣ ጸሐፊ ወዘተ): Assigned duty campus & Shift
+                            OutlinedTextField(
+                                value = dutyLocation,
+                                onValueChange = { dutyLocation = it },
+                                label = { Text(if (isAmharic) "የተመደበበት ግቢ / ህንፃ / የስራ ክፍል *" else "Duty Location / Campus *") },
+                                placeholder = { Text("ለምሳሌ፡ ዋናው ግቢ ህንፃ B፣ መማሪያ ክፍሎች፣ ዋና በር") },
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Text(
+                                text = if (isAmharic) "የስራ ፈረቃ (Duty Shift):" else "Duty Shift:",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.padding(vertical = 4.dp)
+                            ) {
+                                listOf("ሙሉ ቀን", "ጧት ፈረቃ", "ከሰዓት ፈረቃ", "የሌሊት ጥበቃ").forEach { sh ->
+                                    FilterChip(
+                                        selected = shift.contains(sh),
+                                        onClick = { shift = sh },
+                                        label = { Text(sh, fontSize = 11.sp) }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(10.dp))
 
                 // Salary & Hiring Year
@@ -1152,7 +1522,14 @@ fun StaffFormDialog(
                                         responsibilities = responsibilities.trim(),
                                         emergencyContact = emergencyContact.trim(),
                                         photoUri = photoUri,
-                                        status = initialStaff?.status ?: "ንቁ"
+                                        status = initialStaff?.status ?: "ንቁ",
+                                        teachingSubject = if (isTeacherRole) teachingSubject else "",
+                                        assignedGrade = if (isTeacherRole || isAssistantTeacherRole) assignedGrade else "",
+                                        assignedSection = if (isTeacherRole || isAssistantTeacherRole) assignedSection else "",
+                                        isHomeroomTeacher = if (isTeacherRole) isHomeroomTeacher else false,
+                                        homeroomClass = if (isTeacherRole && isHomeroomTeacher) "$homeroomGrade - $homeroomSection" else "",
+                                        dutyLocation = if (isCleanerOrSecurityOrOther) dutyLocation.trim() else "",
+                                        shift = if (isCleanerOrSecurityOrOther) shift.trim() else ""
                                     )
                                 )
                             }
@@ -1295,6 +1672,47 @@ fun StaffDetailDialog(
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
+
+                // Role Assignment & Scope Card
+                if (staff.teachingSubject.isNotBlank() || staff.assignedGrade.isNotBlank() || staff.isHomeroomTeacher || staff.dutyLocation.isNotBlank() || staff.shift.isNotBlank()) {
+                    Card(
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = if (isAmharic) "📍 የተመደበበት የስራ ምድብ ዝርዝር" else "📍 Assignment Details",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                color = NavyPrimary
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            if (staff.teachingSubject.isNotBlank()) {
+                                DetailRow(label = if (isAmharic) "የሚያስተምረው የትምህርት አይነት:" else "Subject:", value = staff.teachingSubject)
+                            }
+                            if (staff.assignedGrade.isNotBlank()) {
+                                DetailRow(
+                                    label = if (staff.role == "ረዳት መምህር") (if (isAmharic) "ረዳት የሆነበት ክፍል:" else "Assistant Class:") else (if (isAmharic) "የሚያስተምርበት ክፍል:" else "Class:"),
+                                    value = "${staff.assignedGrade} - ${staff.assignedSection}"
+                                )
+                            }
+                            if (staff.isHomeroomTeacher) {
+                                DetailRow(
+                                    label = if (isAmharic) "የክፍል ኃላፊነት (Homeroom):" else "Homeroom Teacher:",
+                                    value = "✅ አዎ (${staff.homeroomClass})"
+                                )
+                            }
+                            if (staff.dutyLocation.isNotBlank()) {
+                                DetailRow(label = if (isAmharic) "የስራ ቦታ/ግቢ:" else "Duty Location:", value = staff.dutyLocation)
+                            }
+                            if (staff.shift.isNotBlank()) {
+                                DetailRow(label = if (isAmharic) "የስራ ፈረቃ:" else "Shift:", value = staff.shift)
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
 
                 // Personal and Employment Details Card
                 Card(
