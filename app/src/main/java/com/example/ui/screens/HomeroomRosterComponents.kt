@@ -1054,46 +1054,55 @@ fun EthiopianReportCardDialog(
                         HorizontalDivider(color = GoldAccent.copy(alpha = 0.5f))
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        // Student Profile Box with Local Storage Photo
-                        Row(
+                        // Student Profile Box with Local Storage Photo (Centered above student info)
+                        Column(
                             modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            // Student Photo
+                            // Centered Student Photo
                             UserAvatar(
                                 photoUri = student.photoUri,
                                 name = student.fullName,
                                 gender = student.gender,
-                                size = 76.dp
+                                size = 80.dp
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = if (isAmharic) "የተማሪ ፎቶ" else "Student Photo",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
 
-                            Spacer(modifier = Modifier.width(14.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
 
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = student.fullName,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text(
-                                    text = "መለያ ቁጥር: ${student.studentIdNumber} • ጾታ: ${student.gender} • እድሜ: ${student.age}",
-                                    fontSize = 11.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = "ክፍል: ${student.grade} (ሴክሽን ${student.section})",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = NavyPrimary
-                                )
-                                Text(
-                                    text = "ወላጅ: ${student.parentName} (${student.parentPhone})",
-                                    fontSize = 11.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
+                            Text(
+                                text = student.fullName,
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "መለያ ቁጥር: ${student.studentIdNumber} • ጾታ: ${student.gender} • እድሜ: ${student.age}",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center
+                            )
+                            Text(
+                                text = "ክፍል: ${student.grade} (ሴክሽን ${student.section})",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = NavyPrimary,
+                                textAlign = TextAlign.Center
+                            )
+                            Text(
+                                text = "ወላጅ: ${student.parentName} (${student.parentPhone})",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(14.dp))

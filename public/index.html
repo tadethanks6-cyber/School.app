@@ -755,24 +755,36 @@
           <button class="btn-primary" onclick="window.print()">🖨️ ፕሪንት አድርግ (Print)</button>
         </div>
         <div class="report-card-view">
-          <div class="report-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
-            <div style="display:flex; align-items:center; gap:0.75rem;">
-              <div id="reportSchoolLogoBadge" class="logo-badge" style="width:52px; height:52px; font-size:1.6rem; border-color:var(--accent); overflow:hidden;">🎓</div>
-              <div>
-                <h2 id="reportSchoolNameDisplay" style="color:var(--primary); font-size:1.25rem;">ዲሊጀንት አካዳሚ (Dilijent Academy)</h2>
-                <p id="reportSchoolSubtitle" style="font-size:0.85rem; color:#475569;">የ2017 ዓ.ም የመጀመሪያ ወሰነ-ትምህርት (Semester I) የተማሪ ውጤት መግለጫ</p>
-                <span id="reportCardSchemePill" class="badge badge-primary" style="margin-top:0.3rem;"></span>
-              </div>
-            </div>
-            <div id="reportStudentPhotoBadge">
-              <!-- Rendered via JS -->
+          <!-- 1. School Header: Centered School Logo at the Top (ከርዕሱ በላይ / Top), followed by School Title and Subtitle -->
+          <div class="report-header" style="display:flex; flex-direction:column; align-items:center; text-align:center; padding-bottom:0.6rem;">
+            <div id="reportSchoolLogoBadge" class="logo-badge" style="width:76px; height:76px; font-size:2.4rem; border:2.5px solid var(--accent); box-shadow:0 3px 8px rgba(0,0,0,0.12); margin:0 auto 0.5rem; overflow:hidden; background:white; display:flex; align-items:center; justify-content:center; border-radius:50%;">🎓</div>
+            <h2 id="reportSchoolNameDisplay" style="color:var(--primary); font-size:1.35rem; font-weight:800; margin:0 0 0.25rem;">ዲሊጀንት ትምህርት ቤት (Dilijent School)</h2>
+            <p id="reportSchoolSubtitle" style="font-size:0.88rem; color:#475569; margin:0 0 0.4rem;">የ2017 ዓ.ም የመጀመሪያ ወሰነ-ትምህርት (Semester I) የተማሪ ውጤት መግለጫ</p>
+            <div style="display:flex; justify-content:center;">
+              <span id="reportCardSchemePill" class="badge badge-primary"></span>
             </div>
           </div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:1rem; font-size:0.85rem; flex-wrap:wrap; gap:0.5rem;">
-            <div><strong>የተማሪ ስም:</strong> <span id="reportStudentNameDisplay">አቤል ታደሰ</span></div>
-            <div><strong>መለያ ቁጥር:</strong> <span id="reportStudentIdDisplay">DIL-001</span></div>
-            <div><strong>ክፍል:</strong> <span id="reportStudentGradeDisplay">12A (Natural Science)</span></div>
-            <div><strong>አማካይ:</strong> <span id="reportStudentAvgDisplay">88.5% (ደረጃ: 1ኛ)</span></div>
+
+          <!-- Decorative Ethiopian Flag Accent Line -->
+          <div class="header-bar" style="height:4px; display:flex; margin:0.4rem 0 1rem; border-radius:2px; overflow:hidden;">
+            <div style="flex:1; background:#078930;"></div>
+            <div style="flex:1; background:#FECB00;"></div>
+            <div style="flex:1; background:#DE2128;"></div>
+          </div>
+
+          <!-- 2. Centered Student Photo Container right above student information (ከተማሪው መረጃ በላይ ሴንተር ላይ) -->
+          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; margin-bottom:0.75rem; text-align:center;">
+            <div id="reportStudentPhotoBadge">
+              <!-- Rendered via JS with student photo / avatar -->
+            </div>
+          </div>
+
+          <!-- 3. Student Information Container Directly Under Centered Photo -->
+          <div style="display:flex; justify-content:space-around; align-items:center; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:0.75rem 1rem; margin-bottom:1rem; font-size:0.88rem; flex-wrap:wrap; gap:0.6rem;">
+            <div><span style="color:#64748B;">የተማሪ ስም:</span> <strong id="reportStudentNameDisplay" style="color:var(--primary);">አቤል ታደሰ</strong></div>
+            <div><span style="color:#64748B;">መለያ ቁጥር:</span> <strong id="reportStudentIdDisplay">DIL-001</strong></div>
+            <div><span style="color:#64748B;">ክፍል:</span> <strong id="reportStudentGradeDisplay">12A (Natural Science)</strong></div>
+            <div><span style="color:#64748B;">አማካይ:</span> <strong id="reportStudentAvgDisplay" style="color:var(--primary);">88.5% (ደረጃ: 1ኛ)</strong></div>
           </div>
           <div class="table-responsive">
             <table>
@@ -2076,15 +2088,19 @@
       if (photoBadge) {
         if (targetStudent.photo) {
           photoBadge.innerHTML = `
-            <div style="text-align:center;">
-              <img src="${targetStudent.photo}" alt="${targetStudent.name}" style="width:72px; height:72px; border-radius:50%; object-fit:cover; border:2.5px solid var(--accent); box-shadow:0 2px 6px rgba(0,0,0,0.15);">
-              <div style="font-size:0.65rem; color:#475569; font-weight:600; margin-top:2px;">የተማሪ ፎቶ</div>
+            <div style="display:flex; flex-direction:column; align-items:center; text-align:center;">
+              <img src="${targetStudent.photo}" alt="${targetStudent.name}" style="width:78px; height:78px; border-radius:50%; object-fit:cover; border:3px solid var(--accent); box-shadow:0 3px 8px rgba(0,0,0,0.15);">
+              <span style="font-size:0.75rem; color:#475569; font-weight:700; margin-top:4px;">የተማሪ ፎቶ</span>
             </div>
           `;
         } else {
+          const isFemale = targetStudent.gender === 'ሴት';
           photoBadge.innerHTML = `
-            <div style="width:68px; height:68px; border-radius:50%; background:#EFF6FF; border:1.5px dashed #93C5FD; display:flex; align-items:center; justify-content:center; color:#1E40AF; font-size:1.6rem; box-shadow:0 2px 6px rgba(0,0,0,0.06);">
-              🎓
+            <div style="display:flex; flex-direction:column; align-items:center; text-align:center;">
+              <div style="width:78px; height:78px; border-radius:50%; background:linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); border:2.5px solid #3B82F6; display:flex; align-items:center; justify-content:center; color:#1E40AF; font-size:2.2rem; box-shadow:0 3px 8px rgba(30,64,175,0.12);">
+                ${isFemale ? '👩‍🎓' : '👨‍🎓'}
+              </div>
+              <span style="font-size:0.75rem; color:#475569; font-weight:700; margin-top:4px;">የተማሪ ፎቶ</span>
             </div>
           `;
         }
