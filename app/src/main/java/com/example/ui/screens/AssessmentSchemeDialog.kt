@@ -113,6 +113,12 @@ fun AssessmentSchemeDialog(
             else
                 "Total weight must equal exactly 100%! (Current: ${String.format("%.1f", calculatedTotal)}%)"
         } else {
+            val componentsList = listOf(
+                com.example.data.model.AssessmentComponent("c1", t1Label.ifBlank { "ጥያቄ 1" }, t1Weight.toFloatOrNull() ?: 0f),
+                com.example.data.model.AssessmentComponent("c2", asLabel.ifBlank { "የቤት ስራ" }, asWeight.toFloatOrNull() ?: 0f),
+                com.example.data.model.AssessmentComponent("c3", midLabel.ifBlank { "አጋማሽ ፈተና" }, midWeight.toFloatOrNull() ?: 0f),
+                com.example.data.model.AssessmentComponent("c4", finalLabel.ifBlank { "ማጠቃለያ ፈተና" }, finalWeight.toFloatOrNull() ?: 0f)
+            )
             val scheme = AssessmentScheme(
                 id = selectedPresetId,
                 titleAmharic = titleAmharic,
@@ -125,7 +131,8 @@ fun AssessmentSchemeDialog(
                 midExamLabel = midLabel.ifBlank { "አጋማሽ ፈተና" },
                 midExamWeight = midWeight.toFloatOrNull() ?: 0f,
                 finalExamLabel = finalLabel.ifBlank { "ማጠቃለያ ፈተና" },
-                finalExamWeight = finalWeight.toFloatOrNull() ?: 0f
+                finalExamWeight = finalWeight.toFloatOrNull() ?: 0f,
+                components = componentsList
             )
             onSave(scheme)
         }
@@ -331,7 +338,11 @@ fun AssessmentSchemeDialog(
                                     color = if (isSelected) NavyPrimary else MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
-                                    text = "${preset.test1Label}: ${preset.test1Weight.toInt()}% | ${preset.assignmentLabel}: ${preset.assignmentWeight.toInt()}% | ${preset.midExamLabel}: ${preset.midExamWeight.toInt()}% | ${preset.finalExamLabel}: ${preset.finalExamWeight.toInt()}%",
+                                    text = if (preset.components.isNotEmpty()) {
+                                        preset.components.joinToString(" | ") { "${it.label}: ${it.weight.toInt()}%" }
+                                    } else {
+                                        "${preset.test1Label}: ${preset.test1Weight.toInt()}% | ${preset.assignmentLabel}: ${preset.assignmentWeight.toInt()}% | ${preset.midExamLabel}: ${preset.midExamWeight.toInt()}% | ${preset.finalExamLabel}: ${preset.finalExamWeight.toInt()}%"
+                                    },
                                     fontSize = 10.5.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )

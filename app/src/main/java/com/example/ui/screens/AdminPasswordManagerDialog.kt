@@ -80,6 +80,7 @@ fun AdminPasswordManagerDialog(
     var userToEditPassword by remember { mutableStateOf<UserAccount?>(null) }
     var newPasswordInput by remember { mutableStateOf("") }
     var newPasswordVisible by remember { mutableStateOf(false) }
+    var passwordValidationError by remember { mutableStateOf<String?>(null) }
 
     // Map to track password visibility toggle per user card
     val revealedPasswords = remember { mutableStateMapOf<Long, Boolean>() }
@@ -499,8 +500,30 @@ fun AdminPasswordManagerDialog(
 
                     OutlinedTextField(
                         value = newPasswordInput,
-                        onValueChange = { newPasswordInput = it },
-                        label = { Text(if (isAmharic) "አዲስ የይለፍ ቃል" else "New Password") },
+                        onValueChange = { 
+                            newPasswordInput = it
+                            if (passwordValidationError != null && it.trim().length >= 8) {
+                                passwordValidationError = null
+                            }
+                        },
+                        label = { Text(if (isAmharic) "አዲስ የይለፍ ቃል (ቢያንስ 8 ፊደላት/ቁጥሮች)" else "New Password (Min 8 chars)") },
+                        isError = passwordValidationError != null,
+                        supportingText = {
+                            if (passwordValidationError != null) {
+                                Text(
+                                    text = passwordValidationError!!,
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            } else {
+                                Text(
+                                    text = if (isAmharic) "ደህንነቱ የተጠበቀ እንዲሆን ቢያንስ 8 ፊደላት/ቁጥሮች ያስፈልጋል" else "Must be at least 8 characters for security",
+                                    fontSize = 10.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        },
                         leadingIcon = {
                             Icon(imageVector = Icons.Default.Lock, contentDescription = null, tint = NavyPrimary)
                         },
@@ -520,19 +543,22 @@ fun AdminPasswordManagerDialog(
                             .testTag("input_modal_new_password")
                     )
 
-                    // Quick PIN suggestions
+                    // Strong Password suggestions (8+ characters)
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = "ፈጣን ምሳሌ:", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        listOf("1234", "admin123", "pass2017", "ethio123").forEach { pin ->
+                        Text(text = "ጠንካራ ምሳሌ:", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        listOf("Admin@2026", "Dilijent#88", "EthioPass1", "Secure@2026").forEach { pin ->
                             Surface(
                                 shape = RoundedCornerShape(6.dp),
                                 color = MaterialTheme.colorScheme.surfaceVariant,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(6.dp))
-                                    .clickable { newPasswordInput = pin }
+                                    .clickable { 
+                                        newPasswordInput = pin 
+                                        passwordValidationError = null
+                                    }
                             ) {
                                 Text(
                                     text = pin,
@@ -549,8 +575,15 @@ fun AdminPasswordManagerDialog(
             confirmButton = {
                 Button(
                     onClick = {
-                        if (newPasswordInput.isNotBlank()) {
-                            onUpdatePassword(targetUser.id, newPasswordInput.trim())
+                        val trimmed = newPasswordInput.trim()
+                        if (trimmed.length < 8) {
+                            passwordValidationError = if (isAmharic)
+                                "የይለፍ ቃሉ ጠንካራ እንዲሆን ቢያንስ 8 ፊደላት/ቁጥሮች (characters) መሆን አለበት!"
+                            else
+                                "Password must be at least 8 characters long for security!"
+                        } else {
+                            passwordValidationError = null
+                            onUpdatePassword(targetUser.id, trimmed)
                             userToEditPassword = null
                         }
                     },
@@ -562,7 +595,10 @@ fun AdminPasswordManagerDialog(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { userToEditPassword = null }) {
+                TextButton(onClick = { 
+                    userToEditPassword = null
+                    passwordValidationError = null
+                }) {
                     Text(text = if (isAmharic) "ሰርዝ" else "Cancel")
                 }
             }

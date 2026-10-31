@@ -541,33 +541,6 @@ fun LoginScreen(
                             onGoogleSignInError = onGoogleSignInError
                         )
 
-                        Spacer(modifier = Modifier.height(18.dp))
-
-                        // Quick Role Test Selector (2 Columns for Desktop)
-                        Text(
-                            text = if (isAmharic) "⚡ በስራ ድርሻዎ ፈጥነው ይግቡ (ይምረጡ)፦" else "⚡ Quick Demo Login by Role (Select):",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = NavyPrimary,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-
-                        RoleSelectorGrid(
-                            roles = availableDemoRoles,
-                            columns = 2,
-                            isAmharic = isAmharic,
-                            onRoleSelected = { identifier, isEmail, pass ->
-                                onToggleAdminMode(isEmail)
-                                if (isEmail) {
-                                    onEmailChange(identifier)
-                                } else {
-                                    onPhoneChange(identifier)
-                                }
-                                onPasswordChange(pass)
-                                onQuickRoleLogin(identifier, isEmail, pass)
-                            }
-                        )
-
                         Spacer(modifier = Modifier.height(14.dp))
 
                         // Share Web Link Card
@@ -816,33 +789,6 @@ fun LoginScreen(
                             onGoogleSignInError = onGoogleSignInError
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Quick Role Test Selector (2 Columns for Mobile)
-                        Text(
-                            text = if (isAmharic) "⚡ በስራ ድርሻዎ ፈጥነው ይግቡ (ይምረጡ)፦" else "⚡ Quick Demo Login by Role (Select):",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = NavyPrimary,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-
-                        RoleSelectorGrid(
-                            roles = availableDemoRoles,
-                            columns = 2,
-                            isAmharic = isAmharic,
-                            onRoleSelected = { identifier, isEmail, pass ->
-                                onToggleAdminMode(isEmail)
-                                if (isEmail) {
-                                    onEmailChange(identifier)
-                                } else {
-                                    onPhoneChange(identifier)
-                                }
-                                onPasswordChange(pass)
-                                onQuickRoleLogin(identifier, isEmail, pass)
-                            }
-                        )
-
                         Spacer(modifier = Modifier.height(12.dp))
 
                         // Share Web Link Card
@@ -881,8 +827,33 @@ fun LoginScreen(
 }
 
 /**
- * Reusable Login Form Input Fields
+ * Role definition for the dropdown menu selector
  */
+data class LoginRoleItem(
+    val titleAm: String,
+    val titleEn: String,
+    val iconEmoji: String,
+    val isAdmin: Boolean,
+    val identifierLabelAm: String,
+    val identifierLabelEn: String,
+    val placeholder: String
+)
+
+val loginRoleOptions = listOf(
+    LoginRoleItem("መምህር", "Teacher", "👨‍🏫", false, "የመምህር ስልክ ቁጥር", "Teacher Phone Number", "09XXXXXXXX"),
+    LoginRoleItem("ሲስተም አድሚን", "System Admin", "👑", true, "የአድሚን ኢሜል አድራሻ", "Admin Email Address", "admin@dilijent.edu.et"),
+    LoginRoleItem("ምክትል ር/መምህር", "Vice Principal", "🎖️", false, "የምክትል ር/መ ስልክ ቁጥር", "Vice Principal Phone", "09XXXXXXXX"),
+    LoginRoleItem("ርዕሰ መምህር", "Principal", "🎓", false, "የርዕሰ መምህር ስልክ ቁጥር", "Principal Phone", "09XXXXXXXX"),
+    LoginRoleItem("ጸሐፊ", "Secretary", "📝", false, "የጸሐፊ ስልክ ቁጥር", "Secretary Phone", "09XXXXXXXX"),
+    LoginRoleItem("ፋይናንስ", "Finance", "💰", false, "የፋይናንስ ስልክ ቁጥር", "Finance Phone", "09XXXXXXXX"),
+    LoginRoleItem("ፅዳት እና ጥበቃ", "Support Staff", "🧹", false, "የሰራተኛ ስልክ ቁጥር", "Support Staff Phone", "09XXXXXXXX"),
+    LoginRoleItem("ተማሪ / ወላጅ", "Student / Parent", "🎒", false, "የተማሪ መለያ ቁጥር ወይም ስልክ", "Student ID or Phone", "DIL-P01 ወይም 09XXXXXXXX")
+)
+
+/**
+ * Reusable Login Form Input Fields with Role Dropdown
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LoginFormFields(
     isAdminMode: Boolean,
@@ -903,97 +874,77 @@ private fun LoginFormFields(
     onGoogleSignInError: (String) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
+    var selectedRoleIndex by remember { mutableStateOf(if (isAdminMode) 1 else 0) }
+    var roleDropdownExpanded by remember { mutableStateOf(false) }
+
+    val currentRole = loginRoleOptions.getOrElse(selectedRoleIndex) { loginRoleOptions[0] }
 
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        // Mode Switcher Toggle (👑 Admin by Email vs 📱 Other Users by Phone)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .background(NavyPrimary.copy(alpha = 0.08f))
-                .border(1.dp, NavyPrimary.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
-                .padding(4.dp)
-        ) {
-            // Admin Tab (Email)
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(if (isAdminMode) NavyPrimary else Color.Transparent)
-                    .clickable { onToggleAdminMode(true) }
-                    .padding(vertical = 8.dp)
-                    .testTag("tab_login_mode_admin")
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "👑", fontSize = 13.sp)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = if (isAmharic) "አድሚን (በኢሜል)" else "Admin (Email)",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (isAdminMode) GoldAccent else NavyPrimary
-                    )
-                }
-            }
+        // 1. Role Selection Dropdown (መምህር፣ አድሚን፣ ምክትል ር/መ፣ ርዕሰ መምህር፣ ጸሐፊ፣ ፋይናንስ፣ ፅዳት፣ ተማሪ)
+        Text(
+            text = if (isAmharic) "የመግቢያ የስራ ድርሻ (በድሮፕ ዳውን ይምረጡ)፦" else "Select Login Role (Dropdown):",
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            color = NavyPrimary
+        )
 
-            // Other Users Tab (Phone)
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .weight(1.3f)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(if (!isAdminMode) NavyPrimary else Color.Transparent)
-                    .clickable { onToggleAdminMode(false) }
-                    .padding(vertical = 8.dp)
-                    .testTag("tab_login_mode_phone")
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "📱", fontSize = 13.sp)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = if (isAmharic) "መምህራን/ተማሪዎች (በስልክ)" else "Teachers/Students (Phone)",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (!isAdminMode) GoldAccent else NavyPrimary
-                    )
-                }
-            }
-        }
-
-        // Mode Explanatory Notice
-        Surface(
-            shape = RoundedCornerShape(8.dp),
-            color = if (isAdminMode) GoldAccent.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        ExposedDropdownMenuBox(
+            expanded = roleDropdownExpanded,
+            onExpandedChange = { roleDropdownExpanded = !roleDropdownExpanded },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                verticalAlignment = Alignment.CenterVertically
+            OutlinedTextField(
+                value = "${currentRole.iconEmoji} ${if (isAmharic) currentRole.titleAm else currentRole.titleEn}",
+                onValueChange = {},
+                readOnly = true,
+                label = { Text(if (isAmharic) "የስራ ድርሻ (Role)" else "Designated Role") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = roleDropdownExpanded) },
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = NavyPrimary,
+                    unfocusedBorderColor = NavyPrimary.copy(alpha = 0.5f)
+                ),
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+                    .testTag("dropdown_login_role")
+            )
+            ExposedDropdownMenu(
+                expanded = roleDropdownExpanded,
+                onDismissRequest = { roleDropdownExpanded = false }
             ) {
-                Icon(
-                    imageVector = if (isAdminMode) Icons.Default.Security else Icons.Default.Phone,
-                    contentDescription = null,
-                    tint = if (isAdminMode) Color(0xFFB45309) else NavyPrimary,
-                    modifier = Modifier.size(14.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = if (isAdminMode) {
-                        if (isAmharic) "የሲስተም አድሚን ብቻ በኢሜልና በይለፍ ቃል ይገባል (admin@dilijent.edu.et)"
-                        else "System Admin only logs in via Email & Password"
-                    } else {
-                        if (isAmharic) "ርዕሰ መምህር፣ መምህራን፣ ተማሪዎች እና ሰራተኞች በስልክ ቁጥር ይገባሉ"
-                        else "Principal, Teachers, Students & Staff log in via Phone Number"
-                    },
-                    fontSize = 10.sp,
-                    color = if (isAdminMode) Color(0xFFB45309) else MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                loginRoleOptions.forEachIndexed { index, option ->
+                    DropdownMenuItem(
+                        text = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(text = option.iconEmoji, fontSize = 16.sp)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column {
+                                    Text(
+                                        text = if (isAmharic) option.titleAm else option.titleEn,
+                                        fontWeight = if (selectedRoleIndex == index) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (selectedRoleIndex == index) NavyPrimary else MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        text = if (isAmharic) option.identifierLabelAm else option.identifierLabelEn,
+                                        fontSize = 10.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        },
+                        onClick = {
+                            selectedRoleIndex = index
+                            onToggleAdminMode(option.isAdmin)
+                            roleDropdownExpanded = false
+                        }
+                    )
+                }
             }
         }
 
+        // Identifier input: Admin Email vs Phone / Student ID
         if (isAdminMode) {
-            // Admin Email Input
             OutlinedTextField(
                 value = email,
                 onValueChange = onEmailChange,
@@ -1017,21 +968,20 @@ private fun LoginFormFields(
                     .testTag("input_login_admin_email")
             )
         } else {
-            // Other Users Phone Input
             OutlinedTextField(
                 value = phone,
                 onValueChange = onPhoneChange,
-                label = { Text(if (isAmharic) "የስልክ ቁጥር (Phone Number)" else "Phone Number") },
-                placeholder = { Text("09XXXXXXXX") },
+                label = { Text(if (isAmharic) currentRole.identifierLabelAm else currentRole.identifierLabelEn) },
+                placeholder = { Text(currentRole.placeholder) },
                 leadingIcon = {
                     Icon(
-                        imageVector = Icons.Default.Phone,
+                        imageVector = Icons.Default.Person,
                         contentDescription = null,
                         tint = NavyPrimary
                     )
                 },
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Phone,
+                    keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next
                 ),
                 singleLine = true,
@@ -1046,7 +996,7 @@ private fun LoginFormFields(
         OutlinedTextField(
             value = password,
             onValueChange = onPasswordChange,
-            label = { Text(if (isAmharic) "የይለፍ ቃል" else "Password") },
+            label = { Text(if (isAmharic) "የይለፍ ቃል (Password)" else "Password") },
             placeholder = { Text("••••••••") },
             leadingIcon = {
                 Icon(
@@ -1083,6 +1033,26 @@ private fun LoginFormFields(
                 .testTag("input_login_password")
         )
 
+        // Security requirement notice
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 4.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Security,
+                contentDescription = null,
+                tint = EthioGreen,
+                modifier = Modifier.size(14.dp)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = if (isAmharic) "ደህንነት፦ የይለፍ ቃል ሲቀየር ቢያንስ 8 ፊደላት/ቁጥሮች መሆን አለበት"
+                       else "Security: Passwords must be at least 8 characters when updated",
+                fontSize = 10.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
         Spacer(modifier = Modifier.height(4.dp))
 
         // Sign In Button (Stretches Full Width)
@@ -1111,40 +1081,6 @@ private fun LoginFormFields(
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
-            }
-        }
-
-        // Fast Quick Admin Login shortcut button
-        if (isAdminMode) {
-            Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = GoldAccent.copy(alpha = 0.2f),
-                border = androidx.compose.foundation.BorderStroke(1.dp, GoldAccent),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(10.dp))
-                    .clickable {
-                        onEmailChange("admin@dilijent.edu.et")
-                        onPasswordChange("admin123")
-                        onLoginClick()
-                    }
-                    .testTag("btn_quick_admin_login")
-            ) {
-                Row(
-                    modifier = Modifier.padding(10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(text = "👑", fontSize = 16.sp)
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = if (isAmharic) "⚡ ፈጣን የአድሚን መግቢያ (admin@dilijent.edu.et / admin123)"
-                               else "⚡ Quick Admin Login (admin@dilijent.edu.et / admin123)",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = NavyPrimary
-                    )
-                }
             }
         }
 
@@ -1284,15 +1220,15 @@ private fun PasswordNoticeCard(isAmharic: Boolean) {
     ) {
         Column(modifier = Modifier.padding(10.dp)) {
             Text(
-                text = if (isAmharic) "🔒 የይለፍ ቃል እና የስራ ድርሻ መመሪያ፦" else "🔒 Password & Role Security Guide:",
+                text = if (isAmharic) "🔒 የይለፍ ቃል እና የስራ ድርሻ ጥበቃ መመሪያ፦" else "🔒 Password & Role Security Guide:",
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 color = NavyPrimary
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = if (isAmharic) "ለሁሉም የስራ መደቦች ነባሪ የይለፍ ቃል 1234 ነው። እያንዳንዱ ተጠቃሚ ሲገባ የሚመለከተውን የስራ ድርሻ ብቻ ያገኛል።"
-                else "Default password for all roles is 1234. Each logged in user only accesses modules relevant to their duty.",
+                text = if (isAmharic) "የይለፍ ቃል ሲቀየር ደህንነቱ የተጠበቀ እንዲሆን ቢያንስ 8 ፊደላት/ቁጥሮች (characters) መሆን አለበት። የአድሚን ገፅ እና የይለፍ ቃል መቆጣጠሪያ በአድሚኑ ብቻ የሚከፈቱ ናቸው።"
+                else "Passwords must be at least 8 characters when changed for security. System settings and password controls are strictly restricted to the Admin.",
                 fontSize = 10.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 14.sp
@@ -1313,14 +1249,14 @@ fun RegisterUserDialog(
 ) {
     var fullName by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("1234") }
-    var role by remember { mutableStateOf("ርዕሰ መምህር (Admin)") }
+    var password by remember { mutableStateOf("") }
+    var role by remember { mutableStateOf("መምህር (Teacher)") }
     var roleDropdownExpanded by remember { mutableStateOf(false) }
 
     val roleOptions = listOf(
+        "መምህር (Teacher)",
         "ርዕሰ መምህር (Admin)",
         "ምክትል ርዕሰ መምህር",
-        "መምህር (Teacher)",
         "ፋይናንስ / ሂሳብ ሹም",
         "ዋና ጸሐፊ / መዝጋቢ",
         "ንብረት ክፍል ኃላፊ",
@@ -1384,7 +1320,23 @@ fun RegisterUserDialog(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text(if (isAmharic) "የይለፍ ቃል" else "Password") },
+                    label = { Text(if (isAmharic) "የይለፍ ቃል (ቢያንስ 8 ፊደላት/ቁጥሮች)" else "Password (Min 8 chars)") },
+                    isError = password.isNotEmpty() && password.trim().length < 8,
+                    supportingText = {
+                        if (password.isNotEmpty() && password.trim().length < 8) {
+                            Text(
+                                text = if (isAmharic) "የይለፍ ቃሉ ቢያንስ 8 ፊደላት/ቁጥሮች መሆን አለበት!" else "Must be at least 8 characters!",
+                                color = MaterialTheme.colorScheme.error,
+                                fontSize = 11.sp
+                            )
+                        } else {
+                            Text(
+                                text = if (isAmharic) "ደህንነቱ የተጠበቀ እንዲሆን ቢያንስ 8 ፊደላት/ቁጥሮች ያስፈልጋል" else "Min 8 characters required",
+                                fontSize = 10.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
@@ -1438,11 +1390,11 @@ fun RegisterUserDialog(
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
                         onClick = {
-                            if (fullName.isNotBlank() && phone.isNotBlank() && password.isNotBlank()) {
-                                onRegister(fullName, phone, password, role)
+                            if (fullName.isNotBlank() && phone.isNotBlank() && password.trim().length >= 8) {
+                                onRegister(fullName, phone, password.trim(), role)
                             }
                         },
-                        enabled = fullName.isNotBlank() && phone.isNotBlank() && password.isNotBlank(),
+                        enabled = fullName.isNotBlank() && phone.isNotBlank() && password.trim().length >= 8,
                         colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary)
                     ) {
                         Text(if (isAmharic) "ይመዝገቡ" else "Register")

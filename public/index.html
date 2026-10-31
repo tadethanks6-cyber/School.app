@@ -272,7 +272,7 @@
         <button class="btn-primary" style="background:#EF4444; border-color:#DC2626;" onclick="logoutWeb()">🚪 ውጣ (Logout)</button>
         <button id="btnBannerSchoolSettings" class="btn-accent" style="background:#0284C7; border-color:#0284C7;" onclick="openSchoolSettingsModal()">⚙️ የት/ቤት ቅንብር & አርማ</button>
         <button id="btnBannerPassManager" class="btn-accent" onclick="openPasswordManagerModal()">🔐 የይለፍ ቃል መቆጣጠሪያ</button>
-        <button class="btn-secondary" onclick="openSchemeModal()">⚙️ የውጤት አሰጣጥ (ርዕሰ መ/ር)</button>
+        <button class="btn-secondary" onclick="openSchemeModal()">⚙️ የውጤት አሰጣጥ (ርዕሰ መ/ር & አድሚን)</button>
         <button class="btn-secondary" onclick="shareWebsiteLink()">🔗 ሊንክ ኮፒ</button>
       </div>
     </div>
@@ -436,7 +436,7 @@
           </div>
           <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
             <button class="btn-primary" onclick="openAddGradeModal()">➕ ውጤት አስገባ (Add Grade)</button>
-            <button class="btn-accent" onclick="openSchemeModal()">⚙️ ስርዓተ-ትምህርት አዋቅር (ርዕሰ መ/ር)</button>
+            <button class="btn-accent" onclick="openSchemeModal()">⚙️ ስርዓተ-ትምህርት አዋቅር (ርዕሰ መ/ር & አድሚን)</button>
           </div>
         </div>
 
@@ -830,26 +830,26 @@
       </div>
 
       <div class="form-group" style="border-top:1px solid var(--border); padding-top:0.75rem;">
-        <label>3. የምዘና ክፍሎች እና የክብደት መቶኛ (Weights)</label>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+          <label style="margin:0; font-weight:700;">3. የምዘና ክፍሎች እና ክብደት (Components & Weights)</label>
+          <button type="button" class="btn-primary" style="padding:0.3rem 0.65rem; font-size:0.78rem;" onclick="addSchemeComponentRow()">➕ አዲስ ምዘና ጨምር</button>
+        </div>
+
+        <!-- Quick suggestion chips for common Ethiopian assessments: Test 1-3, Groupw, CW, CP, Mid, Final -->
+        <div style="display:flex; gap:0.35rem; flex-wrap:wrap; margin-bottom:0.6rem; align-items:center;">
+          <span style="font-size:0.72rem; color:#64748B; font-weight:600;">ፈጣን ምዘና ጨምር፡</span>
+          <button type="button" class="badge" style="background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE; cursor:pointer;" onclick="quickAddSchemeComponent('ፈተና 1 (Test 1)', 10)">+ Test 1 (10%)</button>
+          <button type="button" class="badge" style="background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE; cursor:pointer;" onclick="quickAddSchemeComponent('ፈተና 2 (Test 2)', 10)">+ Test 2 (10%)</button>
+          <button type="button" class="badge" style="background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE; cursor:pointer;" onclick="quickAddSchemeComponent('ፈተና 3 (Test 3)', 10)">+ Test 3 (10%)</button>
+          <button type="button" class="badge" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0; cursor:pointer;" onclick="quickAddSchemeComponent('የቡድን ስራ (Groupw)', 10)">+ Groupw (10%)</button>
+          <button type="button" class="badge" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0; cursor:pointer;" onclick="quickAddSchemeComponent('የክፍል ስራ (CW)', 10)">+ CW (10%)</button>
+          <button type="button" class="badge" style="background:#FEF3C7; color:#92400E; border:1px solid #FDE68A; cursor:pointer;" onclick="quickAddSchemeComponent('ተሳትፎ (CP)', 10)">+ CP (10%)</button>
+          <button type="button" class="badge" style="background:#F5F3FF; color:#5B21B6; border:1px solid #DDD6FE; cursor:pointer;" onclick="quickAddSchemeComponent('አጋማሽ ፈተና (Mid)', 30)">+ Mid (30%)</button>
+          <button type="button" class="badge" style="background:#FFF1F2; color:#9F1239; border:1px solid #FECDD3; cursor:pointer;" onclick="quickAddSchemeComponent('ማጠቃለያ ፈተና (Final)', 40)">+ Final (40%)</button>
+        </div>
         
-        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem; margin-bottom:0.4rem;">
-          <input type="text" id="sch_t1_label" class="form-control" placeholder="ምዘና 1 ስም" oninput="calculateSchemeTotal()">
-          <input type="number" id="sch_t1_weight" class="form-control" placeholder="10%" oninput="calculateSchemeTotal()">
-        </div>
-
-        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem; margin-bottom:0.4rem;">
-          <input type="text" id="sch_as_label" class="form-control" placeholder="ምዘና 2 ስም" oninput="calculateSchemeTotal()">
-          <input type="number" id="sch_as_weight" class="form-control" placeholder="10%" oninput="calculateSchemeTotal()">
-        </div>
-
-        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem; margin-bottom:0.4rem;">
-          <input type="text" id="sch_mid_label" class="form-control" placeholder="ምዘና 3 ስም" oninput="calculateSchemeTotal()">
-          <input type="number" id="sch_mid_weight" class="form-control" placeholder="30%" oninput="calculateSchemeTotal()">
-        </div>
-
-        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem; margin-bottom:0.4rem;">
-          <input type="text" id="sch_final_label" class="form-control" placeholder="ምዘና 4 ስም" oninput="calculateSchemeTotal()">
-          <input type="number" id="sch_final_weight" class="form-control" placeholder="50%" oninput="calculateSchemeTotal()">
+        <div id="schemeComponentsList" style="display:flex; flex-direction:column; gap:0.45rem; max-height:260px; overflow-y:auto; padding-right:4px;">
+          <!-- Dynamically populated via renderSchemeComponentsUI() -->
         </div>
       </div>
 
@@ -912,26 +912,8 @@
             የምዘና ነጥቦች (በተመረጠው ስርዓተ-ትምህርት መሠረት)
           </div>
 
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; margin-bottom:0.5rem;">
-            <div>
-              <label id="lblScore1" style="font-size:0.75rem; font-weight:600; color:#475569; display:block; margin-bottom:0.2rem;">ምዘና 1</label>
-              <input type="number" id="inputGradeScore1" step="0.1" min="0" class="form-control" required oninput="calculateLiveModalGrade()">
-            </div>
-            <div>
-              <label id="lblScore2" style="font-size:0.75rem; font-weight:600; color:#475569; display:block; margin-bottom:0.2rem;">ምዘና 2</label>
-              <input type="number" id="inputGradeScore2" step="0.1" min="0" class="form-control" required oninput="calculateLiveModalGrade()">
-            </div>
-          </div>
-
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
-            <div>
-              <label id="lblScore3" style="font-size:0.75rem; font-weight:600; color:#475569; display:block; margin-bottom:0.2rem;">ምዘና 3</label>
-              <input type="number" id="inputGradeScore3" step="0.1" min="0" class="form-control" required oninput="calculateLiveModalGrade()">
-            </div>
-            <div>
-              <label id="lblScore4" style="font-size:0.75rem; font-weight:600; color:#475569; display:block; margin-bottom:0.2rem;">ምዘና 4</label>
-              <input type="number" id="inputGradeScore4" step="0.1" min="0" class="form-control" required oninput="calculateLiveModalGrade()">
-            </div>
+          <div id="dynamicGradeInputsContainer" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:0.5rem;">
+            <!-- Dynamically populated based on active assessment components (Test 1, Test 2, Test 3, Groupw, CW, CP, Final, etc.) -->
           </div>
         </div>
 
@@ -1294,42 +1276,49 @@
           </div>
         </div>
 
-        <!-- Mode Toggle: Admin by Email vs Others by Phone -->
-        <div style="display:flex; background:#F1F5F9; border-radius:10px; padding:4px; margin-bottom:1rem; border:1px solid #E2E8F0; gap:4px;">
-          <button type="button" id="tabLoginAdmin" onclick="setWebLoginMode('admin')" style="flex:1; border:none; padding:9px; border-radius:8px; font-weight:700; font-size:0.82rem; cursor:pointer; background:var(--primary); color:white; font-family:inherit; transition:all 0.2s; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
-            👑 ሲስተም አድሚን (Email)
-          </button>
-          <button type="button" id="tabLoginPhone" onclick="setWebLoginMode('phone')" style="flex:1.2; border:none; padding:9px; border-radius:8px; font-weight:700; font-size:0.82rem; cursor:pointer; background:transparent; color:#64748B; font-family:inherit; transition:all 0.2s;">
-            📱 መምህራን / ተማሪዎች (ስልክ)
-          </button>
+        <!-- Role Dropdown Selector -->
+        <div class="form-group" style="margin-bottom:0.85rem;">
+          <label style="font-size:0.82rem; font-weight:700; color:var(--primary); display:block; margin-bottom:5px;">
+            👤 የመግቢያ የስራ ድርሻ ይምረጡ (Select Login Role) *
+          </label>
+          <select id="loginRoleSelect" class="form-control" style="font-size:0.9rem; padding:0.65rem 0.8rem; border-radius:8px; font-weight:700; border:1.8px solid var(--primary); background:#F8FAFC; color:#0F172A;" onchange="handleLoginRoleChange()">
+            <option value="teacher" selected>👨‍🏫 መምህር (Teacher)</option>
+            <option value="admin">👑 ሲስተም አድሚን (System Admin)</option>
+            <option value="vice_principal">🎓 ምክትል ር/መምህር (Vice Principal)</option>
+            <option value="principal">👔 ርዕሰ መምህር (Principal)</option>
+            <option value="secretary">✍️ ጸሐፊ / ሬጅስትራር (Secretary)</option>
+            <option value="finance">💰 ፋይናንስ / ሂሳብ ሹም (Finance)</option>
+            <option value="support">🧹 ፅዳት እና ጥበቃ (Support Staff)</option>
+            <option value="student">👨‍🎓 ተማሪ / ወላጅ (Student / Parent)</option>
+          </select>
         </div>
 
         <!-- Mode explanation banner -->
-        <div id="loginModeNotice" style="background:#FEF3C7; border:1px solid #FCD34D; border-radius:8px; padding:8px 12px; margin-bottom:1rem; font-size:0.78rem; color:#92400E; display:flex; align-items:center; gap:6px;">
-          <span>👑</span><span>የሲስተም አድሚን ብቻ በኢሜል እና በይለፍ ቃል ይገባል (admin@dilijent.edu.et)</span>
+        <div id="loginModeNotice" style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:8px 12px; margin-bottom:1rem; font-size:0.78rem; color:#1E40AF; display:flex; align-items:center; gap:6px;">
+          <span>📱</span><span>የተመረጠው ሚና፡ <strong>መምህር</strong> — በስልክ ቁጥርዎ እና በይለፍ ቃልዎ ይግቡ</span>
         </div>
 
         <form id="webLoginForm" onsubmit="handleWebLoginSubmit(event)">
-          <!-- Admin Email Field -->
-          <div id="loginEmailGroup" class="form-group" style="margin-bottom:0.85rem;">
+          <!-- Admin Email Field (shown only when Admin is selected) -->
+          <div id="loginEmailGroup" class="form-group" style="display:none; margin-bottom:0.85rem;">
             <label style="font-size:0.82rem; font-weight:700; color:var(--primary); display:block; margin-bottom:4px;">✉️ የአድሚን ኢሜል አድራሻ (Admin Email) *</label>
-            <input type="email" id="inputWebLoginEmail" class="form-control" value="admin@dilijent.edu.et" placeholder="admin@dilijent.edu.et" style="font-size:0.9rem; padding:0.6rem 0.75rem; border-radius:8px;">
+            <input type="email" id="inputWebLoginEmail" class="form-control" placeholder="admin@dilijent.edu.et" style="font-size:0.9rem; padding:0.6rem 0.75rem; border-radius:8px;">
           </div>
 
-          <!-- Phone Field for Teachers, Students & Staff -->
-          <div id="loginPhoneGroup" class="form-group" style="display:none; margin-bottom:0.85rem;">
-            <label style="font-size:0.82rem; font-weight:700; color:var(--primary); display:block; margin-bottom:4px;">📞 የስልክ ቁጥር (Phone Number) *</label>
-            <input type="tel" id="inputWebLoginPhone" class="form-control" placeholder="09XXXXXXXX" value="0911000000" style="font-size:0.9rem; padding:0.6rem 0.75rem; border-radius:8px;">
+          <!-- Phone Field for Teachers, Principal, Staff, Students -->
+          <div id="loginPhoneGroup" class="form-group" style="margin-bottom:0.85rem;">
+            <label id="lblLoginPhone" style="font-size:0.82rem; font-weight:700; color:var(--primary); display:block; margin-bottom:4px;">📞 የተጠቃሚው የስልክ ቁጥር (Phone Number) *</label>
+            <input type="tel" id="inputWebLoginPhone" class="form-control" placeholder="09XXXXXXXX" style="font-size:0.9rem; padding:0.6rem 0.75rem; border-radius:8px;">
           </div>
 
-          <!-- Password Field with Show/Hide Toggle Button -->
+          <!-- Password Field with Show/Hide Toggle Button and 8-char rule -->
           <div class="form-group" style="margin-bottom:0.85rem;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <label style="font-size:0.82rem; font-weight:700; color:var(--primary); margin:0;">🔒 የይለፍ ቃል (Password) *</label>
-              <span style="font-size:0.7rem; color:#64748B;">ሚስጥራዊ</span>
+              <label style="font-size:0.82rem; font-weight:700; color:var(--primary); margin:0;">🔒 ሚስጥራዊ የይለፍ ቃል (Password) *</label>
+              <span style="font-size:0.7rem; color:#16A34A; font-weight:700;">ቢያንስ 8 ፊደላት/ቁጥሮች</span>
             </div>
             <div style="position:relative;">
-              <input type="password" id="inputWebLoginPass" class="form-control" value="admin123" required placeholder="••••••••" style="padding-right:45px; font-size:0.95rem; padding:0.6rem 0.75rem; border-radius:8px;">
+              <input type="password" id="inputWebLoginPass" class="form-control" required placeholder="የይለፍ ቃልዎን እዚህ ያስገቡ (min 8 chars)" minlength="8" style="padding-right:45px; font-size:0.95rem; padding:0.6rem 0.75rem; border-radius:8px;">
               <button type="button" id="btnTogglePassVisibility" onclick="toggleWebLoginPasswordVisibility()" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.15rem; color:#64748B; padding:4px;" title="የይለፍ ቃል አሳይ/ደብቅ">
                 👁️
               </button>
@@ -1348,31 +1337,6 @@
             🔐 ደህንነቱ በተጠበቀ ሁኔታ ግባ (Secure Sign In)
           </button>
         </form>
-
-        <!-- Quick Fast Demo Roles Section with clear role guidance -->
-        <div style="margin-top:1.25rem; border-top:1px solid #E2E8F0; padding-top:0.85rem;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-            <span style="font-size:0.78rem; font-weight:700; color:var(--primary);">⚡ ፈጣን የመግቢያ ሚናዎች (Demo Accounts):</span>
-            <small style="color:#64748B; font-size:0.7rem;">የስራ ድርሻ ፈቃድ ተወስኗል</small>
-          </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.45rem; font-size:0.75rem;">
-            <button type="button" class="btn-secondary" style="text-align:left; padding:7px 9px; border:1.5px solid #F59E0B; background:#FEF3C7; color:#92400E; border-radius:8px; cursor:pointer;" onclick="quickWebLogin('admin')">
-              <strong>👑 ሲስተም አድሚን</strong><br><small style="color:#B45309;">ሙሉ ስልጣን • ቅንብር & Passwords</small>
-            </button>
-            <button type="button" class="btn-secondary" style="text-align:left; padding:7px 9px; border:1.5px solid #0284C7; background:#E0F2FE; color:#0369A1; border-radius:8px; cursor:pointer;" onclick="quickWebLogin('vice_principal')">
-              <strong>🎓 ምክትል ርዕሰ መምህር</strong><br><small style="color:#0284C7;">የሰራተኞች & ተማሪዎች አቴንዳንስ</small>
-            </button>
-            <button type="button" class="btn-secondary" style="text-align:left; padding:7px 9px; border:1px solid #CBD5E1; background:#F8FAFC; color:#334155; border-radius:8px; cursor:pointer;" onclick="quickWebLogin('principal')">
-              <strong>👔 ርዕሰ መምህር</strong><br><small style="color:#64748B;">ስርዓተ-ትምህርት & ሪፖርቶች</small>
-            </button>
-            <button type="button" class="btn-secondary" style="text-align:left; padding:7px 9px; border:1px solid #CBD5E1; background:#F8FAFC; color:#334155; border-radius:8px; cursor:pointer;" onclick="quickWebLogin('math_teacher')">
-              <strong>👨‍🏫 መምህር (ሒሳብ)</strong><br><small style="color:#64748B;">ሮስተር & ማርክ ሊስት</small>
-            </button>
-            <button type="button" class="btn-secondary" style="text-align:left; padding:7px 9px; border:1px solid #CBD5E1; background:#F8FAFC; color:#334155; border-radius:8px; cursor:pointer;" onclick="quickWebLogin('student')">
-              <strong>👨‍🎓 ተማሪ (ዮናስ)</strong><br><small style="color:#64748B;">ውጤት ካርድ & ክትትል ብቻ</small>
-            </button>
-          </div>
-        </div>
 
         <div style="margin-top:1rem; text-align:right;">
           <button type="button" class="btn-secondary" style="padding:0.45rem 1rem; border-radius:6px; cursor:pointer;" onclick="closeLoginModal()">ዝጋ (Close)</button>
@@ -1682,21 +1646,51 @@
   </footer>
 
   <script>
-    // Assessment Scheme Presets
+    // Assessment Scheme Presets (Flexible & Modular for Admin & Principal)
     const SCHEME_PRESETS = [
       {
         id: 'moe_standard',
         title: 'መደበኛ የመንግስት ስርዓተ-ትምህርት (10% + 10% + 30% + 50%)',
         schoolType: 'የመንግስት',
+        components: [
+          { id: 'c1', label: 'ጥያቄ/ፈተና 1', weight: 10 },
+          { id: 'c2', label: 'የቤት ስራ/ምደባ', weight: 10 },
+          { id: 'c3', label: 'አጋማሽ ፈተና (Mid)', weight: 30 },
+          { id: 'c4', label: 'ማጠቃለያ ፈተና (Final)', weight: 50 }
+        ],
         t1Label: 'ጥያቄ/ፈተና 1', t1Weight: 10,
         asLabel: 'የቤት ስራ/ምደባ', asWeight: 10,
         midLabel: 'አጋማሽ ፈተና (Mid)', midWeight: 30,
         finalLabel: 'ማጠቃለያ ፈተና (Final)', finalWeight: 50
       },
       {
+        id: 'multi_modular',
+        title: 'ባለ ብዙ ምዘና ሞዴል (Test 1, 2, 3, Groupw, CW, CP, Final)',
+        schoolType: 'የግል',
+        components: [
+          { id: 'c1', label: 'ፈተና 1 (Test 1)', weight: 10 },
+          { id: 'c2', label: 'ፈተና 2 (Test 2)', weight: 10 },
+          { id: 'c3', label: 'ፈተና 3 (Test 3)', weight: 10 },
+          { id: 'c4', label: 'የቡድን ስራ (Groupw)', weight: 10 },
+          { id: 'c5', label: 'የክፍል ስራ (CW)', weight: 10 },
+          { id: 'c6', label: 'ተሳትፎ (CP)', weight: 10 },
+          { id: 'c7', label: 'ማጠቃለያ ፈተና (Final)', weight: 40 }
+        ],
+        t1Label: 'ፈተና 1 (Test 1)', t1Weight: 10,
+        asLabel: 'የቡድን ስራ (Groupw)', asWeight: 10,
+        midLabel: 'የክፍል ስራ (CW)', midWeight: 10,
+        finalLabel: 'ማጠቃለያ ፈተና (Final)', finalWeight: 40
+      },
+      {
         id: 'private_model_a',
         title: 'የግል ት/ቤት አማራጭ 1 - Continuous (15% + 15% + 10% + 60%)',
         schoolType: 'የግል',
+        components: [
+          { id: 'c1', label: 'ኩዊዝ/ፈተና', weight: 15 },
+          { id: 'c2', label: 'ሆምወርክ/ክላስወርክ', weight: 15 },
+          { id: 'c3', label: 'ወርሃዊ ምዘና', weight: 10 },
+          { id: 'c4', label: 'ማጠቃለያ ፈተና', weight: 60 }
+        ],
         t1Label: 'ኩዊዝ/ፈተና', t1Weight: 15,
         asLabel: 'ሆምወርክ/ክላስወርክ', asWeight: 15,
         midLabel: 'ወርሃዊ ምዘና', midWeight: 10,
@@ -1706,6 +1700,12 @@
         id: 'private_model_b',
         title: 'የግል ት/ቤት አማራጭ 2 - ሚዛናዊ (15% + 15% + 20% + 50%)',
         schoolType: 'የግል',
+        components: [
+          { id: 'c1', label: 'ኩዊዝ/ፈተና', weight: 15 },
+          { id: 'c2', label: 'ፕሮጀክት/የቤት ስራ', weight: 15 },
+          { id: 'c3', label: 'አጋማሽ ፈተና', weight: 20 },
+          { id: 'c4', label: 'ማጠቃለያ ፈተና', weight: 50 }
+        ],
         t1Label: 'ኩዊዝ/ፈተና', t1Weight: 15,
         asLabel: 'ፕሮጀክት/የቤት ስራ', asWeight: 15,
         midLabel: 'አጋማሽ ፈተና', midWeight: 20,
@@ -1715,14 +1715,33 @@
         id: 'private_model_c',
         title: 'የግል ት/ቤት አማራጭ 3 - ፈተና ተኮር (Mid 30% + Final 70%)',
         schoolType: 'የግል',
+        components: [
+          { id: 'c1', label: 'አጋማሽ ፈተና (Mid)', weight: 30 },
+          { id: 'c2', label: 'ማጠቃለያ ፈተና (Final)', weight: 70 }
+        ],
         t1Label: 'ተከታታይ ምዘና 1', t1Weight: 0,
         asLabel: 'ተከታታይ ምዘና 2', asWeight: 0,
-        midLabel: 'አጋማሽ ፈተና', midWeight: 30,
-        finalLabel: 'ማጠቃለያ ፈተና', finalWeight: 70
+        midLabel: 'አጋማሽ ፈተና (Mid)', midWeight: 30,
+        finalLabel: 'ማጠቃለያ ፈተና (Final)', finalWeight: 70
       }
     ];
 
+    function getSchemeComponents(scheme) {
+      if (scheme && Array.isArray(scheme.components) && scheme.components.length > 0) {
+        return scheme.components;
+      }
+      return [
+        { id: 'c1', label: (scheme && scheme.t1Label) || 'ምዘና 1 (Test 1)', weight: parseFloat(scheme && scheme.t1Weight) || 10 },
+        { id: 'c2', label: (scheme && scheme.asLabel) || 'ምዘና 2 (HW/CW)', weight: parseFloat(scheme && scheme.asWeight) || 10 },
+        { id: 'c3', label: (scheme && scheme.midLabel) || 'አጋማሽ ፈተና (Mid)', weight: parseFloat(scheme && scheme.midWeight) || 30 },
+        { id: 'c4', label: (scheme && scheme.finalLabel) || 'ማጠቃለያ ፈተና (Final)', weight: parseFloat(scheme && scheme.finalWeight) || 50 }
+      ];
+    }
+
     let currentScheme = JSON.parse(localStorage.getItem('dilijent_assessment_scheme')) || SCHEME_PRESETS[0];
+    if (!currentScheme.components || !currentScheme.components.length) {
+      currentScheme.components = getSchemeComponents(currentScheme);
+    }
 
     // Initial Seed Data with strict separation for Primary/Middle (1-8) and High School (9-12)
     const SEED_STUDENTS_PRIMARY = [
@@ -1862,11 +1881,13 @@
     }
 
     function calculateTotal(scores) {
-      const t1 = Math.min(scores[0] || 0, currentScheme.t1Weight);
-      const as = Math.min(scores[1] || 0, currentScheme.asWeight);
-      const mid = Math.min(scores[2] || 0, currentScheme.midWeight);
-      const fn = Math.min(scores[3] || 0, currentScheme.finalWeight);
-      const sum = t1 + as + mid + fn;
+      if (!scores || !Array.isArray(scores)) return '0.0';
+      const comps = getSchemeComponents(currentScheme);
+      let sum = 0;
+      comps.forEach((c, idx) => {
+        const val = parseFloat(scores[idx]) || 0;
+        sum += Math.min(val, c.weight);
+      });
       return sum.toFixed(1);
     }
 
@@ -1895,14 +1916,26 @@
     }
 
     function updateSchemeUI() {
-      document.getElementById('activeSchemeTitle').innerText = currentScheme.title;
-      document.getElementById('activeSchemeTypeBadge').innerText = currentScheme.schoolType;
-      document.getElementById('activeSchemeTypeBadge').className = currentScheme.schoolType === 'የግል' ? 'badge badge-warning' : 'badge badge-primary';
-      document.getElementById('activeSchemeBreakdown').innerText = 
-        `${currentScheme.t1Label}: ${currentScheme.t1Weight}% | ${currentScheme.asLabel}: ${currentScheme.asWeight}% | ${currentScheme.midLabel}: ${currentScheme.midWeight}% | ${currentScheme.finalLabel}: ${currentScheme.finalWeight}% = ድምር 100%`;
-      document.getElementById('gradeTableSubLabel').innerText = 
-        `ምዘናው በ${currentScheme.schoolType} ት/ቤት ስታንዳርድ መሠረት፡ ${currentScheme.t1Label}(${currentScheme.t1Weight}%) + ${currentScheme.asLabel}(${currentScheme.asWeight}%) + ${currentScheme.midLabel}(${currentScheme.midWeight}%) + ${currentScheme.finalLabel}(${currentScheme.finalWeight}%) = ድምር 100%`;
-      document.getElementById('reportCardSchemePill').innerText = `${currentScheme.title} (${currentScheme.schoolType})`;
+      const titleEl = document.getElementById('activeSchemeTitle');
+      if (!titleEl) return;
+      titleEl.innerText = currentScheme.title;
+      const typeBadge = document.getElementById('activeSchemeTypeBadge');
+      if (typeBadge) {
+        typeBadge.innerText = currentScheme.schoolType;
+        typeBadge.className = currentScheme.schoolType === 'የግል' ? 'badge badge-warning' : 'badge badge-primary';
+      }
+      
+      const comps = getSchemeComponents(currentScheme);
+      const breakdown = comps.map(c => `${c.label}: ${c.weight}%`).join(' | ') + ' = ድምር 100%';
+      const breakdownEl = document.getElementById('activeSchemeBreakdown');
+      if (breakdownEl) breakdownEl.innerText = breakdown;
+
+      const subLabelEl = document.getElementById('gradeTableSubLabel');
+      if (subLabelEl) {
+        subLabelEl.innerText = `ምዘናው በ${currentScheme.schoolType} ት/ቤት ስታንዳርድ መሠረት፡ ` + comps.map(c => `${c.label}(${c.weight}%)`).join(' + ') + ' = ድምር 100%';
+      }
+      const pillEl = document.getElementById('reportCardSchemePill');
+      if (pillEl) pillEl.innerText = `${currentScheme.title} (${currentScheme.schoolType})`;
     }
 
     function switchTab(tabId) {
@@ -2029,42 +2062,44 @@
     function renderGrades() {
       const activeStudents = getFilteredStudentsWeb();
       const subjectFilter = document.getElementById('gradeSubjectFilter') ? document.getElementById('gradeSubjectFilter').value : 'Mathematics';
+      const comps = getSchemeComponents(currentScheme);
+
       const thead = document.getElementById('gradesTableHeadRow');
-      thead.innerHTML = `
-        <th>ተማሪ</th>
-        <th>የት/ት ዓይነት</th>
-        <th>${currentScheme.t1Label} (${currentScheme.t1Weight}%)</th>
-        <th>${currentScheme.asLabel} (${currentScheme.asWeight}%)</th>
-        <th>${currentScheme.midLabel} (${currentScheme.midWeight}%)</th>
-        <th>${currentScheme.finalLabel} (${currentScheme.finalWeight}%)</th>
-        <th style="background:#1E3A8A; color:white; text-align:center;">የማርክ ሊስቱ ድምር (100%)</th>
-        <th style="text-align:center;">ደረጃ</th>
-        <th style="text-align:center;">እርምጃ</th>
-      `;
+      if (thead) {
+        thead.innerHTML = `
+          <th>ተማሪ</th>
+          <th>የት/ት ዓይነት</th>
+          ${comps.map(c => `<th style="text-align:center;">${c.label}<br><small style="color:var(--accent); font-weight:600;">(${c.weight}%)</small></th>`).join('')}
+          <th style="background:#1E3A8A; color:white; text-align:center;">የማርክ ሊስቱ ድምር (100%)</th>
+          <th style="text-align:center;">ደረጃ</th>
+          <th style="text-align:center;">እርምጃ</th>
+        `;
+      }
 
       const tbody = document.getElementById('gradesTableBody');
+      if (!tbody) return;
       tbody.innerHTML = activeStudents.map(s => {
         let sc = (s.subjectGrades && s.subjectGrades[subjectFilter]) ? s.subjectGrades[subjectFilter] : s.scores;
-        if (!sc || sc.length < 4) sc = [0, 0, 0, 0];
+        if (!sc || !Array.isArray(sc)) sc = [];
 
-        const s1 = parseFloat(sc[0] || 0);
-        const s2 = parseFloat(sc[1] || 0);
-        const s3 = parseFloat(sc[2] || 0);
-        const s4 = parseFloat(sc[3] || 0);
-        const total = (s1 + s2 + s3 + s4).toFixed(1);
-        const letter = getLetter(total);
+        let total = 0;
+        const compCols = comps.map((c, idx) => {
+          const val = parseFloat(sc[idx] !== undefined ? sc[idx] : 0);
+          total += Math.min(val, c.weight);
+          return `<td style="text-align:center;">${val.toFixed(1)}</td>`;
+        }).join('');
+
+        const totalStr = total.toFixed(1);
+        const letter = getLetter(totalStr);
 
         return `
           <tr>
             <td><strong>${s.name}</strong> <small style="color:#64748B;">(${s.id} - ${s.grade})</small></td>
             <td><span class="badge badge-primary">${subjectFilter}</span></td>
-            <td>${s1.toFixed(1)}</td>
-            <td>${s2.toFixed(1)}</td>
-            <td>${s3.toFixed(1)}</td>
-            <td>${s4.toFixed(1)}</td>
-            <td><strong>${total}%</strong></td>
-            <td><span class="badge ${parseFloat(total) >= 50 ? 'badge-success' : 'badge-danger'}">${letter}</span></td>
-            <td>
+            ${compCols}
+            <td style="text-align:center;"><strong>${totalStr}%</strong></td>
+            <td style="text-align:center;"><span class="badge ${parseFloat(totalStr) >= 50 ? 'badge-success' : 'badge-danger'}">${letter}</span></td>
+            <td style="text-align:center;">
               <button class="btn-secondary" style="padding:0.25rem 0.55rem; font-size:0.75rem;" onclick="openAddGradeModal('${s.id}', '${subjectFilter}')">✏️ ውጤት አስገባ</button>
             </td>
           </tr>
@@ -3134,7 +3169,15 @@
     function openRoleModal() { document.getElementById('roleModal').style.display = 'flex'; }
     function closeRoleModal() { document.getElementById('roleModal').style.display = 'none'; }
 
-    // Add Grade Modal Handlers
+    function canAccessSchemeWeb() {
+      if (!currentWebUser) return false;
+      if (currentWebUser.isAdmin) return true;
+      const r = (currentWebUser.role || '').toLowerCase();
+      const email = (currentWebUser.email || '').toLowerCase();
+      return r.includes('ርዕሰ መምህር') || r.includes('principal') || r.includes('አድሚን') || r.includes('admin') || email.includes('admin');
+    }
+
+    // Add Grade Modal Handlers (Dynamic with Active Components)
     function openAddGradeModal(studentId, subject) {
       const studentSelect = document.getElementById('gradeStudentSelect');
       const activeStudents = getFilteredStudentsWeb();
@@ -3146,17 +3189,7 @@
         document.getElementById('gradeSubjectSelect').value = subject;
       }
 
-      // Update dynamic labels from current assessment scheme
-      document.getElementById('lblScore1').innerText = `${currentScheme.t1Label} (ከ ${currentScheme.t1Weight}%) *`;
-      document.getElementById('lblScore2').innerText = `${currentScheme.asLabel} (ከ ${currentScheme.asWeight}%) *`;
-      document.getElementById('lblScore3').innerText = `${currentScheme.midLabel} (ከ ${currentScheme.midWeight}%) *`;
-      document.getElementById('lblScore4').innerText = `${currentScheme.finalLabel} (ከ ${currentScheme.finalWeight}%) *`;
-
-      document.getElementById('inputGradeScore1').max = currentScheme.t1Weight;
-      document.getElementById('inputGradeScore2').max = currentScheme.asWeight;
-      document.getElementById('inputGradeScore3').max = currentScheme.midWeight;
-      document.getElementById('inputGradeScore4').max = currentScheme.finalWeight;
-
+      renderDynamicGradeInputs();
       loadExistingScoresIntoModal();
       document.getElementById('addGradeModal').style.display = 'flex';
     }
@@ -3173,86 +3206,111 @@
       loadExistingScoresIntoModal();
     }
 
+    function renderDynamicGradeInputs() {
+      const container = document.getElementById('dynamicGradeInputsContainer');
+      if (!container) return;
+      const comps = getSchemeComponents(currentScheme);
+      container.innerHTML = comps.map((c, idx) => `
+        <div>
+          <label style="font-size:0.75rem; font-weight:600; color:#475569; display:block; margin-bottom:0.2rem;">
+            ${c.label} (ከ ${c.weight}%) *
+          </label>
+          <input type="number" id="inputGradeComp_${idx}" data-idx="${idx}" data-max="${c.weight}" data-label="${c.label}" step="0.1" min="0" max="${c.weight}" class="form-control dynamic-grade-input" required oninput="calculateLiveModalGrade()">
+        </div>
+      `).join('');
+    }
+
     function loadExistingScoresIntoModal() {
       const studentId = document.getElementById('gradeStudentSelect').value;
       const subject = document.getElementById('gradeSubjectSelect').value;
       const student = students.find(s => s.id === studentId);
+      const comps = getSchemeComponents(currentScheme);
 
       if (student) {
         let sc = (student.subjectGrades && student.subjectGrades[subject]) ? student.subjectGrades[subject] : student.scores;
-        if (!sc || sc.length < 4) sc = [0, 0, 0, 0];
-
-        document.getElementById('inputGradeScore1').value = sc[0] !== undefined ? sc[0] : '';
-        document.getElementById('inputGradeScore2').value = sc[1] !== undefined ? sc[1] : '';
-        document.getElementById('inputGradeScore3').value = sc[2] !== undefined ? sc[2] : '';
-        document.getElementById('inputGradeScore4').value = sc[3] !== undefined ? sc[3] : '';
+        if (!sc || !Array.isArray(sc)) sc = [];
+        comps.forEach((c, idx) => {
+          const input = document.getElementById(`inputGradeComp_${idx}`);
+          if (input) {
+            input.value = sc[idx] !== undefined ? sc[idx] : '';
+          }
+        });
       }
       calculateLiveModalGrade();
     }
 
     function calculateLiveModalGrade() {
-      const s1 = parseFloat(document.getElementById('inputGradeScore1').value) || 0;
-      const s2 = parseFloat(document.getElementById('inputGradeScore2').value) || 0;
-      const s3 = parseFloat(document.getElementById('inputGradeScore3').value) || 0;
-      const s4 = parseFloat(document.getElementById('inputGradeScore4').value) || 0;
+      const inputs = document.querySelectorAll('.dynamic-grade-input');
+      let total = 0;
+      inputs.forEach(input => {
+        const val = parseFloat(input.value) || 0;
+        total += val;
+      });
 
-      const total = (s1 + s2 + s3 + s4).toFixed(1);
-      const letter = getLetter(total);
-      const isPassed = parseFloat(total) >= 50;
+      const totalStr = total.toFixed(1);
+      const letter = getLetter(totalStr);
+      const isPassed = parseFloat(totalStr) >= 50;
 
-      document.getElementById('modalCalculatedTotal').innerText = total + '%';
-      document.getElementById('modalGradeLetterBadge').innerText = 'ደረጃ: ' + letter;
-      document.getElementById('modalGradeLetterBadge').className = 'badge ' + (isPassed ? 'badge-primary' : 'badge-danger');
-      document.getElementById('modalGradePassBadge').innerText = isPassed ? 'አልፏል (Pass)' : 'አልተሳካም (Fail)';
-      document.getElementById('modalGradePassBadge').className = 'badge ' + (isPassed ? 'badge-success' : 'badge-danger');
+      const calcTotalEl = document.getElementById('modalCalculatedTotal');
+      if (calcTotalEl) calcTotalEl.innerText = totalStr + '%';
+
+      const letterBadge = document.getElementById('modalGradeLetterBadge');
+      if (letterBadge) {
+        letterBadge.innerText = 'ደረጃ: ' + letter;
+        letterBadge.className = 'badge ' + (isPassed ? 'badge-primary' : 'badge-danger');
+      }
+
+      const passBadge = document.getElementById('modalGradePassBadge');
+      if (passBadge) {
+        passBadge.innerText = isPassed ? 'አልፏል (Pass)' : 'አልተሳካም (Fail)';
+        passBadge.className = 'badge ' + (isPassed ? 'badge-success' : 'badge-danger');
+      }
     }
 
     function saveGradeEntry(e) {
       e.preventDefault();
       const studentId = document.getElementById('gradeStudentSelect').value;
       const subject = document.getElementById('gradeSubjectSelect').value;
+      const comps = getSchemeComponents(currentScheme);
 
-      const s1 = parseFloat(document.getElementById('inputGradeScore1').value) || 0;
-      const s2 = parseFloat(document.getElementById('inputGradeScore2').value) || 0;
-      const s3 = parseFloat(document.getElementById('inputGradeScore3').value) || 0;
-      const s4 = parseFloat(document.getElementById('inputGradeScore4').value) || 0;
-
-      // Validate against active scheme limits
-      if (s1 > currentScheme.t1Weight || s2 > currentScheme.asWeight || s3 > currentScheme.midWeight || s4 > currentScheme.finalWeight) {
-        alert(`የነጥብ ስህተት! ከፍተኛ ወሰን: ${currentScheme.t1Label} (${currentScheme.t1Weight}%), ${currentScheme.asLabel} (${currentScheme.asWeight}%), ${currentScheme.midLabel} (${currentScheme.midWeight}%), ${currentScheme.finalLabel} (${currentScheme.finalWeight}%)`);
-        return;
+      const scoresArray = [];
+      for (let i = 0; i < comps.length; i++) {
+        const input = document.getElementById(`inputGradeComp_${i}`);
+        const val = parseFloat(input ? input.value : 0) || 0;
+        const maxWeight = comps[i].weight;
+        if (val > maxWeight) {
+          alert(`የነጥብ ስህተት! የ${comps[i].label} ከፍተኛ ወሰን ${maxWeight}% ነው። እርስዎ ያስገቡት: ${val}%`);
+          return;
+        }
+        scoresArray.push(val);
       }
 
       const studentIndex = students.findIndex(s => s.id === studentId);
       if (studentIndex !== -1) {
         const student = students[studentIndex];
         student.subjectGrades = student.subjectGrades || {};
-        student.subjectGrades[subject] = [s1, s2, s3, s4];
-        student.scores = [s1, s2, s3, s4];
+        student.subjectGrades[subject] = scoresArray;
+        student.scores = scoresArray;
 
-        // Recalculate average
-        const total = (s1 + s2 + s3 + s4).toFixed(1);
+        const total = scoresArray.reduce((a, b) => a + b, 0).toFixed(1);
         student.avg = total + '%';
 
-        // Automatically update localStorage via saveState()
         saveState();
-
         closeAddGradeModal();
         alert(`የ${student.name} የ${subject} ውጤት በተሳካ ሁኔታ በሲስተሙ ተመዝግቧል! (ድምር: ${total}%)`);
       }
     }
 
+    // ==========================================
+    // ASSESSMENT SCHEME MODAL (ርዕሰ-መምህር እና አድሚን ገፅ)
+    // ==========================================
     function openSchemeModal() {
-      document.getElementById('sch_t1_label').value = currentScheme.t1Label;
-      document.getElementById('sch_t1_weight').value = currentScheme.t1Weight;
-      document.getElementById('sch_as_label').value = currentScheme.asLabel;
-      document.getElementById('sch_as_weight').value = currentScheme.asWeight;
-      document.getElementById('sch_mid_label').value = currentScheme.midLabel;
-      document.getElementById('sch_mid_weight').value = currentScheme.midWeight;
-      document.getElementById('sch_final_label').value = currentScheme.finalLabel;
-      document.getElementById('sch_final_weight').value = currentScheme.finalWeight;
-
+      if (!canAccessSchemeWeb()) {
+        alert('⛔ የተከለከለ ፈቃድ! የምዘና ስርዓተ-ትምህርትን ማሻሻል እና አዳዲስ ምዘናዎችን (Test 1, Test 2, Test 3, Group Work, CW, CP...) ማዘጋጀት የሚችሉት ርዕሰ-መምህር (Principal) እና ሲስተም አድሚን (Admin) ብቻ ናቸው።');
+        return;
+      }
       renderPresetsInModal();
+      renderSchemeComponentsUI(getSchemeComponents(currentScheme));
       calculateSchemeTotal();
       document.getElementById('schemeModal').style.display = 'flex';
     }
@@ -3263,32 +3321,27 @@
 
     function renderPresetsInModal() {
       const container = document.getElementById('presetsContainer');
-      container.innerHTML = SCHEME_PRESETS.map((p, idx) => `
-        <div class="preset-card ${currentScheme.id === p.id ? 'active' : ''}" onclick="selectPreset(${idx})">
-          <input type="radio" name="presetRadio" ${currentScheme.id === p.id ? 'checked' : ''} style="margin-top:0.25rem;">
-          <div>
-            <div style="font-weight:700; font-size:0.85rem; color:var(--primary);">${p.title}</div>
-            <div style="font-size:0.75rem; color:#475569;">
-              ${p.t1Label}: ${p.t1Weight}% | ${p.asLabel}: ${p.asWeight}% | ${p.midLabel}: ${p.midWeight}% | ${p.finalLabel}: ${p.finalWeight}%
+      if (!container) return;
+      container.innerHTML = SCHEME_PRESETS.map((p, idx) => {
+        const comps = getSchemeComponents(p);
+        const breakdownStr = comps.map(c => `${c.label}: ${c.weight}%`).join(' | ');
+        return `
+          <div class="preset-card ${currentScheme.id === p.id ? 'active' : ''}" onclick="selectPreset(${idx})" style="cursor:pointer; margin-bottom:0.4rem; padding:0.55rem 0.75rem; border-radius:8px; border:1px solid #CBD5E1; display:flex; gap:0.5rem; align-items:flex-start;">
+            <input type="radio" name="presetRadio" ${currentScheme.id === p.id ? 'checked' : ''} style="margin-top:0.25rem;">
+            <div>
+              <div style="font-weight:700; font-size:0.85rem; color:var(--primary);">${p.title}</div>
+              <div style="font-size:0.75rem; color:#475569;">${breakdownStr}</div>
             </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function selectPreset(idx) {
       const p = SCHEME_PRESETS[idx];
-      currentScheme = { ...p };
-      document.getElementById('sch_t1_label').value = p.t1Label;
-      document.getElementById('sch_t1_weight').value = p.t1Weight;
-      document.getElementById('sch_as_label').value = p.asLabel;
-      document.getElementById('sch_as_weight').value = p.asWeight;
-      document.getElementById('sch_mid_label').value = p.midLabel;
-      document.getElementById('sch_mid_weight').value = p.midWeight;
-      document.getElementById('sch_final_label').value = p.finalLabel;
-      document.getElementById('sch_final_weight').value = p.finalWeight;
-
+      currentScheme = JSON.parse(JSON.stringify(p));
       renderPresetsInModal();
+      renderSchemeComponentsUI(getSchemeComponents(p));
       calculateSchemeTotal();
     }
 
@@ -3301,50 +3354,124 @@
       }
     }
 
-    function calculateSchemeTotal() {
-      const w1 = parseFloat(document.getElementById('sch_t1_weight').value) || 0;
-      const w2 = parseFloat(document.getElementById('sch_as_weight').value) || 0;
-      const w3 = parseFloat(document.getElementById('sch_mid_weight').value) || 0;
-      const w4 = parseFloat(document.getElementById('sch_final_weight').value) || 0;
-      const total = w1 + w2 + w3 + w4;
+    function renderSchemeComponentsUI(components) {
+      const container = document.getElementById('schemeComponentsList');
+      if (!container) return;
+      container.innerHTML = components.map((c, idx) => `
+        <div class="scheme-row" data-id="${c.id || ('c_' + idx)}" style="display:flex; gap:0.5rem; align-items:center; background:#FFFFFF; border:1px solid #E2E8F0; padding:0.4rem 0.6rem; border-radius:6px;">
+          <span style="font-size:0.75rem; font-weight:700; color:#64748B; width:24px;">#${idx + 1}</span>
+          <input type="text" class="form-control scheme-comp-label" value="${c.label}" placeholder="ምዘና ስም (ምሳሌ: Test 1, CW)" style="flex:2; font-size:0.85rem;" oninput="calculateSchemeTotal()">
+          <div style="display:flex; align-items:center; gap:0.25rem; flex:1;">
+            <input type="number" step="0.5" min="0" max="100" class="form-control scheme-comp-weight" value="${c.weight}" placeholder="%" style="font-size:0.85rem; text-align:right;" oninput="calculateSchemeTotal()">
+            <span style="font-size:0.82rem; font-weight:700; color:#475569;">%</span>
+          </div>
+          <button type="button" class="btn-secondary" style="color:#DC2626; padding:0.35rem 0.55rem; font-size:0.85rem; border-color:#FECACA;" onclick="removeSchemeComponentRow(this)" title="ሰርዝ">🗑️</button>
+        </div>
+      `).join('');
+    }
 
-      document.getElementById('schemeTotalIndicator').innerText = total.toFixed(1) + '%';
+    function addSchemeComponentRow(label = 'አዲስ ምዘና', weight = 10) {
+      const container = document.getElementById('schemeComponentsList');
+      if (!container) return;
+      const count = container.querySelectorAll('.scheme-row').length + 1;
+      const row = document.createElement('div');
+      row.className = 'scheme-row';
+      row.dataset.id = 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+      row.style.cssText = 'display:flex; gap:0.5rem; align-items:center; background:#FFFFFF; border:1px solid #E2E8F0; padding:0.4rem 0.6rem; border-radius:6px;';
+      row.innerHTML = `
+        <span style="font-size:0.75rem; font-weight:700; color:#64748B; width:24px;">#${count}</span>
+        <input type="text" class="form-control scheme-comp-label" value="${label}" placeholder="ምዘና ስም (ምሳሌ: Test 1, CW)" style="flex:2; font-size:0.85rem;" oninput="calculateSchemeTotal()">
+        <div style="display:flex; align-items:center; gap:0.25rem; flex:1;">
+          <input type="number" step="0.5" min="0" max="100" class="form-control scheme-comp-weight" value="${weight}" placeholder="%" style="font-size:0.85rem; text-align:right;" oninput="calculateSchemeTotal()">
+          <span style="font-size:0.82rem; font-weight:700; color:#475569;">%</span>
+        </div>
+        <button type="button" class="btn-secondary" style="color:#DC2626; padding:0.35rem 0.55rem; font-size:0.85rem; border-color:#FECACA;" onclick="removeSchemeComponentRow(this)" title="ሰርዝ">🗑️</button>
+      `;
+      container.appendChild(row);
+      calculateSchemeTotal();
+    }
+
+    function quickAddSchemeComponent(label, weight) {
+      addSchemeComponentRow(label, weight);
+    }
+
+    function removeSchemeComponentRow(btn) {
+      const container = document.getElementById('schemeComponentsList');
+      const rows = container.querySelectorAll('.scheme-row');
+      if (rows.length <= 1) {
+        alert('ቢያንስ አንድ የምዘና ዓይነት መኖር አለበት!');
+        return;
+      }
+      btn.closest('.scheme-row').remove();
+      container.querySelectorAll('.scheme-row').forEach((r, idx) => {
+        r.querySelector('span').innerText = `#${idx + 1}`;
+      });
+      calculateSchemeTotal();
+    }
+
+    function calculateSchemeTotal() {
+      const weightInputs = document.querySelectorAll('.scheme-comp-weight');
+      let total = 0;
+      weightInputs.forEach(inp => {
+        total += parseFloat(inp.value) || 0;
+      });
+
+      const totalIndicator = document.getElementById('schemeTotalIndicator');
+      if (totalIndicator) totalIndicator.innerText = total.toFixed(1) + '%';
+
       const isValid = (total >= 99.9 && total <= 100.1);
       const badge = document.getElementById('schemeValidationStatus');
-
-      if (isValid) {
-        badge.className = 'badge badge-success';
-        badge.innerText = '✓ ትክክል ነው (100%)';
-      } else {
-        badge.className = 'badge badge-danger';
-        badge.innerText = '⚠️ ድምሩ 100% መሆን አለበት';
+      if (badge) {
+        if (isValid) {
+          badge.className = 'badge badge-success';
+          badge.innerText = '✓ ትክክል ነው (100%)';
+        } else {
+          badge.className = 'badge badge-danger';
+          badge.innerText = `⚠️ ድምሩ 100% መሆን አለበት (አሁን: ${total.toFixed(1)}%)`;
+        }
       }
       return isValid;
     }
 
     function saveAssessmentScheme() {
       if (!calculateSchemeTotal()) {
-        alert('እባክዎ የምዘናዎቹ ድምር በትክክል 100% መሆኑን ያረጋግጡ!');
+        alert('እባክዎ የምዘናዎቹ ክብደት ድምር በትክክል 100% መሆኑን ያረጋግጡ!');
         return;
       }
 
+      const rows = document.querySelectorAll('#schemeComponentsList .scheme-row');
+      const components = [];
+      rows.forEach((r, idx) => {
+        const label = r.querySelector('.scheme-comp-label').value.trim() || `ምዘና ${idx + 1}`;
+        const weight = parseFloat(r.querySelector('.scheme-comp-weight').value) || 0;
+        components.push({
+          id: r.dataset.id || ('c_' + idx),
+          label: label,
+          weight: weight
+        });
+      });
+
       currentScheme = {
         id: 'custom_' + Date.now(),
-        title: (currentScheme.schoolType === 'የግል' ? 'የግል ት/ቤት ስርዓተ-ትምህርት' : 'የመንግስት ስርዓተ-ትምህርት'),
+        title: (currentScheme.schoolType === 'የግል' ? 'የግል ት/ቤት ስርዓተ-ትምህርት (ብጁ)' : 'የመንግስት ስርዓተ-ትምህርት (ብጁ)'),
         schoolType: currentScheme.schoolType || 'የመንግስት',
-        t1Label: document.getElementById('sch_t1_label').value || 'ምዘና 1',
-        t1Weight: parseFloat(document.getElementById('sch_t1_weight').value) || 0,
-        asLabel: document.getElementById('sch_as_label').value || 'ምዘና 2',
-        asWeight: parseFloat(document.getElementById('sch_as_weight').value) || 0,
-        midLabel: document.getElementById('sch_mid_label').value || 'አጋማሽ ፈተና',
-        midWeight: parseFloat(document.getElementById('sch_mid_weight').value) || 0,
-        finalLabel: document.getElementById('sch_final_label').value || 'ማጠቃለያ ፈተና',
-        finalWeight: parseFloat(document.getElementById('sch_final_weight').value) || 0
+        components: components,
+        t1Label: components[0] ? components[0].label : 'ምዘና 1',
+        t1Weight: components[0] ? components[0].weight : 10,
+        asLabel: components[1] ? components[1].label : 'ምዘና 2',
+        asWeight: components[1] ? components[1].weight : 10,
+        midLabel: components[2] ? components[2].label : 'ምዘና 3',
+        midWeight: components[2] ? components[2].weight : 30,
+        finalLabel: components[components.length - 1] ? components[components.length - 1].label : 'ማጠቃለያ ፈተና',
+        finalWeight: components[components.length - 1] ? components[components.length - 1].weight : 50
       };
 
+      localStorage.setItem('dilijent_assessment_scheme', JSON.stringify(currentScheme));
       saveState();
       closeSchemeModal();
-      alert('የኢትዮጵያ ስርዓተ-ትምህርት ምዘና ማዋቀሪያው በተሳካ ሁኔታ ተተግብሯል!');
+      updateSchemeUI();
+      renderGrades();
+      alert(`የምዘና ስርዓተ-ትምህርቱ በተሳካ ሁኔታ ተሻሽሏል! ጠቅላላ ${components.length} የምዘና ክፍሎች ተዋቅረዋል።`);
     }
 
     function setRole(role) {
@@ -3477,22 +3604,27 @@
     // USER ACCOUNTS, AUTHENTICATION & LOGOUT
     // ==========================================
     const DEFAULT_ACCOUNTS = [
-      { name: 'እኔ (System Administrator)', role: '👑 ሲስተም አድሚን', email: 'admin@dilijent.edu.et', phone: '0911999999', pass: 'admin123', isAdmin: true, isVicePrincipal: false },
-      { name: 'አቶ ከበደ ለማ', role: '🎓 ምክትል ርዕሰ መምህር', email: '', phone: '0918000000', pass: 'vp1234', isAdmin: false, isVicePrincipal: true },
-      { name: 'አቶ ሙሉጌታ ከበደ', role: '🎓 ርዕሰ መምህር', email: '', phone: '0911000000', pass: 'p123456', isAdmin: false, isVicePrincipal: false },
-      { name: 'መምህር ዳዊት በቀለ', role: '👨‍🏫 መምህር (ሒሳብ)', email: '', phone: '0911223344', pass: 't123456', isAdmin: false, isVicePrincipal: false },
-      { name: 'መምህርት ሳራ መኮንን', role: '👩‍🏫 መምህርት (ፊዚክስ)', email: '', phone: '0922334455', pass: 't123456', isAdmin: false, isVicePrincipal: false },
-      { name: 'ተማሪ አቤል ታደሰ', role: '👨‍🎓 ተማሪ (12A)', email: '', phone: '0911002233', pass: 's123456', isAdmin: false, isVicePrincipal: false }
+      { name: 'እኔ (System Administrator)', role: '👑 ሲስተም አድሚን', email: 'admin@dilijent.edu.et', phone: '0911999999', pass: 'Admin@2026', isAdmin: true, isVicePrincipal: false, roleKey: 'admin' },
+      { name: 'አቶ ሙሉጌታ ከበደ', role: '👔 ርዕሰ መምህር', email: 'principal@dilijent.edu.et', phone: '0911000000', pass: 'Principal@26', isAdmin: false, isVicePrincipal: false, roleKey: 'principal' },
+      { name: 'አቶ ከበደ ለማ', role: '🎓 ምክትል ርዕሰ መምህር', email: 'vp@dilijent.edu.et', phone: '0918000000', pass: 'VicePrin@26', isAdmin: false, isVicePrincipal: true, roleKey: 'vice_principal' },
+      { name: 'መምህር ዳዊት በቀለ', role: '👨‍🏫 መምህር (ሒሳብ)', email: 'davit@dilijent.edu.et', phone: '0911223344', pass: 'Teacher@2026', isAdmin: false, isVicePrincipal: false, roleKey: 'teacher' },
+      { name: 'መምህርት ሳራ መኮንን', role: '👩‍🏫 መምህርት (ፊዚክስ)', email: 'sara@dilijent.edu.et', phone: '0922334455', pass: 'Teacher@2026', isAdmin: false, isVicePrincipal: false, roleKey: 'teacher' },
+      { name: 'ወ/ሪት ትዕግስት ሀይሉ', role: '✍️ ጸሐፊ / ሬጅስትራር', email: 'registrar@dilijent.edu.et', phone: '0911335577', pass: 'Secretary@26', isAdmin: false, isVicePrincipal: false, roleKey: 'secretary' },
+      { name: 'አቶ ዮሐንስ ታደሰ', role: '💰 ፋይናንስ / ሂሳብ ሹም', email: 'finance@dilijent.edu.et', phone: '0911446688', pass: 'Finance@2026', isAdmin: false, isVicePrincipal: false, roleKey: 'finance' },
+      { name: 'ወ/ሮ ብርቱካን በቀለ', role: '🧹 ፅዳት እና ጥበቃ (ድጋፍ ሰጪ)', email: '', phone: '0911557799', pass: 'Support@2026', isAdmin: false, isVicePrincipal: false, roleKey: 'support' },
+      { name: 'ተማሪ አቤል ታደሰ', role: '👨‍🎓 ተማሪ (12A)', email: '', phone: '0911002233', pass: 'Student@2026', isAdmin: false, isVicePrincipal: false, roleKey: 'student' }
     ];
 
     let userAccounts = JSON.parse(localStorage.getItem('dilijent_user_accounts')) || DEFAULT_ACCOUNTS;
-    // Ensure vice principal account exists if previously saved to local storage
-    if (!userAccounts.some(u => u.phone === '0918000000' || (u.role && u.role.includes('ምክትል')))) {
-      userAccounts.splice(1, 0, DEFAULT_ACCOUNTS[1]);
-      localStorage.setItem('dilijent_user_accounts', JSON.stringify(userAccounts));
-    }
+    // Ensure all predefined roles exist
+    DEFAULT_ACCOUNTS.forEach(acc => {
+      if (!userAccounts.some(u => (u.email && acc.email && u.email === acc.email) || (u.phone && acc.phone && u.phone === acc.phone))) {
+        userAccounts.push(acc);
+      }
+    });
+    localStorage.setItem('dilijent_user_accounts', JSON.stringify(userAccounts));
     let currentWebUser = JSON.parse(localStorage.getItem('dilijent_current_user')) || userAccounts[0];
-    let currentLoginMode = 'admin'; // 'admin' (email) or 'phone' (teachers/students)
+    let currentLoginMode = 'phone';
 
     function canAccessStaffAttendanceWeb() {
       if (!currentWebUser) return false;
@@ -3588,82 +3720,130 @@
       currentLoginMode = mode;
       const tabAdmin = document.getElementById('tabLoginAdmin');
       const tabPhone = document.getElementById('tabLoginPhone');
+    function handleLoginRoleChange() {
+      const select = document.getElementById('loginRoleSelect');
+      if (!select) return;
+      const roleKey = select.value;
       const emailGroup = document.getElementById('loginEmailGroup');
       const phoneGroup = document.getElementById('loginPhoneGroup');
       const notice = document.getElementById('loginModeNotice');
+      const passInput = document.getElementById('inputWebLoginPass');
+      if (passInput) passInput.value = '';
 
-      if (mode === 'admin') {
-        tabAdmin.style.background = 'var(--primary)';
-        tabAdmin.style.color = 'white';
-        tabPhone.style.background = 'transparent';
-        tabPhone.style.color = 'var(--text-muted)';
-        emailGroup.style.display = 'block';
-        phoneGroup.style.display = 'none';
-        notice.innerHTML = '👑 <strong>የሲስተም አድሚን ብቻ</strong> በኢሜል እና በይለፍ ቃል ይገባል (admin@dilijent.edu.et / admin123)';
+      if (roleKey === 'admin') {
+        currentLoginMode = 'admin';
+        if (emailGroup) emailGroup.style.display = 'block';
+        if (phoneGroup) phoneGroup.style.display = 'none';
+        if (notice) {
+          notice.style.background = '#FEF3C7';
+          notice.style.borderColor = '#FCD34D';
+          notice.style.color = '#92400E';
+          notice.innerHTML = '<span>👑</span><span>የሲስተም አድሚን ብቻ በይፋዊ ኢሜል እና በይለፍ ቃል ይገባል (admin@dilijent.edu.et)</span>';
+        }
       } else {
-        tabAdmin.style.background = 'transparent';
-        tabAdmin.style.color = 'var(--text-muted)';
-        tabPhone.style.background = 'var(--primary)';
-        tabPhone.style.color = 'white';
-        emailGroup.style.display = 'none';
-        phoneGroup.style.display = 'block';
-        notice.innerHTML = '📱 <strong>መምህራን፣ ተማሪዎች እና ሰራተኞች</strong> በስልክ ቁጥር እና በይለፍ ቃል ይገባሉ (ምሳሌ፦ 0911000000 / p123456)';
+        currentLoginMode = 'phone';
+        if (emailGroup) emailGroup.style.display = 'none';
+        if (phoneGroup) phoneGroup.style.display = 'block';
+        if (notice) {
+          notice.style.background = '#EFF6FF';
+          notice.style.borderColor = '#BFDBFE';
+          notice.style.color = '#1E40AF';
+          const selectedText = select.options[select.selectedIndex].text;
+          notice.innerHTML = `<span>📱</span><span>የተመረጠው ሚና፡ <strong>${selectedText}</strong> — በስልክ ቁጥርዎ እና በይለፍ ቃልዎ ይግቡ</span>`;
+        }
       }
+    }
+
+    function openLoginModal() {
+      const passInput = document.getElementById('inputWebLoginPass');
+      if (passInput) passInput.value = '';
+      document.getElementById('loginModal').style.display = 'flex';
+      handleLoginRoleChange();
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').style.display = 'none';
     }
 
     function handleWebLoginSubmit(e) {
       e.preventDefault();
+      const roleSelect = document.getElementById('loginRoleSelect');
+      const roleKey = roleSelect ? roleSelect.value : 'teacher';
       const pass = document.getElementById('inputWebLoginPass').value.trim();
 
-      if (currentLoginMode === 'admin') {
+      if (!pass) {
+        alert('እባክዎ የይለፍ ቃልዎን ያስገቡ!');
+        return;
+      }
+
+      if (roleKey === 'admin') {
         const email = document.getElementById('inputWebLoginEmail').value.trim().toLowerCase();
-        const found = userAccounts.find(u => u.isAdmin && u.email.toLowerCase() === email && u.pass === pass);
+        if (!email) {
+          alert('እባክዎ የአድሚን ኢሜል አድራሻ ያስገቡ!');
+          return;
+        }
+        const found = userAccounts.find(u => u.isAdmin && u.email && u.email.toLowerCase() === email && u.pass === pass);
         if (found) {
           currentWebUser = found;
           localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
           updateCurrentUserUI();
           closeLoginModal();
-          alert(`እንኳን ደህና መጡ! ወደ አድሚን ገጽ በ${found.email} ገብተዋል።`);
+          alert(`እንኳን ደህና መጡ! ወደ ሲስተም አድሚን ገጽ በ${found.email} ገብተዋል።`);
         } else {
-          alert('የተሳሳተ የአድሚን ኢሜል ወይም የይለፍ ቃል! (ትክክለኛ፦ admin@dilijent.edu.et / admin123)');
+          alert('⛔ የተሳሳተ የአድሚን ኢሜል ወይም የይለፍ ቃል! እባክዎ ትክክለኛውን መረጃ ያስገቡ።');
         }
       } else {
         const phone = document.getElementById('inputWebLoginPhone').value.trim();
-        const found = userAccounts.find(u => !u.isAdmin && (u.phone === phone || u.phone.includes(phone.slice(-9))) && u.pass === pass);
-        if (found) {
-          currentWebUser = found;
-          localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
-          updateCurrentUserUI();
-          closeLoginModal();
-          alert(`እንኳን ደህና መጡ! ${found.name} (${found.role}) በስልክ ቁጥር ገብተዋል።`);
-        } else {
-          alert('የተሳሳተ የስልክ ቁጥር ወይም የይለፍ ቃል! የአድሚን የይለፍ ቃል መቆጣጠሪያውን በመጠቀም ማረጋገጥ ይችላሉ።');
+        if (!phone) {
+          alert('እባክዎ የስልክ ቁጥርዎን ያስገቡ!');
+          return;
         }
-      }
-    }
 
-    function quickWebLogin(roleKey) {
-      let target = null;
-      if (roleKey === 'admin') {
-        target = userAccounts.find(u => u.isAdmin) || userAccounts[0];
-      } else if (roleKey === 'vice_principal') {
-        target = userAccounts.find(u => u.isVicePrincipal || u.role.includes('ምክትል')) || userAccounts.find(u => u.phone === '0918000000');
-      } else if (roleKey === 'principal') {
-        target = userAccounts.find(u => u.role.includes('ርዕሰ መምህር') && !u.role.includes('ምክትል'));
-      } else if (roleKey === 'math_teacher') {
-        target = userAccounts.find(u => u.role.includes('መምህር') && !u.role.includes('ርዕሰ'));
-      } else if (roleKey === 'student') {
-        target = userAccounts.find(u => u.role.includes('ተማሪ'));
-      }
+        const cleanPhone = phone.replace(/\s+/g, '');
+        const found = userAccounts.find(u => {
+          if (u.isAdmin) return false;
+          const uPhone = (u.phone || '').replace(/\s+/g, '');
+          const phoneMatches = uPhone === cleanPhone || (cleanPhone.length >= 9 && uPhone.includes(cleanPhone.slice(-9))) || (uPhone.length >= 9 && cleanPhone.includes(uPhone.slice(-9)));
+          return phoneMatches && u.pass === pass;
+        });
 
-      if (target) {
-        currentWebUser = target;
+        if (!found) {
+          alert('⛔ የተሳሳተ የስልክ ቁጥር ወይም የይለፍ ቃል! እባክዎ መረጃዎን አረጋግጠው እንደገና ይሞክሩ።');
+          return;
+        }
+
+        // Validate that the account genuinely belongs to the chosen dropdown role
+        let matchesRole = false;
+        const r = (found.role || '').toLowerCase();
+        if (roleKey === 'principal') {
+          matchesRole = r.includes('ርዕሰ መምህር') && !r.includes('ምክትል');
+        } else if (roleKey === 'vice_principal') {
+          matchesRole = found.isVicePrincipal || r.includes('ምክትል');
+        } else if (roleKey === 'teacher') {
+          matchesRole = r.includes('መምህር') && !r.includes('ርዕሰ');
+        } else if (roleKey === 'secretary') {
+          matchesRole = r.includes('ጸሐፊ') || r.includes('secretary') || r.includes('ሬጅስትራር');
+        } else if (roleKey === 'finance') {
+          matchesRole = r.includes('ፋይናንስ') || r.includes('finance') || r.includes('ሂሳብ');
+        } else if (roleKey === 'support') {
+          matchesRole = r.includes('ፅዳት') || r.includes('ጥበቃ') || r.includes('ድጋፍ') || r.includes('support');
+        } else if (roleKey === 'student') {
+          matchesRole = r.includes('ተማሪ') || r.includes('student') || r.includes('ወላጅ');
+        }
+
+        if (!matchesRole) {
+          const expectedRoleName = roleSelect.options[roleSelect.selectedIndex].text;
+          alert(`⚠️ ሚና አይዛመድም! ያስገቡት መለያ የ«${found.role}» እንጂ የ«${expectedRoleName}» አይደለም። እባክዎ በድሮፕ ዳውኑ ትክክለኛውን የስራ ድርሻ ይምረጡ።`);
+          return;
+        }
+
+        currentWebUser = found;
         localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
         updateCurrentUserUI();
         if (typeof renderAttendance === 'function') renderAttendance();
         if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
         closeLoginModal();
-        alert(`በፈጣን ሁኔታ በ${target.name} (${target.role}) ገብተዋል!`);
+        alert(`እንኳን ደህና መጡ! ${found.name} (${found.role}) በተሳካ ሁኔታ ገብተዋል።`);
       }
     }
 
@@ -3690,10 +3870,10 @@
           <td style="padding:7px 8px;"><span class="badge ${acc.isAdmin ? 'badge-primary' : 'badge-warning'}">${acc.role}</span></td>
           <td style="padding:7px 8px; font-family:monospace; font-size:0.8rem; color:#1E40AF;">${acc.isAdmin ? acc.email : acc.phone}</td>
           <td style="padding:7px 8px; text-align:center;">
-            <input type="text" id="accPassInput_${idx}" value="${acc.pass}" style="width:110px; padding:3px 6px; font-size:0.8rem; border:1px solid #CBD5E1; border-radius:4px; font-family:monospace; text-align:center;">
+            <input type="text" id="accPassInput_${idx}" value="${acc.pass}" minlength="8" style="width:130px; padding:4px 6px; font-size:0.8rem; border:1px solid #CBD5E1; border-radius:4px; font-family:monospace; text-align:center;" placeholder="min 8 chars">
           </td>
           <td style="padding:7px 8px; text-align:center;">
-            <button class="btn-primary" style="padding:3px 8px; font-size:0.75rem;" onclick="saveAccountPassword(${idx})">💾 ቀይር</button>
+            <button class="btn-primary" style="padding:4px 8px; font-size:0.75rem;" onclick="saveAccountPassword(${idx})">💾 ቀይር</button>
           </td>
         </tr>
       `).join('');
@@ -3705,13 +3885,17 @@
         alert('እባክዎ የይለፍ ቃል ያስገቡ!');
         return;
       }
+      if (newPass.length < 8) {
+        alert(`⚠️ ደህንነቱ ያልተጠበቀ የይለፍ ቃል! የይለፍ ቃሉ ጠንካራ እንዲሆን ቢያንስ 8 ፊደላት/ቁጥሮች (characters) መሆን አለበት። (እርስዎ ያስገቡት: ${newPass.length} ፊደላት ብቻ ነው)`);
+        return;
+      }
       userAccounts[idx].pass = newPass;
       localStorage.setItem('dilijent_user_accounts', JSON.stringify(userAccounts));
       if (currentWebUser && currentWebUser.name === userAccounts[idx].name) {
         currentWebUser.pass = newPass;
         localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
       }
-      alert(`የ${userAccounts[idx].name} የይለፍ ቃል ወደ "${newPass}" በተሳካ ሁኔታ ተቀይሯል!`);
+      alert(`የ${userAccounts[idx].name} የይለፍ ቃል ወደ "${newPass}" (8+ characters) በተሳካ ሁኔታ ተቀይሯል!`);
     }
 
     // ==========================================

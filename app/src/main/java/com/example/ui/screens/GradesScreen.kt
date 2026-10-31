@@ -240,7 +240,7 @@ fun GradesScreen(
                 }
             }
 
-            // Executive Assessment Scheme Banner for Principal / Headmaster (ርዕሰ መ/ር)
+            // Executive Assessment Scheme Banner for Principal / Headmaster (ርዕሰ መ/ር) & Admin
             if (isAdmin && onConfigureSchemeClick != null) {
                 Card(
                     shape = RoundedCornerShape(12.dp),
