@@ -1398,7 +1398,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
-                if (showAdminPasswordManager) {
+                if (showAdminPasswordManager && (isAdmin || isSuperAdmin)) {
                     AdminPasswordManagerDialog(
                         users = allUsers,
                         isAmharic = isAmharic,
@@ -1425,7 +1425,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
-                if (showSchoolSettingsDialog) {
+                if (showSchoolSettingsDialog && (isAdmin || isSuperAdmin)) {
                     AdminSchoolSettingsDialog(
                         viewModel = viewModel,
                         onDismiss = { viewModel.showSchoolSettingsDialog.value = false }
