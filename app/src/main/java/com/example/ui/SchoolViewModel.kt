@@ -71,6 +71,7 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         // Ensure System Admin account exists for Email login and seed Primary 1-8 data if missing
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             seedPrimarySchoolDataIfNeeded()
+            seedOfficialStudentsIfNeeded()
             val adminUser = repository.getUserByEmail("admin@dilijent.edu.et")
             if (adminUser == null) {
                 repository.registerUser(
@@ -1255,9 +1256,18 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
 
     fun deleteStaff(staff: Staff) {
         viewModelScope.launch {
+            try {
+                val currentDeleted = prefs.getStringSet("deleted_staff_ids", emptySet()) ?: emptySet()
+                val newDeleted = currentDeleted.toMutableSet().apply {
+                    add(staff.staffCode.trim().lowercase())
+                    add(staff.fullName.trim().lowercase())
+                }
+                prefs.edit().putStringSet("deleted_staff_ids", newDeleted).apply()
+            } catch (_: Exception) {}
+
             repository.deleteStaff(staff)
             val docId = "staff_${staff.staffCode.replace(Regex("[^a-zA-Z0-9_]"), "_")}"
-            firestoreRepository.deleteStudent(docId)
+            firestoreRepository.deleteStaff(docId)
             if (selectedStaffForDetails.value?.id == staff.id) {
                 selectedStaffForDetails.value = null
             }
@@ -1364,8 +1374,33 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         showSchoolSettingsDialog.value = false
     }
 
+    private suspend fun seedOfficialStudentsIfNeeded() {
+        try {
+            val alreadySeeded = prefs.getBoolean("official_students_seeded_v3", false)
+            if (alreadySeeded) return
+
+            val deletedIds = prefs.getStringSet("deleted_student_ids", emptySet()) ?: emptySet()
+            val existing = repository.allStudents.first()
+            val existingIds = existing.map { it.studentIdNumber.trim().lowercase() }.toSet()
+            val officialList = com.example.data.model.OfficialStudentsData.getAllOfficialStudents()
+            val toInsert = officialList.filter {
+                val idLower = it.studentIdNumber.trim().lowercase()
+                !existingIds.contains(idLower) && !deletedIds.contains(idLower)
+            }
+            if (toInsert.isNotEmpty()) {
+                toInsert.forEach { student ->
+                    repository.insertStudent(student)
+                }
+            }
+            prefs.edit().putBoolean("official_students_seeded_v3", true).apply()
+        } catch (_: Exception) {}
+    }
+
     private suspend fun seedPrimarySchoolDataIfNeeded() {
         try {
+            val alreadySeeded = prefs.getBoolean("primary_school_seeded_v2", false)
+            if (alreadySeeded) return
+
             val existing = repository.allStudents.first()
             if (existing.none { isGradeInLevel(it.grade, "1_8") }) {
                 val primaryStudents = listOf(
@@ -1526,6 +1561,7 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                 )
                 primaryWorkloads.forEach { repository.insertWorkload(it) }
             }
+            prefs.edit().putBoolean("primary_school_seeded_v2", true).apply()
         } catch (_: Exception) {}
     }
 
@@ -1559,6 +1595,14 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
 
     fun deleteStudent(student: Student) {
         viewModelScope.launch {
+            try {
+                val currentDeleted = prefs.getStringSet("deleted_student_ids", emptySet()) ?: emptySet()
+                val newDeleted = currentDeleted.toMutableSet().apply {
+                    add(student.studentIdNumber.trim().lowercase())
+                }
+                prefs.edit().putStringSet("deleted_student_ids", newDeleted).apply()
+            } catch (_: Exception) {}
+
             repository.deleteStudent(student)
             val docId = "student_${student.studentIdNumber.replace(Regex("[^a-zA-Z0-9_]"), "_")}"
             firestoreRepository.deleteStudent(docId)
@@ -1590,7 +1634,7 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             repository.deleteTeacher(teacher)
             val docId = "teacher_${teacher.teacherCode.replace(Regex("[^a-zA-Z0-9_]"), "_")}"
-            firestoreRepository.deleteStudent(docId)
+            firestoreRepository.deleteTeacher(docId)
             if (selectedTeacherForDetails.value?.id == teacher.id) {
                 selectedTeacherForDetails.value = null
             }
@@ -1615,6 +1659,8 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
     fun deleteSubject(subject: Subject) {
         viewModelScope.launch {
             repository.deleteSubject(subject)
+            val docId = "sub_${subject.code.replace(Regex("[^a-zA-Z0-9_]"), "_")}"
+            firestoreRepository.deleteSubject(docId)
         }
     }
 
@@ -1636,6 +1682,8 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
     fun deleteWorkload(workload: TeacherWorkload) {
         viewModelScope.launch {
             repository.deleteWorkload(workload)
+            val docId = "workload_${workload.teacherId}_${workload.subjectId}_${workload.grade.replace(" ", "_")}_${workload.section}"
+            firestoreRepository.deleteWorkload(docId)
         }
     }
 
@@ -1665,6 +1713,8 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
     fun deleteGrade(grade: StudentGrade) {
         viewModelScope.launch {
             repository.deleteGrade(grade)
+            val docId = "grade_${grade.studentId}_${grade.subjectName.replace(Regex("[^a-zA-Z0-9_]"), "_")}_${grade.semester.replace(" ", "_")}"
+            firestoreRepository.deleteGrade(docId)
         }
     }
 

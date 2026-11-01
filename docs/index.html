@@ -371,13 +371,14 @@
           <table>
             <thead>
               <tr>
+                <th style="width:50px; text-align:center;">ተ.ቁ</th>
                 <th>መለያ ቁጥር</th>
-                <th>ፎቶ እና ስም</th>
+                <th>ፎቶ እና ሙሉ ስም</th>
                 <th>ጾታ</th>
                 <th>ክፍል</th>
                 <th>የአሳዳጊ ስልክ</th>
                 <th>ሁኔታ</th>
-                <th>እርምጃ</th>
+                <th style="text-align:center;">እርምጃ</th>
               </tr>
             </thead>
             <tbody id="studentsTableBody">
@@ -407,13 +408,14 @@
           <table>
             <thead>
               <tr>
+                <th style="width:50px; text-align:center;">ተ.ቁ</th>
                 <th>ፎቶ እና ሙሉ ስም</th>
                 <th>የስራ መደብ (Role)</th>
                 <th>ክፍል / የስራ ዘርፍ</th>
                 <th>ስልክ ቁጥር</th>
                 <th>የትምህርት ደረጃ</th>
                 <th>ሁኔታ</th>
-                <th>እርምጃ</th>
+                <th style="text-align:center;">እርምጃ</th>
               </tr>
             </thead>
             <tbody id="staffTableBody">
@@ -1743,8 +1745,2349 @@
       currentScheme.components = getSchemeComponents(currentScheme);
     }
 
+    // Official Uploaded Student Datasets from School Administration (Grade 6 and Grade 1)
+    const OFFICIAL_GRADE_6_STUDENTS = [
+      { id: 'F/01/19', name: 'Abigiya Tsegaye Kebede', gender: 'ሴት', grade: '6A', phone: '0910589919', scores: [9.5, 9.5, 28.0, 48.0], photo: '', status: 'ንቁ' },
+      { id: 'F/02/19', name: 'Akilesia Getnet Demilew', gender: 'ሴት', grade: '6A', phone: '0913461004', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'F/03/19', name: 'Amar Jemal Awel', gender: 'ወንድ', grade: '6A', phone: '0911145298', scores: [8.5, 9.0, 26.0, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'F/04/19', name: 'Amen Deresse Lemma', gender: 'ሴት', grade: '6A', phone: '0921381529', scores: [9.0, 9.5, 27.5, 47.0], photo: '', status: 'ንቁ' },
+      { id: 'F/05/19', name: 'Bereket Assefa Fikadu', gender: 'ወንድ', grade: '6A', phone: '0922822204', scores: [9.0, 8.5, 26.5, 44.0], photo: '', status: 'ንቁ' },
+      { id: 'F/06/19', name: 'Bitania Tefera Kebed', gender: 'ወንድ', grade: '6A', phone: '0911513788', scores: [8.5, 9.0, 25.5, 43.5], photo: '', status: 'ንቁ' },
+      { id: 'F/07/19', name: 'Bitania Solomon Dires', gender: 'ሴት', grade: '6A', phone: '0949246507', scores: [9.5, 9.0, 28.0, 48.5], photo: '', status: 'ንቁ' },
+      { id: 'F/08/19', name: 'Eden Habtamu Manaye', gender: 'ሴት', grade: '6A', phone: '0911042549', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'F/09/19', name: 'Eleni Ermias Tilahun', gender: 'ሴት', grade: '6A', phone: '0911757802', scores: [9.5, 9.5, 28.5, 47.5], photo: '', status: 'ንቁ' },
+      { id: 'F/10/19', name: 'Elued Sintayehue', gender: 'ወንድ', grade: '6A', phone: '0911944734', scores: [8.5, 8.5, 25.0, 42.0], photo: '', status: 'ንቁ' },
+      { id: 'F/11/19', name: 'Eyasu Ermias Tilahun', gender: 'ወንድ', grade: '6A', phone: '0905903889', scores: [9.0, 9.0, 26.0, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'F/12/19', name: 'Fatima Abubeker Suleman', gender: 'ሴት', grade: '6A', phone: '0964202931', scores: [9.5, 9.0, 28.0, 47.0], photo: '', status: 'ንቁ' },
+      { id: 'F/13/19', name: 'Fikir Ashagre Gesesse', gender: 'ወንድ', grade: '6A', phone: '0913371522', scores: [8.5, 9.0, 26.0, 44.5], photo: '', status: 'ንቁ' },
+      { id: 'F/14/19', name: 'Kalikidan Zeleke Timotiwos', gender: 'ሴት', grade: '6A', phone: '0921412080', scores: [9.0, 9.5, 27.5, 46.5], photo: '', status: 'ንቁ' },
+      { id: 'F/15/19', name: 'Liyona Addis Tekelabe', gender: 'ሴት', grade: '6A', phone: '0911074921', scores: [9.5, 9.5, 29.0, 48.0], photo: '', status: 'ንቁ' },
+      { id: 'F/16/19', name: 'Mohammed Nuredin Kedir', gender: 'ወንድ', grade: '6A', phone: '0942180101', scores: [8.5, 8.5, 25.5, 43.0], photo: '', status: 'ንቁ' },
+      { id: 'F/17/19', name: 'Maramawit Andarige', gender: 'ሴት', grade: '6A', phone: '0912928141', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'F/18/19', name: 'Makbel Isaal Assfaw', gender: 'ወንድ', grade: '6A', phone: '0913960156', scores: [8.5, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
+      { id: 'F/19/19', name: 'Marikon Million', gender: 'ወንድ', grade: '6A', phone: '0911643150', scores: [9.0, 8.5, 26.5, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'F/20/19', name: 'Naod Solomon', gender: 'ወንድ', grade: '6A', phone: '0911410703', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'F/21/19', name: 'Nebile Kalif', gender: 'ወንድ', grade: '6A', phone: '0911282484', scores: [8.5, 8.5, 25.0, 43.0], photo: '', status: 'ንቁ' },
+      { id: 'F/22/19', name: 'Reyan Kalif', gender: 'ወንድ', grade: '6A', phone: '0911282484', scores: [8.5, 9.0, 25.5, 43.5], photo: '', status: 'ንቁ' },
+      { id: 'F/23/19', name: 'Robel Arega', gender: 'ወንድ', grade: '6A', phone: '0911042484', scores: [9.0, 8.5, 26.0, 44.5], photo: '', status: 'ንቁ' },
+      { id: 'F/24/19', name: 'Yusuf Enyew Kesaye', gender: 'ወንድ', grade: '6A', phone: '0913084728', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'F/25/19', name: 'Yusuf Musema Kedir', gender: 'ወንድ', grade: '6A', phone: '0942180101', scores: [8.5, 8.5, 25.0, 42.5], photo: '', status: 'ንቁ' },
+      { id: 'F/26/19', name: 'Yohana Farasim Tilawu', gender: 'ወንድ', grade: '6A', phone: '0911426507', scores: [9.0, 9.0, 26.5, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'F/27/19', name: 'Yonas Selamu', gender: 'ወንድ', grade: '6A', phone: '0913978333', scores: [8.5, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
+      { id: 'F/28/19', name: 'Micjael Leulseged Tamiru', gender: 'ወንድ', grade: '6A', phone: '0910970202', scores: [9.0, 8.5, 26.5, 45.0], photo: '', status: 'ንቁ' }
+    ];
+
+    const OFFICIAL_GRADE_1_STUDENTS = [
+      { id: 'A/01/19', name: 'Abem Mideyem Degu', gender: 'ወንድ', grade: '1A', phone: '0932205411', scores: [9.5, 9.5, 28.5, 48.0], photo: '', status: 'ንቁ' },
+      { id: 'A/02/19', name: 'Abiraham Zewude Balcha', gender: 'ወንድ', grade: '1A', phone: '0988180950', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'A/03/19', name: 'Amen Anduamlak', gender: 'ወንድ', grade: '1A', phone: '0913796762', scores: [9.0, 9.0, 26.5, 45.5], photo: '', status: 'ንቁ' },
+      { id: 'A/04/19', name: 'Anania Getahun Lulseged', gender: 'ሴት', grade: '1A', phone: '0983848574', scores: [9.5, 9.5, 29.0, 49.0], photo: '', status: 'ንቁ' },
+      { id: 'A/05/19', name: 'Aron Derese Lemma', gender: 'ወንድ', grade: '1A', phone: '0921381529', scores: [8.5, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
+      { id: 'A/06/19', name: 'Azaryas Yehuala Kahsay', gender: 'ወንድ', grade: '1A', phone: '0933697065', scores: [9.0, 8.5, 26.5, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'A/07/19', name: 'Barkot Melak Lenberu', gender: 'ወንድ', grade: '1A', phone: '0912179133', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'A/08/19', name: 'Barkot Mikias Zewudu', gender: 'ወንድ', grade: '1A', phone: '0985425516', scores: [8.5, 9.0, 26.0, 44.5], photo: '', status: 'ንቁ' },
+      { id: 'A/09/19', name: 'Betelhem Deresse Getachew', gender: 'ሴት', grade: '1A', phone: '0913094326', scores: [9.5, 9.0, 28.0, 48.0], photo: '', status: 'ንቁ' },
+      { id: 'A/10/19', name: 'Bilen Surafel Kifle', gender: 'ሴት', grade: '1A', phone: '0987880512', scores: [9.0, 9.5, 27.5, 47.0], photo: '', status: 'ንቁ' },
+      { id: 'A/11/19', name: 'Bilisuma Markos Seyfu', gender: 'ሴት', grade: '1A', phone: '0935011175', scores: [9.0, 9.0, 27.0, 46.5], photo: '', status: 'ንቁ' },
+      { id: 'A/12/19', name: 'Biruk Henok Dechassa', gender: 'ወንድ', grade: '1A', phone: '0934610272', scores: [8.5, 8.5, 25.5, 43.0], photo: '', status: 'ንቁ' },
+      { id: 'A/13/19', name: 'Blen Lijalem Beyene', gender: 'ሴት', grade: '1A', phone: '0920665945', scores: [9.5, 9.0, 28.0, 47.5], photo: '', status: 'ንቁ' },
+      { id: 'A/14/19', name: 'Dagim Samuel Mekasha', gender: 'ወንድ', grade: '1A', phone: '0938073166', scores: [9.0, 9.0, 26.5, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'A/15/19', name: 'Dibora Dereje Tamiru', gender: 'ሴት', grade: '1A', phone: '0910002243', scores: [9.5, 9.5, 28.5, 48.0], photo: '', status: 'ንቁ' },
+      { id: 'A/16/19', name: 'Elsabet Mengistu Fetene', gender: 'ሴት', grade: '1A', phone: '0921323261', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'A/17/19', name: 'Emad Mehammed Abrar', gender: 'ወንድ', grade: '1A', phone: '0912288604', scores: [8.5, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
+      { id: 'A/18/19', name: 'Emad Mohammedabrar Yasin', gender: 'ወንድ', grade: '1A', phone: '0912288604', scores: [8.5, 8.5, 25.5, 43.5], photo: '', status: 'ንቁ' },
+      { id: 'A/19/19', name: 'Esrael Yohannes Selfu', gender: 'ሴት', grade: '1A', phone: '0913498899', scores: [9.5, 9.0, 28.0, 47.0], photo: '', status: 'ንቁ' },
+      { id: 'A/20/19', name: 'Ethan Tibebu Asefa', gender: 'ወንድ', grade: '1A', phone: '0913734563', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'A/21/19', name: 'Eyad Abubeker Hamza', gender: 'ወንድ', grade: '1A', phone: '0912025302', scores: [8.5, 9.0, 26.5, 44.5], photo: '', status: 'ንቁ' },
+      { id: 'A/22/19', name: 'Eyob Tamiru Hayilee', gender: 'ወንድ', grade: '1A', phone: '0911763237', scores: [9.0, 8.5, 26.0, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'A/23/19', name: 'Faruk Ahmed Seyd', gender: 'ወንድ', grade: '1A', phone: '0913094566', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'A/24/19', name: 'Ferehan Musbaha kemal', gender: 'ሴት', grade: '1A', phone: '0910860774', scores: [9.5, 9.0, 27.5, 47.0], photo: '', status: 'ንቁ' },
+      { id: 'A/25/19', name: 'Fiker Yilkal Abebaw', gender: 'ወንድ', grade: '1A', phone: '0913553375', scores: [9.0, 9.0, 26.5, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'A/26/19', name: 'Hari Halid Redi', gender: 'ሴት', grade: '1A', phone: '0921732788', scores: [9.0, 9.5, 28.0, 47.5], photo: '', status: 'ንቁ' },
+      { id: 'A/27/19', name: 'Harme Feshaye', gender: 'ወንድ', grade: '1A', phone: '0913794361', scores: [8.5, 8.5, 25.0, 43.0], photo: '', status: 'ንቁ' },
+      { id: 'A/28/19', name: 'Haron derese', gender: 'ወንድ', grade: '1A', phone: '0911870201', scores: [9.0, 8.5, 26.0, 44.0], photo: '', status: 'ንቁ' },
+      { id: 'A/29/19', name: 'Haron Halid Redi', gender: 'ወንድ', grade: '1A', phone: '0921732788', scores: [9.0, 9.0, 26.5, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'A/30/19', name: 'Hawlet Seid Dese', gender: 'ሴት', grade: '1A', phone: '0935851020', scores: [9.5, 9.0, 28.0, 47.0], photo: '', status: 'ንቁ' },
+      { id: 'A/31/19', name: 'Haykel Mustefa Mohammed', gender: 'ወንድ', grade: '1A', phone: '0949438091', scores: [8.5, 9.0, 26.0, 44.5], photo: '', status: 'ንቁ' },
+      { id: 'A/32/19', name: 'Hemen Fantahun Aray', gender: 'ሴት', grade: '1A', phone: '0968670919', scores: [9.0, 9.5, 28.5, 48.0], photo: '', status: 'ንቁ' },
+      { id: 'A/33/19', name: 'Heran dereje', gender: 'ሴት', grade: '1A', phone: '0911919600', scores: [9.5, 9.0, 27.5, 47.0], photo: '', status: 'ንቁ' },
+      { id: 'A/34/19', name: 'Judi Zeki Abdlhadi', gender: 'ወንድ', grade: '1A', phone: '0961134950', scores: [8.5, 8.5, 25.5, 43.0], photo: '', status: 'ንቁ' },
+      { id: 'A/35/19', name: 'Junior Asrat Biru', gender: 'ወንድ', grade: '1A', phone: '0911861486', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'A/36/19', name: 'Kaleab Dawit Ayele', gender: 'ወንድ', grade: '1A', phone: '0904186642', scores: [9.0, 9.0, 26.5, 45.5], photo: '', status: 'ንቁ' },
+      { id: 'A/37/19', name: 'Kalkidan Alamneh Meseret', gender: 'ወንድ', grade: '1A', phone: '0900831486', scores: [8.5, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
+      { id: 'A/38/19', name: 'Kerab Moges Gezahegn', gender: 'ወንድ', grade: '1A', phone: '0910526407', scores: [9.0, 8.5, 26.0, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'A/39/19', name: 'Lelina Tesfaye Shewangizew', gender: 'ሴት', grade: '1A', phone: '0926873989', scores: [9.5, 9.5, 29.0, 48.5], photo: '', status: 'ንቁ' },
+      { id: 'A/40/19', name: 'Madot Getu Abraham', gender: 'ሴት', grade: '1A', phone: '0920725394', scores: [9.0, 9.0, 27.5, 46.5], photo: '', status: 'ንቁ' },
+      { id: 'A/41/19', name: 'Maraki Tilahun Gashaw', gender: 'ሴት', grade: '1A', phone: '0913314886', scores: [9.5, 9.0, 28.0, 47.5], photo: '', status: 'ንቁ' },
+      { id: 'A/42/19', name: 'Maramawit Getaneh Addisu', gender: 'ሴት', grade: '1A', phone: '0947893246', scores: [9.0, 9.5, 28.0, 47.0], photo: '', status: 'ንቁ' },
+      { id: 'A/43/19', name: 'Maramawit Sintayehu Semeneh', gender: 'ወንድ', grade: '1A', phone: '0967600763', scores: [8.5, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
+      { id: 'A/44/19', name: 'Melona Girum Gemechu', gender: 'ሴት', grade: '1A', phone: '0921772073', scores: [9.5, 9.0, 28.0, 48.0], photo: '', status: 'ንቁ' },
+      { id: 'A/45/19', name: 'Menesa Jemil Sultan', gender: 'ሴት', grade: '1A', phone: '0910107981', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'A/46/19', name: 'Mohomred Yusuf sunkamo', gender: 'ወንድ', grade: '1A', phone: '0911972002', scores: [8.5, 8.5, 25.0, 43.0], photo: '', status: 'ንቁ' },
+      { id: 'A/47/19', name: 'Nafkot Yilkal Abebaw', gender: 'ወንድ', grade: '1A', phone: '0913553315', scores: [9.0, 9.0, 26.5, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'A/48/19', name: 'Nahom Lekenaw Beyazen', gender: 'ወንድ', grade: '1A', phone: '0961224215', scores: [8.5, 9.0, 26.0, 44.5], photo: '', status: 'ንቁ' },
+      { id: 'A/49/19', name: 'Natan Hilemikael Eyasu', gender: 'ወንድ', grade: '1A', phone: '0934540158', scores: [9.0, 8.5, 26.5, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'A/50/19', name: 'Natnael Dereje Mulatu', gender: 'ወንድ', grade: '1A', phone: '0991179169', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'A/51/19', name: 'Reyan Abdu Sani', gender: 'ወንድ', grade: '1A', phone: '0910148921', scores: [8.5, 8.5, 25.5, 43.5], photo: '', status: 'ንቁ' },
+      { id: 'A/52/19', name: 'Robel Behailu Eba', gender: 'ወንድ', grade: '1A', phone: '0927168669', scores: [9.0, 9.0, 26.5, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'A/53/19', name: 'Robel Shegaw Muche', gender: 'ወንድ', grade: '1A', phone: '0910527807', scores: [8.5, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
+      { id: 'A/54/19', name: 'Robel Yohanis Hosen', gender: 'ወንድ', grade: '1A', phone: '0911472377', scores: [9.0, 8.5, 26.0, 44.5], photo: '', status: 'ንቁ' },
+      { id: 'A/55/19', name: 'Ruth zeleke Timotewos', gender: 'ሴት', grade: '1A', phone: '0929120667', scores: [9.5, 9.5, 28.5, 48.0], photo: '', status: 'ንቁ' },
+      { id: 'A/56/19', name: 'Sunper Eyasu', gender: 'ሴት', grade: '1A', phone: '0920729676', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'A/57/19', name: 'Tensye Agegnew Yirdaw', gender: 'ሴት', grade: '1A', phone: '0913266595', scores: [9.0, 9.5, 27.5, 47.0], photo: '', status: 'ንቁ' },
+      { id: 'A/58/19', name: 'Tina Tewodros Ararsa', gender: 'ሴት', grade: '1A', phone: '0920707552', scores: [9.5, 9.0, 28.0, 47.5], photo: '', status: 'ንቁ' },
+      { id: 'A/59/19', name: 'Yosef Siraj Awoel', gender: 'ወንድ', grade: '1A', phone: '0911012368', scores: [9.0, 9.0, 26.5, 45.5], photo: '', status: 'ንቁ' },
+      { id: 'A/60/19', name: 'Tinbit Yonas Yazachew', gender: 'ሴት', grade: '1A', phone: '0937397127', scores: [9.5, 9.5, 28.5, 48.0], photo: '', status: 'ንቁ' }
+    ];
+
+    const OFFICIAL_GRADE_2_STUDENTS = [
+  {
+    "id": "B/01/19",
+    "name": "Abesalat Habetamu",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0910641821",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/02/19",
+    "name": "Akilsia Solomon G/selasy",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0913166768",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/03/19",
+    "name": "Amen Wondyefraw  Tesfaye",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0935023103",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/04/19",
+    "name": "Anania Asechalew",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0929022966",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/05/19",
+    "name": "Anania Asechalwe Gezahign",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0929022966",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/06/19",
+    "name": "Barekot Samson Degu",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0920890253",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/07/19",
+    "name": "Bereket Kasahun Tebabal",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0913906070",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/08/19",
+    "name": "Ceristian Eyob",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0973054399",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/09/19",
+    "name": "Dagem Moges Gezahgn",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0910526407",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/10/19",
+    "name": "Daniya Suleman",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0910914934",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/11/19",
+    "name": "Eldan Addisalem",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0912414432",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/12/19",
+    "name": "Elham Liyad Aborehaman",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0911086041",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/13/19",
+    "name": "Eyobe Selamu",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0913978333",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/14/19",
+    "name": "Eyosias Muluneh",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0979042639",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/15/19",
+    "name": "Filiya Medeset Melaku",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0911268727",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/16/19",
+    "name": "Firdos Nuredin",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0942181001",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/17/19",
+    "name": "Frehiwot Zewdu Abe",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0920508768",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/18/19",
+    "name": "Hafnan Jemal Delile",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0913708797",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/19/19",
+    "name": "Haset Beruk",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0988180950",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/20/19",
+    "name": "kaleab Belachew Beyene",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0932444678",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/21/19",
+    "name": "Kalkidan Fikru",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0912929367",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/22/19",
+    "name": "Kedus Esubalwe Sharwe",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0935364884",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/23/19",
+    "name": "Keradiyon kebebew",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0951072324",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/24/19",
+    "name": "Mahi Ysain Jibrile",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0913690729",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/25/19",
+    "name": "Mahinyem Tegaye Kebed",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0910589919",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/26/19",
+    "name": "Makibel getacew",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0947893246",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/27/19",
+    "name": "Maramawit Zeriyehun Seyfe",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0944726217",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/28/19",
+    "name": "Marisel Dejeny",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0913626074",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/29/19",
+    "name": "Markon Getachew Nedi",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0913130678",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/30/19",
+    "name": "Mekilit Sefefi",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0991744843",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/31/19",
+    "name": "Meskir Teshom",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0929304671",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/32/19",
+    "name": "Millen Mulugeta kifle",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0931718145",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/33/19",
+    "name": "Nabek H/geberale",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0921978963",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/34/19",
+    "name": "Nabeki Hailegebrel Garomsa",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0921978963",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/35/19",
+    "name": "Nahom Asenafi",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0912150856",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/36/19",
+    "name": "Nahom Ashenafi Tadesse",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0912150856",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/37/19",
+    "name": "Natnae Solomon Zenabe",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0923253086",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/38/19",
+    "name": "Nolawi Tywederose",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0911602285",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/39/19",
+    "name": "Riyan Emame Aliy",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0911710783",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/40/19",
+    "name": "Robel Yohan Osi",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0911472377",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/41/19",
+    "name": "Rute Tefera Kebde",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0911513788",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/42/19",
+    "name": "Samuel Erimeys Gerema",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0911933522",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/43/19",
+    "name": "Selam Belete Siyoum",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0951979672",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/44/19",
+    "name": "Selendos Tomase",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0923706479",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/45/19",
+    "name": "Semper Edeom",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0910072738",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/46/19",
+    "name": "Sipara Getnet Demlew",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0913461004",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/47/19",
+    "name": "Tihon Addis Cerey",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0900353529",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/48/19",
+    "name": "Twebisita addis",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0922858079",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/49/19",
+    "name": "Yordanos Mekuriya",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0910459939",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/50/19",
+    "name": "Zemen Alembirhan Haile",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0944101301",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/51/19",
+    "name": "Zemikael Tesefaye Mekone",
+    "gender": "ወንድ",
+    "grade": "2ኛA",
+    "phone": "0919721919",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/52/19",
+    "name": "Hawlet Addi Shifa",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0911013515",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "B/53/19",
+    "name": "Tibebu Solomon H/mariam",
+    "gender": "ሴት",
+    "grade": "2ኛA",
+    "phone": "0921804013",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  }
+];
+
+    const OFFICIAL_GRADE_3_STUDENTS = [
+  {
+    "id": "C/01/19",
+    "name": "Abriham Waletaneguse Werku",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0936501143",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/02/19",
+    "name": "Absalate Sentayehu",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0911196654",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/03/19",
+    "name": "Ahemed Musema Keder",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0942180101",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/4/19",
+    "name": "Akelesia Solomon",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0913160768",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/05/19",
+    "name": "Amanuel Anduamelm Bayele",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0912210293",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/06/19",
+    "name": "Amudin Alemayew Kassa",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0911192622",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/7/19",
+    "name": "Aresema Alembirhan Hayele",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0944101301",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/08/19",
+    "name": "Barekot Ashenafi Gethachew",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0911427268",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/09/19",
+    "name": "Beteab Markos Seyfe",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0935011175",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/10/19",
+    "name": "Betelot Tsegaye Birhanu",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0985433577",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/11/19",
+    "name": "Danwit Kemal",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0966035768",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/12/19",
+    "name": "Eleyana Ashenafi Gethachew",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0911427268",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/13/19",
+    "name": "Ermiyas Anduamelak Animaw",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0913796762",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/14/19",
+    "name": "Firdos Nurdine",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0942180101",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/15/19",
+    "name": "Fitsum Ashenafi Gethecw",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0911427268",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/16/19",
+    "name": "Hamudi Almayhu",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0913695168",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/17/19",
+    "name": "Hayat Nuredin Kedere",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0956828243",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/18/19",
+    "name": "Hiyabe Tesefaye",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0926873980",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/19/19",
+    "name": "Huda Ismail Tafese",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0910641343",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/20/19",
+    "name": "Kalkidan Anagaw Azanawe",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0990847488",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/21/19",
+    "name": "Kidus Behailu",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0983318895",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/22/19",
+    "name": "Kidus Derje Getacehu",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0913566256",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/23/19",
+    "name": "Libanose Desalegn Getahun",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0938847258",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/24/19",
+    "name": "Liwela Habetamu",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0955340429",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/25/19",
+    "name": "Maedot Sintayehu Tekelabe",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0967650566",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/26/19",
+    "name": "Makiba Getahun",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0916822368",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/27/19",
+    "name": "Monet Fekiru Kejela",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0912929367",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/28/19",
+    "name": "Naode Solomom",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0911373909",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/29/19",
+    "name": "Natan Anteneh Getachew",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0911478443",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/30/19",
+    "name": "Nathan Demelash Kume",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0912688490",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/31/19",
+    "name": "Natinm Worken Guta",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0939670104",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/32/19",
+    "name": "Nebat  Mehammed",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0925989652",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/33/19",
+    "name": "Nejat Mehmmed Alemye",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0925989652",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/34/19",
+    "name": "Newal Abubeker Suleyman",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0964202931",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/35/19",
+    "name": "Nolawi million Lemma",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0924848134",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/36/19",
+    "name": "Nuhamin Solomon Dessalegn",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0992552686",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/37/19",
+    "name": "Rakib solomon Temame",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0911373909",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/38/19",
+    "name": "Sebirina Selahadin Temame",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0963201304",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/39/19",
+    "name": "Selman Jemil Delil",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0913708797",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/40/19",
+    "name": "Yabesera Melaku",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0940256301",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/41/19",
+    "name": "Yeausera Melaku Desalgn",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0940256301",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/42/19",
+    "name": "Yohannes Geta Teshome",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0944364243",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/43/19",
+    "name": "Yohannes Sentayehu",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0911944734",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/44/19",
+    "name": "Zekariase Tadesse Ayele",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0902458781",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/45/19",
+    "name": "Robel Gebeyehu Negash",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0911000000",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/46/19",
+    "name": "Elroe Ashenafi Solomon",
+    "gender": "ሴት",
+    "grade": "3ኛA",
+    "phone": "0913637740",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "C/47/19",
+    "name": "Abikem Asdesach Habtie",
+    "gender": "ወንድ",
+    "grade": "3ኛA",
+    "phone": "0913307330",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  }
+];
+
+    const OFFICIAL_GRADE_4_STUDENTS = [
+  {
+    "id": "D/01/19",
+    "name": "Amen Nebiyat Mekonen",
+    "gender": "ወንድ",
+    "grade": "4ኛA",
+    "phone": "0913092209",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/02/19",
+    "name": "Aresema woreku Kemal",
+    "gender": "ሴት",
+    "grade": "4ኛA",
+    "phone": "0913681874",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/03/19",
+    "name": "Biserat  Addisalem Dejene",
+    "gender": "ወንድ",
+    "grade": "4ኛA",
+    "phone": "0912414432",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/04/19",
+    "name": "Betslot Takele Lagesse",
+    "gender": "ወንድ",
+    "grade": "4ኛA",
+    "phone": "0911138474",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/05/19",
+    "name": "Eeneb Abubeker",
+    "gender": "ሴት",
+    "grade": "4ኛA",
+    "phone": "0912025302",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/06/19",
+    "name": "Eibrahim Ahemd",
+    "gender": "ወንድ",
+    "grade": "4ኛA",
+    "phone": "0913101053",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/07/19",
+    "name": "Eibrahim Mehamed",
+    "gender": "ወንድ",
+    "grade": "4ኛA",
+    "phone": "0913101053",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/08/19",
+    "name": "Eneb Dawud Kemal",
+    "gender": "ሴት",
+    "grade": "4ኛA",
+    "phone": "0913201522",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/09/19",
+    "name": "Eledan Mekonene Adugna",
+    "gender": "ሴት",
+    "grade": "4ኛA",
+    "phone": "0920147472",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/10/19",
+    "name": "Elidana Wondesen",
+    "gender": "ሴት",
+    "grade": "4ኛA",
+    "phone": "0911985310",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/11/19",
+    "name": "Elroi  Ashenafi Solomon",
+    "gender": "ሴት",
+    "grade": "4ኛA",
+    "phone": "0929193220",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/12/19",
+    "name": "Enas Abubeker Hmza",
+    "gender": "ሴት",
+    "grade": "4ኛA",
+    "phone": "0912025302",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/13/19",
+    "name": "Harun Dawud Kemal",
+    "gender": "ወንድ",
+    "grade": "4ኛA",
+    "phone": "0913201522",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/14/19",
+    "name": "Kalkidan Adisu Senbet",
+    "gender": "ሴት",
+    "grade": "4ኛA",
+    "phone": "0964468034",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/15/19",
+    "name": "Makibel Aneteneh Getacew",
+    "gender": "ወንድ",
+    "grade": "4ኛA",
+    "phone": "0911478443",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/16/19",
+    "name": "Mintsenot Dereje",
+    "gender": "ወንድ",
+    "grade": "4ኛA",
+    "phone": "0991179169",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/17/19",
+    "name": "Nohel Million",
+    "gender": "ወንድ",
+    "grade": "4ኛA",
+    "phone": "0911643150",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/18/19",
+    "name": "Samuel Yoseph Sahelmariame",
+    "gender": "ወንድ",
+    "grade": "4ኛA",
+    "phone": "0930011709",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/19/19",
+    "name": "Yanet Tesefahun Belay",
+    "gender": "ሴት",
+    "grade": "4ኛA",
+    "phone": "0911128772",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/20/19",
+    "name": "Yonatan Negatu W/senbet",
+    "gender": "ወንድ",
+    "grade": "4ኛA",
+    "phone": "0910560557",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "D/21/19",
+    "name": "Yohannes Zewudu Tadesse",
+    "gender": "ወንድ",
+    "grade": "4ኛA",
+    "phone": "0943100850",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  }
+];
+
+    const OFFICIAL_GRADE_5_STUDENTS = [
+  {
+    "id": "E/01/19",
+    "name": "Adil Behailu Ali",
+    "gender": "ወንድ",
+    "grade": "5ኛA",
+    "phone": "0910917471",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "E/02/19",
+    "name": "Amanuel Lemma G/meskel",
+    "gender": "ሴት",
+    "grade": "5ኛA",
+    "phone": "0911100331",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "E/03/19",
+    "name": "Elora Seyde Hudan",
+    "gender": "ሴት",
+    "grade": "5ኛA",
+    "phone": "0975861028",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "E/04/19",
+    "name": "Feven Getu",
+    "gender": "ሴት",
+    "grade": "5ኛA",
+    "phone": "0920725394",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "E/05/19",
+    "name": "Kidus Belachew",
+    "gender": "ወንድ",
+    "grade": "5ኛA",
+    "phone": "0932444672",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "E/06/19",
+    "name": "Leuel Endale Legesse",
+    "gender": "ወንድ",
+    "grade": "5ኛA",
+    "phone": "0913521307",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "E/07/19",
+    "name": "Markon Abel Tesfaye",
+    "gender": "ወንድ",
+    "grade": "5ኛA",
+    "phone": "0921601025",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "E/08/19",
+    "name": "Mericy Eermyas Gerima",
+    "gender": "ሴት",
+    "grade": "5ኛA",
+    "phone": "0911933522",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "E/09/19",
+    "name": "Natan Gosaye Abera",
+    "gender": "ወንድ",
+    "grade": "5ኛA",
+    "phone": "0911810965",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "E/10/19",
+    "name": "Raey Yohannes Mihirtu",
+    "gender": "ወንድ",
+    "grade": "5ኛA",
+    "phone": "0911178392",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "E/11/19",
+    "name": "Rakeb Solomon G/selasy",
+    "gender": "ሴት",
+    "grade": "5ኛA",
+    "phone": "0913160768",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "E/12/19",
+    "name": "Shalom Muluken",
+    "gender": "ሴት",
+    "grade": "5ኛA",
+    "phone": "0911000000",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "E/13/19",
+    "name": "Tsion Ashenafi Tadesse",
+    "gender": "ሴት",
+    "grade": "5ኛA",
+    "phone": "0912150856",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "E/14/19",
+    "name": "Yemariyam Dagmawi Alemayehu",
+    "gender": "ሴት",
+    "grade": "5ኛA",
+    "phone": "0913371054",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "E/15/19",
+    "name": "Yenus  Abdu Sane",
+    "gender": "ወንድ",
+    "grade": "5ኛA",
+    "phone": "0910148921",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "E/16/19",
+    "name": "Yonatan Dawit G/mariyam",
+    "gender": "ወንድ",
+    "grade": "5ኛA",
+    "phone": "0913552460",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  }
+];
+
+    const OFFICIAL_GRADE_7_STUDENTS = [
+  {
+    "id": "G/01/19",
+    "name": "Amanuel Behailu Abebe",
+    "gender": "ወንድ",
+    "grade": "7ኛA",
+    "phone": "0983318895",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "G/02/19",
+    "name": "Ayub Fedelu Kuami",
+    "gender": "ወንድ",
+    "grade": "7ኛA",
+    "phone": "0911855181",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "G/03/19",
+    "name": "Chirstian Abiyot Mulugeta",
+    "gender": "ወንድ",
+    "grade": "7ኛA",
+    "phone": "0911471462",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "G/04/19",
+    "name": "Eilham Ismail Tafesse",
+    "gender": "ሴት",
+    "grade": "7ኛA",
+    "phone": "0910641343",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "G/05/19",
+    "name": "Emad",
+    "gender": "ሴት",
+    "grade": "7ኛA",
+    "phone": "0944366463",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "G/06/19",
+    "name": "Emran Mohammed Hassen",
+    "gender": "ወንድ",
+    "grade": "7ኛA",
+    "phone": "0913906652",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "G/07/19",
+    "name": "Hayat  Kemale",
+    "gender": "ሴት",
+    "grade": "7ኛA",
+    "phone": "0966035768",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "G/08/19",
+    "name": "Natnael Yonas Mulugeta",
+    "gender": "ወንድ",
+    "grade": "7ኛA",
+    "phone": "0913345058",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "G/09/19",
+    "name": "Rut Yared Tilahun",
+    "gender": "ሴት",
+    "grade": "7ኛA",
+    "phone": "0965808912",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "G/10/19",
+    "name": "Yonatan Samuel Mekasha",
+    "gender": "ወንድ",
+    "grade": "7ኛA",
+    "phone": "0900820060",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  },
+  {
+    "id": "G/11/19",
+    "name": "Yordanos Mengest Abebe",
+    "gender": "ሴት",
+    "grade": "7ኛA",
+    "phone": "0912711636",
+    "scores": [
+      9.0,
+      9.0,
+      27.0,
+      46.0
+    ],
+    "photo": "",
+    "status": "ንቁ"
+  }
+];
+
+    const ALL_OFFICIAL_STUDENTS = [
+      ...OFFICIAL_GRADE_1_STUDENTS,
+      ...OFFICIAL_GRADE_2_STUDENTS,
+      ...OFFICIAL_GRADE_3_STUDENTS,
+      ...OFFICIAL_GRADE_4_STUDENTS,
+      ...OFFICIAL_GRADE_5_STUDENTS,
+      ...OFFICIAL_GRADE_6_STUDENTS,
+      ...OFFICIAL_GRADE_7_STUDENTS
+    ];
+
     // Initial Seed Data with strict separation for Primary/Middle (1-8) and High School (9-12)
     const SEED_STUDENTS_PRIMARY = [
+      ...ALL_OFFICIAL_STUDENTS,
       { id: 'DIL-P01', name: 'ዮናስ ተስፋዬ', gender: 'ወንድ', grade: '8A', phone: '+251 911 334455', scores: [9.5, 9.5, 29.0, 48.0], photo: '', status: 'ንቁ' },
       { id: 'DIL-P02', name: 'ሶፊያ ጌታቸው', gender: 'ሴት', grade: '7B', phone: '+251 922 445566', scores: [9.0, 9.5, 27.0, 46.5], photo: '', status: 'ንቁ' },
       { id: 'DIL-P03', name: 'ሚካኤል ዳዊት', gender: 'ወንድ', grade: '5A', phone: '+251 933 556677', scores: [8.5, 8.5, 26.0, 44.0], photo: '', status: 'ንቁ' },
@@ -1785,6 +4128,8 @@
 
     // Seed attendance
     const SEED_ATTENDANCE = [
+      { name: 'Abigiya Tsegaye Kebede', grade: '6A', status: 'Present', note: 'በሰዓቱ ገብቷል' },
+      { name: 'Abem Mideyem Degu', grade: '1A', status: 'Present', note: 'በሰዓቱ ገብቷል' },
       { name: 'ዮናስ ተስፋዬ', grade: '8A', status: 'Present', note: 'በሰዓቱ ገብቷል' },
       { name: 'ሶፊያ ጌታቸው', grade: '7B', status: 'Present', note: 'በሰዓቱ ገብቷል' },
       { name: 'ሚካኤል ዳዊት', grade: '5A', status: 'Present', note: 'በሰዓቱ ገብቷል' },
@@ -1796,25 +4141,59 @@
       { name: 'ቤተልሔም ሰለሞን', grade: '9A', status: 'Absent', note: 'የሕመም ፈቃድ' }
     ];
 
-    // Initialize state
-    let storedStudents = JSON.parse(localStorage.getItem('dilijent_students'));
-    let students = storedStudents || [...SEED_STUDENTS_PRIMARY, ...SEED_STUDENTS_HIGH];
-    // Guarantee that both levels have sample records available so switching is rich and uncorrupted
-    if (!students.some(s => isGradeInLevelWeb(s.grade, '1_8'))) {
-      students.unshift(...SEED_STUDENTS_PRIMARY);
-    }
-    if (!students.some(s => isGradeInLevelWeb(s.grade, '9_12'))) {
-      students.push(...SEED_STUDENTS_HIGH);
+    // Initialize state with permanent deletion tracking
+    let deletedStudentIds = new Set(
+      (JSON.parse(localStorage.getItem('dilijent_deleted_student_ids') || '[]')).map(id => (id || '').trim().toLowerCase())
+    );
+    let deletedStaffIds = new Set(
+      (JSON.parse(localStorage.getItem('dilijent_deleted_staff_ids') || '[]')).map(id => (id || '').trim().toLowerCase())
+    );
+
+    let storedStudentsRaw = localStorage.getItem('dilijent_students');
+    let students = [];
+    if (storedStudentsRaw !== null) {
+      try {
+        students = JSON.parse(storedStudentsRaw) || [];
+      } catch (e) {
+        students = [];
+      }
+    } else {
+      // First-time fresh seeding
+      students = [...OFFICIAL_GRADE_6_STUDENTS, ...OFFICIAL_GRADE_1_STUDENTS, ...SEED_STUDENTS_PRIMARY, ...SEED_STUDENTS_HIGH];
     }
 
-    let storedStaff = JSON.parse(localStorage.getItem('dilijent_staff_list'));
-    let staffList = storedStaff || [...SEED_STAFF_PRIMARY, ...SEED_STAFF_HIGH, ...SEED_STAFF_COMMON];
-    if (!staffList.some(st => isStaffInLevelWeb(st, '1_8') && !st.role.includes('ጸሐፊ') && !st.role.includes('ጥበቃ'))) {
-      staffList.unshift(...SEED_STAFF_PRIMARY);
+    // Ensure official uploaded students (Grade 6 and Grade 1) are incorporated once, respecting deletions
+    if (!localStorage.getItem('dilijent_official_migrated_v3')) {
+      const existingStudentIds = new Set(students.map(s => (s.id || '').trim().toLowerCase()));
+      const officialToInsert = ALL_OFFICIAL_STUDENTS.filter(
+        os => !existingStudentIds.has(os.id.trim().toLowerCase()) && !deletedStudentIds.has(os.id.trim().toLowerCase())
+      );
+      if (officialToInsert.length > 0) {
+        students = [...officialToInsert, ...students];
+      }
+      localStorage.setItem('dilijent_official_migrated_v3', 'true');
     }
-    if (!staffList.some(st => isStaffInLevelWeb(st, '9_12') && !st.role.includes('ጸሐፊ') && !st.role.includes('ጥበቃ'))) {
-      staffList.splice(SEED_STAFF_PRIMARY.length, 0, ...SEED_STAFF_HIGH);
+
+    // Always exclude any permanently deleted students
+    students = students.filter(s => !deletedStudentIds.has((s.id || '').trim().toLowerCase()));
+    localStorage.setItem('dilijent_students', JSON.stringify(students));
+
+    let storedStaffRaw = localStorage.getItem('dilijent_staff_list');
+    let staffList = [];
+    if (storedStaffRaw !== null) {
+      try {
+        staffList = JSON.parse(storedStaffRaw) || [];
+      } catch (e) {
+        staffList = [];
+      }
+    } else {
+      // First-time fresh seeding
+      staffList = [...SEED_STAFF_PRIMARY, ...SEED_STAFF_HIGH, ...SEED_STAFF_COMMON];
     }
+
+    // Always exclude any permanently deleted staff
+    staffList = staffList.filter(st => !deletedStaffIds.has((st.id || '').trim().toLowerCase()));
+    localStorage.setItem('dilijent_staff_list', JSON.stringify(staffList));
 
     let attendance = JSON.parse(localStorage.getItem('dilijent_attendance')) || SEED_ATTENDANCE;
 
@@ -1998,12 +4377,13 @@
     function renderStudents() {
       const activeStudents = getFilteredStudentsWeb();
       const tbody = document.getElementById('studentsTableBody');
-      tbody.innerHTML = activeStudents.map(s => {
+      tbody.innerHTML = activeStudents.map((s, index) => {
         const avatar = s.photo
           ? `<img src="${s.photo}" alt="${s.name}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid var(--accent); vertical-align:middle; margin-right:8px; box-shadow:0 1px 4px rgba(0,0,0,0.1);">`
           : `<span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; background:${s.gender === 'ሴት' ? '#FCE7F3' : '#DBEAFE'}; color:${s.gender === 'ሴት' ? '#BE185D' : '#1E40AF'}; font-weight:bold; font-size:0.85rem; margin-right:8px; vertical-align:middle;">${s.name.charAt(0)}</span>`;
         return `
         <tr>
+          <td style="text-align:center; font-weight:bold; color:#64748B;">${index + 1}</td>
           <td><span class="badge badge-primary">${s.id}</span></td>
           <td>
             <div style="display:flex; align-items:center;">
@@ -2014,12 +4394,12 @@
               </div>
             </div>
           </td>
-          <td>${s.gender}</td>
+          <td><span style="font-size:0.8rem; font-weight:600; padding:2px 8px; border-radius:12px; background:${s.gender === 'ሴት' ? '#FCE7F3' : '#DBEAFE'}; color:${s.gender === 'ሴት' ? '#BE185D' : '#1E40AF'};">${s.gender}</span></td>
           <td><span class="badge badge-primary">${s.grade}</span></td>
-          <td>${s.phone}</td>
+          <td><a href="tel:${s.phone}" style="color:var(--primary); text-decoration:none; font-weight:600;">${s.phone}</a></td>
           <td><span class="badge badge-success">${s.status}</span></td>
-          <td>
-            <button class="btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.75rem;" onclick="removeStudent('${s.id}')">🗑️ ሰርዝ</button>
+          <td style="text-align:center;">
+            <button class="btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.75rem; color:var(--danger);" onclick="removeStudent('${s.id}')">🗑️ ሰርዝ</button>
           </td>
         </tr>
       `}).join('');
@@ -2029,12 +4409,13 @@
       const activeStaff = getFilteredStaffWeb();
       const tbody = document.getElementById('staffTableBody');
       if (!tbody) return;
-      tbody.innerHTML = activeStaff.map(st => {
+      tbody.innerHTML = activeStaff.map((st, index) => {
         const avatar = st.photo
           ? `<img src="${st.photo}" alt="${st.name}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid var(--accent); vertical-align:middle; margin-right:8px; box-shadow:0 1px 4px rgba(0,0,0,0.1);">`
           : `<span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; background:#FEF3C7; color:#B45309; font-weight:bold; font-size:0.85rem; margin-right:8px; vertical-align:middle;">${st.name.replace('መምህር ', '').replace('መምህርት ', '').replace('አቶ ', '').replace('ወ/ሮ ', '').charAt(0)}</span>`;
         return `
         <tr>
+          <td style="text-align:center; font-weight:bold; color:#64748B;">${index + 1}</td>
           <td>
             <div style="display:flex; align-items:center;">
               ${avatar}
@@ -2049,7 +4430,7 @@
           <td><a href="tel:${st.phone}" style="color:var(--primary); text-decoration:none; font-weight:600;">${st.phone}</a></td>
           <td><span class="badge badge-warning">${st.qual}</span></td>
           <td><span class="badge badge-success">${st.status}</span></td>
-          <td>
+          <td style="text-align:center;">
             <button class="btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.75rem; color:var(--danger);" onclick="removeStaff('${st.id}')">🗑️ ሰርዝ</button>
           </td>
         </tr>
@@ -3146,10 +5527,19 @@
     }
 
     function removeStudent(idOrIdx) {
-      if (confirm('ተማሪውን ከመዝገብ መሰረዝ ይፈልጋሉ?')) {
-        if (typeof idOrIdx === 'string') {
-          students = students.filter(s => s.id !== idOrIdx);
-        } else {
+      let targetId = '';
+      if (typeof idOrIdx === 'string') {
+        targetId = idOrIdx.trim();
+      } else if (typeof idOrIdx === 'number' && students[idOrIdx]) {
+        targetId = (students[idOrIdx].id || '').trim();
+      }
+      const stName = students.find(s => s.id === targetId)?.name || 'ይህን ተማሪ';
+      if (confirm(`ተማሪ ${stName} (${targetId}) ከመዝገብ በቋሚነት እንዲሰረዝ ይፈልጋሉ?`)) {
+        if (targetId) {
+          deletedStudentIds.add(targetId.toLowerCase());
+          localStorage.setItem('dilijent_deleted_student_ids', JSON.stringify([...deletedStudentIds]));
+          students = students.filter(s => (s.id || '').trim().toLowerCase() !== targetId.toLowerCase());
+        } else if (typeof idOrIdx === 'number') {
           students.splice(idOrIdx, 1);
         }
         saveState();
@@ -3590,10 +5980,19 @@
     }
 
     function removeStaff(idOrIdx) {
-      if (confirm('ሰራተኛውን/መምህሩን ከዝርዝር መሰረዝ ይፈልጋሉ?')) {
-        if (typeof idOrIdx === 'string') {
-          staffList = staffList.filter(st => st.id !== idOrIdx);
-        } else {
+      let targetId = '';
+      if (typeof idOrIdx === 'string') {
+        targetId = idOrIdx.trim();
+      } else if (typeof idOrIdx === 'number' && staffList[idOrIdx]) {
+        targetId = (staffList[idOrIdx].id || '').trim();
+      }
+      const staffName = staffList.find(st => st.id === targetId)?.name || 'ይህን ሰራተኛ';
+      if (confirm(`ሰራተኛ/መምህር ${staffName} (${targetId}) ከዝርዝር በቋሚነት እንዲሰረዝ ይፈልጋሉ?`)) {
+        if (targetId) {
+          deletedStaffIds.add(targetId.toLowerCase());
+          localStorage.setItem('dilijent_deleted_staff_ids', JSON.stringify([...deletedStaffIds]));
+          staffList = staffList.filter(st => (st.id || '').trim().toLowerCase() !== targetId.toLowerCase());
+        } else if (typeof idOrIdx === 'number') {
           staffList.splice(idOrIdx, 1);
         }
         saveState();
@@ -3707,19 +6106,10 @@
       openLoginModal();
     }
 
-    function openLoginModal() {
-      document.getElementById('loginModal').style.display = 'flex';
-      setWebLoginMode(currentLoginMode);
-    }
-
-    function closeLoginModal() {
-      document.getElementById('loginModal').style.display = 'none';
-    }
-
     function setWebLoginMode(mode) {
       currentLoginMode = mode;
-      const tabAdmin = document.getElementById('tabLoginAdmin');
-      const tabPhone = document.getElementById('tabLoginPhone');
+      handleLoginRoleChange();
+    }
     function handleLoginRoleChange() {
       const select = document.getElementById('loginRoleSelect');
       if (!select) return;

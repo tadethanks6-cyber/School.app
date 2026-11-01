@@ -10,14 +10,12 @@ import com.example.data.model.StudentGrade
 import com.example.data.model.Subject
 import com.example.data.model.Teacher
 import com.example.data.model.TeacherWorkload
-import com.google.firebase.Timestamp
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.snapshots
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 
 private const val TAG = "FirestoreSchoolRepo"
@@ -37,6 +35,7 @@ class FirestoreSchoolRepository(
         )
     )
 
+    private val auth = Firebase.auth
     private val _syncStatus = MutableStateFlow(CloudStatus.CONNECTED)
     val syncStatus = _syncStatus.asStateFlow()
 
@@ -51,8 +50,21 @@ class FirestoreSchoolRepository(
         }
     }
 
+    private fun getAuthenticatedUid(): String? {
+        return auth.currentUser?.uid
+    }
+
     // --- STUDENT CLOUD PERSISTENCE ---
-    suspend fun saveStudent(userId: String, student: Student, docId: String = "student_${student.studentIdNumber.replace(Regex("[^a-zA-Z0-9_]"), "_")}") {
+    suspend fun saveStudent(
+        userId: String,
+        student: Student,
+        docId: String = "student_${student.studentIdNumber.replace(Regex("[^a-zA-Z0-9_]"), "_")}"
+    ) {
+        val uid = getAuthenticatedUid()
+        if (uid == null) {
+            _syncStatus.value = CloudStatus.OFFLINE_PERSISTENT
+            return
+        }
         _syncStatus.value = CloudStatus.SYNCING
         val docRef = db.collection("students").document(docId)
         val data = hashMapOf<String, Any>(
@@ -68,28 +80,38 @@ class FirestoreSchoolRepository(
             "status" to student.status,
             "specialNeeds" to student.specialNeeds,
             "academicYear" to student.academicYear,
-            "userId" to userId,
+            "userId" to uid,
             "createdAt" to FieldValue.serverTimestamp()
         )
         try {
             docRef.set(data).await()
             _syncStatus.value = CloudStatus.CONNECTED
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to save student in cloud", e)
+            Log.d(TAG, "Notice: Offline local persistence active for student: ${e.message}")
             _syncStatus.value = CloudStatus.OFFLINE_PERSISTENT
         }
     }
 
     suspend fun deleteStudent(docId: String) {
+        val uid = getAuthenticatedUid() ?: return
         try {
             db.collection("students").document(docId).delete().await()
         } catch (e: Exception) {
-            Log.e(TAG, "Error deleting student $docId", e)
+            Log.d(TAG, "Notice: Cloud delete student handled locally: ${e.message}")
         }
     }
 
     // --- TEACHER CLOUD PERSISTENCE ---
-    suspend fun saveTeacher(userId: String, teacher: Teacher, docId: String = "teacher_${teacher.teacherCode.replace(Regex("[^a-zA-Z0-9_]"), "_")}") {
+    suspend fun saveTeacher(
+        userId: String,
+        teacher: Teacher,
+        docId: String = "teacher_${teacher.teacherCode.replace(Regex("[^a-zA-Z0-9_]"), "_")}"
+    ) {
+        val uid = getAuthenticatedUid()
+        if (uid == null) {
+            _syncStatus.value = CloudStatus.OFFLINE_PERSISTENT
+            return
+        }
         _syncStatus.value = CloudStatus.SYNCING
         val docRef = db.collection("teachers").document(docId)
         val data = hashMapOf<String, Any>(
@@ -107,20 +129,38 @@ class FirestoreSchoolRepository(
             "joinedYear" to teacher.joinedYear,
             "maxWeeklyPeriods" to teacher.maxWeeklyPeriods,
             "status" to teacher.status,
-            "userId" to userId,
+            "userId" to uid,
             "createdAt" to FieldValue.serverTimestamp()
         )
         try {
             docRef.set(data).await()
             _syncStatus.value = CloudStatus.CONNECTED
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to save teacher in cloud", e)
+            Log.d(TAG, "Notice: Offline local persistence active for teacher: ${e.message}")
             _syncStatus.value = CloudStatus.OFFLINE_PERSISTENT
         }
     }
 
+    suspend fun deleteTeacher(docId: String) {
+        val uid = getAuthenticatedUid() ?: return
+        try {
+            db.collection("teachers").document(docId).delete().await()
+        } catch (e: Exception) {
+            Log.d(TAG, "Notice: Cloud delete teacher handled locally: ${e.message}")
+        }
+    }
+
     // --- STAFF CLOUD PERSISTENCE ---
-    suspend fun saveStaff(userId: String, staff: Staff, docId: String = "staff_${staff.staffCode.replace(Regex("[^a-zA-Z0-9_]"), "_")}") {
+    suspend fun saveStaff(
+        userId: String,
+        staff: Staff,
+        docId: String = "staff_${staff.staffCode.replace(Regex("[^a-zA-Z0-9_]"), "_")}"
+    ) {
+        val uid = getAuthenticatedUid()
+        if (uid == null) {
+            _syncStatus.value = CloudStatus.OFFLINE_PERSISTENT
+            return
+        }
         _syncStatus.value = CloudStatus.SYNCING
         val docRef = db.collection("staff").document(docId)
         val data = hashMapOf<String, Any>(
@@ -146,20 +186,34 @@ class FirestoreSchoolRepository(
             "homeroomClass" to staff.homeroomClass,
             "dutyLocation" to staff.dutyLocation,
             "shift" to staff.shift,
-            "userId" to userId,
+            "userId" to uid,
             "createdAt" to FieldValue.serverTimestamp()
         )
         try {
             docRef.set(data).await()
             _syncStatus.value = CloudStatus.CONNECTED
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to save staff in cloud", e)
+            Log.d(TAG, "Notice: Offline local persistence active for staff: ${e.message}")
             _syncStatus.value = CloudStatus.OFFLINE_PERSISTENT
         }
     }
 
+    suspend fun deleteStaff(docId: String) {
+        val uid = getAuthenticatedUid() ?: return
+        try {
+            db.collection("staff").document(docId).delete().await()
+        } catch (e: Exception) {
+            Log.d(TAG, "Notice: Cloud delete staff handled locally: ${e.message}")
+        }
+    }
+
     // --- SUBJECT CLOUD PERSISTENCE ---
-    suspend fun saveSubject(userId: String, subject: Subject, docId: String = "sub_${subject.code.replace(Regex("[^a-zA-Z0-9_]"), "_")}") {
+    suspend fun saveSubject(
+        userId: String,
+        subject: Subject,
+        docId: String = "sub_${subject.code.replace(Regex("[^a-zA-Z0-9_]"), "_")}"
+    ) {
+        val uid = getAuthenticatedUid() ?: return
         val docRef = db.collection("subjects").document(docId)
         val data = hashMapOf<String, Any>(
             "code" to subject.code,
@@ -168,18 +222,32 @@ class FirestoreSchoolRepository(
             "periodsPerWeek" to subject.periodsPerWeek,
             "passingScore" to subject.passingScore,
             "category" to subject.category,
-            "userId" to userId,
+            "userId" to uid,
             "createdAt" to FieldValue.serverTimestamp()
         )
         try {
             docRef.set(data).await()
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to save subject in cloud", e)
+            Log.d(TAG, "Notice: Subject cloud save handled locally: ${e.message}")
+        }
+    }
+
+    suspend fun deleteSubject(docId: String) {
+        val uid = getAuthenticatedUid() ?: return
+        try {
+            db.collection("subjects").document(docId).delete().await()
+        } catch (e: Exception) {
+            Log.d(TAG, "Notice: Cloud delete subject handled locally: ${e.message}")
         }
     }
 
     // --- WORKLOAD CLOUD PERSISTENCE ---
-    suspend fun saveWorkload(userId: String, workload: TeacherWorkload, docId: String = "workload_${workload.teacherId}_${workload.subjectId}_${workload.grade.replace(" ", "_")}_${workload.section}") {
+    suspend fun saveWorkload(
+        userId: String,
+        workload: TeacherWorkload,
+        docId: String = "workload_${workload.teacherId}_${workload.subjectId}_${workload.grade.replace(" ", "_")}_${workload.section}"
+    ) {
+        val uid = getAuthenticatedUid() ?: return
         val docRef = db.collection("workloads").document(docId)
         val data = hashMapOf<String, Any>(
             "teacherName" to workload.teacherName,
@@ -189,18 +257,32 @@ class FirestoreSchoolRepository(
             "periodsPerWeek" to workload.periodsPerWeek,
             "daysAllotted" to workload.daysAllotted,
             "academicYear" to workload.academicYear,
-            "userId" to userId,
+            "userId" to uid,
             "createdAt" to FieldValue.serverTimestamp()
         )
         try {
             docRef.set(data).await()
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to save workload in cloud", e)
+            Log.d(TAG, "Notice: Workload cloud save handled locally: ${e.message}")
+        }
+    }
+
+    suspend fun deleteWorkload(docId: String) {
+        val uid = getAuthenticatedUid() ?: return
+        try {
+            db.collection("workloads").document(docId).delete().await()
+        } catch (e: Exception) {
+            Log.d(TAG, "Notice: Cloud delete workload handled locally: ${e.message}")
         }
     }
 
     // --- GRADE CLOUD PERSISTENCE ---
-    suspend fun saveGrade(userId: String, grade: StudentGrade, docId: String = "grade_${grade.studentId}_${grade.subjectName.replace(Regex("[^a-zA-Z0-9_]"), "_")}_${grade.semester.replace(" ", "_")}") {
+    suspend fun saveGrade(
+        userId: String,
+        grade: StudentGrade,
+        docId: String = "grade_${grade.studentId}_${grade.subjectName.replace(Regex("[^a-zA-Z0-9_]"), "_")}_${grade.semester.replace(" ", "_")}"
+    ) {
+        val uid = getAuthenticatedUid() ?: return
         val docRef = db.collection("grades").document(docId)
         val data = hashMapOf<String, Any>(
             "studentName" to grade.studentName,
@@ -216,18 +298,32 @@ class FirestoreSchoolRepository(
             "totalScore" to grade.totalScore,
             "letterGrade" to grade.letterGrade,
             "remarks" to grade.remarks,
-            "userId" to userId,
+            "userId" to uid,
             "createdAt" to FieldValue.serverTimestamp()
         )
         try {
             docRef.set(data).await()
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to save grade in cloud", e)
+            Log.d(TAG, "Notice: Grade cloud save handled locally: ${e.message}")
+        }
+    }
+
+    suspend fun deleteGrade(docId: String) {
+        val uid = getAuthenticatedUid() ?: return
+        try {
+            db.collection("grades").document(docId).delete().await()
+        } catch (e: Exception) {
+            Log.d(TAG, "Notice: Cloud delete grade handled locally: ${e.message}")
         }
     }
 
     // --- ATTENDANCE CLOUD PERSISTENCE ---
-    suspend fun saveAttendance(userId: String, record: AttendanceRecord, docId: String = "att_${record.studentId}_${record.date.replace("-", "_")}") {
+    suspend fun saveAttendance(
+        userId: String,
+        record: AttendanceRecord,
+        docId: String = "att_${record.studentId}_${record.date.replace("-", "_")}"
+    ) {
+        val uid = getAuthenticatedUid() ?: return
         val docRef = db.collection("attendance").document(docId)
         val data = hashMapOf<String, Any>(
             "studentName" to record.studentName,
@@ -235,13 +331,22 @@ class FirestoreSchoolRepository(
             "section" to record.section,
             "date" to record.date,
             "status" to record.status,
-            "userId" to userId,
+            "userId" to uid,
             "createdAt" to FieldValue.serverTimestamp()
         )
         try {
             docRef.set(data).await()
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to save attendance in cloud", e)
+            Log.d(TAG, "Notice: Attendance cloud save handled locally: ${e.message}")
+        }
+    }
+
+    suspend fun deleteAttendance(docId: String) {
+        val uid = getAuthenticatedUid() ?: return
+        try {
+            db.collection("attendance").document(docId).delete().await()
+        } catch (e: Exception) {
+            Log.d(TAG, "Notice: Cloud delete attendance handled locally: ${e.message}")
         }
     }
 }

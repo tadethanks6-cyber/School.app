@@ -25,11 +25,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.TableChart
+import androidx.compose.material.icons.filled.ViewAgenda
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.Business
@@ -145,229 +150,256 @@ fun StaffScreen(
 
     val deptsForFilter = listOf("ሁሉም") + STAFF_DEPARTMENTS
 
+    var isTableView by remember { mutableStateOf(true) }
+
     Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+                .padding(horizontal = 16.dp)
         ) {
-            item {
-                Spacer(modifier = Modifier.height(10.dp))
-                // Screen Title Banner
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            text = if (isAmharic) "የአስተዳደር ሰራተኞች" else "Administrative Staff",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                        Text(
-                            text = if (isAmharic) "ርዕሰ መምህራን፣ ጸሐፊዎች፣ ፋይናንስ፣ ንብረት፣ ፅዳት እና ጥበቃ" else "Leadership, Admin, Finance, Store, Cleaning & Security",
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-
-                    Button(
-                        onClick = onAddStaffClick,
-                        colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary),
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.testTag("btn_add_staff")
-                    ) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = if (isAmharic) "መዝግብ" else "Add",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-            }
-
-            // Summary Metric Badges
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    StaffMetricCard(
-                        title = if (isAmharic) "ጠቅላላ ሰራተኛ" else "Total Staff",
-                        count = staffList.size.toString(),
-                        color = NavyPrimary,
-                        modifier = Modifier.weight(1f)
+            Spacer(modifier = Modifier.height(10.dp))
+            // Screen Title Banner
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = if (isAmharic) "የአስተዳደር ሰራተኞች" else "Administrative Staff",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
-                    StaffMetricCard(
-                        title = if (isAmharic) "አስተዳደር" else "Leadership",
-                        count = staffList.count { it.department == "አስተዳደር" }.toString(),
-                        color = GoldAccent,
-                        modifier = Modifier.weight(1f)
-                    )
-                    StaffMetricCard(
-                        title = if (isAmharic) "አገልግሎትና ጥበቃ" else "Support & Security",
-                        count = staffList.count { it.department == "አገልግሎትና ደህንነት" }.toString(),
-                        color = EthioGreen,
-                        modifier = Modifier.weight(1f)
+                    Text(
+                        text = if (isAmharic) "ርዕሰ መምህራን፣ ጸሐፊዎች፣ ፋይናንስ፣ ንብረት፣ ፅዳት እና ጥበቃ" else "Leadership, Admin, Finance, Store, Cleaning & Security",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                Spacer(modifier = Modifier.height(10.dp))
+
+                Button(
+                    onClick = onAddStaffClick,
+                    colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.testTag("btn_add_staff")
+                ) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = if (isAmharic) "መዝግብ" else "Add",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Search Bar
-            item {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = onSearchChange,
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = onSearchChange,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("search_staff_input"),
+                placeholder = {
+                    Text(
+                        if (isAmharic) "በስም፣ በስራ ድርሻ፣ በመለያ ኮድ ወይም በስልክ ይፈልጉ..." else "Search by name, role, ID, or phone...",
+                        fontSize = 13.sp
+                    )
+                },
+                leadingIcon = {
+                    Icon(imageVector = Icons.Default.Search, contentDescription = "Search", tint = NavyPrimary)
+                },
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { onSearchChange("") }) {
+                            Icon(imageVector = Icons.Default.Clear, contentDescription = "Clear")
+                        }
+                    }
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(14.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = NavyPrimary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                )
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // Role and Department Filter Chips Row
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(rolesForFilter) { r ->
+                    val isSelected = roleFilter == r
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { onRoleFilterChange(r) },
+                        label = { Text(r, fontSize = 11.sp) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = NavyPrimary,
+                            selectedLabelColor = Color.White
+                        )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // View Mode Switcher + Count Header
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (isAmharic) "ሰራተኞች: ${staffList.size}" else "Staff: ${staffList.size}",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = NavyPrimary
+                )
+
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(2.dp)
+                ) {
+                    Row(modifier = Modifier.padding(3.dp)) {
+                        // Table View
+                        Surface(
+                            shape = RoundedCornerShape(16.dp),
+                            color = if (isTableView) NavyPrimary else Color.Transparent,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(16.dp))
+                                .clickable { isTableView = true }
+                                .testTag("btn_staff_table_view")
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.TableChart,
+                                    contentDescription = "Table",
+                                    modifier = Modifier.size(14.dp),
+                                    tint = if (isTableView) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = if (isAmharic) "ሰንጠረዥ" else "Table",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isTableView) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+
+                        // Cards View
+                        Surface(
+                            shape = RoundedCornerShape(16.dp),
+                            color = if (!isTableView) NavyPrimary else Color.Transparent,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(16.dp))
+                                .clickable { isTableView = false }
+                                .testTag("btn_staff_cards_view")
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ViewAgenda,
+                                    contentDescription = "Cards",
+                                    modifier = Modifier.size(14.dp),
+                                    tint = if (!isTableView) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = if (isAmharic) "ካርዶች" else "Cards",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (!isTableView) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            if (staffList.isEmpty()) {
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .testTag("search_staff_input"),
-                    placeholder = {
-                        Text(
-                            if (isAmharic) "በስም፣ በስራ ድርሻ፣ በመለያ ኮድ ወይም በስልክ ይፈልጉ..." else "Search by name, role, ID, or phone...",
-                            fontSize = 13.sp
-                        )
-                    },
-                    leadingIcon = {
-                        Icon(imageVector = Icons.Default.Search, contentDescription = "Search", tint = NavyPrimary)
-                    },
-                    trailingIcon = {
-                        if (searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { onSearchChange("") }) {
-                                Icon(imageVector = Icons.Default.Clear, contentDescription = "Clear")
-                            }
-                        }
-                    },
-                    singleLine = true,
-                    shape = RoundedCornerShape(14.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = NavyPrimary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
-                    )
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-            }
-
-            // Role Filter Chips
-            item {
-                Column {
-                    Text(
-                        text = if (isAmharic) "የስራ ድርሻ (Role):" else "Role Filter:",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        items(rolesForFilter) { r ->
-                            val isSelected = roleFilter == r
-                            FilterChip(
-                                selected = isSelected,
-                                onClick = { onRoleFilterChange(r) },
-                                label = { Text(r, fontSize = 11.sp) },
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = NavyPrimary,
-                                    selectedLabelColor = Color.White
-                                )
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Department Filter Chips
-            item {
-                Column {
-                    Text(
-                        text = if (isAmharic) "የስራ ክፍል (Department):" else "Department Filter:",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        items(deptsForFilter) { d ->
-                            val isSelected = departmentFilter == d
-                            FilterChip(
-                                selected = isSelected,
-                                onClick = { onDepartmentFilterChange(d) },
-                                label = { Text(d, fontSize = 11.sp) },
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = GoldAccent,
-                                    selectedLabelColor = Color.Black
-                                )
-                            )
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(6.dp))
-            }
-
-            // Staff Cards List
-            if (staffList.isEmpty()) {
-                item {
-                    Card(
+                        .padding(vertical = 32.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 32.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-                        shape = RoundedCornerShape(16.dp)
+                            .padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(32.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Icon(
+                            imageVector = Icons.Default.Work,
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = if (isAmharic) "ምንም የተመዘገበ ሰራተኛ አልተገኘም" else "No staff members found",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(14.dp))
+                        Button(
+                            onClick = onAddStaffClick,
+                            colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Work,
-                                contentDescription = null,
-                                modifier = Modifier.size(48.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Text(
-                                text = if (isAmharic) "ምንም የተመዘገበ ሰራተኛ አልተገኘም" else "No staff members found",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 15.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(modifier = Modifier.height(14.dp))
-                            Button(
-                                onClick = onAddStaffClick,
-                                colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary)
-                            ) {
-                                Text(if (isAmharic) "+ የመጀመሪያ ሰራተኛ መዝግብ" else "+ Add First Staff Member")
-                            }
+                            Text(if (isAmharic) "+ የመጀመሪያ ሰራተኛ መዝግብ" else "+ Add First Staff Member")
                         }
                     }
                 }
+            } else if (isTableView) {
+                StaffDataTable(
+                    staffList = staffList,
+                    isAmharic = isAmharic,
+                    onStaffClick = onStaffClick,
+                    onEditStaff = onEditStaffClick,
+                    onDeleteStaff = onDeleteStaffClick,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                )
             } else {
-                items(staffList, key = { it.id }) { staff ->
-                    StaffCardItem(
-                        staff = staff,
-                        isAmharic = isAmharic,
-                        onCardClick = { onStaffClick(staff) },
-                        onEditClick = { onEditStaffClick(staff) },
-                        onDeleteClick = { onDeleteStaffClick(staff) }
-                    )
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                ) {
+                    items(staffList, key = { it.id }) { staff ->
+                        StaffCardItem(
+                            staff = staff,
+                            isAmharic = isAmharic,
+                            onCardClick = { onStaffClick(staff) },
+                            onEditClick = { onEditStaffClick(staff) },
+                            onDeleteClick = { onDeleteStaffClick(staff) }
+                        )
+                    }
+                    item {
+                        Spacer(modifier = Modifier.height(80.dp))
+                    }
                 }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(80.dp))
             }
         }
 
@@ -1826,3 +1858,308 @@ private fun DetailRow(label: String, value: String) {
         Text(text = value, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
     }
 }
+
+@Composable
+fun StaffDataTable(
+    staffList: List<Staff>,
+    isAmharic: Boolean,
+    onStaffClick: (Staff) -> Unit,
+    onEditStaff: (Staff) -> Unit,
+    onDeleteStaff: (Staff) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.testTag("staff_data_table"),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        val hScrollState = rememberScrollState()
+
+        Column(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .horizontalScroll(hScrollState)
+            ) {
+                Column(modifier = Modifier.width(880.dp)) {
+                    // Table Header
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(NavyPrimary)
+                            .padding(vertical = 10.dp, horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = if (isAmharic) "ተ.ቁ" else "No.",
+                            modifier = Modifier.width(44.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = if (isAmharic) "የሰራተኛው ሙሉ ስም" else "Staff Full Name",
+                            modifier = Modifier.width(190.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp
+                        )
+                        Text(
+                            text = if (isAmharic) "መለያ ኮድ" else "Staff ID",
+                            modifier = Modifier.width(90.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp
+                        )
+                        Text(
+                            text = if (isAmharic) "የስራ ድርሻ" else "Role",
+                            modifier = Modifier.width(130.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp
+                        )
+                        Text(
+                            text = if (isAmharic) "የስራ ክፍል" else "Department",
+                            modifier = Modifier.width(120.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp
+                        )
+                        Text(
+                            text = if (isAmharic) "ስልክ ቁጥር" else "Phone",
+                            modifier = Modifier.width(110.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp
+                        )
+                        Text(
+                            text = if (isAmharic) "ሁኔታ" else "Status",
+                            modifier = Modifier.width(70.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = if (isAmharic) "ተግባራት" else "Actions",
+                            modifier = Modifier.width(126.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    HorizontalDivider(color = Color.White.copy(alpha = 0.2f), thickness = 1.dp)
+
+                    // Rows
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        itemsIndexed(staffList, key = { _, st -> st.id }) { index, staff ->
+                            val isEven = index % 2 == 0
+                            val rowBg = if (isEven) {
+                                MaterialTheme.colorScheme.surface
+                            } else {
+                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                            }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(rowBg)
+                                    .clickable { onStaffClick(staff) }
+                                    .padding(vertical = 8.dp, horizontal = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // Index
+                                Text(
+                                    text = "${index + 1}",
+                                    modifier = Modifier.width(44.dp),
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+
+                                // Name with Avatar
+                                Row(
+                                    modifier = Modifier.width(190.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    UserAvatar(
+                                        photoUri = staff.photoUri,
+                                        name = staff.fullName,
+                                        gender = staff.gender,
+                                        size = 28.dp
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Column {
+                                        Text(
+                                            text = staff.fullName,
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        if (staff.qualification.isNotBlank()) {
+                                            Text(
+                                                text = staff.qualification,
+                                                fontSize = 9.sp,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                }
+
+                                // Staff Code
+                                Surface(
+                                    shape = RoundedCornerShape(4.dp),
+                                    color = GoldAccent.copy(alpha = 0.2f),
+                                    modifier = Modifier.width(90.dp)
+                                ) {
+                                    Text(
+                                        text = staff.staffCode.ifBlank { "ADM-${staff.id}" },
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = NavyPrimary,
+                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+
+                                // Role
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                                    modifier = Modifier.width(130.dp)
+                                ) {
+                                    Text(
+                                        text = staff.role,
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+
+                                // Department
+                                Text(
+                                    text = staff.department,
+                                    modifier = Modifier.width(120.dp),
+                                    fontSize = 11.sp,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+
+                                // Phone
+                                Text(
+                                    text = staff.phone.ifBlank { "-" },
+                                    modifier = Modifier.width(110.dp),
+                                    fontSize = 11.sp,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1
+                                )
+
+                                // Status
+                                val isActive = staff.status.contains("ንቁ") || staff.status.equals("Active", ignoreCase = true)
+                                Box(
+                                    modifier = Modifier.width(70.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Surface(
+                                        shape = RoundedCornerShape(10.dp),
+                                        color = if (isActive) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
+                                    ) {
+                                        Text(
+                                            text = if (isActive) "ንቁ" else "የታገደ",
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (isActive) Color(0xFF15803D) else Color(0xFFB91C1C),
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                        )
+                                    }
+                                }
+
+                                // Actions
+                                Row(
+                                    modifier = Modifier.width(126.dp),
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    IconButton(
+                                        onClick = { onStaffClick(staff) },
+                                        modifier = Modifier.size(28.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Info,
+                                            contentDescription = "ዝርዝር",
+                                            tint = NavyPrimary,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = { onEditStaff(staff) },
+                                        modifier = Modifier.size(28.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Edit,
+                                            contentDescription = "ማረም",
+                                            tint = GoldAccent,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = { onDeleteStaff(staff) },
+                                        modifier = Modifier.size(28.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = "ሰርዝ",
+                                            tint = Color(0xFFDC2626),
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                }
+                            }
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f), thickness = 0.5.dp)
+                        }
+                    }
+                }
+            }
+
+            // Footer
+            Surface(
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (isAmharic) "በሰንጠረዡ የቀረቡ ሰራተኞች: ${staffList.size}" else "Staff in table: ${staffList.size}",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = if (isAmharic) "↔ ወደ ጎን በማንሸራተት ሙሉውን ይመልከቱ" else "↔ Scroll horizontally to view all",
+                        fontSize = 10.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                    )
+                }
+            }
+        }
+    }
+}
+

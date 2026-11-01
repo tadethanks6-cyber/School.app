@@ -71,7 +71,7 @@ service cloud.firestore {
                        incoming().userId == request.auth.uid &&
                        incoming().createdAt == existing().createdAt &&
                        isValidStudent(incoming());
-      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+      allow delete: if isSignedIn() && (resource == null || existing().userId == request.auth.uid);
     }
 
     // Teacher validation
@@ -103,7 +103,7 @@ service cloud.firestore {
                        incoming().userId == request.auth.uid &&
                        incoming().createdAt == existing().createdAt &&
                        isValidTeacher(incoming());
-      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+      allow delete: if isSignedIn() && (resource == null || existing().userId == request.auth.uid);
     }
 
     // Staff validation
@@ -136,7 +136,7 @@ service cloud.firestore {
                        incoming().userId == request.auth.uid &&
                        incoming().createdAt == existing().createdAt &&
                        isValidStaff(incoming());
-      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+      allow delete: if isSignedIn() && (resource == null || existing().userId == request.auth.uid);
     }
 
     // Subject validation
@@ -160,7 +160,7 @@ service cloud.firestore {
                        incoming().userId == request.auth.uid &&
                        incoming().createdAt == existing().createdAt &&
                        isValidSubject(incoming());
-      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+      allow delete: if isSignedIn() && (resource == null || existing().userId == request.auth.uid);
     }
 
     // Workload validation
@@ -187,7 +187,7 @@ service cloud.firestore {
                        incoming().userId == request.auth.uid &&
                        incoming().createdAt == existing().createdAt &&
                        isValidWorkload(incoming());
-      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+      allow delete: if isSignedIn() && (resource == null || existing().userId == request.auth.uid);
     }
 
     // Grade validation
@@ -219,7 +219,7 @@ service cloud.firestore {
                        incoming().userId == request.auth.uid &&
                        incoming().createdAt == existing().createdAt &&
                        isValidGrade(incoming());
-      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+      allow delete: if isSignedIn() && (resource == null || existing().userId == request.auth.uid);
     }
 
     // Attendance validation
@@ -243,7 +243,7 @@ service cloud.firestore {
                        incoming().userId == request.auth.uid &&
                        incoming().createdAt == existing().createdAt &&
                        isValidAttendance(incoming());
-      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+      allow delete: if isSignedIn() && (resource == null || existing().userId == request.auth.uid);
     }
   }
 }

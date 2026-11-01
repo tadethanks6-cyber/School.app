@@ -243,7 +243,8 @@ abstract class SchoolDatabase : RoomDatabase() {
                     status = "ንቁ"
                 )
             )
-            database.studentDao().insertStudents(students)
+            val allInitialStudents = students + com.example.data.model.OfficialStudentsData.getAllOfficialStudents()
+            database.studentDao().insertStudents(allInitialStudents)
 
             // 4. Initial Teacher Workload Allotments (የሥራ ክፍፍል)
             val workloads = listOf(

@@ -7,6 +7,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.filled.TableChart
+import androidx.compose.material.icons.filled.ViewAgenda
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -100,6 +109,7 @@ fun StudentsScreen(
 ) {
     var selectedStudentForDetail by remember { mutableStateOf<Student?>(null) }
     var studentToDelete by remember { mutableStateOf<Student?>(null) }
+    var isTableView by remember { mutableStateOf(true) }
 
     Box(
         modifier = modifier
@@ -152,12 +162,80 @@ fun StudentsScreen(
                     .fillMaxWidth()
                     .padding(vertical = 4.dp)
             ) {
-                Text(
-                    text = if (isAmharic) "የተማሪዎች ብዛት: ${students.size}" else "Total Students: ${students.size}",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = if (isAmharic) "ተማሪዎች: ${students.size}" else "Students: ${students.size}",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    // View Mode Toggle (ሰንጠረዥ vs ካርዶች)
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        modifier = Modifier.padding(2.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Surface(
+                                shape = RoundedCornerShape(6.dp),
+                                color = if (isTableView) NavyPrimary else Color.Transparent,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .clickable { isTableView = true }
+                                    .testTag("btn_view_table")
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.TableChart,
+                                        contentDescription = "Table View",
+                                        tint = if (isTableView) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(3.dp))
+                                    Text(
+                                        text = if (isAmharic) "ሰንጠረዥ" else "Table",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isTableView) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+
+                            Surface(
+                                shape = RoundedCornerShape(6.dp),
+                                color = if (!isTableView) NavyPrimary else Color.Transparent,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .clickable { isTableView = false }
+                                    .testTag("btn_view_cards")
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.ViewAgenda,
+                                        contentDescription = "Card View",
+                                        tint = if (!isTableView) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(3.dp))
+                                    Text(
+                                        text = if (isAmharic) "ካርድ" else "Cards",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (!isTableView) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
 
                 Surface(
                     shape = RoundedCornerShape(8.dp),
@@ -186,6 +264,19 @@ fun StudentsScreen(
             if (students.isEmpty()) {
                 EmptyStateCard(
                     message = if (isAmharic) "ምንም የተመዘገበ ተማሪ አልተገኘም" else "No students match this filter"
+                )
+            } else if (isTableView) {
+                // Beautiful Table View representation
+                StudentsDataTable(
+                    students = students,
+                    isAmharic = isAmharic,
+                    onStudentClick = { selectedStudentForDetail = it },
+                    onEditStudent = onEditStudentClick,
+                    onDeleteStudent = { studentToDelete = it },
+                    onViewGrades = onViewGradesClick,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
                 )
             } else {
                 LazyColumn(
@@ -938,3 +1029,328 @@ fun StudentFormDialog(
         }
     }
 }
+
+@Composable
+fun StudentsDataTable(
+    students: List<Student>,
+    isAmharic: Boolean,
+    onStudentClick: (Student) -> Unit,
+    onEditStudent: (Student) -> Unit,
+    onDeleteStudent: (Student) -> Unit,
+    onViewGrades: (Student) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.testTag("students_data_table"),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        val hScrollState = rememberScrollState()
+
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Horizontal scroll container holding header and rows
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .horizontalScroll(hScrollState)
+            ) {
+                Column(modifier = Modifier.width(820.dp)) {
+                    // Table Header
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(NavyPrimary)
+                            .padding(vertical = 10.dp, horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = if (isAmharic) "ተ.ቁ" else "No.",
+                            modifier = Modifier.width(44.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = if (isAmharic) "የተማሪው ሙሉ ስም" else "Student Full Name",
+                            modifier = Modifier.width(190.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp
+                        )
+                        Text(
+                            text = if (isAmharic) "መለያ ቁጥር" else "ID",
+                            modifier = Modifier.width(90.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp
+                        )
+                        Text(
+                            text = if (isAmharic) "ክፍል" else "Grade",
+                            modifier = Modifier.width(85.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = if (isAmharic) "ጾታ" else "Gender",
+                            modifier = Modifier.width(60.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = if (isAmharic) "የወላጅ ስልክ" else "Parent Phone",
+                            modifier = Modifier.width(120.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp
+                        )
+                        Text(
+                            text = if (isAmharic) "ሁኔታ" else "Status",
+                            modifier = Modifier.width(75.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = if (isAmharic) "ተግባራት" else "Actions",
+                            modifier = Modifier.width(156.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    HorizontalDivider(color = Color.White.copy(alpha = 0.2f), thickness = 1.dp)
+
+                    // Table Body Rows
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        itemsIndexed(students, key = { _, s -> s.id }) { index, student ->
+                            val isEven = index % 2 == 0
+                            val rowBg = if (isEven) {
+                                MaterialTheme.colorScheme.surface
+                            } else {
+                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                            }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(rowBg)
+                                    .clickable { onStudentClick(student) }
+                                    .padding(vertical = 8.dp, horizontal = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // Index
+                                Text(
+                                    text = "${index + 1}",
+                                    modifier = Modifier.width(44.dp),
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+
+                                // Name with mini avatar
+                                Row(
+                                    modifier = Modifier.width(190.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    val isFemale = student.gender.contains("ሴት") || student.gender.equals("F", ignoreCase = true)
+                                    Box(
+                                        modifier = Modifier
+                                            .size(26.dp)
+                                            .clip(CircleShape)
+                                            .background(if (isFemale) Color(0xFFFCE7F3) else Color(0xFFDBEAFE)),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = student.fullName.take(1),
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (isFemale) Color(0xFFBE185D) else Color(0xFF1E40AF)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = student.fullName,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+
+                                // ID
+                                Surface(
+                                    shape = RoundedCornerShape(4.dp),
+                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                                    modifier = Modifier.width(90.dp)
+                                ) {
+                                    Text(
+                                        text = student.studentIdNumber.ifBlank { student.id.toString() },
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = NavyPrimary,
+                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+
+                                // Grade + Section
+                                Text(
+                                    text = "${student.grade} - ${student.section}",
+                                    modifier = Modifier.width(85.dp),
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+
+                                // Gender
+                                val isFemale = student.gender.contains("ሴት") || student.gender.equals("F", ignoreCase = true)
+                                Box(
+                                    modifier = Modifier.width(60.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Surface(
+                                        shape = RoundedCornerShape(12.dp),
+                                        color = if (isFemale) Color(0xFFFCE7F3) else Color(0xFFDBEAFE)
+                                    ) {
+                                        Text(
+                                            text = if (isFemale) "ሴት" else "ወንድ",
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (isFemale) Color(0xFFBE185D) else Color(0xFF1E40AF),
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                        )
+                                    }
+                                }
+
+                                // Phone
+                                Text(
+                                    text = student.parentPhone.ifBlank { "-" },
+                                    modifier = Modifier.width(120.dp),
+                                    fontSize = 11.sp,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1
+                                )
+
+                                // Status
+                                val isActive = student.status.contains("ንቁ") || student.status.equals("Active", ignoreCase = true)
+                                Box(
+                                    modifier = Modifier.width(75.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Surface(
+                                        shape = RoundedCornerShape(10.dp),
+                                        color = if (isActive) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
+                                    ) {
+                                        Text(
+                                            text = if (isActive) "ንቁ" else "የታገደ",
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (isActive) Color(0xFF15803D) else Color(0xFFB91C1C),
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                        )
+                                    }
+                                }
+
+                                // Action Buttons
+                                Row(
+                                    modifier = Modifier.width(156.dp),
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    IconButton(
+                                        onClick = { onStudentClick(student) },
+                                        modifier = Modifier.size(28.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Visibility,
+                                            contentDescription = "ማየት",
+                                            tint = NavyPrimary,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = { onEditStudent(student) },
+                                        modifier = Modifier.size(28.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Edit,
+                                            contentDescription = "ማረም",
+                                            tint = GoldAccent,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = { onViewGrades(student) },
+                                        modifier = Modifier.size(28.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Assessment,
+                                            contentDescription = "ውጤት",
+                                            tint = EthioGreen,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = { onDeleteStudent(student) },
+                                        modifier = Modifier.size(28.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = "ሰርዝ",
+                                            tint = Color(0xFFDC2626),
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                }
+                            }
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f), thickness = 0.5.dp)
+                        }
+                    }
+                }
+            }
+
+            // Footer showing count
+            Surface(
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (isAmharic) "በሰንጠረዡ የቀረቡ ተማሪዎች: ${students.size}" else "Students in table: ${students.size}",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = if (isAmharic) "↔ ወደ ጎን በማንሸራተት ሙሉውን ይመልከቱ" else "↔ Scroll horizontally to view all",
+                        fontSize = 10.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                    )
+                }
+            }
+        }
+    }
+}
+
