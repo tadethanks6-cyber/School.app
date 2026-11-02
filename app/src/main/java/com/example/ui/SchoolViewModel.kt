@@ -72,6 +72,8 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             seedPrimarySchoolDataIfNeeded()
             seedOfficialStudentsIfNeeded()
+            clearSampleGradesIfNeeded()
+            purgeDeletedStaffAndRestoreUserStaff()
             val adminUser = repository.getUserByEmail("admin@dilijent.edu.et")
             if (adminUser == null) {
                 repository.registerUser(
@@ -379,7 +381,13 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         staffRoleFilter,
         staffDepartmentFilter
     ) { staffList, query, role, dept ->
+        val deleted = prefs.getStringSet("deleted_staff_ids", emptySet()) ?: emptySet()
         staffList.filter { staff ->
+            val codeLower = staff.staffCode.trim().lowercase()
+            val nameLower = staff.fullName.trim().lowercase()
+            if (deleted.contains(codeLower) || deleted.contains(nameLower)) {
+                return@filter false
+            }
             val matchesQuery = query.isBlank() ||
                     staff.fullName.contains(query, ignoreCase = true) ||
                     staff.staffCode.contains(query, ignoreCase = true) ||
@@ -1185,6 +1193,62 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
 
     fun saveStaff(staff: Staff) {
         viewModelScope.launch {
+            // Remove from deleted_staff_ids in case it was previously marked deleted
+            try {
+                val currentDeleted = prefs.getStringSet("deleted_staff_ids", emptySet()) ?: emptySet()
+                val codeLower = staff.staffCode.trim().lowercase()
+                val nameLower = staff.fullName.trim().lowercase()
+                if (currentDeleted.contains(codeLower) || currentDeleted.contains(nameLower)) {
+                    val updated = currentDeleted.toMutableSet().apply {
+                        remove(codeLower)
+                        remove(nameLower)
+                    }
+                    prefs.edit().putStringSet("deleted_staff_ids", updated).apply()
+                }
+
+                // Add to persistent user-registered staff backup in SharedPreferences
+                val userStaffBackupJson = prefs.getString("user_registered_staff_backup_v1", "[]") ?: "[]"
+                val arr = org.json.JSONArray(userStaffBackupJson)
+                val newArr = org.json.JSONArray()
+                for (i in 0 until arr.length()) {
+                    val obj = arr.getJSONObject(i)
+                    val existingCode = obj.optString("staffCode", "").trim().lowercase()
+                    val existingName = obj.optString("fullName", "").trim().lowercase()
+                    if (existingCode != codeLower && existingName != nameLower) {
+                        newArr.put(obj)
+                    }
+                }
+                val staffObj = org.json.JSONObject().apply {
+                    put("staffCode", staff.staffCode)
+                    put("fullName", staff.fullName)
+                    put("title", staff.title)
+                    put("role", staff.role)
+                    put("department", staff.department)
+                    put("phone", staff.phone)
+                    put("email", staff.email)
+                    put("gender", staff.gender)
+                    put("qualification", staff.qualification)
+                    put("employmentType", staff.employmentType)
+                    put("salary", staff.salary)
+                    put("hiringDate", staff.hiringDate)
+                    put("responsibilities", staff.responsibilities)
+                    put("emergencyContact", staff.emergencyContact)
+                    put("photoUri", staff.photoUri)
+                    put("status", staff.status)
+                    put("teachingSubject", staff.teachingSubject)
+                    put("assignedGrade", staff.assignedGrade)
+                    put("assignedSection", staff.assignedSection)
+                    put("isHomeroomTeacher", staff.isHomeroomTeacher)
+                    put("homeroomClass", staff.homeroomClass)
+                    put("dutyLocation", staff.dutyLocation)
+                    put("shift", staff.shift)
+                }
+                newArr.put(staffObj)
+                prefs.edit().putString("user_registered_staff_backup_v1", newArr.toString()).apply()
+            } catch (e: Exception) {
+                android.util.Log.e("SchoolViewModel", "saveStaff backup error: ${e.message}")
+            }
+
             val id = if (staff.id == 0L) {
                 repository.insertStaff(staff)
             } else {
@@ -1258,16 +1322,43 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             try {
                 val currentDeleted = prefs.getStringSet("deleted_staff_ids", emptySet()) ?: emptySet()
+                val codeLower = staff.staffCode.trim().lowercase()
+                val nameLower = staff.fullName.trim().lowercase()
                 val newDeleted = currentDeleted.toMutableSet().apply {
-                    add(staff.staffCode.trim().lowercase())
-                    add(staff.fullName.trim().lowercase())
+                    add(codeLower)
+                    add(nameLower)
                 }
                 prefs.edit().putStringSet("deleted_staff_ids", newDeleted).apply()
+
+                // Remove from user registered staff backup
+                val userStaffBackupJson = prefs.getString("user_registered_staff_backup_v1", "[]") ?: "[]"
+                val arr = org.json.JSONArray(userStaffBackupJson)
+                val newArr = org.json.JSONArray()
+                for (i in 0 until arr.length()) {
+                    val obj = arr.getJSONObject(i)
+                    val existingCode = obj.optString("staffCode", "").trim().lowercase()
+                    val existingName = obj.optString("fullName", "").trim().lowercase()
+                    if (existingCode != codeLower && existingName != nameLower) {
+                        newArr.put(obj)
+                    }
+                }
+                prefs.edit().putString("user_registered_staff_backup_v1", newArr.toString()).apply()
             } catch (_: Exception) {}
 
             repository.deleteStaff(staff)
             val docId = "staff_${staff.staffCode.replace(Regex("[^a-zA-Z0-9_]"), "_")}"
             firestoreRepository.deleteStaff(docId)
+
+            // If this staff member was synced as a Teacher, also delete from Teachers table
+            try {
+                val allT = repository.allTeachers.first()
+                val match = allT.find { it.fullName == staff.fullName || (it.phone.isNotBlank() && it.phone == staff.phone) }
+                if (match != null) {
+                    repository.deleteTeacher(match)
+                    firestoreRepository.deleteTeacher("teacher_${match.teacherCode.replace(Regex("[^a-zA-Z0-9_]"), "_")}")
+                }
+            } catch (_: Exception) {}
+
             if (selectedStaffForDetails.value?.id == staff.id) {
                 selectedStaffForDetails.value = null
             }
@@ -1393,6 +1484,86 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                 }
             }
             prefs.edit().putBoolean("official_students_seeded_v3", true).apply()
+        } catch (_: Exception) {}
+    }
+
+    private suspend fun purgeDeletedStaffAndRestoreUserStaff() {
+        try {
+            val deletedStaff = prefs.getStringSet("deleted_staff_ids", emptySet()) ?: emptySet()
+            if (deletedStaff.isNotEmpty()) {
+                val currentStaff = repository.allStaff.first()
+                for (s in currentStaff) {
+                    val codeLower = s.staffCode.trim().lowercase()
+                    val nameLower = s.fullName.trim().lowercase()
+                    if (deletedStaff.contains(codeLower) || deletedStaff.contains(nameLower)) {
+                        repository.deleteStaff(s)
+                    }
+                }
+            }
+
+            // Restore any user-registered staff from persistent backup if missing from DB
+            val userStaffBackupJson = prefs.getString("user_registered_staff_backup_v1", null)
+            if (!userStaffBackupJson.isNullOrBlank()) {
+                val currentStaff = repository.allStaff.first()
+                val existingCodes = currentStaff.map { it.staffCode.trim().lowercase() }.toSet()
+                val existingNames = currentStaff.map { it.fullName.trim().lowercase() }.toSet()
+                val arr = org.json.JSONArray(userStaffBackupJson)
+                for (i in 0 until arr.length()) {
+                    val obj = arr.getJSONObject(i)
+                    val code = obj.optString("staffCode", "")
+                    val name = obj.optString("fullName", "")
+                    val codeLower = code.trim().lowercase()
+                    val nameLower = name.trim().lowercase()
+                    if (!deletedStaff.contains(codeLower) && !deletedStaff.contains(nameLower) &&
+                        !existingCodes.contains(codeLower) && !existingNames.contains(nameLower) &&
+                        name.isNotBlank()) {
+                        val restored = Staff(
+                            id = 0L,
+                            staffCode = code.ifBlank { "ADM-${(100..999).random()}" },
+                            fullName = name,
+                            title = obj.optString("title", "አቶ"),
+                            role = obj.optString("role", "መምህር"),
+                            department = obj.optString("department", "አስተዳደር"),
+                            phone = obj.optString("phone", ""),
+                            email = obj.optString("email", ""),
+                            gender = obj.optString("gender", "ወንድ"),
+                            qualification = obj.optString("qualification", "የመጀመሪያ ዲግሪ"),
+                            employmentType = obj.optString("employmentType", "ቋሚ"),
+                            salary = obj.optString("salary", ""),
+                            hiringDate = obj.optString("hiringDate", "2017 ዓ.ም"),
+                            responsibilities = obj.optString("responsibilities", ""),
+                            emergencyContact = obj.optString("emergencyContact", ""),
+                            photoUri = obj.optString("photoUri", ""),
+                            status = obj.optString("status", "ንቁ"),
+                            teachingSubject = obj.optString("teachingSubject", ""),
+                            assignedGrade = obj.optString("assignedGrade", ""),
+                            assignedSection = obj.optString("assignedSection", ""),
+                            isHomeroomTeacher = obj.optBoolean("isHomeroomTeacher", false),
+                            homeroomClass = obj.optString("homeroomClass", ""),
+                            dutyLocation = obj.optString("dutyLocation", ""),
+                            shift = obj.optString("shift", "")
+                        )
+                        repository.insertStaff(restored)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("SchoolViewModel", "purgeDeletedStaff error: ${e.message}")
+        }
+    }
+
+    private suspend fun clearSampleGradesIfNeeded() {
+        try {
+            val cleared = prefs.getBoolean("sample_grades_zeroed_v3", false)
+            if (cleared) return
+            val allG = repository.allGrades.first()
+            for (g in allG) {
+                // Delete legacy sample grades with pre-filled estimates so everything is 0.0
+                if (g.studentId <= 2 || g.remarks.contains("በጣም ከፍተኛ") || g.remarks.contains("የክፍሉ ቀዳሚ") || g.quizScore > 0f) {
+                    repository.deleteGrade(g)
+                }
+            }
+            prefs.edit().putBoolean("sample_grades_zeroed_v3", true).apply()
         } catch (_: Exception) {}
     }
 

@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Class
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.Print
@@ -37,6 +38,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -186,9 +188,7 @@ fun HomeroomRosterView(
                     if (matchedGrade != null) {
                         scoreMap[sub.name] = matchedGrade.totalScore
                     } else {
-                        // If grade not yet entered in database, use balanced default for demonstration
-                        val base = ((student.fullName.hashCode().let { if (it < 0) -it else it } % 25) + 68).toFloat()
-                        scoreMap[sub.name] = base.coerceIn(50f, 98f)
+                        scoreMap[sub.name] = 0f
                     }
                 }
 
@@ -844,25 +844,23 @@ fun EthiopianReportCardDialog(
                 it.subjectName.equals(sub.name, ignoreCase = true) ||
                 it.subjectName.contains(sub.name.take(4), ignoreCase = true)
             }
-            val base100 = match?.totalScore ?: run {
-                val seed = ((student.fullName.hashCode() + sub.name.hashCode()).let { if (it < 0) -it else it })
-                (55 + (seed % 42)).toFloat().coerceIn(52f, 98f)
-            }
-            val s1 = base100
-            val s2 = (base100 * 0.98f + 1.2f).coerceIn(45f, 99f)
-            val avg = (s1 + s2) / 2f
+            val base100 = match?.totalScore ?: 0f
+            val s1 = if (match?.semester == "1ኛ ሴሚስተር" || match?.semester == null) base100 else 0f
+            val s2 = if (match?.semester == "2ኛ ሴሚስተር") match.totalScore else 0f
+            val avg = if (s1 > 0f && s2 > 0f) (s1 + s2) / 2f else (s1 + s2)
 
-            val q1 = (s1 + 1.2f).coerceIn(40f, 100f)
-            val q2 = (s1 - 1.0f).coerceIn(40f, 100f)
-            val q3 = (s2 + 1.5f).coerceIn(40f, 100f)
-            val q4 = (s2 - 0.8f).coerceIn(40f, 100f)
+            val q1 = if (s1 > 0f) s1 else 0f
+            val q2 = if (s1 > 0f) s1 else 0f
+            val q3 = if (s2 > 0f) s2 else 0f
+            val q4 = if (s2 > 0f) s2 else 0f
 
             val letter = when {
                 avg >= 90 -> "A"
                 avg >= 80 -> "B"
                 avg >= 65 -> "C"
                 avg >= 50 -> "D"
-                else -> "F"
+                avg > 0 -> "F"
+                else -> "-"
             }
             val remark = when {
                 avg >= 85 -> "እጅግ በጣም ጥሩ"
@@ -1553,6 +1551,40 @@ fun SubjectMarkListView(
     var classDropdownExpanded by remember { mutableStateOf(false) }
     var subjectDropdownExpanded by remember { mutableStateOf(false) }
 
+    // Identify assigned teacher for the selected subject and class
+    val assignedTeacherForSubject = remember(teacherWorkloads, selectedSubject, selectedClassString) {
+        val parts = selectedClassString.split("-")
+        val targetGrade = parts.getOrNull(0) ?: ""
+        val targetSection = parts.getOrNull(1) ?: ""
+        val subName = selectedSubject?.name ?: ""
+        teacherWorkloads.firstOrNull { wl ->
+            (wl.subjectName.contains(subName, ignoreCase = true) || subName.contains(wl.subjectName, ignoreCase = true)) &&
+            (targetGrade.isEmpty() || wl.grade.contains(targetGrade, ignoreCase = true) || targetGrade.contains(wl.grade, ignoreCase = true)) &&
+            (targetSection.isEmpty() || wl.section.isEmpty() || wl.section.equals(targetSection, ignoreCase = true))
+        }
+    }
+
+    // Verify if active teacher is authorized to enter/edit marks for this subject
+    val isAuthorizedTeacher = remember(currentTeacher, assignedTeacherForSubject, selectedSubject) {
+        if (currentTeacher != null) {
+            if (assignedTeacherForSubject != null) {
+                assignedTeacherForSubject.teacherId == currentTeacher.id ||
+                assignedTeacherForSubject.teacherName.contains(currentTeacher.fullName, ignoreCase = true) ||
+                currentTeacher.fullName.contains(assignedTeacherForSubject.teacherName, ignoreCase = true)
+            } else {
+                val sub = selectedSubject
+                currentTeacher.specialization.isNotBlank() &&
+                sub != null &&
+                (sub.name.contains(currentTeacher.specialization, ignoreCase = true) ||
+                 currentTeacher.specialization.contains(sub.name, ignoreCase = true))
+            }
+        } else {
+            false
+        }
+    }
+
+    var unauthorizedTeacherAlert by remember { mutableStateOf<String?>(null) }
+
     // Filter students belonging to this class
     val classStudents = remember(students, selectedClassString) {
         val parts = selectedClassString.split("-")
@@ -1588,28 +1620,16 @@ fun SubjectMarkListView(
                     isRecordedInDb = true
                 )
             } else {
-                val seed = (student.fullName.hashCode().let { if (it < 0) -it else it })
-                val q = (seed % (assessmentScheme.test1Weight.toInt() + 1)).toFloat()
-                val a = ((seed / 2) % (assessmentScheme.assignmentWeight.toInt() + 1)).toFloat()
-                val m = (((seed / 3) % (assessmentScheme.midExamWeight.toInt() - 5)) + 16).toFloat().coerceIn(10f, assessmentScheme.midExamWeight)
-                val f = (((seed / 5) % (assessmentScheme.finalExamWeight.toInt() - 10)) + 28).toFloat().coerceIn(20f, assessmentScheme.finalExamWeight)
-                val tot = q + a + m + f
-                val letter = when {
-                    tot >= 90 -> "A"
-                    tot >= 80 -> "B"
-                    tot >= 65 -> "C"
-                    tot >= 50 -> "D"
-                    else -> "F"
-                }
+                // All unentered grades default to 0.0 as requested
                 MarkListStudentRecord(
                     student = student,
-                    quizScore = q,
-                    assignmentScore = a,
-                    midExamScore = m,
-                    finalExamScore = f,
-                    totalScore = tot,
-                    letterGrade = letter,
-                    remarks = if (tot >= 85) "እጅግ በጣም ጥሩ" else if (tot >= 70) "ጥሩ" else if (tot >= 50) "አጥጋቢ" else "ድጋፍ ያስፈልገዋል",
+                    quizScore = 0f,
+                    assignmentScore = 0f,
+                    midExamScore = 0f,
+                    finalExamScore = 0f,
+                    totalScore = 0f,
+                    letterGrade = "-",
+                    remarks = if (isAmharic) "ውጤት አልተሞላም" else "No score entered",
                     isRecordedInDb = false
                 )
             }
@@ -1938,7 +1958,22 @@ fun SubjectMarkListView(
                                                 )
                                             }
 
-                                            Text(row.student.studentIdNumber, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.width(75.dp))
+                                            // Student ID Badge (White Font on Navy)
+                                            Surface(
+                                                shape = RoundedCornerShape(4.dp),
+                                                color = NavyPrimary,
+                                                modifier = Modifier.width(82.dp)
+                                            ) {
+                                                Text(
+                                                    text = row.student.studentIdNumber,
+                                                    fontSize = 10.5.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = Color.White,
+                                                    textAlign = TextAlign.Center,
+                                                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                                                )
+                                            }
+
                                             Text(row.student.gender, fontSize = 11.sp, modifier = Modifier.width(36.dp), textAlign = TextAlign.Center)
 
                                             Text(String.format("%.0f", row.quizScore), fontSize = 11.sp, modifier = Modifier.width(62.dp), textAlign = TextAlign.Center)
@@ -1948,38 +1983,56 @@ fun SubjectMarkListView(
 
                                             // Mark List Total Out of 100
                                             Surface(
-                                                color = if (row.totalScore >= 50f) EthioGreen.copy(alpha = 0.12f) else EthioRed.copy(alpha = 0.12f),
+                                                color = if (row.totalScore >= 50f) EthioGreen.copy(alpha = 0.12f) else if (row.totalScore > 0f) EthioRed.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surfaceVariant,
                                                 shape = RoundedCornerShape(4.dp),
                                                 modifier = Modifier.width(76.dp)
                                             ) {
                                                 Text(
-                                                    text = String.format("%.0f%%", row.totalScore),
+                                                    text = if (row.totalScore > 0f) String.format("%.0f%%", row.totalScore) else "0.0%",
                                                     fontWeight = FontWeight.Bold,
                                                     fontSize = 12.sp,
-                                                    color = if (row.totalScore >= 50f) EthioGreen else EthioRed,
+                                                    color = if (row.totalScore >= 50f) EthioGreen else if (row.totalScore > 0f) EthioRed else MaterialTheme.colorScheme.onSurfaceVariant,
                                                     textAlign = TextAlign.Center,
                                                     modifier = Modifier.padding(vertical = 3.dp)
                                                 )
                                             }
 
-                                            Text(row.letterGrade, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = if (row.totalScore >= 50f) EthioGreen else EthioRed, modifier = Modifier.width(42.dp), textAlign = TextAlign.Center)
+                                            Text(row.letterGrade, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = if (row.totalScore >= 50f) EthioGreen else if (row.totalScore > 0f) EthioRed else MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.width(42.dp), textAlign = TextAlign.Center)
                                             Text(row.remarks, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.width(82.dp), textAlign = TextAlign.Center)
 
-                                            // Action Button to Input/Edit Grade
+                                            // Action Button to Input/Edit Grade (Teacher Only Enforcement)
                                             Button(
                                                 onClick = {
                                                     selectedSubject?.let { sub ->
-                                                        onAddGradeForStudent(row.student, sub)
+                                                        if (isAuthorizedTeacher) {
+                                                            onAddGradeForStudent(row.student, sub)
+                                                        } else {
+                                                            val tName = assignedTeacherForSubject?.teacherName ?: if (isAmharic) "ይህንን የትምህርት አይነት የሚያስተምሩት መምህር" else "Assigned Subject Teacher"
+                                                            unauthorizedTeacherAlert = if (isAmharic)
+                                                                "ማስጠንቀቂያ፦ የተማሪ ውጤት መሞላት እና መታረም ያለበት ይሄንን የትምህርት አይነት በሚያስተምረው መምህር (${tName}) ብቻ ነው! ሌላ አካል የማረም ፈቃድ የለውም።"
+                                                            else
+                                                                "Access Denied: Only the assigned subject teacher ($tName) is authorized to enter or edit grades."
+                                                        }
                                                     }
                                                 },
-                                                colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary),
+                                                colors = ButtonDefaults.buttonColors(containerColor = if (isAuthorizedTeacher) NavyPrimary else Color(0xFF64748B)),
                                                 shape = RoundedCornerShape(6.dp),
                                                 contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 6.dp, vertical = 2.dp),
-                                                modifier = Modifier.width(90.dp).height(28.dp).padding(start = 4.dp)
+                                                modifier = Modifier.width(96.dp).height(28.dp).padding(start = 4.dp)
                                             ) {
-                                                Icon(Icons.Default.Edit, contentDescription = null, tint = GoldAccent, modifier = Modifier.size(12.dp))
+                                                Icon(
+                                                    imageVector = if (isAuthorizedTeacher) Icons.Default.Edit else Icons.Default.Lock,
+                                                    contentDescription = null,
+                                                    tint = if (isAuthorizedTeacher) GoldAccent else Color.White,
+                                                    modifier = Modifier.size(12.dp)
+                                                )
                                                 Spacer(modifier = Modifier.width(3.dp))
-                                                Text(if (isAmharic) "ውጤት ሙላ" else "Edit", color = GoldAccent, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                                Text(
+                                                    text = if (isAuthorizedTeacher) (if (isAmharic) "ውጤት ሙላ" else "Edit") else (if (isAmharic) "የመምህር ብቻ" else "Teacher Only"),
+                                                    color = if (isAuthorizedTeacher) GoldAccent else Color.White,
+                                                    fontSize = 9.5.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
                                             }
                                         }
                                     }
@@ -1990,6 +2043,28 @@ fun SubjectMarkListView(
                     }
                 }
             }
+        }
+
+        // Unauthorized Teacher Warning Dialog
+        unauthorizedTeacherAlert?.let { alertMsg ->
+            AlertDialog(
+                onDismissRequest = { unauthorizedTeacherAlert = null },
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("⛔ ", fontSize = 18.sp)
+                        Text(if (isAmharic) "የመምህር ፈቃድ ብቻ" else "Teacher Authorization Only", fontWeight = FontWeight.Bold)
+                    }
+                },
+                text = { Text(alertMsg) },
+                confirmButton = {
+                    Button(
+                        onClick = { unauthorizedTeacherAlert = null },
+                        colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary)
+                    ) {
+                        Text(if (isAmharic) "ተረድቻለሁ" else "Understood")
+                    }
+                }
+            )
         }
     }
 }

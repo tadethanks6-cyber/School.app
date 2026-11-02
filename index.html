@@ -199,6 +199,7 @@
     .badge-primary { background: #DBEAFE; color: #1E40AF; }
     .badge-warning { background: #FEF3C7; color: #B45309; }
     .badge-danger { background: #FEE2E2; color: #B91C1C; }
+    .badge-id { background: #1E3A8A !important; color: #FFFFFF !important; font-weight: 700 !important; font-family: monospace, sans-serif; padding: 0.22rem 0.55rem !important; border-radius: 6px !important; letter-spacing: 0.5px; box-shadow: 0 1px 3px rgba(0,0,0,0.18); display: inline-block; }
 
     /* Modal */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; padding: 1rem; }
@@ -907,6 +908,14 @@
               <option value="2">2ኛ ሴሚስተር (Semester II)</option>
             </select>
           </div>
+        <div class="form-group" style="background:#FEF3C7; border:1px solid #FDE68A; padding:0.6rem 0.85rem; border-radius:8px;">
+          <label style="color:#B45309; font-weight:700; margin-bottom:0.25rem;">🔒 የሚያስተምረው መምህር ማረጋገጫ (Subject Teacher Verification) *</label>
+          <select id="gradeTeacherSelect" class="form-control" required style="border-color:#F59E0B; background:white; font-weight:600;">
+            <!-- Populated via JS -->
+          </select>
+          <small style="color:#92400E; font-size:0.72rem; font-weight:600; display:block; margin-top:0.25rem;">
+            ⚠️ መመሪያ፦ የተማሪ ውጤት መሞላትና መታረም (edit) ያለበት ይሄንን የትምህርት አይነት በሚያስተምረው መምህር ብቻ ነው።
+          </small>
         </div>
 
         <div class="form-group" style="background:#F8FAFC; border:1px solid var(--border); padding:0.85rem; border-radius:8px;">
@@ -4162,7 +4171,7 @@
       students = [...OFFICIAL_GRADE_6_STUDENTS, ...OFFICIAL_GRADE_1_STUDENTS, ...SEED_STUDENTS_PRIMARY, ...SEED_STUDENTS_HIGH];
     }
 
-    // Ensure official uploaded students (Grade 6 and Grade 1) are incorporated once, respecting deletions
+    // Ensure official uploaded students are incorporated once, respecting deletions
     if (!localStorage.getItem('dilijent_official_migrated_v3')) {
       const existingStudentIds = new Set(students.map(s => (s.id || '').trim().toLowerCase()));
       const officialToInsert = ALL_OFFICIAL_STUDENTS.filter(
@@ -4172,6 +4181,16 @@
         students = [...officialToInsert, ...students];
       }
       localStorage.setItem('dilijent_official_migrated_v3', 'true');
+    }
+
+    // Zero out all sample estimated scores everywhere as requested by user
+    if (!localStorage.getItem('dilijent_scores_zeroed_v5')) {
+      students.forEach(s => {
+        s.scores = [0, 0, 0, 0];
+        s.subjectGrades = {};
+        s.avg = '0.0%';
+      });
+      localStorage.setItem('dilijent_scores_zeroed_v5', 'true');
     }
 
     // Always exclude any permanently deleted students
@@ -4384,7 +4403,7 @@
         return `
         <tr>
           <td style="text-align:center; font-weight:bold; color:#64748B;">${index + 1}</td>
-          <td><span class="badge badge-primary">${s.id}</span></td>
+          <td><span class="badge-id">${s.id}</span></td>
           <td>
             <div style="display:flex; align-items:center;">
               ${avatar}
@@ -4440,10 +4459,44 @@
       }
     }
 
+    function getAssignedTeacherForSubject(subjectName) {
+      const s = (subjectName || '').toLowerCase();
+      const list = (typeof staffList !== 'undefined' && Array.isArray(staffList)) ? staffList : [];
+      const found = list.find(st => {
+        const dept = (st.dept || '').toLowerCase();
+        const role = (st.role || '').toLowerCase();
+        if (s.includes('math') || s.includes('ሒሳብ')) return dept.includes('math') || dept.includes('ሒሳብ');
+        if (s.includes('eng') || s.includes('እንግሊዝ')) return dept.includes('eng') || dept.includes('እንግሊዝ');
+        if (s.includes('phys') || s.includes('ፊዚክስ')) return dept.includes('phys') || dept.includes('ፊዚክስ');
+        if (s.includes('chem') || s.includes('ኬሚስትሪ')) return dept.includes('chem') || dept.includes('ኬሚስትሪ');
+        if (s.includes('bio') || s.includes('ባዮ')) return dept.includes('bio') || dept.includes('ባዮ') || dept.includes('ሳይንስ');
+        if (s.includes('civ') || s.includes('ዜጋ')) return dept.includes('civ') || dept.includes('ዜጋ');
+        if (s.includes('hist') || s.includes('ታሪክ')) return dept.includes('hist') || dept.includes('ታሪክ');
+        if (s.includes('geo') || s.includes('ጆግራ')) return dept.includes('geo') || dept.includes('ጆግራ');
+        if (s.includes('amh') || s.includes('አማርኛ')) return dept.includes('amh') || dept.includes('አማርኛ');
+        if (s.includes('it') || s.includes('ኮምፒውተር') || s.includes('መረጃ')) return dept.includes('it') || dept.includes('ኮምፒውተር');
+        return dept.includes(s) || role.includes(s);
+      });
+      if (found) return found;
+      if (s.includes('math') || s.includes('ሒሳብ')) return { name: 'መምህር ዳዊት በቀለ', dept: 'Mathematics' };
+      if (s.includes('phys') || s.includes('ፊዚክስ')) return { name: 'መምህርት ሳራ መኮንን', dept: 'Physics' };
+      if (s.includes('chem') || s.includes('ኬሚስትሪ')) return { name: 'መምህር ዮሴፍ ሀይሉ', dept: 'Chemistry' };
+      if (s.includes('eng') || s.includes('እንግሊዝ')) return { name: 'መምህርት ራሔል ተክሌ', dept: 'English' };
+      if (s.includes('bio') || s.includes('ባዮ') || s.includes('ሳይንስ')) return { name: 'መምህርት አስቴር ከበደ', dept: 'General Science' };
+      if (s.includes('soc') || s.includes('ማህበራዊ') || s.includes('hist') || s.includes('ታሪክ')) return { name: 'መምህር ዮሴፍ ተክሌ', dept: 'Social Science' };
+      return { name: 'መምህር (' + subjectName + ')', dept: subjectName };
+    }
+
     function renderGrades() {
       const activeStudents = getFilteredStudentsWeb();
       const subjectFilter = document.getElementById('gradeSubjectFilter') ? document.getElementById('gradeSubjectFilter').value : 'Mathematics';
       const comps = getSchemeComponents(currentScheme);
+      const teacher = getAssignedTeacherForSubject(subjectFilter);
+
+      const banner = document.getElementById('subjectAssignedTeacherBanner');
+      if (banner) {
+        banner.innerHTML = `<span>👨‍🏫 <strong>የ${subjectFilter} መምህር፦</strong> <span style="color:#1E3A8A; font-weight:700;">${teacher.name}</span></span> <span style="color:#B45309; font-size:0.72rem; margin-left:8px;">(ውጤት መሙላት እና edit ማድረግ የሚችሉት ይሄ መምህር ብቻ ናቸው 🔒)</span>`;
+      }
 
       const thead = document.getElementById('gradesTableHeadRow');
       if (thead) {
@@ -4460,26 +4513,26 @@
       const tbody = document.getElementById('gradesTableBody');
       if (!tbody) return;
       tbody.innerHTML = activeStudents.map(s => {
-        let sc = (s.subjectGrades && s.subjectGrades[subjectFilter]) ? s.subjectGrades[subjectFilter] : s.scores;
-        if (!sc || !Array.isArray(sc)) sc = [];
+        const hasRecorded = s.subjectGrades && s.subjectGrades[subjectFilter] && s.subjectGrades[subjectFilter].length > 0;
+        let sc = hasRecorded ? s.subjectGrades[subjectFilter] : [];
 
         let total = 0;
         const compCols = comps.map((c, idx) => {
-          const val = parseFloat(sc[idx] !== undefined ? sc[idx] : 0);
+          const val = (hasRecorded && sc[idx] !== undefined) ? parseFloat(sc[idx]) : 0;
           total += Math.min(val, c.weight);
           return `<td style="text-align:center;">${val.toFixed(1)}</td>`;
         }).join('');
 
-        const totalStr = total.toFixed(1);
-        const letter = getLetter(totalStr);
+        const totalStr = hasRecorded ? total.toFixed(1) : '0.0';
+        const letter = (hasRecorded && total > 0) ? getLetter(totalStr) : '-';
 
         return `
           <tr>
-            <td><strong>${s.name}</strong> <small style="color:#64748B;">(${s.id} - ${s.grade})</small></td>
+            <td><strong>${s.name}</strong> <span class="badge-id" style="margin-left:4px;">${s.id}</span> <span class="badge badge-primary">${s.grade}</span></td>
             <td><span class="badge badge-primary">${subjectFilter}</span></td>
             ${compCols}
             <td style="text-align:center;"><strong>${totalStr}%</strong></td>
-            <td style="text-align:center;"><span class="badge ${parseFloat(totalStr) >= 50 ? 'badge-success' : 'badge-danger'}">${letter}</span></td>
+            <td style="text-align:center;"><span class="badge ${(hasRecorded && parseFloat(totalStr) >= 50) ? 'badge-success' : 'badge-danger'}">${letter}</span></td>
             <td style="text-align:center;">
               <button class="btn-secondary" style="padding:0.25rem 0.55rem; font-size:0.75rem;" onclick="openAddGradeModal('${s.id}', '${subjectFilter}')">✏️ ውጤት አስገባ</button>
             </td>
@@ -4490,7 +4543,7 @@
 
     function renderReportCard() {
       const activeStudents = getFilteredStudentsWeb();
-      const targetStudent = activeStudents[0] || { name: 'ተማሪ', id: 'DIL-001', grade: (schoolSettings.gradeLevel === '1_8' ? '8A' : '12A'), scores: [9, 9, 28, 46] };
+      const targetStudent = activeStudents[0] || { name: 'ተማሪ', id: 'DIL-001', grade: (schoolSettings.gradeLevel === '1_8' ? '8A' : '12A'), scores: [0, 0, 0, 0] };
       const subjects = getSubjectsForGradeLevel(schoolSettings.gradeLevel);
 
       const headerRow = document.getElementById('reportCardHeaderRow');
@@ -4506,20 +4559,27 @@
 
       const tbody = document.getElementById('reportCardBody');
       tbody.innerHTML = subjects.map((subName, idx) => {
-        const base = (targetStudent.scores[0] + targetStudent.scores[1] + targetStudent.scores[2] + targetStudent.scores[3]);
-        const s1 = Math.min(100, Math.max(40, base - (idx * 1.5))).toFixed(1);
-        const s2 = Math.min(100, Math.max(40, base - (idx * 1.2) + 0.8)).toFixed(1);
-        const avg = ((parseFloat(s1) + parseFloat(s2)) / 2).toFixed(1);
-        const letter = getLetter(avg);
-        const remark = parseFloat(avg) >= 85 ? 'እጅግ በጣም ጥሩ' : 'ጥሩ';
+        let s1 = 0;
+        let s2 = 0;
+        let hasData = false;
+        if (targetStudent.subjectGrades && targetStudent.subjectGrades[subName] && targetStudent.subjectGrades[subName].length > 0) {
+          const sc = targetStudent.subjectGrades[subName];
+          s1 = sc.reduce((a, b) => a + b, 0);
+          hasData = true;
+        }
+        const s1Str = s1.toFixed(1);
+        const s2Str = s2.toFixed(1);
+        const avg = hasData ? ((s1 + s2) / 2).toFixed(1) : '0.0';
+        const letter = (hasData && parseFloat(avg) > 0) ? getLetter(avg) : '-';
+        const remark = !hasData || parseFloat(avg) === 0 ? 'ውጤት አልተሞላም' : (parseFloat(avg) >= 85 ? 'እጅግ በጣም ጥሩ' : (parseFloat(avg) >= 50 ? 'ጥሩ' : 'ማሻሻል አለበት'));
 
         return `
           <tr>
             <td><strong>${subName}</strong></td>
-            <td style="text-align:center; font-weight:600;">${s1}</td>
-            <td style="text-align:center; font-weight:600;">${s2}</td>
+            <td style="text-align:center; font-weight:600;">${s1Str}</td>
+            <td style="text-align:center; font-weight:600;">${s2Str}</td>
             <td style="text-align:center; font-weight:800; color:var(--primary); background:#F8FAFC;">${avg}%</td>
-            <td style="text-align:center;"><span class="badge ${parseFloat(avg) >= 50 ? 'badge-success' : 'badge-danger'}">${letter}</span></td>
+            <td style="text-align:center;"><span class="badge ${(hasData && parseFloat(avg) >= 50) ? 'badge-success' : 'badge-danger'}">${letter}</span></td>
             <td style="text-align:center; font-size:0.75rem;">${idx + 1}ኛ</td>
             <td>${remark}</td>
           </tr>
@@ -4527,7 +4587,11 @@
       }).join('');
 
       document.getElementById('reportStudentNameDisplay').innerText = targetStudent.name;
-      document.getElementById('reportStudentIdDisplay').innerText = targetStudent.id;
+      const idEl = document.getElementById('reportStudentIdDisplay');
+      if (idEl) {
+        idEl.className = 'badge-id';
+        idEl.innerText = targetStudent.id;
+      }
       document.getElementById('reportStudentGradeDisplay').innerText = targetStudent.grade;
       const photoBadge = document.getElementById('reportStudentPhotoBadge');
       if (photoBadge) {
@@ -5255,22 +5319,26 @@
 
       // Generate composite scores for each student strictly
       const rosterData = classStudents.map(student => {
-        const baseTotal = parseFloat(calculateTotal(student.scores));
-        const subScores = subjects.map((sub, idx) => {
-          const variance = ((student.name.charCodeAt(0) + idx * 7) % 15) - 7;
-          let s = Math.min(100, Math.max(40, baseTotal + variance));
-          return Math.round(s * 10) / 10;
+        let hasAnyGrade = false;
+        const subScores = subjects.map((sub) => {
+          if (student.subjectGrades && student.subjectGrades[sub] && student.subjectGrades[sub].length > 0) {
+            hasAnyGrade = true;
+            const sum = student.subjectGrades[sub].reduce((a, b) => a + b, 0);
+            return Math.round(sum * 10) / 10;
+          }
+          return 0;
         });
 
         const totalSum = subScores.reduce((a, b) => a + b, 0);
-        const avg = Math.round((totalSum / subjects.length) * 10) / 10;
-        const isPassing = avg >= 50;
+        const avg = hasAnyGrade ? Math.round((totalSum / subjects.length) * 10) / 10 : 0;
+        const isPassing = hasAnyGrade && avg >= 50;
 
         return {
           student,
           subScores,
           totalSum: Math.round(totalSum * 10) / 10,
           avg,
+          hasAnyGrade,
           isPassing
         };
       });
@@ -5284,12 +5352,14 @@
         document.getElementById('rosterTotalCount').innerText = `${rosterData.length} ተማሪዎች`;
       }
       if (document.getElementById('rosterClassAvg')) {
-        const classAvg = rosterData.length > 0 ? (rosterData.reduce((acc, r) => acc + r.avg, 0) / rosterData.length).toFixed(1) : '0';
+        const hasGradesCount = rosterData.filter(r => r.hasAnyGrade).length;
+        const classAvg = hasGradesCount > 0 ? (rosterData.reduce((acc, r) => acc + r.avg, 0) / hasGradesCount).toFixed(1) : '0.0';
         document.getElementById('rosterClassAvg').innerText = `${classAvg}%`;
       }
       if (document.getElementById('rosterPassRate')) {
+        const hasGradesCount = rosterData.filter(r => r.hasAnyGrade).length;
         const passCount = rosterData.filter(r => r.isPassing).length;
-        const rate = rosterData.length > 0 ? Math.round((passCount / rosterData.length) * 100) : 100;
+        const rate = hasGradesCount > 0 ? Math.round((passCount / hasGradesCount) * 100) : 0;
         document.getElementById('rosterPassRate').innerText = `${rate}%`;
       }
 
@@ -5298,24 +5368,26 @@
 
       tbody.innerHTML = rosterData.map(row => {
         const s = row.student;
-        const rankBadge = row.rank === 1
+        const rankBadge = !row.hasAnyGrade
+          ? '<span style="color:#64748B; font-size:0.75rem;">-</span>'
+          : (row.rank === 1
           ? '<span style="background:#FEF3C7; color:#B45309; padding:2px 8px; border-radius:12px; font-weight:800; font-size:0.8rem; border:1px solid #FCD34D;">🥇 1ኛ</span>'
           : row.rank === 2
           ? '<span style="background:#F1F5F9; color:#475569; padding:2px 8px; border-radius:12px; font-weight:800; font-size:0.8rem; border:1px solid #CBD5E1;">🥈 2ኛ</span>'
           : row.rank === 3
           ? '<span style="background:#FFF7ED; color:#C2410C; padding:2px 8px; border-radius:12px; font-weight:800; font-size:0.8rem; border:1px solid #FDBA74;">🥉 3ኛ</span>'
-          : `<span style="font-weight:700; color:#64748B;">${row.rank}ኛ</span>`;
+          : `<span style="font-weight:700; color:#64748B;">${row.rank}ኛ</span>`);
 
         const avatar = s.photo
           ? `<img src="${s.photo}" alt="${s.name}" style="width:30px; height:30px; border-radius:50%; object-fit:cover; margin-right:8px; vertical-align:middle; border:1.5px solid var(--accent);">`
           : `<span style="display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:50%; background:${s.gender === 'ሴት' ? '#FCE7F3' : '#DBEAFE'}; color:${s.gender === 'ሴት' ? '#BE185D' : '#1E40AF'}; font-weight:bold; font-size:0.75rem; margin-right:8px; vertical-align:middle;">${s.name.charAt(0)}</span>`;
 
         const subjectTds = row.subScores.map(sc => 
-          `<td style="text-align:center; font-weight:600; color:${sc >= 50 ? '#0F172A' : '#DC2626'}; font-size:0.78rem;">${sc}</td>`
+          `<td style="text-align:center; font-weight:600; color:${sc >= 50 ? '#0F172A' : (sc > 0 ? '#DC2626' : '#64748B')}; font-size:0.78rem;">${sc}</td>`
         ).join('');
 
         return `
-          <tr style="border-bottom:1px solid var(--border); ${row.rank === 1 ? 'background:#FFFBEB;' : ''}">
+          <tr style="border-bottom:1px solid var(--border); ${row.rank === 1 && row.hasAnyGrade ? 'background:#FFFBEB;' : ''}">
             <td style="text-align:center; padding:8px 4px;">${rankBadge}</td>
             <td style="padding:8px 6px;">
               <div style="display:flex; align-items:center;">
@@ -5326,13 +5398,13 @@
                 </div>
               </div>
             </td>
-            <td style="text-align:center; font-size:0.75rem; color:#64748B; padding:8px 4px;">${s.id}</td>
+            <td style="text-align:center; padding:8px 4px;"><span class="badge-id">${s.id}</span></td>
             ${subjectTds}
             <td style="text-align:center; font-weight:800; color:#1E3A8A; background:#F8FAFC; padding:8px 4px;">${row.totalSum}</td>
-            <td style="text-align:center; font-weight:800; color:${row.avg >= 50 ? '#078930' : '#DC2626'}; background:#F8FAFC; padding:8px 4px;">${row.avg}%</td>
+            <td style="text-align:center; font-weight:800; color:${row.avg >= 50 ? '#078930' : (row.hasAnyGrade ? '#DC2626' : '#64748B')}; background:#F8FAFC; padding:8px 4px;">${row.avg}%</td>
             <td style="text-align:center; padding:8px 4px;">
-              <span class="badge ${row.isPassing ? 'badge-success' : 'badge-danger'}">
-                ${row.isPassing ? 'አልፏል' : 'ደግሟል'}
+              <span class="badge ${!row.hasAnyGrade ? 'badge-warning' : (row.isPassing ? 'badge-success' : 'badge-danger')}">
+                ${!row.hasAnyGrade ? 'ውጤት አልተሞላም' : (row.isPassing ? 'አልፏል' : 'ደግሟል')}
               </span>
             </td>
             <td style="text-align:center; padding:8px 4px;">
@@ -5567,6 +5639,24 @@
       return r.includes('ርዕሰ መምህር') || r.includes('principal') || r.includes('አድሚን') || r.includes('admin') || email.includes('admin');
     }
 
+    function updateGradeTeacherDropdown(subject) {
+      const teacherSelect = document.getElementById('gradeTeacherSelect');
+      if (!teacherSelect) return;
+      const assignedTeacher = getAssignedTeacherForSubject(subject);
+      const list = (typeof staffList !== 'undefined' && Array.isArray(staffList)) ? staffList : [];
+      let teachers = list.filter(st => {
+        const role = (st.role || '').toLowerCase();
+        return role.includes('መምህር') || role.includes('teacher') || role.includes('ኃላፊ');
+      });
+      if (!teachers.some(t => t.name === assignedTeacher.name)) {
+        teachers = [assignedTeacher, ...teachers];
+      }
+      teacherSelect.innerHTML = teachers.map(t => {
+        const isAssigned = (t.name === assignedTeacher.name);
+        return `<option value="${t.name}" ${isAssigned ? 'selected' : ''}>${t.name} (${t.dept || t.role})${isAssigned ? ' ★ የተመደበው መምህር' : ''}</option>`;
+      }).join('');
+    }
+
     // Add Grade Modal Handlers (Dynamic with Active Components)
     function openAddGradeModal(studentId, subject) {
       const studentSelect = document.getElementById('gradeStudentSelect');
@@ -5578,6 +5668,8 @@
       if (subject) {
         document.getElementById('gradeSubjectSelect').value = subject;
       }
+      const activeSub = document.getElementById('gradeSubjectSelect').value;
+      updateGradeTeacherDropdown(activeSub);
 
       renderDynamicGradeInputs();
       loadExistingScoresIntoModal();
@@ -5593,6 +5685,8 @@
     }
 
     function onGradeSubjectChange() {
+      const activeSub = document.getElementById('gradeSubjectSelect').value;
+      updateGradeTeacherDropdown(activeSub);
       loadExistingScoresIntoModal();
     }
 
@@ -5663,6 +5757,15 @@
       const subject = document.getElementById('gradeSubjectSelect').value;
       const comps = getSchemeComponents(currentScheme);
 
+      const selectedTeacherName = document.getElementById('gradeTeacherSelect') ? document.getElementById('gradeTeacherSelect').value : '';
+      const assignedTeacher = getAssignedTeacherForSubject(subject);
+
+      // Verify that only the authorized teacher can enter or edit marks
+      if (selectedTeacherName !== assignedTeacher.name) {
+        alert(`⛔ የተከለከለ ፈቃድ! የ${subject} ውጤት መሞላትና edit መደረግ ያለበት በሚያስተምረው መምህር [${assignedTeacher.name}] ብቻ ነው።\nእባክዎ የተመደበውን መምህር [${assignedTeacher.name}] ይምረጡ።`);
+        return;
+      }
+
       const scoresArray = [];
       for (let i = 0; i < comps.length; i++) {
         const input = document.getElementById(`inputGradeComp_${i}`);
@@ -5687,7 +5790,7 @@
 
         saveState();
         closeAddGradeModal();
-        alert(`የ${student.name} የ${subject} ውጤት በተሳካ ሁኔታ በሲስተሙ ተመዝግቧል! (ድምር: ${total}%)`);
+        alert(`የ${student.name} የ${subject} ውጤት በመምህር ${assignedTeacher.name} በተሳካ ሁኔታ ተመዝግቧል! (ድምር: ${total}%)`);
       }
     }
 

@@ -301,51 +301,9 @@ abstract class SchoolDatabase : RoomDatabase() {
             )
             database.workloadDao().insertWorkloads(workloads)
 
-            // 5. Initial Sample Grades
-            val sampleGrades = listOf(
-                StudentGrade(
-                    studentId = 1,
-                    studentName = "ዮናስ አለሙ ከበደ",
-                    grade = "9ኛ ክፍል",
-                    section = "A",
-                    subjectName = "ሂሳብ (Mathematics)",
-                    quizScore = 9f,
-                    assignmentScore = 9.5f,
-                    midExamScore = 27f,
-                    finalExamScore = 46f,
-                    totalScore = 91.5f,
-                    letterGrade = "A",
-                    remarks = "በጣም ከፍተኛ ውጤት"
-                ),
-                StudentGrade(
-                    studentId = 1,
-                    studentName = "ዮናስ አለሙ ከበደ",
-                    grade = "9ኛ ክፍል",
-                    section = "A",
-                    subjectName = "እንግሊዝኛ (English)",
-                    quizScore = 8f,
-                    assignmentScore = 8.5f,
-                    midExamScore = 25f,
-                    finalExamScore = 44f,
-                    totalScore = 85.5f,
-                    letterGrade = "A",
-                    remarks = "ጥሩ ውጤት"
-                ),
-                StudentGrade(
-                    studentId = 2,
-                    studentName = "ሄለን ታደሰ ብርሃኑ",
-                    grade = "9ኛ ክፍል",
-                    section = "A",
-                    subjectName = "ሂሳብ (Mathematics)",
-                    quizScore = 8.5f,
-                    assignmentScore = 9f,
-                    midExamScore = 28f,
-                    finalExamScore = 48f,
-                    totalScore = 93.5f,
-                    letterGrade = "A",
-                    remarks = "የክፍሉ ቀዳሚ"
-                )
-            )
+            // 5. Initial Grades (Do not pre-fill estimated sample scores; marks are entered exclusively by subject teachers)
+            // Empty initially as requested by user
+            val sampleGrades = emptyList<StudentGrade>()
             database.gradeDao().insertGrades(sampleGrades)
 
             // 6. Initial Administrative Staff Members (የአስተዳደር ሰራተኞች)

@@ -424,11 +424,18 @@ fun StudentCardItem(
                             )
                         }
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = student.studentIdNumber,
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = NavyPrimary
+                        ) {
+                            Text(
+                                text = student.studentIdNumber,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
                     }
                 }
 
@@ -1194,14 +1201,15 @@ fun StudentsDataTable(
                                 // ID
                                 Surface(
                                     shape = RoundedCornerShape(4.dp),
-                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                                    color = NavyPrimary,
                                     modifier = Modifier.width(90.dp)
                                 ) {
                                     Text(
                                         text = student.studentIdNumber.ifBlank { student.id.toString() },
                                         fontSize = 10.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = NavyPrimary,
+                                        color = Color.White,
+                                        textAlign = TextAlign.Center,
                                         modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
