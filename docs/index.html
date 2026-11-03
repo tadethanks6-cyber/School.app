@@ -332,7 +332,7 @@
       <div class="panel-card">
         <div class="panel-header">
           <h3 class="panel-title">የቅርብ ጊዜ እንቅስቃሴዎች (Recent Updates)</h3>
-          <span class="badge badge-primary">2017 ዓ.ም Semester I</span>
+          <span id="dashAcademicYearBadge" class="badge badge-primary"><span class="dynamic-academic-year">2017 ዓ.ም</span> Semester I</span>
         </div>
         <div class="table-responsive">
           <table>
@@ -1266,8 +1266,9 @@
 
   <!-- Modal: Dual Login Gate (Admin Email vs Others Phone) -->
   <!-- Modal: Dual Login Gate (Ultra-Secured & Polished) -->
-  <div id="loginModal" class="modal-overlay">
-    <div class="modal-box" style="max-width:500px; width:95%; padding:0; border-radius:16px; overflow:hidden; box-shadow:0 20px 40px rgba(15,30,74,0.3); border:1.5px solid #CBD5E1; background:#FFFFFF;">
+  <!-- Modal: Dual Login Gate (Ultra-Secured & Polished - Matching Android App) -->
+  <div id="loginModal" class="modal-overlay" style="backdrop-filter: blur(8px); background: rgba(15, 23, 42, 0.75);">
+    <div class="modal-box" style="max-width:540px; width:95%; padding:0; border-radius:20px; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0, 0, 0, 0.45); border:1.5px solid #CBD5E1; background:#FFFFFF;">
       <!-- Ethiopian Flag Header Strip -->
       <div style="display:flex; height:6px;">
         <div style="flex:1; background:#078930;"></div>
@@ -1275,82 +1276,143 @@
         <div style="flex:1; background:#DE2128;"></div>
       </div>
 
-      <div style="padding:1.5rem 1.6rem;">
-        <!-- Header Branding -->
-        <div style="text-align:center; margin-bottom:1rem;">
-          <div id="loginSchoolLogoBadge" class="logo-badge" style="width:64px; height:64px; font-size:2.2rem; border:2.5px solid var(--accent); box-shadow:0 3px 8px rgba(0,0,0,0.12); margin:0 auto 0.5rem; overflow:hidden; background:white; display:flex; align-items:center; justify-content:center; border-radius:50%;">🎓</div>
-          <div id="loginSchoolName" style="font-weight:800; color:var(--primary); font-size:1.25rem;">ዲሊጀንት ትምህርት ቤት</div>
-          <div id="loginSchoolSubtitle" style="font-size:0.78rem; color:#64748B; margin-top:2px;">የአስተዳደር እና መረጃ አያያዝ ስርዓት • Official Portal</div>
+      <div style="padding:1.6rem 1.8rem; max-height:88vh; overflow-y:auto;">
+        <!-- Header Branding (School Logo, Name & Academic Year) -->
+        <div style="text-align:center; margin-bottom:1.1rem;">
+          <div id="loginSchoolLogoBadge" class="logo-badge" style="width:72px; height:72px; font-size:2.4rem; border:3px solid #D97706; box-shadow:0 4px 14px rgba(217,119,6,0.3); margin:0 auto 0.6rem; overflow:hidden; background:white; display:flex; align-items:center; justify-content:center; border-radius:50%;">🎓</div>
+          <h2 id="loginSchoolName" style="font-weight:900; color:#1E3A8A; font-size:1.35rem; margin:0 0 4px; letter-spacing:-0.3px;">ዲሊጀንት ትምህርት ቤት</h2>
+          <div id="loginSchoolSubtitle" style="font-size:0.8rem; color:#64748B; font-weight:600;">
+            የአስተዳደር እና መረጃ አያያዝ ስርዓት • <span class="dynamic-academic-year">2017 ዓ.ም</span>
+          </div>
           
-          <div style="display:inline-flex; align-items:center; gap:5px; background:#F0FDF4; border:1px solid #86EFAC; color:#166534; font-size:0.73rem; font-weight:700; padding:3px 10px; border-radius:12px; margin-top:6px;">
-            <span>🛡️</span><span>256-Bit SSL ደህንነቱ የተጠበቀ መግቢያ</span>
+          <div style="display:inline-flex; align-items:center; gap:6px; background:#F0FDF4; border:1px solid #86EFAC; color:#166534; font-size:0.74rem; font-weight:700; padding:4px 12px; border-radius:14px; margin-top:8px;">
+            <span>🛡️</span><span>256-Bit SSL ደህንነቱ የተጠበቀ ይፋዊ የመግቢያ በር</span>
           </div>
         </div>
 
-        <!-- Role Dropdown Selector -->
-        <div class="form-group" style="margin-bottom:0.85rem;">
-          <label style="font-size:0.82rem; font-weight:700; color:var(--primary); display:block; margin-bottom:5px;">
-            👤 የመግቢያ የስራ ድርሻ ይምረጡ (Select Login Role) *
-          </label>
-          <select id="loginRoleSelect" class="form-control" style="font-size:0.9rem; padding:0.65rem 0.8rem; border-radius:8px; font-weight:700; border:1.8px solid var(--primary); background:#F8FAFC; color:#0F172A;" onchange="handleLoginRoleChange()">
-            <option value="teacher" selected>👨‍🏫 መምህር (Teacher)</option>
-            <option value="admin">👑 ሲስተም አድሚን (System Admin)</option>
-            <option value="vice_principal">🎓 ምክትል ር/መምህር (Vice Principal)</option>
-            <option value="principal">👔 ርዕሰ መምህር (Principal)</option>
-            <option value="secretary">✍️ ጸሐፊ / ሬጅስትራር (Secretary)</option>
-            <option value="finance">💰 ፋይናንስ / ሂሳብ ሹም (Finance)</option>
-            <option value="support">🧹 ፅዳት እና ጥበቃ (Support Staff)</option>
-            <option value="student">👨‍🎓 ተማሪ / ወላጅ (Student / Parent)</option>
-          </select>
+        <!-- Quick Demo Role Profiles (Like Android App Quick Selector) -->
+        <div style="margin-bottom:1.1rem; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:10px 12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:0.75rem; font-weight:800; color:#1E3A8A; text-transform:uppercase; letter-spacing:0.5px;">⚡ ፈጣን የሙከራ መለያዎች (Quick Role Selection)</span>
+            <span style="font-size:0.7rem; color:#64748B;">ለመምረጥ ይጫኑ</span>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(115px, 1fr)); gap:6px;">
+            <button type="button" class="demo-role-chip" onclick="quickFillWebAccount('admin')" style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.2s ease;">
+              <div style="font-size:1.1rem;">👑</div>
+              <div style="font-size:0.72rem; font-weight:800; color:#B45309;">አድሚን</div>
+              <div style="font-size:0.62rem; color:#64748B;">admin@dilijent</div>
+            </button>
+            <button type="button" class="demo-role-chip" onclick="quickFillWebAccount('principal')" style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.2s ease;">
+              <div style="font-size:1.1rem;">👔</div>
+              <div style="font-size:0.72rem; font-weight:800; color:#1E3A8A;">ርዕሰ መምህር</div>
+              <div style="font-size:0.62rem; color:#64748B;">0911000000</div>
+            </button>
+            <button type="button" class="demo-role-chip" onclick="quickFillWebAccount('vice_principal')" style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.2s ease;">
+              <div style="font-size:1.1rem;">🎓</div>
+              <div style="font-size:0.72rem; font-weight:800; color:#4338CA;">ም/ር/መምህር</div>
+              <div style="font-size:0.62rem; color:#64748B;">0918000000</div>
+            </button>
+            <button type="button" class="demo-role-chip" onclick="quickFillWebAccount('teacher')" style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.2s ease;">
+              <div style="font-size:1.1rem;">👨‍🏫</div>
+              <div style="font-size:0.72rem; font-weight:800; color:#6D28D9;">መምህር</div>
+              <div style="font-size:0.62rem; color:#64748B;">0911223344</div>
+            </button>
+            <button type="button" class="demo-role-chip" onclick="quickFillWebAccount('secretary')" style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.2s ease;">
+              <div style="font-size:1.1rem;">✍️</div>
+              <div style="font-size:0.72rem; font-weight:800; color:#0D9488;">ጸሐፊ</div>
+              <div style="font-size:0.62rem; color:#64748B;">0911335577</div>
+            </button>
+            <button type="button" class="demo-role-chip" onclick="quickFillWebAccount('student')" style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.2s ease;">
+              <div style="font-size:1.1rem;">👨‍🎓</div>
+              <div style="font-size:0.72rem; font-weight:800; color:#0284C7;">ተማሪ/ወላጅ</div>
+              <div style="font-size:0.62rem; color:#64748B;">0911002233</div>
+            </button>
+          </div>
         </div>
 
-        <!-- Mode explanation banner -->
-        <div id="loginModeNotice" style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:8px 12px; margin-bottom:1rem; font-size:0.78rem; color:#1E40AF; display:flex; align-items:center; gap:6px;">
+        <!-- Mode Toggle Segment (Email vs Phone) -->
+        <div style="display:flex; background:#E2E8F0; border-radius:10px; padding:3px; margin-bottom:1rem; gap:4px;">
+          <button type="button" id="tabLoginAdminEmail" onclick="setWebLoginMode('admin')" style="flex:1; border:none; padding:7px 10px; border-radius:8px; font-size:0.8rem; font-weight:800; cursor:pointer; background:white; color:#1E3A8A; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+            👑 ሲስተም አድሚን (ኢሜል)
+          </button>
+          <button type="button" id="tabLoginStaffPhone" onclick="setWebLoginMode('phone')" style="flex:1; border:none; padding:7px 10px; border-radius:8px; font-size:0.8rem; font-weight:700; cursor:pointer; background:transparent; color:#64748B;">
+            📱 መምህራን እና ሰራተኞች (ስልክ)
+          </button>
+        </div>
+
+        <!-- Hidden role dropdown kept in sync for security validation -->
+        <select id="loginRoleSelect" class="form-control" style="display:none;" onchange="handleLoginRoleChange()">
+          <option value="admin">👑 ሲስተም አድሚን (System Admin)</option>
+          <option value="principal">👔 ርዕሰ መምህር (Principal)</option>
+          <option value="vice_principal">🎓 ምክትል ር/መምህር (Vice Principal)</option>
+          <option value="teacher" selected>👨‍🏫 መምህር (Teacher)</option>
+          <option value="secretary">✍️ ጸሐፊ / ሬጅስትራር (Secretary)</option>
+          <option value="finance">💰 ፋይናንስ / ሂሳብ ሹም (Finance)</option>
+          <option value="support">🧹 ፅዳት እና ጥበቃ (Support Staff)</option>
+          <option value="student">👨‍🎓 ተማሪ / ወላጅ (Student / Parent)</option>
+        </select>
+
+        <!-- Mode explanation notice banner -->
+        <div id="loginModeNotice" style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:9px 12px; margin-bottom:1rem; font-size:0.78rem; color:#1E40AF; display:flex; align-items:center; gap:8px;">
           <span>📱</span><span>የተመረጠው ሚና፡ <strong>መምህር</strong> — በስልክ ቁጥርዎ እና በይለፍ ቃልዎ ይግቡ</span>
         </div>
 
         <form id="webLoginForm" onsubmit="handleWebLoginSubmit(event)">
-          <!-- Admin Email Field (shown only when Admin is selected) -->
-          <div id="loginEmailGroup" class="form-group" style="display:none; margin-bottom:0.85rem;">
-            <label style="font-size:0.82rem; font-weight:700; color:var(--primary); display:block; margin-bottom:4px;">✉️ የአድሚን ኢሜል አድራሻ (Admin Email) *</label>
-            <input type="email" id="inputWebLoginEmail" class="form-control" placeholder="admin@dilijent.edu.et" style="font-size:0.9rem; padding:0.6rem 0.75rem; border-radius:8px;">
+          <!-- Admin Email Field -->
+          <div id="loginEmailGroup" class="form-group" style="display:none; margin-bottom:0.95rem;">
+            <label style="font-size:0.82rem; font-weight:700; color:#1E3A8A; display:block; margin-bottom:5px;">
+              ✉️ የአድሚን ኢሜል አድራሻ (Admin Email) *
+            </label>
+            <div style="position:relative;">
+              <input type="email" id="inputWebLoginEmail" class="form-control" placeholder="admin@dilijent.edu.et" value="admin@dilijent.edu.et" style="font-size:0.9rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
+            </div>
           </div>
 
           <!-- Phone Field for Teachers, Principal, Staff, Students -->
-          <div id="loginPhoneGroup" class="form-group" style="margin-bottom:0.85rem;">
-            <label id="lblLoginPhone" style="font-size:0.82rem; font-weight:700; color:var(--primary); display:block; margin-bottom:4px;">📞 የተጠቃሚው የስልክ ቁጥር (Phone Number) *</label>
-            <input type="tel" id="inputWebLoginPhone" class="form-control" placeholder="09XXXXXXXX" style="font-size:0.9rem; padding:0.6rem 0.75rem; border-radius:8px;">
+          <div id="loginPhoneGroup" class="form-group" style="margin-bottom:0.95rem;">
+            <label id="lblLoginPhone" style="font-size:0.82rem; font-weight:700; color:#1E3A8A; display:block; margin-bottom:5px;">
+              📞 የተጠቃሚው የስልክ ቁጥር (Phone Number) *
+            </label>
+            <div style="position:relative;">
+              <input type="tel" id="inputWebLoginPhone" class="form-control" placeholder="09XXXXXXXX" value="0911223344" style="font-size:0.9rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
+            </div>
           </div>
 
-          <!-- Password Field with Show/Hide Toggle Button and 8-char rule -->
-          <div class="form-group" style="margin-bottom:0.85rem;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <label style="font-size:0.82rem; font-weight:700; color:var(--primary); margin:0;">🔒 ሚስጥራዊ የይለፍ ቃል (Password) *</label>
-              <span style="font-size:0.7rem; color:#16A34A; font-weight:700;">ቢያንስ 8 ፊደላት/ቁጥሮች</span>
+          <!-- Password Field with Show/Hide Toggle Button -->
+          <div class="form-group" style="margin-bottom:0.95rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+              <label style="font-size:0.82rem; font-weight:700; color:#1E3A8A; margin:0;">🔒 ሚስጥራዊ የይለፍ ቃል (Password) *</label>
+              <span style="font-size:0.7rem; color:#16A34A; font-weight:700;">ቢያንስ 8 ፊደላት</span>
             </div>
             <div style="position:relative;">
-              <input type="password" id="inputWebLoginPass" class="form-control" required placeholder="የይለፍ ቃልዎን እዚህ ያስገቡ (min 8 chars)" minlength="8" style="padding-right:45px; font-size:0.95rem; padding:0.6rem 0.75rem; border-radius:8px;">
-              <button type="button" id="btnTogglePassVisibility" onclick="toggleWebLoginPasswordVisibility()" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.15rem; color:#64748B; padding:4px;" title="የይለፍ ቃል አሳይ/ደብቅ">
+              <input type="password" id="inputWebLoginPass" class="form-control" required placeholder="የይለፍ ቃልዎን እዚህ ያስገቡ" value="Teacher@2026" minlength="8" style="padding-right:48px; font-size:0.95rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
+              <button type="button" id="btnTogglePassVisibility" onclick="toggleWebLoginPasswordVisibility()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.2rem; color:#64748B; padding:4px;" title="የይለፍ ቃል አሳይ/ደብቅ">
                 👁️
               </button>
             </div>
           </div>
 
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem; font-size:0.75rem; color:#64748B;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; font-size:0.76rem; color:#64748B;">
             <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin:0;">
-              <input type="checkbox" id="checkRememberLogin" checked style="accent-color:var(--primary);">
+              <input type="checkbox" id="checkRememberLogin" checked style="accent-color:#1E3A8A; width:15px; height:15px;">
               <span>በዚህ መሳሪያ አስታውሰኝ (Remember Me)</span>
             </label>
-            <span style="color:#0284C7; font-weight:600; cursor:pointer;" onclick="alert('የይለፍ ቃልዎን ከረሱ እባክዎ ዋናውን ሲስተም አድሚን ያነጋግሩ። አድሚኑ በይለፍ ቃል መቆጣጠሪያው ማስተካከል ይችላል።')">የይለፍ ቃል ረሳሁ?</span>
+            <span style="color:#0284C7; font-weight:700; cursor:pointer;" onclick="alert('የይለፍ ቃልዎን ከረሱ እባክዎ ዋናውን ሲስተም አድሚን (admin@dilijent.edu.et) ያነጋግሩ። አድሚኑ በተጠቃሚዎች የይለፍ ቃል መቆጣጠሪያው በኩል አዲስ የይለፍ ቃል ሊሰጥዎ ይችላል።')">የይለፍ ቃል ረሳሁ?</span>
           </div>
 
-          <button type="submit" class="btn-primary" style="width:100%; padding:0.75rem; font-size:0.95rem; font-weight:800; border-radius:8px; background:linear-gradient(135deg, #0F1E4A 0%, #1E3A8A 100%); border:none; box-shadow:0 3px 8px rgba(15,30,74,0.25); cursor:pointer;">
+          <button type="submit" class="btn-primary" style="width:100%; padding:0.85rem; font-size:0.98rem; font-weight:800; border-radius:10px; background:linear-gradient(135deg, #0F1E4A 0%, #1E3A8A 50%, #2563EB 100%); border:none; box-shadow:0 4px 12px rgba(30,58,138,0.35); cursor:pointer; transition:transform 0.15s ease;">
             🔐 ደህንነቱ በተጠበቀ ሁኔታ ግባ (Secure Sign In)
           </button>
         </form>
 
-        <div style="margin-top:1rem; text-align:right;">
-          <button type="button" class="btn-secondary" style="padding:0.45rem 1rem; border-radius:6px; cursor:pointer;" onclick="closeLoginModal()">ዝጋ (Close)</button>
+        <!-- Quick 1-Click Action & Close / Guest preview -->
+        <div style="margin-top:1rem; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+          <button type="button" class="btn-accent" onclick="quickOneClickAdminLogin()" style="flex:1; padding:0.5rem 0.8rem; border-radius:8px; font-size:0.78rem; font-weight:700; cursor:pointer; text-align:center;">
+            ⚡ በ1 ጠቅታ እንደ አድሚን ግባ
+          </button>
+          <button type="button" class="btn-secondary" style="padding:0.5rem 1rem; border-radius:8px; font-size:0.78rem; font-weight:600; cursor:pointer;" onclick="closeLoginModal()">
+            👥 እንደ እንግዳ እይ (Close)
+          </button>
         </div>
       </div>
     </div>
@@ -1431,7 +1493,7 @@
         <div><strong>መለያ ቁጥር (ID):</strong> <span id="cardModalId" style="font-weight:700;">-</span></div>
         <div><strong>ክፍል እና ክፍልፋይ:</strong> <span id="cardModalGrade" style="font-weight:700;">-</span></div>
         <div><strong>ጾታ:</strong> <span id="cardModalGender">-</span></div>
-        <div><strong>የትምህርት ዘመን:</strong> <span>2017 ዓ.ም (2025/26)</span></div>
+        <div><strong>የትምህርት ዘመን:</strong> <span id="cardModalAcademicYear" class="dynamic-academic-year">2017 ዓ.ም</span></div>
         <div><strong>ወሰነ-ትምህርት:</strong> <span id="cardModalTermDisplay">1ኛ እና 2ኛ ሴሚስተር (Semesters I & II)</span></div>
         <div><strong>የክፍል ደረጃ (Rank):</strong> <span id="cardModalRank" class="badge badge-warning" style="font-size:0.8rem; font-weight:800;">-</span></div>
         <div><strong>አማካይ ውጤት:</strong> <span id="cardModalAvg" style="color:#078930; font-weight:800; font-size:0.9rem;">-</span></div>
@@ -4206,12 +4268,34 @@
         staffList = [];
       }
     } else {
-      // First-time fresh seeding
-      staffList = [...SEED_STAFF_PRIMARY, ...SEED_STAFF_HIGH, ...SEED_STAFF_COMMON];
+      // First-time fresh seeding - only if not already seeded or marked empty
+      if (!localStorage.getItem('dilijent_staff_seeded_v1')) {
+        staffList = [...SEED_STAFF_PRIMARY, ...SEED_STAFF_HIGH, ...SEED_STAFF_COMMON];
+        localStorage.setItem('dilijent_staff_seeded_v1', 'true');
+      }
     }
 
-    // Always exclude any permanently deleted staff
-    staffList = staffList.filter(st => !deletedStaffIds.has((st.id || '').trim().toLowerCase()));
+    // Restore any user-registered staff from dedicated permanent backup if missing
+    let userStaff = [];
+    try {
+      userStaff = JSON.parse(localStorage.getItem('dilijent_user_registered_staff') || '[]');
+    } catch (e) {
+      userStaff = [];
+    }
+    userStaff.forEach(us => {
+      const exists = staffList.some(st => (st.id || '').trim().toLowerCase() === (us.id || '').trim().toLowerCase() || (st.name || '').trim().toLowerCase() === (us.name || '').trim().toLowerCase());
+      const isDeleted = deletedStaffIds.has((us.id || '').trim().toLowerCase()) || deletedStaffIds.has((us.name || '').trim().toLowerCase());
+      if (!exists && !isDeleted) {
+        staffList.push(us);
+      }
+    });
+
+    // Always exclude any permanently deleted staff (both by ID and by Name)
+    staffList = staffList.filter(st => {
+      const sid = (st.id || '').trim().toLowerCase();
+      const sname = (st.name || '').trim().toLowerCase();
+      return !deletedStaffIds.has(sid) && !deletedStaffIds.has(sname);
+    });
     localStorage.setItem('dilijent_staff_list', JSON.stringify(staffList));
 
     let attendance = JSON.parse(localStorage.getItem('dilijent_attendance')) || SEED_ATTENDANCE;
@@ -4234,6 +4318,8 @@
     }
 
     function isStaffInLevelWeb(staff, level) {
+      // User-registered staff MUST ALWAYS be visible in the directory! Never hidden by level!
+      if (staff.isUserCreated) return true;
       if (!level || level === 'ALL') return true;
       const role = staff.role || '';
       const dept = staff.dept || '';
@@ -4463,6 +4549,9 @@
       const s = (subjectName || '').toLowerCase();
       const list = (typeof staffList !== 'undefined' && Array.isArray(staffList)) ? staffList : [];
       const found = list.find(st => {
+        const sid = (st.id || '').trim().toLowerCase();
+        const sname = (st.name || '').trim().toLowerCase();
+        if (deletedStaffIds.has(sid) || deletedStaffIds.has(sname)) return false;
         const dept = (st.dept || '').toLowerCase();
         const role = (st.role || '').toLowerCase();
         if (s.includes('math') || s.includes('ሒሳብ')) return dept.includes('math') || dept.includes('ሒሳብ');
@@ -4478,12 +4567,46 @@
         return dept.includes(s) || role.includes(s);
       });
       if (found) return found;
-      if (s.includes('math') || s.includes('ሒሳብ')) return { name: 'መምህር ዳዊት በቀለ', dept: 'Mathematics' };
-      if (s.includes('phys') || s.includes('ፊዚክስ')) return { name: 'መምህርት ሳራ መኮንን', dept: 'Physics' };
-      if (s.includes('chem') || s.includes('ኬሚስትሪ')) return { name: 'መምህር ዮሴፍ ሀይሉ', dept: 'Chemistry' };
-      if (s.includes('eng') || s.includes('እንግሊዝ')) return { name: 'መምህርት ራሔል ተክሌ', dept: 'English' };
-      if (s.includes('bio') || s.includes('ባዮ') || s.includes('ሳይንስ')) return { name: 'መምህርት አስቴር ከበደ', dept: 'General Science' };
-      if (s.includes('soc') || s.includes('ማህበራዊ') || s.includes('hist') || s.includes('ታሪክ')) return { name: 'መምህር ዮሴፍ ተክሌ', dept: 'Social Science' };
+
+      // Safe fallback that checks deletedStaffIds
+      const checkFallback = (tName, tDept) => {
+        if (deletedStaffIds.has(tName.toLowerCase())) return null;
+        return { name: tName, dept: tDept };
+      };
+
+      if (s.includes('math') || s.includes('ሒሳብ')) {
+        const fb = checkFallback('መምህር ዳዊት በቀለ', 'Mathematics');
+        if (fb) return fb;
+      }
+      if (s.includes('phys') || s.includes('ፊዚክስ')) {
+        const fb = checkFallback('መምህርት ሳራ መኮንን', 'Physics');
+        if (fb) return fb;
+      }
+      if (s.includes('chem') || s.includes('ኬሚስትሪ')) {
+        const fb = checkFallback('መምህር ዮሴፍ ሀይሉ', 'Chemistry');
+        if (fb) return fb;
+      }
+      if (s.includes('eng') || s.includes('እንግሊዝ')) {
+        const fb = checkFallback('መምህርት ራሔል ተክሌ', 'English');
+        if (fb) return fb;
+      }
+      if (s.includes('bio') || s.includes('ባዮ') || s.includes('ሳይንስ')) {
+        const fb = checkFallback('መምህርት አስቴር ከበደ', 'General Science');
+        if (fb) return fb;
+      }
+      if (s.includes('soc') || s.includes('ማህበራዊ') || s.includes('hist') || s.includes('ታሪክ')) {
+        const fb = checkFallback('መምህር ዮሴፍ ተክሌ', 'Social Science');
+        if (fb) return fb;
+      }
+
+      // If all specific fallbacks are deleted, find any active non-deleted teacher
+      const anyTeacher = list.find(st => {
+        const sid = (st.id || '').trim().toLowerCase();
+        const sname = (st.name || '').trim().toLowerCase();
+        return !deletedStaffIds.has(sid) && !deletedStaffIds.has(sname) && (st.role || '').includes('መምህር');
+      });
+      if (anyTeacher) return anyTeacher;
+
       return { name: 'መምህር (' + subjectName + ')', dept: subjectName };
     }
 
@@ -4682,6 +4805,40 @@
       }
       return item;
     });
+
+    // CRITICAL FIX: Exclude any permanently deleted staff from attendance
+    staffAttendanceListWeb = staffAttendanceListWeb.filter(item => {
+      const sid = String(item.id || '').trim().toLowerCase();
+      const sname = (item.name || '').trim().toLowerCase();
+      return !deletedStaffIds.has(sid) && !deletedStaffIds.has(sname);
+    });
+
+    // Sync all active staff from staffList into staffAttendanceListWeb
+    if (typeof staffList !== 'undefined' && Array.isArray(staffList)) {
+      staffList.forEach(st => {
+        const sname = (st.name || '').trim();
+        const sid = (st.id || '').trim();
+        if (deletedStaffIds.has(sid.toLowerCase()) || deletedStaffIds.has(sname.toLowerCase())) return;
+        const isTeacher = (st.role || '').toLowerCase().includes('መምህር') || (st.dept || '').toLowerCase().includes('መምህር');
+        if (!staffAttendanceListWeb.some(sa => (sa.name || '').trim().toLowerCase() === sname.toLowerCase() || String(sa.id || '').trim().toLowerCase() === sid.toLowerCase())) {
+          staffAttendanceListWeb.push({
+            id: sid,
+            name: sname,
+            role: st.role || 'ሰራተኛ',
+            dept: st.dept || 'አስተዳደር',
+            isTeacher: isTeacher,
+            morningStatus: 'ተገኝቷል',
+            morningTime: '01:30 ጧት',
+            morningRemarks: 'በሰዓቱ ገብተዋል',
+            afternoonStatus: 'ተገኝቷል',
+            afternoonTime: '09:20 ከሰዓት',
+            afternoonRemarks: 'በሰዓቱ ተገኝተዋል',
+            isUserCreated: !!st.isUserCreated
+          });
+        }
+      });
+    }
+    localStorage.setItem('dilijent_staff_attendance', JSON.stringify(staffAttendanceListWeb));
 
     function saveStaffAttendanceWeb() {
       localStorage.setItem('dilijent_staff_attendance', JSON.stringify(staffAttendanceListWeb));
@@ -6057,14 +6214,22 @@
 
     function saveNewStaff(e) {
       e.preventDefault();
-      const name = document.getElementById('newStaffName').value;
-      const role = document.getElementById('newStaffRole').value;
-      const dept = document.getElementById('newStaffDept').value;
-      const phone = document.getElementById('newStaffPhone').value;
-      const qual = document.getElementById('newStaffQual').value;
-      const id = 'STF-00' + (staffList.length + 1);
+      const name = document.getElementById('newStaffName').value.trim();
+      const role = document.getElementById('newStaffRole').value.trim();
+      const dept = document.getElementById('newStaffDept').value.trim();
+      const phone = document.getElementById('newStaffPhone').value.trim();
+      const qual = document.getElementById('newStaffQual').value.trim();
+      
+      // Collision-free unique ID that never collides with deleted or existing sample IDs
+      const uniqueSuffix = Date.now().toString().slice(-4) + '-' + Math.floor(100 + Math.random() * 900);
+      const id = 'STF-' + uniqueSuffix;
 
-      staffList.push({
+      // Unblock if previously marked as deleted
+      deletedStaffIds.delete(id.toLowerCase());
+      deletedStaffIds.delete(name.toLowerCase());
+      localStorage.setItem('dilijent_deleted_staff_ids', JSON.stringify([...deletedStaffIds]));
+
+      const newStaffObj = {
         id,
         name,
         role,
@@ -6072,33 +6237,122 @@
         phone,
         qual,
         photo: selectedStaffPhotoBase64,
-        status: 'ንቁ'
-      });
+        status: 'ንቁ',
+        isUserCreated: true
+      };
+
+      // 1. Add to main staffList
+      staffList.unshift(newStaffObj);
+
+      // 2. Save to permanent user-registered staff backup in localStorage
+      let userStaff = [];
+      try {
+        userStaff = JSON.parse(localStorage.getItem('dilijent_user_registered_staff') || '[]');
+      } catch (err) { userStaff = []; }
+      userStaff = userStaff.filter(us => (us.id || '').toLowerCase() !== id.toLowerCase() && (us.name || '').trim().toLowerCase() !== name.toLowerCase());
+      userStaff.unshift(newStaffObj);
+      localStorage.setItem('dilijent_user_registered_staff', JSON.stringify(userStaff));
+
+      // 3. Synchronize with staffAttendanceListWeb
+      const isTeacher = role.toLowerCase().includes('መምህር') || dept.toLowerCase().includes('መምህር');
+      if (!staffAttendanceListWeb.some(sa => (sa.name || '').trim().toLowerCase() === name.toLowerCase())) {
+        staffAttendanceListWeb.push({
+          id: id,
+          name: name,
+          role: role,
+          dept: dept,
+          isTeacher: isTeacher,
+          morningStatus: 'ተገኝቷል',
+          morningTime: '01:30 ጧት',
+          morningRemarks: 'በሰዓቱ ገብተዋል',
+          afternoonStatus: 'ተገኝቷል',
+          afternoonTime: '09:20 ከሰዓት',
+          afternoonRemarks: 'በሰዓቱ ተገኝተዋል',
+          isUserCreated: true
+        });
+        saveStaffAttendanceWeb();
+      }
+
+      // 4. Synchronize with userAccounts so the registered staff can log in
+      let roleKey = 'teacher';
+      if (role.includes('ርዕሰ')) roleKey = 'principal';
+      else if (role.includes('ምክትል')) roleKey = 'vice_principal';
+      else if (role.includes('ጸሐፊ')) roleKey = 'secretary';
+      else if (role.includes('ፋይናንስ') || role.includes('ሂሳብ')) roleKey = 'finance';
+      else if (role.includes('ፅዳት') || role.includes('ጥበቃ')) roleKey = 'support';
+
+      if (!userAccounts.some(u => (u.phone && phone && u.phone === phone) || (u.name && u.name === name))) {
+        userAccounts.push({
+          name: name,
+          role: role,
+          email: '',
+          phone: phone,
+          pass: 'Staff@2026',
+          isAdmin: false,
+          isVicePrincipal: roleKey === 'vice_principal',
+          roleKey: roleKey
+        });
+        localStorage.setItem('dilijent_user_accounts', JSON.stringify(userAccounts));
+      }
 
       saveState();
       closeAddStaffModal();
       e.target.reset();
       clearStaffPhoto();
-      alert(`መምህር/ሰራተኛ ${name} ከፎቶ ጋር በተሳካ ሁኔታ በLocal Storage ተመዝግቧል!`);
+      if (typeof renderStaff === 'function') renderStaff();
+      if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
+      alert(`✅ መምህር/ሰራተኛ ${name} (${id}) በቋሚነት ተመዝግቧል!`);
     }
 
     function removeStaff(idOrIdx) {
-      let targetId = '';
+      let targetStaff = null;
       if (typeof idOrIdx === 'string') {
-        targetId = idOrIdx.trim();
+        targetStaff = staffList.find(st => (st.id || '').trim().toLowerCase() === idOrIdx.trim().toLowerCase());
       } else if (typeof idOrIdx === 'number' && staffList[idOrIdx]) {
-        targetId = (staffList[idOrIdx].id || '').trim();
+        targetStaff = staffList[idOrIdx];
       }
-      const staffName = staffList.find(st => st.id === targetId)?.name || 'ይህን ሰራተኛ';
+      const targetId = targetStaff ? (targetStaff.id || '').trim() : (typeof idOrIdx === 'string' ? idOrIdx.trim() : '');
+      const staffName = targetStaff ? (targetStaff.name || '').trim() : 'ይህን ሰራተኛ';
+
       if (confirm(`ሰራተኛ/መምህር ${staffName} (${targetId}) ከዝርዝር በቋሚነት እንዲሰረዝ ይፈልጋሉ?`)) {
-        if (targetId) {
-          deletedStaffIds.add(targetId.toLowerCase());
-          localStorage.setItem('dilijent_deleted_staff_ids', JSON.stringify([...deletedStaffIds]));
-          staffList = staffList.filter(st => (st.id || '').trim().toLowerCase() !== targetId.toLowerCase());
-        } else if (typeof idOrIdx === 'number') {
-          staffList.splice(idOrIdx, 1);
-        }
+        if (targetId) deletedStaffIds.add(targetId.toLowerCase());
+        if (staffName && staffName !== 'ይህን ሰራተኛ') deletedStaffIds.add(staffName.toLowerCase());
+        localStorage.setItem('dilijent_deleted_staff_ids', JSON.stringify([...deletedStaffIds]));
+
+        // 1. Remove from staffList
+        staffList = staffList.filter(st => {
+          const sid = (st.id || '').trim().toLowerCase();
+          const sname = (st.name || '').trim().toLowerCase();
+          return sid !== targetId.toLowerCase() && sname !== staffName.toLowerCase();
+        });
+
+        // 2. Remove from permanent user-registered staff backup
+        try {
+          let userStaff = JSON.parse(localStorage.getItem('dilijent_user_registered_staff') || '[]');
+          userStaff = userStaff.filter(us => {
+            const usId = (us.id || '').trim().toLowerCase();
+            const usName = (us.name || '').trim().toLowerCase();
+            return usId !== targetId.toLowerCase() && usName !== staffName.toLowerCase();
+          });
+          localStorage.setItem('dilijent_user_registered_staff', JSON.stringify(userStaff));
+        } catch (e) {}
+
+        // 3. Remove from staffAttendanceListWeb
+        staffAttendanceListWeb = staffAttendanceListWeb.filter(sa => {
+          const saId = String(sa.id || '').trim().toLowerCase();
+          const saName = (sa.name || '').trim().toLowerCase();
+          return saId !== targetId.toLowerCase() && saName !== staffName.toLowerCase();
+        });
+        saveStaffAttendanceWeb();
+
+        // 4. Remove from userAccounts
+        userAccounts = userAccounts.filter(acc => (acc.name || '').trim().toLowerCase() !== staffName.toLowerCase());
+        localStorage.setItem('dilijent_user_accounts', JSON.stringify(userAccounts));
+
         saveState();
+        if (typeof renderStaff === 'function') renderStaff();
+        if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
+        alert(`🗑️ ሰራተኛ ${staffName} በቋሚነት ተሰርዟል! ወደፊትም አይመለስም።`);
       }
     }
 
@@ -6209,22 +6463,68 @@
       openLoginModal();
     }
 
+    function quickFillWebAccount(roleKey) {
+      const select = document.getElementById('loginRoleSelect');
+      if (select) select.value = roleKey;
+
+      // Update chip highlights
+      document.querySelectorAll('.demo-role-chip').forEach(c => {
+        c.style.borderColor = '#CBD5E1';
+        c.style.background = 'white';
+      });
+
+      const emailInput = document.getElementById('inputWebLoginEmail');
+      const phoneInput = document.getElementById('inputWebLoginPhone');
+      const passInput = document.getElementById('inputWebLoginPass');
+
+      if (roleKey === 'admin') {
+        setWebLoginMode('admin');
+        if (emailInput) emailInput.value = 'admin@dilijent.edu.et';
+        if (passInput) passInput.value = 'Admin@2026';
+      } else {
+        setWebLoginMode('phone');
+        let matched = userAccounts.find(u => {
+          if (roleKey === 'principal') return (u.role || '').includes('ርዕሰ') && !(u.role || '').includes('ምክትል');
+          if (roleKey === 'vice_principal') return u.isVicePrincipal || (u.role || '').includes('ምክትል');
+          if (roleKey === 'teacher') return (u.role || '').includes('መምህር');
+          if (roleKey === 'secretary') return (u.role || '').includes('ጸሐፊ');
+          if (roleKey === 'student') return (u.role || '').includes('ተማሪ');
+          return false;
+        });
+
+        if (phoneInput && matched) phoneInput.value = matched.phone || '';
+        if (passInput && matched) passInput.value = matched.pass || 'Teacher@2026';
+      }
+    }
+
+    function quickOneClickAdminLogin() {
+      const adminAcc = userAccounts.find(u => u.isAdmin) || DEFAULT_ACCOUNTS[0];
+      currentWebUser = adminAcc;
+      localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
+      updateCurrentUserUI();
+      closeLoginModal();
+      alert(`⚡ በ1 ጠቅታ እንደ ሲስተም አድሚን ገብተዋል! ሙሉ ፈቃዶች ነቅተዋል።`);
+    }
+
     function setWebLoginMode(mode) {
       currentLoginMode = mode;
-      handleLoginRoleChange();
-    }
-    function handleLoginRoleChange() {
-      const select = document.getElementById('loginRoleSelect');
-      if (!select) return;
-      const roleKey = select.value;
+      const tabAdmin = document.getElementById('tabLoginAdminEmail');
+      const tabStaff = document.getElementById('tabLoginStaffPhone');
       const emailGroup = document.getElementById('loginEmailGroup');
       const phoneGroup = document.getElementById('loginPhoneGroup');
       const notice = document.getElementById('loginModeNotice');
-      const passInput = document.getElementById('inputWebLoginPass');
-      if (passInput) passInput.value = '';
+      const select = document.getElementById('loginRoleSelect');
 
-      if (roleKey === 'admin') {
-        currentLoginMode = 'admin';
+      if (mode === 'admin') {
+        if (select) select.value = 'admin';
+        if (tabAdmin) {
+          tabAdmin.style.background = '#1E3A8A';
+          tabAdmin.style.color = 'white';
+        }
+        if (tabStaff) {
+          tabStaff.style.background = 'transparent';
+          tabStaff.style.color = '#64748B';
+        }
         if (emailGroup) emailGroup.style.display = 'block';
         if (phoneGroup) phoneGroup.style.display = 'none';
         if (notice) {
@@ -6234,24 +6534,41 @@
           notice.innerHTML = '<span>👑</span><span>የሲስተም አድሚን ብቻ በይፋዊ ኢሜል እና በይለፍ ቃል ይገባል (admin@dilijent.edu.et)</span>';
         }
       } else {
-        currentLoginMode = 'phone';
+        if (select && select.value === 'admin') select.value = 'teacher';
+        if (tabStaff) {
+          tabStaff.style.background = '#1E3A8A';
+          tabStaff.style.color = 'white';
+        }
+        if (tabAdmin) {
+          tabAdmin.style.background = 'transparent';
+          tabAdmin.style.color = '#64748B';
+        }
         if (emailGroup) emailGroup.style.display = 'none';
         if (phoneGroup) phoneGroup.style.display = 'block';
         if (notice) {
           notice.style.background = '#EFF6FF';
           notice.style.borderColor = '#BFDBFE';
           notice.style.color = '#1E40AF';
-          const selectedText = select.options[select.selectedIndex].text;
+          const selectedText = select ? select.options[select.selectedIndex]?.text : 'መምህር/ሰራተኛ';
           notice.innerHTML = `<span>📱</span><span>የተመረጠው ሚና፡ <strong>${selectedText}</strong> — በስልክ ቁጥርዎ እና በይለፍ ቃልዎ ይግቡ</span>`;
         }
       }
     }
 
+    function handleLoginRoleChange() {
+      const select = document.getElementById('loginRoleSelect');
+      if (!select) return;
+      const roleKey = select.value;
+      if (roleKey === 'admin') {
+        setWebLoginMode('admin');
+      } else {
+        setWebLoginMode('phone');
+      }
+    }
+
     function openLoginModal() {
-      const passInput = document.getElementById('inputWebLoginPass');
-      if (passInput) passInput.value = '';
       document.getElementById('loginModal').style.display = 'flex';
-      handleLoginRoleChange();
+      setWebLoginMode(currentLoginMode);
     }
 
     function closeLoginModal() {
@@ -6772,13 +7089,31 @@
       const loginName = document.getElementById('loginSchoolName');
       if (loginName) loginName.innerText = schoolSettings.nameAm;
 
-      // 3. Subtitles and levels
+      // 3. Subtitles, Academic Year & Levels
       const levelText = schoolSettings.gradeLevel === '1_8' ? '1ኛ - 8ኛ ክፍል' : (schoolSettings.gradeLevel === '9_12' ? '9ኛ - 12ኛ ክፍል' : 'KG - 12ኛ ክፍል');
+      const year = schoolSettings.academicYear || '2017 ዓ.ም';
+
       const subEl = document.getElementById('headerSchoolSubtitle');
-      if (subEl) subEl.innerText = `${schoolSettings.nameEn} • ${levelText} • Addis Ababa`;
+      if (subEl) subEl.innerText = `${schoolSettings.nameEn} • ${levelText} • ${year} • Addis Ababa`;
 
       const loginSub = document.getElementById('loginSchoolSubtitle');
-      if (loginSub) loginSub.innerText = `${levelText} • የአስተዳደር እና መረጃ አያያዝ ስርዓት`;
+      if (loginSub) loginSub.innerHTML = `የአስተዳደር እና መረጃ አያያዝ ስርዓት • <span class="dynamic-academic-year">${year}</span>`;
+
+      // Dynamic Academic Year Propagation to all elements marked with class
+      document.querySelectorAll('.dynamic-academic-year').forEach(el => {
+        el.innerText = year;
+      });
+
+      // Update Report Card Subtitle & Metadata Year
+      const repSub = document.getElementById('reportSchoolSubtitle');
+      if (repSub) repSub.innerText = `የ${year} የመጀመሪያ ወሰነ-ትምህርት (Semester I) የተማሪ ውጤት መግለጫ`;
+
+      const repYearSpan = document.getElementById('cardModalAcademicYear');
+      if (repYearSpan) repYearSpan.innerText = year;
+
+      // Update Dashboard badge
+      const dashYearBadge = document.getElementById('dashAcademicYearBadge');
+      if (dashYearBadge) dashYearBadge.innerHTML = `<span class="dynamic-academic-year">${year}</span> Semester I`;
 
       // 4. Update dynamic dropdowns for classes
       updateClassDropdowns();
