@@ -230,6 +230,171 @@
 </head>
 <body>
 
+  <!-- ======================================================== -->
+  <!-- DEDICATED FULL-SCREEN ANDROID-STYLE LOGIN PAGE (Web Portal) -->
+  <!-- ======================================================== -->
+  <div id="fullLoginPage" style="display:flex; min-height:100vh; background:linear-gradient(145deg, #0A1128 0%, #0F1E4A 45%, #1E293B 100%); padding:1.25rem 0.85rem; box-sizing:border-box; align-items:center; justify-content:center; flex-direction:column;">
+    <div style="max-width:520px; width:100%; margin:auto; background:#FFFFFF; border-radius:22px; overflow:hidden; box-shadow:0 25px 60px rgba(0,0,0,0.5); border:1.5px solid #CBD5E1;">
+      
+      <!-- Ethiopian Flag Header Strip -->
+      <div style="display:flex; height:7px; width:100%;">
+        <div style="flex:1; background:#078930;"></div>
+        <div style="flex:1; background:#FECB00;"></div>
+        <div style="flex:1; background:#DE2128;"></div>
+      </div>
+
+      <div style="padding:1.6rem 1.5rem;">
+        
+        <!-- School Branding Header (Logo, Name, Year) -->
+        <div style="text-align:center; margin-bottom:1.15rem;">
+          <div id="fullLoginSchoolLogoBadge" class="logo-badge" style="width:78px; height:78px; font-size:2.5rem; border:3px solid #D97706; box-shadow:0 4px 16px rgba(217,119,6,0.35); margin:0 auto 0.6rem; overflow:hidden; background:white; display:flex; align-items:center; justify-content:center; border-radius:50%;">🎓</div>
+          <h1 id="fullLoginSchoolName" style="font-weight:900; color:#1E3A8A; font-size:1.35rem; margin:0 0 3px; letter-spacing:-0.2px;">ዲሊጀንት ትምህርት ቤት</h1>
+          <div id="fullLoginSchoolSubtitle" style="font-size:0.8rem; color:#64748B; font-weight:600;">
+            <span id="fullLoginNameEn">Dilijent School</span> • <span id="fullLoginGradeLevel">1ኛ - 8ኛ ክፍል</span> • <span class="dynamic-academic-year">2017 ዓ.ም</span>
+          </div>
+          
+          <div style="display:inline-flex; align-items:center; gap:6px; background:#F0FDF4; border:1px solid #86EFAC; color:#166534; font-size:0.73rem; font-weight:700; padding:4px 12px; border-radius:14px; margin-top:8px;">
+            <span>🛡️</span><span>256-Bit SSL ደህንነቱ የተጠበቀ ይፋዊ የመግቢያ በር</span>
+          </div>
+        </div>
+
+        <!-- Quick Demo Role Profiles (Interactive Chips exactly like Android app) -->
+        <div style="margin-bottom:1.1rem; background:#F8FAFC; border:1.5px solid #E2E8F0; border-radius:14px; padding:10px 12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:0.75rem; font-weight:800; color:#1E3A8A; text-transform:uppercase; letter-spacing:0.4px;">⚡ ፈጣን የሙከራ መለያዎች (Quick Role Selection)</span>
+            <span style="font-size:0.68rem; color:#64748B;">ለመምረጥ ይጫኑ</span>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr)); gap:6px;" id="fullDemoRolesGrid">
+            <button type="button" class="demo-chip-btn active-chip" onclick="selectFullRoleLogin('admin')" style="background:white; border:1.8px solid #D97706; border-radius:10px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.15s ease;">
+              <div style="font-size:1.15rem;">👑</div>
+              <div style="font-size:0.73rem; font-weight:800; color:#B45309;">አድሚን (እኔ)</div>
+              <div style="font-size:0.62rem; color:#64748B;">admin@dilijent</div>
+            </button>
+            <button type="button" class="demo-chip-btn" onclick="selectFullRoleLogin('principal')" style="background:white; border:1.5px solid #CBD5E1; border-radius:10px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.15s ease;">
+              <div style="font-size:1.15rem;">👔</div>
+              <div style="font-size:0.73rem; font-weight:800; color:#1E3A8A;">ርዕሰ መምህር</div>
+              <div style="font-size:0.62rem; color:#64748B;">0911000000</div>
+            </button>
+            <button type="button" class="demo-chip-btn" onclick="selectFullRoleLogin('vice_principal')" style="background:white; border:1.5px solid #CBD5E1; border-radius:10px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.15s ease;">
+              <div style="font-size:1.15rem;">🎓</div>
+              <div style="font-size:0.73rem; font-weight:800; color:#4338CA;">ም/ር/መምህር</div>
+              <div style="font-size:0.62rem; color:#64748B;">0918000000</div>
+            </button>
+            <button type="button" class="demo-chip-btn" onclick="selectFullRoleLogin('teacher_math')" style="background:white; border:1.5px solid #CBD5E1; border-radius:10px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.15s ease;">
+              <div style="font-size:1.15rem;">👨‍🏫</div>
+              <div style="font-size:0.73rem; font-weight:800; color:#6D28D9;">መምህር (ሒሳብ)</div>
+              <div style="font-size:0.62rem; color:#64748B;">0911223344</div>
+            </button>
+            <button type="button" class="demo-chip-btn" onclick="selectFullRoleLogin('teacher_eng')" style="background:white; border:1.5px solid #CBD5E1; border-radius:10px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.15s ease;">
+              <div style="font-size:1.15rem;">👩‍🏫</div>
+              <div style="font-size:0.73rem; font-weight:800; color:#7C3AED;">መምህርት (እንግሊዝ)</div>
+              <div style="font-size:0.62rem; color:#64748B;">0922334455</div>
+            </button>
+            <button type="button" class="demo-chip-btn" onclick="selectFullRoleLogin('secretary')" style="background:white; border:1.5px solid #CBD5E1; border-radius:10px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.15s ease;">
+              <div style="font-size:1.15rem;">✍️</div>
+              <div style="font-size:0.73rem; font-weight:800; color:#0D9488;">ጸሐፊ/ሬጅስትራር</div>
+              <div style="font-size:0.62rem; color:#64748B;">0911335577</div>
+            </button>
+            <button type="button" class="demo-chip-btn" onclick="selectFullRoleLogin('finance')" style="background:white; border:1.5px solid #CBD5E1; border-radius:10px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.15s ease;">
+              <div style="font-size:1.15rem;">💰</div>
+              <div style="font-size:0.73rem; font-weight:800; color:#047857;">ፋይናንስ/ሂሳብ</div>
+              <div style="font-size:0.62rem; color:#64748B;">0911446688</div>
+            </button>
+            <button type="button" class="demo-chip-btn" onclick="selectFullRoleLogin('student')" style="background:white; border:1.5px solid #CBD5E1; border-radius:10px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.15s ease;">
+              <div style="font-size:1.15rem;">👨‍🎓</div>
+              <div style="font-size:0.73rem; font-weight:800; color:#0284C7;">ተማሪ/ወላጅ</div>
+              <div style="font-size:0.62rem; color:#64748B;">0911002233</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mode Toggle Segment (Email vs Phone) -->
+        <div style="display:flex; background:#E2E8F0; border-radius:10px; padding:3px; margin-bottom:1rem; gap:4px;">
+          <button type="button" id="tabFullLoginEmail" onclick="setFullPageLoginMode('admin')" style="flex:1; border:none; padding:8px 10px; border-radius:8px; font-size:0.82rem; font-weight:800; cursor:pointer; background:#1E3A8A; color:white; box-shadow:0 1px 3px rgba(0,0,0,0.15);">
+            👑 ሲስተም አድሚን (ኢሜል)
+          </button>
+          <button type="button" id="tabFullLoginPhone" onclick="setFullPageLoginMode('phone')" style="flex:1; border:none; padding:8px 10px; border-radius:8px; font-size:0.82rem; font-weight:700; cursor:pointer; background:transparent; color:#64748B;">
+            📱 መምህራን እና ሰራተኞች (ስልክ)
+          </button>
+        </div>
+
+        <!-- Mode Notice Banner -->
+        <div id="fullLoginNotice" style="background:#FEF3C7; border:1px solid #FCD34D; border-radius:10px; padding:9px 12px; margin-bottom:1rem; font-size:0.78rem; color:#92400E; display:flex; align-items:center; gap:8px;">
+          <span>👑</span><span>የሲስተም አድሚን ብቻ በይፋዊ ኢሜል እና በይለፍ ቃል ይገባል (admin@dilijent.edu.et)</span>
+        </div>
+
+        <!-- Hidden selector for role validation -->
+        <select id="fullLoginRoleSelect" style="display:none;">
+          <option value="admin" selected>👑 ሲስተም አድሚን</option>
+          <option value="principal">👔 ርዕሰ መምህር</option>
+          <option value="vice_principal">🎓 ምክትል ር/መምህር</option>
+          <option value="teacher">👨‍🏫 መምህር</option>
+          <option value="secretary">✍️ ጸሐፊ / ሬጅስትራር</option>
+          <option value="finance">💰 ፋይናንስ / ሂሳብ ሹም</option>
+          <option value="support">🧹 ፅዳት እና ጥበቃ</option>
+          <option value="student">👨‍🎓 ተማሪ / ወላጅ</option>
+        </select>
+
+        <form id="fullLoginForm" onsubmit="handleFullLoginSubmit(event)">
+          <!-- Admin Email Field -->
+          <div id="fullLoginEmailGroup" class="form-group" style="margin-bottom:0.95rem;">
+            <label style="font-size:0.82rem; font-weight:700; color:#1E3A8A; display:block; margin-bottom:5px;">
+              ✉️ የአድሚን ኢሜል አድራሻ (Admin Email) *
+            </label>
+            <input type="email" id="inputFullLoginEmail" class="form-control" placeholder="admin@dilijent.edu.et" value="admin@dilijent.edu.et" style="font-size:0.92rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
+          </div>
+
+          <!-- Phone Field -->
+          <div id="fullLoginPhoneGroup" class="form-group" style="display:none; margin-bottom:0.95rem;">
+            <label style="font-size:0.82rem; font-weight:700; color:#1E3A8A; display:block; margin-bottom:5px;">
+              📞 የተጠቃሚው የስልክ ቁጥር (Phone Number) *
+            </label>
+            <input type="tel" id="inputFullLoginPhone" class="form-control" placeholder="09XXXXXXXX" value="0911000000" style="font-size:0.92rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
+          </div>
+
+          <!-- Password Field with Toggle -->
+          <div class="form-group" style="margin-bottom:0.95rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+              <label style="font-size:0.82rem; font-weight:700; color:#1E3A8A; margin:0;">🔒 ሚስጥራዊ የይለፍ ቃል (Password) *</label>
+              <span style="font-size:0.7rem; color:#16A34A; font-weight:700;">ቢያንስ 8 ፊደላት</span>
+            </div>
+            <div style="position:relative;">
+              <input type="password" id="inputFullLoginPass" class="form-control" required placeholder="የይለፍ ቃልዎን እዚህ ያስገቡ" value="Admin@2026" minlength="8" style="padding-right:48px; font-size:0.95rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
+              <button type="button" id="btnToggleFullPass" onclick="toggleFullPassVisibility()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.2rem; color:#64748B; padding:4px;" title="የይለፍ ቃል አሳይ/ደብቅ">
+                👁️
+              </button>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.15rem; font-size:0.76rem; color:#64748B;">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; margin:0;">
+              <input type="checkbox" id="checkFullRemember" checked style="accent-color:#1E3A8A; width:15px; height:15px;">
+              <span>በዚህ መሳሪያ አስታውሰኝ (Remember Me)</span>
+            </label>
+            <span style="color:#0284C7; font-weight:700; cursor:pointer;" onclick="alert('የይለፍ ቃልዎን ከረሱ እባክዎ ዋናውን ሲስተም አድሚን (admin@dilijent.edu.et) ያነጋግሩ። አድሚኑ በተጠቃሚዎች የይለፍ ቃል መቆጣጠሪያው በኩል አዲስ የይለፍ ቃል ሊሰጥዎ ይችላል።')">የይለፍ ቃል ረሳሁ?</span>
+          </div>
+
+          <button type="submit" class="btn-primary" style="width:100%; padding:0.85rem; font-size:1rem; font-weight:800; border-radius:10px; background:linear-gradient(135deg, #0F1E4A 0%, #1E3A8A 50%, #2563EB 100%); border:none; box-shadow:0 4px 14px rgba(30,58,138,0.35); cursor:pointer;">
+            🔐 ደህንነቱ በተጠበቀ ሁኔታ ግባ (Secure Sign In)
+          </button>
+        </form>
+
+        <!-- Secondary Actions (Quick 1-Click & Guest Browse) -->
+        <div style="margin-top:1.1rem; display:flex; gap:8px;">
+          <button type="button" class="btn-accent" onclick="quickOneClickAdminLogin()" style="flex:1; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.78rem; font-weight:700; cursor:pointer; text-align:center;">
+            ⚡ በ1 ጠቅታ እንደ አድሚን ግባ
+          </button>
+          <button type="button" class="btn-secondary" onclick="enterGuestModeWeb()" style="flex:1; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.78rem; font-weight:700; cursor:pointer; text-align:center;">
+            👥 እንደ እንግዳ ተመልከት
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP WRAPPER (Header + Dashboard + Tables, shown when logged in or guest) -->
+  <div id="mainAppWrapper" style="display:none;">
+
   <!-- Header -->
   <header>
     <div class="header-content">
@@ -1717,6 +1882,7 @@
     <p>© 2026 ዲሊጀንት ትምህርት ቤት (Dilijent School Management System). All Rights Reserved.</p>
     <p style="margin-top:0.25rem;">አዲስ አበባ፣ ኢትዮጵያ • Addis Ababa, Ethiopia</p>
   </footer>
+  </div> <!-- /mainAppWrapper -->
 
   <script>
     // Assessment Scheme Presets (Flexible & Modular for Admin & Principal)
@@ -6379,8 +6545,182 @@
       }
     });
     localStorage.setItem('dilijent_user_accounts', JSON.stringify(userAccounts));
-    let currentWebUser = JSON.parse(localStorage.getItem('dilijent_current_user')) || userAccounts[0];
-    let currentLoginMode = 'phone';
+    let isGuestMode = false;
+    let currentWebUser = JSON.parse(localStorage.getItem('dilijent_current_user')) || null;
+    let currentLoginMode = 'admin';
+
+    function setFullPageLoginMode(mode) {
+      currentLoginMode = mode;
+      const tabEmail = document.getElementById('tabFullLoginEmail');
+      const tabPhone = document.getElementById('tabFullLoginPhone');
+      const emailGroup = document.getElementById('fullLoginEmailGroup');
+      const phoneGroup = document.getElementById('fullLoginPhoneGroup');
+      const notice = document.getElementById('fullLoginNotice');
+      const select = document.getElementById('fullLoginRoleSelect');
+
+      if (mode === 'admin') {
+        if (select) select.value = 'admin';
+        if (tabEmail) {
+          tabEmail.style.background = '#1E3A8A';
+          tabEmail.style.color = 'white';
+        }
+        if (tabPhone) {
+          tabPhone.style.background = 'transparent';
+          tabPhone.style.color = '#64748B';
+        }
+        if (emailGroup) emailGroup.style.display = 'block';
+        if (phoneGroup) phoneGroup.style.display = 'none';
+        if (notice) {
+          notice.style.background = '#FEF3C7';
+          notice.style.borderColor = '#FCD34D';
+          notice.style.color = '#92400E';
+          notice.innerHTML = '<span>👑</span><span>የሲስተም አድሚን ብቻ በይፋዊ ኢሜል እና በይለፍ ቃል ይገባል (admin@dilijent.edu.et)</span>';
+        }
+      } else {
+        if (select && select.value === 'admin') select.value = 'teacher';
+        if (tabPhone) {
+          tabPhone.style.background = '#1E3A8A';
+          tabPhone.style.color = 'white';
+        }
+        if (tabEmail) {
+          tabEmail.style.background = 'transparent';
+          tabEmail.style.color = '#64748B';
+        }
+        if (emailGroup) emailGroup.style.display = 'none';
+        if (phoneGroup) phoneGroup.style.display = 'block';
+        if (notice) {
+          notice.style.background = '#EFF6FF';
+          notice.style.borderColor = '#BFDBFE';
+          notice.style.color = '#1E40AF';
+          const selectedText = select ? (select.options[select.selectedIndex]?.text || 'መምህር') : 'መምህር/ሰራተኛ';
+          notice.innerHTML = `<span>📱</span><span>የተመረጠው ሚና፡ <strong>${selectedText}</strong> — በስልክ ቁጥርዎ እና በይለፍ ቃልዎ ይግቡ</span>`;
+        }
+      }
+    }
+
+    function selectFullRoleLogin(roleKey) {
+      // Highlight selected chip
+      document.querySelectorAll('.demo-chip-btn').forEach(c => {
+        c.style.borderColor = '#CBD5E1';
+        c.style.background = 'white';
+      });
+      if (event && event.currentTarget) {
+        event.currentTarget.style.borderColor = '#D97706';
+        event.currentTarget.style.background = '#FFFBEB';
+      }
+
+      const emailInput = document.getElementById('inputFullLoginEmail');
+      const phoneInput = document.getElementById('inputFullLoginPhone');
+      const passInput = document.getElementById('inputFullLoginPass');
+      const select = document.getElementById('fullLoginRoleSelect');
+
+      if (roleKey === 'admin') {
+        if (select) select.value = 'admin';
+        setFullPageLoginMode('admin');
+        if (emailInput) emailInput.value = 'admin@dilijent.edu.et';
+        if (passInput) passInput.value = 'Admin@2026';
+      } else {
+        setFullPageLoginMode('phone');
+        let searchRole = roleKey;
+        if (roleKey === 'teacher_math' || roleKey === 'teacher_eng') searchRole = 'teacher';
+        if (select) select.value = searchRole;
+
+        let matched = null;
+        if (roleKey === 'principal') {
+          matched = userAccounts.find(u => (u.role || '').includes('ርዕሰ') && !(u.role || '').includes('ምክትል'));
+        } else if (roleKey === 'vice_principal') {
+          matched = userAccounts.find(u => u.isVicePrincipal || (u.role || '').includes('ምክትል'));
+        } else if (roleKey === 'teacher_math') {
+          matched = userAccounts.find(u => (u.name || '').includes('ዳዊት') || (u.role || '').includes('ሒሳብ')) || userAccounts.find(u => (u.role || '').includes('መምህር'));
+        } else if (roleKey === 'teacher_eng') {
+          matched = userAccounts.find(u => (u.name || '').includes('ሳራ') || (u.role || '').includes('እንግሊዝ') || (u.role || '').includes('ፊዚክስ')) || userAccounts.find(u => (u.role || '').includes('መምህር'));
+        } else if (roleKey === 'secretary') {
+          matched = userAccounts.find(u => (u.role || '').includes('ጸሐፊ') || (u.role || '').includes('ሬጅስትራር'));
+        } else if (roleKey === 'finance') {
+          matched = userAccounts.find(u => (u.role || '').includes('ፋይናንስ') || (u.role || '').includes('ሂሳብ'));
+        } else if (roleKey === 'student') {
+          matched = userAccounts.find(u => (u.role || '').includes('ተማሪ') || (u.role || '').includes('ወላጅ'));
+        }
+
+        if (phoneInput && matched) phoneInput.value = matched.phone || '0911000000';
+        if (passInput && matched) passInput.value = matched.pass || 'Teacher@2026';
+      }
+    }
+
+    function toggleFullPassVisibility() {
+      const passInput = document.getElementById('inputFullLoginPass');
+      const btn = document.getElementById('btnToggleFullPass');
+      if (!passInput) return;
+      if (passInput.type === 'password') {
+        passInput.type = 'text';
+        if (btn) btn.innerText = '🙈';
+      } else {
+        passInput.type = 'password';
+        if (btn) btn.innerText = '👁️';
+      }
+    }
+
+    function handleFullLoginSubmit(e) {
+      e.preventDefault();
+      const select = document.getElementById('fullLoginRoleSelect');
+      const roleKey = select ? select.value : 'admin';
+      const pass = document.getElementById('inputFullLoginPass').value.trim();
+
+      if (!pass) {
+        alert('እባክዎ የይለፍ ቃልዎን ያስገቡ!');
+        return;
+      }
+
+      if (currentLoginMode === 'admin') {
+        const email = document.getElementById('inputFullLoginEmail').value.trim().toLowerCase();
+        if (!email) {
+          alert('እባክዎ የአድሚን ኢሜል አድራሻ ያስገቡ!');
+          return;
+        }
+        const found = userAccounts.find(u => u.isAdmin && u.email && u.email.toLowerCase() === email && u.pass === pass);
+        if (found) {
+          currentWebUser = found;
+          isGuestMode = false;
+          localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
+          updateCurrentUserUI();
+          alert(`🎉 እንኳን ደህና መጡ! ወደ ዲሊጀንት ትምህርት ቤት ስርዓት በ${found.email} በተሳካ ሁኔታ ገብተዋል።`);
+        } else {
+          alert('⛔ የተሳሳተ የአድሚን ኢሜል ወይም የይለፍ ቃል! እባክዎ መረጃዎን አረጋግጠው እንደገና ይሞክሩ።');
+        }
+      } else {
+        const phone = document.getElementById('inputFullLoginPhone').value.trim();
+        if (!phone) {
+          alert('እባክዎ የስልክ ቁጥርዎን ያስገቡ!');
+          return;
+        }
+        const cleanPhone = phone.replace(/\s+/g, '');
+        const found = userAccounts.find(u => {
+          if (u.isAdmin) return false;
+          const uPhone = (u.phone || '').replace(/\s+/g, '');
+          const phoneMatches = uPhone === cleanPhone || (cleanPhone.length >= 9 && uPhone.includes(cleanPhone.slice(-9))) || (uPhone.length >= 9 && cleanPhone.includes(uPhone.slice(-9)));
+          return phoneMatches && u.pass === pass;
+        });
+
+        if (!found) {
+          alert('⛔ የተሳሳተ የስልክ ቁጥር ወይም የይለፍ ቃል! እባክዎ መረጃዎን አረጋግጠው እንደገና ይሞክሩ።');
+          return;
+        }
+
+        currentWebUser = found;
+        isGuestMode = false;
+        localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
+        updateCurrentUserUI();
+        if (typeof renderAttendance === 'function') renderAttendance();
+        if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
+        alert(`🎉 እንኳን ደህና መጡ! ${found.name} (${found.role}) በተሳካ ሁኔታ ገብተዋል።`);
+      }
+    }
+
+    function enterGuestModeWeb() {
+      isGuestMode = true;
+      updateCurrentUserUI();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
     function canAccessStaffAttendanceWeb() {
       if (!currentWebUser) return false;
@@ -6418,6 +6758,17 @@
     }
 
     function updateCurrentUserUI() {
+      const fullLoginPage = document.getElementById('fullLoginPage');
+      const mainAppWrapper = document.getElementById('mainAppWrapper');
+
+      if (currentWebUser || isGuestMode) {
+        if (fullLoginPage) fullLoginPage.style.display = 'none';
+        if (mainAppWrapper) mainAppWrapper.style.display = 'block';
+      } else {
+        if (fullLoginPage) fullLoginPage.style.display = 'flex';
+        if (mainAppWrapper) mainAppWrapper.style.display = 'none';
+      }
+
       const pill = document.getElementById('currentRoleDisplay');
       const isAdmin = isCurrentUserAdminWeb();
 
@@ -6458,48 +6809,20 @@
     function logoutWeb() {
       localStorage.removeItem('dilijent_current_user');
       currentWebUser = null;
+      isGuestMode = false;
       updateCurrentUserUI();
-      alert('🚪 በተሳካ ሁኔታ ከስርዓቱ ወጥተዋል! (Logged out successfully)');
-      openLoginModal();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      alert('🚪 በተሳካ ሁኔታ ከስርዓቱ ወጥተዋል! ወደ መግቢያ ገጽ ተመልሰዋል።');
     }
 
     function quickFillWebAccount(roleKey) {
-      const select = document.getElementById('loginRoleSelect');
-      if (select) select.value = roleKey;
-
-      // Update chip highlights
-      document.querySelectorAll('.demo-role-chip').forEach(c => {
-        c.style.borderColor = '#CBD5E1';
-        c.style.background = 'white';
-      });
-
-      const emailInput = document.getElementById('inputWebLoginEmail');
-      const phoneInput = document.getElementById('inputWebLoginPhone');
-      const passInput = document.getElementById('inputWebLoginPass');
-
-      if (roleKey === 'admin') {
-        setWebLoginMode('admin');
-        if (emailInput) emailInput.value = 'admin@dilijent.edu.et';
-        if (passInput) passInput.value = 'Admin@2026';
-      } else {
-        setWebLoginMode('phone');
-        let matched = userAccounts.find(u => {
-          if (roleKey === 'principal') return (u.role || '').includes('ርዕሰ') && !(u.role || '').includes('ምክትል');
-          if (roleKey === 'vice_principal') return u.isVicePrincipal || (u.role || '').includes('ምክትል');
-          if (roleKey === 'teacher') return (u.role || '').includes('መምህር');
-          if (roleKey === 'secretary') return (u.role || '').includes('ጸሐፊ');
-          if (roleKey === 'student') return (u.role || '').includes('ተማሪ');
-          return false;
-        });
-
-        if (phoneInput && matched) phoneInput.value = matched.phone || '';
-        if (passInput && matched) passInput.value = matched.pass || 'Teacher@2026';
-      }
+      selectFullRoleLogin(roleKey);
     }
 
     function quickOneClickAdminLogin() {
       const adminAcc = userAccounts.find(u => u.isAdmin) || DEFAULT_ACCOUNTS[0];
       currentWebUser = adminAcc;
+      isGuestMode = false;
       localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
       updateCurrentUserUI();
       closeLoginModal();
@@ -6507,72 +6830,24 @@
     }
 
     function setWebLoginMode(mode) {
-      currentLoginMode = mode;
-      const tabAdmin = document.getElementById('tabLoginAdminEmail');
-      const tabStaff = document.getElementById('tabLoginStaffPhone');
-      const emailGroup = document.getElementById('loginEmailGroup');
-      const phoneGroup = document.getElementById('loginPhoneGroup');
-      const notice = document.getElementById('loginModeNotice');
-      const select = document.getElementById('loginRoleSelect');
-
-      if (mode === 'admin') {
-        if (select) select.value = 'admin';
-        if (tabAdmin) {
-          tabAdmin.style.background = '#1E3A8A';
-          tabAdmin.style.color = 'white';
-        }
-        if (tabStaff) {
-          tabStaff.style.background = 'transparent';
-          tabStaff.style.color = '#64748B';
-        }
-        if (emailGroup) emailGroup.style.display = 'block';
-        if (phoneGroup) phoneGroup.style.display = 'none';
-        if (notice) {
-          notice.style.background = '#FEF3C7';
-          notice.style.borderColor = '#FCD34D';
-          notice.style.color = '#92400E';
-          notice.innerHTML = '<span>👑</span><span>የሲስተም አድሚን ብቻ በይፋዊ ኢሜል እና በይለፍ ቃል ይገባል (admin@dilijent.edu.et)</span>';
-        }
-      } else {
-        if (select && select.value === 'admin') select.value = 'teacher';
-        if (tabStaff) {
-          tabStaff.style.background = '#1E3A8A';
-          tabStaff.style.color = 'white';
-        }
-        if (tabAdmin) {
-          tabAdmin.style.background = 'transparent';
-          tabAdmin.style.color = '#64748B';
-        }
-        if (emailGroup) emailGroup.style.display = 'none';
-        if (phoneGroup) phoneGroup.style.display = 'block';
-        if (notice) {
-          notice.style.background = '#EFF6FF';
-          notice.style.borderColor = '#BFDBFE';
-          notice.style.color = '#1E40AF';
-          const selectedText = select ? select.options[select.selectedIndex]?.text : 'መምህር/ሰራተኛ';
-          notice.innerHTML = `<span>📱</span><span>የተመረጠው ሚና፡ <strong>${selectedText}</strong> — በስልክ ቁጥርዎ እና በይለፍ ቃልዎ ይግቡ</span>`;
-        }
-      }
+      setFullPageLoginMode(mode);
     }
 
     function handleLoginRoleChange() {
-      const select = document.getElementById('loginRoleSelect');
-      if (!select) return;
-      const roleKey = select.value;
-      if (roleKey === 'admin') {
-        setWebLoginMode('admin');
-      } else {
-        setWebLoginMode('phone');
-      }
+      handleFullLoginSubmit();
     }
 
     function openLoginModal() {
-      document.getElementById('loginModal').style.display = 'flex';
-      setWebLoginMode(currentLoginMode);
+      isGuestMode = false;
+      updateCurrentUserUI();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function closeLoginModal() {
-      document.getElementById('loginModal').style.display = 'none';
+      if (!currentWebUser && !isGuestMode) {
+        isGuestMode = true;
+      }
+      updateCurrentUserUI();
     }
 
     function handleWebLoginSubmit(e) {
@@ -7070,7 +7345,7 @@
 
     function applySchoolSettingsWeb() {
       // 1. Logo Badges
-      const logoBadges = document.querySelectorAll('.logo-badge, #headerLogoBadge, #reportSchoolLogoBadge, #loginSchoolLogoBadge');
+      const logoBadges = document.querySelectorAll('.logo-badge, #headerLogoBadge, #reportSchoolLogoBadge, #loginSchoolLogoBadge, #fullLoginSchoolLogoBadge');
       logoBadges.forEach(badge => {
         if (schoolSettings.logoData) {
           badge.innerHTML = `<img src="${schoolSettings.logoData}" alt="School Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />`;
@@ -7083,6 +7358,9 @@
       const h1El = document.getElementById('headerSchoolName');
       if (h1El) h1El.innerText = schoolSettings.nameAm;
 
+      const fullLoginName = document.getElementById('fullLoginSchoolName');
+      if (fullLoginName) fullLoginName.innerText = schoolSettings.nameAm;
+
       const repName = document.getElementById('reportSchoolNameDisplay');
       if (repName) repName.innerText = `${schoolSettings.nameAm} (${schoolSettings.nameEn})`;
 
@@ -7092,6 +7370,11 @@
       // 3. Subtitles, Academic Year & Levels
       const levelText = schoolSettings.gradeLevel === '1_8' ? '1ኛ - 8ኛ ክፍል' : (schoolSettings.gradeLevel === '9_12' ? '9ኛ - 12ኛ ክፍል' : 'KG - 12ኛ ክፍል');
       const year = schoolSettings.academicYear || '2017 ዓ.ም';
+
+      const fullLoginEn = document.getElementById('fullLoginNameEn');
+      if (fullLoginEn) fullLoginEn.innerText = schoolSettings.nameEn;
+      const fullLoginLvl = document.getElementById('fullLoginGradeLevel');
+      if (fullLoginLvl) fullLoginLvl.innerText = levelText;
 
       const subEl = document.getElementById('headerSchoolSubtitle');
       if (subEl) subEl.innerText = `${schoolSettings.nameEn} • ${levelText} • ${year} • Addis Ababa`;
