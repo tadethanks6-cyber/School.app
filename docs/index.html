@@ -258,108 +258,59 @@
           </div>
         </div>
 
-        <!-- Quick Demo Role Profiles (Interactive Chips exactly like Android app) -->
-        <div style="margin-bottom:1.1rem; background:#F8FAFC; border:1.5px solid #E2E8F0; border-radius:14px; padding:10px 12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span style="font-size:0.75rem; font-weight:800; color:#1E3A8A; text-transform:uppercase; letter-spacing:0.4px;">⚡ ፈጣን የሙከራ መለያዎች (Quick Role Selection)</span>
-            <span style="font-size:0.68rem; color:#64748B;">ለመምረጥ ይጫኑ</span>
-          </div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr)); gap:6px;" id="fullDemoRolesGrid">
-            <button type="button" class="demo-chip-btn active-chip" onclick="selectFullRoleLogin('admin')" style="background:white; border:1.8px solid #D97706; border-radius:10px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.15s ease;">
-              <div style="font-size:1.15rem;">👑</div>
-              <div style="font-size:0.73rem; font-weight:800; color:#B45309;">አድሚን (እኔ)</div>
-              <div style="font-size:0.62rem; color:#64748B;">admin@dilijent</div>
-            </button>
-            <button type="button" class="demo-chip-btn" onclick="selectFullRoleLogin('principal')" style="background:white; border:1.5px solid #CBD5E1; border-radius:10px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.15s ease;">
-              <div style="font-size:1.15rem;">👔</div>
-              <div style="font-size:0.73rem; font-weight:800; color:#1E3A8A;">ርዕሰ መምህር</div>
-              <div style="font-size:0.62rem; color:#64748B;">0911000000</div>
-            </button>
-            <button type="button" class="demo-chip-btn" onclick="selectFullRoleLogin('vice_principal')" style="background:white; border:1.5px solid #CBD5E1; border-radius:10px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.15s ease;">
-              <div style="font-size:1.15rem;">🎓</div>
-              <div style="font-size:0.73rem; font-weight:800; color:#4338CA;">ም/ር/መምህር</div>
-              <div style="font-size:0.62rem; color:#64748B;">0918000000</div>
-            </button>
-            <button type="button" class="demo-chip-btn" onclick="selectFullRoleLogin('teacher_math')" style="background:white; border:1.5px solid #CBD5E1; border-radius:10px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.15s ease;">
-              <div style="font-size:1.15rem;">👨‍🏫</div>
-              <div style="font-size:0.73rem; font-weight:800; color:#6D28D9;">መምህር (ሒሳብ)</div>
-              <div style="font-size:0.62rem; color:#64748B;">0911223344</div>
-            </button>
-            <button type="button" class="demo-chip-btn" onclick="selectFullRoleLogin('teacher_eng')" style="background:white; border:1.5px solid #CBD5E1; border-radius:10px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.15s ease;">
-              <div style="font-size:1.15rem;">👩‍🏫</div>
-              <div style="font-size:0.73rem; font-weight:800; color:#7C3AED;">መምህርት (እንግሊዝ)</div>
-              <div style="font-size:0.62rem; color:#64748B;">0922334455</div>
-            </button>
-            <button type="button" class="demo-chip-btn" onclick="selectFullRoleLogin('secretary')" style="background:white; border:1.5px solid #CBD5E1; border-radius:10px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.15s ease;">
-              <div style="font-size:1.15rem;">✍️</div>
-              <div style="font-size:0.73rem; font-weight:800; color:#0D9488;">ጸሐፊ/ሬጅስትራር</div>
-              <div style="font-size:0.62rem; color:#64748B;">0911335577</div>
-            </button>
-            <button type="button" class="demo-chip-btn" onclick="selectFullRoleLogin('finance')" style="background:white; border:1.5px solid #CBD5E1; border-radius:10px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.15s ease;">
-              <div style="font-size:1.15rem;">💰</div>
-              <div style="font-size:0.73rem; font-weight:800; color:#047857;">ፋይናንስ/ሂሳብ</div>
-              <div style="font-size:0.62rem; color:#64748B;">0911446688</div>
-            </button>
-            <button type="button" class="demo-chip-btn" onclick="selectFullRoleLogin('student')" style="background:white; border:1.5px solid #CBD5E1; border-radius:10px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.15s ease;">
-              <div style="font-size:1.15rem;">👨‍🎓</div>
-              <div style="font-size:0.73rem; font-weight:800; color:#0284C7;">ተማሪ/ወላጅ</div>
-              <div style="font-size:0.62rem; color:#64748B;">0911002233</div>
-            </button>
+        <!-- Roles Dropdown Selector (ድሮፕ ዳውን) -->
+        <div style="margin-bottom:1.15rem; background:#F8FAFC; border:2px solid #E2E8F0; border-radius:14px; padding:12px 14px;">
+          <label for="fullLoginRoleSelect" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; cursor:pointer;">
+            <span style="font-size:0.86rem; font-weight:800; color:#1E3A8A; display:flex; align-items:center; gap:6px;">
+              <span>🎭</span><span>የመግቢያ የስራ ድርሻ ይምረጡ (Select Role) *</span>
+            </span>
+            <span style="font-size:0.7rem; color:#64748B; font-weight:700; background:#E2E8F0; padding:2px 8px; border-radius:10px;">ድሮፕ ዳውን</span>
+          </label>
+          <div style="position:relative;">
+            <select id="fullLoginRoleSelect" class="form-control" onchange="handleFullLoginRoleDropdownChange()" style="font-size:0.95rem; padding:0.75rem 2.2rem 0.75rem 0.95rem; border-radius:10px; font-weight:800; border:2px solid #3B82F6; background:#FFFFFF; color:#0F172A; cursor:pointer; width:100%; box-shadow:0 2px 6px rgba(59,130,246,0.12); appearance:none; -webkit-appearance:none;">
+              <option value="teacher" selected>👨‍🏫 መምህር / መምህርት (Teacher - በስልክ)</option>
+              <option value="admin">👑 ሲስተም አድሚን (System Administrator - በኢሜል)</option>
+              <option value="principal">👔 ርዕሰ መምህር (School Principal - በስልክ)</option>
+              <option value="vice_principal">🎓 ምክትል ርዕሰ መምህር (Vice Principal - በስልክ)</option>
+              <option value="secretary">✍️ ዋና ጸሐፊ / ሬጅስትራር (Secretary / Registrar - በስልክ)</option>
+              <option value="finance">💰 ፋይናንስ / ሂሳብ ሹም (Finance / Accountant - በስልክ)</option>
+              <option value="support">🧹 ፅዳት እና ጥበቃ (Support Staff - በስልክ)</option>
+              <option value="student">👨‍🎓 ተማሪ / ወላጅ (Student / Parent - በስልክ)</option>
+            </select>
+            <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); pointer-events:none; font-size:1.1rem; color:#3B82F6;">▼</span>
           </div>
         </div>
 
-        <!-- Mode Toggle Segment (Email vs Phone) -->
-        <div style="display:flex; background:#E2E8F0; border-radius:10px; padding:3px; margin-bottom:1rem; gap:4px;">
-          <button type="button" id="tabFullLoginEmail" onclick="setFullPageLoginMode('admin')" style="flex:1; border:none; padding:8px 10px; border-radius:8px; font-size:0.82rem; font-weight:800; cursor:pointer; background:#1E3A8A; color:white; box-shadow:0 1px 3px rgba(0,0,0,0.15);">
-            👑 ሲስተም አድሚን (ኢሜል)
-          </button>
-          <button type="button" id="tabFullLoginPhone" onclick="setFullPageLoginMode('phone')" style="flex:1; border:none; padding:8px 10px; border-radius:8px; font-size:0.82rem; font-weight:700; cursor:pointer; background:transparent; color:#64748B;">
-            📱 መምህራን እና ሰራተኞች (ስልክ)
-          </button>
+        <!-- Role Guidance Notice Banner -->
+        <div id="fullLoginNotice" style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:10px 14px; margin-bottom:1.15rem; font-size:0.8rem; color:#1E40AF; display:flex; align-items:center; gap:8px;">
+          <span>📱</span><span>የተመረጠው ሚና፡ <strong>መምህር / መምህርት</strong> — እባክዎ የተመዘገበ ስልክ ቁጥር እና የይለፍ ቃል ያስገቡ (ግዴታ ነው)</span>
         </div>
-
-        <!-- Mode Notice Banner -->
-        <div id="fullLoginNotice" style="background:#FEF3C7; border:1px solid #FCD34D; border-radius:10px; padding:9px 12px; margin-bottom:1rem; font-size:0.78rem; color:#92400E; display:flex; align-items:center; gap:8px;">
-          <span>👑</span><span>የሲስተም አድሚን ብቻ በይፋዊ ኢሜል እና በይለፍ ቃል ይገባል (admin@dilijent.edu.et)</span>
-        </div>
-
-        <!-- Hidden selector for role validation -->
-        <select id="fullLoginRoleSelect" style="display:none;">
-          <option value="admin" selected>👑 ሲስተም አድሚን</option>
-          <option value="principal">👔 ርዕሰ መምህር</option>
-          <option value="vice_principal">🎓 ምክትል ር/መምህር</option>
-          <option value="teacher">👨‍🏫 መምህር</option>
-          <option value="secretary">✍️ ጸሐፊ / ሬጅስትራር</option>
-          <option value="finance">💰 ፋይናንስ / ሂሳብ ሹም</option>
-          <option value="support">🧹 ፅዳት እና ጥበቃ</option>
-          <option value="student">👨‍🎓 ተማሪ / ወላጅ</option>
-        </select>
 
         <form id="fullLoginForm" onsubmit="handleFullLoginSubmit(event)">
-          <!-- Admin Email Field -->
-          <div id="fullLoginEmailGroup" class="form-group" style="margin-bottom:0.95rem;">
+          <!-- Admin Email Field (hidden by default for teacher) -->
+          <div id="fullLoginEmailGroup" class="form-group" style="display:none; margin-bottom:0.95rem;">
             <label style="font-size:0.82rem; font-weight:700; color:#1E3A8A; display:block; margin-bottom:5px;">
-              ✉️ የአድሚን ኢሜል አድራሻ (Admin Email) *
+              ✉️ የአድሚን ይፋዊ ኢሜል አድራሻ (Admin Email) *
             </label>
-            <input type="email" id="inputFullLoginEmail" class="form-control" placeholder="admin@dilijent.edu.et" value="admin@dilijent.edu.et" style="font-size:0.92rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
+            <input type="email" id="inputFullLoginEmail" class="form-control" placeholder="ለምሳሌ፡ admin@dilijent.edu.et" value="" style="font-size:0.92rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
           </div>
 
-          <!-- Phone Field -->
-          <div id="fullLoginPhoneGroup" class="form-group" style="display:none; margin-bottom:0.95rem;">
-            <label style="font-size:0.82rem; font-weight:700; color:#1E3A8A; display:block; margin-bottom:5px;">
+          <!-- Phone Field (visible by default) -->
+          <div id="fullLoginPhoneGroup" class="form-group" style="display:block; margin-bottom:0.95rem;">
+            <label id="lblFullLoginPhone" style="font-size:0.82rem; font-weight:700; color:#1E3A8A; display:block; margin-bottom:5px;">
               📞 የተጠቃሚው የስልክ ቁጥር (Phone Number) *
             </label>
-            <input type="tel" id="inputFullLoginPhone" class="form-control" placeholder="09XXXXXXXX" value="0911000000" style="font-size:0.92rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
+            <input type="tel" id="inputFullLoginPhone" class="form-control" placeholder="ለምሳሌ፡ 09XXXXXXXX" value="" style="font-size:0.92rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
           </div>
 
-          <!-- Password Field with Toggle -->
+          <!-- Password Field with Toggle (Empty by default, typing is mandatory!) -->
           <div class="form-group" style="margin-bottom:0.95rem;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
               <label style="font-size:0.82rem; font-weight:700; color:#1E3A8A; margin:0;">🔒 ሚስጥራዊ የይለፍ ቃል (Password) *</label>
-              <span style="font-size:0.7rem; color:#16A34A; font-weight:700;">ቢያንስ 8 ፊደላት</span>
+              <span style="font-size:0.7rem; color:#16A34A; font-weight:700;">የግዴታ መስክ</span>
             </div>
             <div style="position:relative;">
-              <input type="password" id="inputFullLoginPass" class="form-control" required placeholder="የይለፍ ቃልዎን እዚህ ያስገቡ" value="Admin@2026" minlength="8" style="padding-right:48px; font-size:0.95rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
+              <input type="password" id="inputFullLoginPass" class="form-control" required placeholder="የይለፍ ቃልዎን እዚህ ይተይቡ" value="" minlength="6" style="padding-right:48px; font-size:0.95rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
               <button type="button" id="btnToggleFullPass" onclick="toggleFullPassVisibility()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.2rem; color:#64748B; padding:4px;" title="የይለፍ ቃል አሳይ/ደብቅ">
                 👁️
               </button>
@@ -379,15 +330,74 @@
           </button>
         </form>
 
-        <!-- Secondary Actions (Quick 1-Click & Guest Browse) -->
-        <div style="margin-top:1.1rem; display:flex; gap:8px;">
-          <button type="button" class="btn-accent" onclick="quickOneClickAdminLogin()" style="flex:1; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.78rem; font-weight:700; cursor:pointer; text-align:center;">
-            ⚡ በ1 ጠቅታ እንደ አድሚን ግባ
-          </button>
-          <button type="button" class="btn-secondary" onclick="enterGuestModeWeb()" style="flex:1; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.78rem; font-weight:700; cursor:pointer; text-align:center;">
-            👥 እንደ እንግዳ ተመልከት
+        <!-- Secondary Actions (Guest Browse ONLY - no 1-click bypass!) -->
+        <div style="margin-top:1.1rem;">
+          <button type="button" class="btn-secondary" onclick="enterGuestModeWeb()" style="width:100%; padding:0.65rem 0.8rem; border-radius:8px; font-size:0.82rem; font-weight:700; cursor:pointer; text-align:center;">
+            👥 እንደ እንግዳ ተመልከት (Browse as Guest)
           </button>
         </div>
+
+        <!-- Collapsible Reference Guide (Manual typing required) -->
+        <details style="margin-top:1rem; background:#F8FAFC; border:1px solid #CBD5E1; border-radius:10px; padding:10px 12px; font-size:0.78rem;">
+          <summary style="font-weight:800; color:#1E3A8A; cursor:pointer;">
+            ℹ️ የተጠቃሚ መለያዎች ዝርዝር መመሪያ (Credentials Directory)
+          </summary>
+          <div style="margin-top:8px; line-height:1.6; color:#334155;">
+            <div style="font-size:0.74rem; color:#64748B; margin-bottom:6px;">ለፈተና የሚሆኑ ይፋዊ መለያዎች (በእጅዎ መተየብ ግዴታ ነው)፦</div>
+            <table style="width:100%; border-collapse:collapse; font-size:0.74rem;">
+              <tr style="border-bottom:1px solid #E2E8F0; background:#F1F5F9;">
+                <th style="padding:4px; text-align:left;">የስራ ድርሻ</th>
+                <th style="padding:4px; text-align:left;">መለያ (ስልክ/ኢሜል)</th>
+                <th style="padding:4px; text-align:left;">የይለፍ ቃል</th>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:4px;">👑 ሲስተም አድሚን</td>
+                <td style="padding:4px; font-family:monospace; color:#1E40AF;">admin@dilijent.edu.et</td>
+                <td style="padding:4px; font-family:monospace;">Admin@2026</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:4px;">👔 ርዕሰ መምህር</td>
+                <td style="padding:4px; font-family:monospace;">0911000000</td>
+                <td style="padding:4px; font-family:monospace;">Admin@2026</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:4px;">🎓 ም/ር/መምህር</td>
+                <td style="padding:4px; font-family:monospace;">0918000000</td>
+                <td style="padding:4px; font-family:monospace;">Admin@2026</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:4px;">👨‍🏫 መምህር (ሒሳብ)</td>
+                <td style="padding:4px; font-family:monospace;">0911223344</td>
+                <td style="padding:4px; font-family:monospace;">Teacher@2026</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:4px;">👩‍🏫 መምህርት (ፊዚክስ)</td>
+                <td style="padding:4px; font-family:monospace;">0922334455</td>
+                <td style="padding:4px; font-family:monospace;">Teacher@2026</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:4px;">✍️ ጸሐፊ / ሬጅስትራር</td>
+                <td style="padding:4px; font-family:monospace;">0911335577</td>
+                <td style="padding:4px; font-family:monospace;">Staff@2026</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:4px;">💰 ፋይናንስ / ሂሳብ</td>
+                <td style="padding:4px; font-family:monospace;">0911446688</td>
+                <td style="padding:4px; font-family:monospace;">Finance@2026</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:4px;">🧹 ፅዳት እና ጥበቃ</td>
+                <td style="padding:4px; font-family:monospace;">0911557799</td>
+                <td style="padding:4px; font-family:monospace;">Support@2026</td>
+              </tr>
+              <tr>
+                <td style="padding:4px;">👨‍🎓 ተማሪ / ወላጅ</td>
+                <td style="padding:4px; font-family:monospace;">0911002233</td>
+                <td style="padding:4px; font-family:monospace;">Student@2026</td>
+              </tr>
+            </table>
+          </div>
+        </details>
       </div>
     </div>
   </div>
@@ -1455,102 +1465,63 @@
           </div>
         </div>
 
-        <!-- Quick Demo Role Profiles (Like Android App Quick Selector) -->
-        <div style="margin-bottom:1.1rem; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:10px 12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span style="font-size:0.75rem; font-weight:800; color:#1E3A8A; text-transform:uppercase; letter-spacing:0.5px;">⚡ ፈጣን የሙከራ መለያዎች (Quick Role Selection)</span>
-            <span style="font-size:0.7rem; color:#64748B;">ለመምረጥ ይጫኑ</span>
-          </div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(115px, 1fr)); gap:6px;">
-            <button type="button" class="demo-role-chip" onclick="quickFillWebAccount('admin')" style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.2s ease;">
-              <div style="font-size:1.1rem;">👑</div>
-              <div style="font-size:0.72rem; font-weight:800; color:#B45309;">አድሚን</div>
-              <div style="font-size:0.62rem; color:#64748B;">admin@dilijent</div>
-            </button>
-            <button type="button" class="demo-role-chip" onclick="quickFillWebAccount('principal')" style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.2s ease;">
-              <div style="font-size:1.1rem;">👔</div>
-              <div style="font-size:0.72rem; font-weight:800; color:#1E3A8A;">ርዕሰ መምህር</div>
-              <div style="font-size:0.62rem; color:#64748B;">0911000000</div>
-            </button>
-            <button type="button" class="demo-role-chip" onclick="quickFillWebAccount('vice_principal')" style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.2s ease;">
-              <div style="font-size:1.1rem;">🎓</div>
-              <div style="font-size:0.72rem; font-weight:800; color:#4338CA;">ም/ር/መምህር</div>
-              <div style="font-size:0.62rem; color:#64748B;">0918000000</div>
-            </button>
-            <button type="button" class="demo-role-chip" onclick="quickFillWebAccount('teacher')" style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.2s ease;">
-              <div style="font-size:1.1rem;">👨‍🏫</div>
-              <div style="font-size:0.72rem; font-weight:800; color:#6D28D9;">መምህር</div>
-              <div style="font-size:0.62rem; color:#64748B;">0911223344</div>
-            </button>
-            <button type="button" class="demo-role-chip" onclick="quickFillWebAccount('secretary')" style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.2s ease;">
-              <div style="font-size:1.1rem;">✍️</div>
-              <div style="font-size:0.72rem; font-weight:800; color:#0D9488;">ጸሐፊ</div>
-              <div style="font-size:0.62rem; color:#64748B;">0911335577</div>
-            </button>
-            <button type="button" class="demo-role-chip" onclick="quickFillWebAccount('student')" style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:6px 4px; text-align:center; cursor:pointer; transition:all 0.2s ease;">
-              <div style="font-size:1.1rem;">👨‍🎓</div>
-              <div style="font-size:0.72rem; font-weight:800; color:#0284C7;">ተማሪ/ወላጅ</div>
-              <div style="font-size:0.62rem; color:#64748B;">0911002233</div>
-            </button>
+        <!-- Roles Dropdown Selector (ድሮፕ ዳውን) -->
+        <div style="margin-bottom:1.15rem; background:#F8FAFC; border:2px solid #E2E8F0; border-radius:14px; padding:12px 14px;">
+          <label for="loginRoleSelect" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; cursor:pointer;">
+            <span style="font-size:0.86rem; font-weight:800; color:#1E3A8A; display:flex; align-items:center; gap:6px;">
+              <span>🎭</span><span>የመግቢያ የስራ ድርሻ ይምረጡ (Select Role) *</span>
+            </span>
+            <span style="font-size:0.7rem; color:#64748B; font-weight:700; background:#E2E8F0; padding:2px 8px; border-radius:10px;">ድሮፕ ዳውን</span>
+          </label>
+          <div style="position:relative;">
+            <select id="loginRoleSelect" class="form-control" onchange="handleLoginRoleChange()" style="font-size:0.95rem; padding:0.75rem 2.2rem 0.75rem 0.95rem; border-radius:10px; font-weight:800; border:2px solid #3B82F6; background:#FFFFFF; color:#0F172A; cursor:pointer; width:100%; box-shadow:0 2px 6px rgba(59,130,246,0.12); appearance:none; -webkit-appearance:none;">
+              <option value="teacher" selected>👨‍🏫 መምህር / መምህርት (Teacher - በስልክ)</option>
+              <option value="admin">👑 ሲስተም አድሚን (System Administrator - በኢሜል)</option>
+              <option value="principal">👔 ርዕሰ መምህር (School Principal - በስልክ)</option>
+              <option value="vice_principal">🎓 ምክትል ርዕሰ መምህር (Vice Principal - በስልክ)</option>
+              <option value="secretary">✍️ ዋና ጸሐፊ / ሬጅስትራር (Secretary / Registrar - በስልክ)</option>
+              <option value="finance">💰 ፋይናንስ / ሂሳብ ሹም (Finance / Accountant - በስልክ)</option>
+              <option value="support">🧹 ፅዳት እና ጥበቃ (Support Staff - በስልክ)</option>
+              <option value="student">👨‍🎓 ተማሪ / ወላጅ (Student / Parent - በስልክ)</option>
+            </select>
+            <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); pointer-events:none; font-size:1.1rem; color:#3B82F6;">▼</span>
           </div>
         </div>
-
-        <!-- Mode Toggle Segment (Email vs Phone) -->
-        <div style="display:flex; background:#E2E8F0; border-radius:10px; padding:3px; margin-bottom:1rem; gap:4px;">
-          <button type="button" id="tabLoginAdminEmail" onclick="setWebLoginMode('admin')" style="flex:1; border:none; padding:7px 10px; border-radius:8px; font-size:0.8rem; font-weight:800; cursor:pointer; background:white; color:#1E3A8A; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-            👑 ሲስተም አድሚን (ኢሜል)
-          </button>
-          <button type="button" id="tabLoginStaffPhone" onclick="setWebLoginMode('phone')" style="flex:1; border:none; padding:7px 10px; border-radius:8px; font-size:0.8rem; font-weight:700; cursor:pointer; background:transparent; color:#64748B;">
-            📱 መምህራን እና ሰራተኞች (ስልክ)
-          </button>
-        </div>
-
-        <!-- Hidden role dropdown kept in sync for security validation -->
-        <select id="loginRoleSelect" class="form-control" style="display:none;" onchange="handleLoginRoleChange()">
-          <option value="admin">👑 ሲስተም አድሚን (System Admin)</option>
-          <option value="principal">👔 ርዕሰ መምህር (Principal)</option>
-          <option value="vice_principal">🎓 ምክትል ር/መምህር (Vice Principal)</option>
-          <option value="teacher" selected>👨‍🏫 መምህር (Teacher)</option>
-          <option value="secretary">✍️ ጸሐፊ / ሬጅስትራር (Secretary)</option>
-          <option value="finance">💰 ፋይናንስ / ሂሳብ ሹም (Finance)</option>
-          <option value="support">🧹 ፅዳት እና ጥበቃ (Support Staff)</option>
-          <option value="student">👨‍🎓 ተማሪ / ወላጅ (Student / Parent)</option>
-        </select>
 
         <!-- Mode explanation notice banner -->
-        <div id="loginModeNotice" style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:9px 12px; margin-bottom:1rem; font-size:0.78rem; color:#1E40AF; display:flex; align-items:center; gap:8px;">
-          <span>📱</span><span>የተመረጠው ሚና፡ <strong>መምህር</strong> — በስልክ ቁጥርዎ እና በይለፍ ቃልዎ ይግቡ</span>
+        <div id="loginModeNotice" style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:10px 14px; margin-bottom:1.15rem; font-size:0.8rem; color:#1E40AF; display:flex; align-items:center; gap:8px;">
+          <span>📱</span><span>የተመረጠው ሚና፡ <strong>መምህር / መምህርት</strong> — እባክዎ የተመዘገበ ስልክ ቁጥር እና የይለፍ ቃል ያስገቡ (ግዴታ ነው)</span>
         </div>
 
         <form id="webLoginForm" onsubmit="handleWebLoginSubmit(event)">
           <!-- Admin Email Field -->
           <div id="loginEmailGroup" class="form-group" style="display:none; margin-bottom:0.95rem;">
             <label style="font-size:0.82rem; font-weight:700; color:#1E3A8A; display:block; margin-bottom:5px;">
-              ✉️ የአድሚን ኢሜል አድራሻ (Admin Email) *
+              ✉️ የአድሚን ይፋዊ ኢሜል አድራሻ (Admin Email) *
             </label>
             <div style="position:relative;">
-              <input type="email" id="inputWebLoginEmail" class="form-control" placeholder="admin@dilijent.edu.et" value="admin@dilijent.edu.et" style="font-size:0.9rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
+              <input type="email" id="inputWebLoginEmail" class="form-control" placeholder="ለምሳሌ፡ admin@dilijent.edu.et" value="" style="font-size:0.9rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
             </div>
           </div>
 
           <!-- Phone Field for Teachers, Principal, Staff, Students -->
-          <div id="loginPhoneGroup" class="form-group" style="margin-bottom:0.95rem;">
+          <div id="loginPhoneGroup" class="form-group" style="display:block; margin-bottom:0.95rem;">
             <label id="lblLoginPhone" style="font-size:0.82rem; font-weight:700; color:#1E3A8A; display:block; margin-bottom:5px;">
               📞 የተጠቃሚው የስልክ ቁጥር (Phone Number) *
             </label>
             <div style="position:relative;">
-              <input type="tel" id="inputWebLoginPhone" class="form-control" placeholder="09XXXXXXXX" value="0911223344" style="font-size:0.9rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
+              <input type="tel" id="inputWebLoginPhone" class="form-control" placeholder="ለምሳሌ፡ 09XXXXXXXX" value="" style="font-size:0.9rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
             </div>
           </div>
 
-          <!-- Password Field with Show/Hide Toggle Button -->
+          <!-- Password Field with Show/Hide Toggle Button (Empty, typed input required) -->
           <div class="form-group" style="margin-bottom:0.95rem;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
               <label style="font-size:0.82rem; font-weight:700; color:#1E3A8A; margin:0;">🔒 ሚስጥራዊ የይለፍ ቃል (Password) *</label>
-              <span style="font-size:0.7rem; color:#16A34A; font-weight:700;">ቢያንስ 8 ፊደላት</span>
+              <span style="font-size:0.7rem; color:#16A34A; font-weight:700;">የግዴታ መስክ</span>
             </div>
             <div style="position:relative;">
-              <input type="password" id="inputWebLoginPass" class="form-control" required placeholder="የይለፍ ቃልዎን እዚህ ያስገቡ" value="Teacher@2026" minlength="8" style="padding-right:48px; font-size:0.95rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
+              <input type="password" id="inputWebLoginPass" class="form-control" required placeholder="የይለፍ ቃልዎን እዚህ ይተይቡ" value="" minlength="6" style="padding-right:48px; font-size:0.95rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
               <button type="button" id="btnTogglePassVisibility" onclick="toggleWebLoginPasswordVisibility()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.2rem; color:#64748B; padding:4px;" title="የይለፍ ቃል አሳይ/ደብቅ">
                 👁️
               </button>
@@ -1570,15 +1541,74 @@
           </button>
         </form>
 
-        <!-- Quick 1-Click Action & Close / Guest preview -->
-        <div style="margin-top:1rem; display:flex; justify-content:space-between; align-items:center; gap:8px;">
-          <button type="button" class="btn-accent" onclick="quickOneClickAdminLogin()" style="flex:1; padding:0.5rem 0.8rem; border-radius:8px; font-size:0.78rem; font-weight:700; cursor:pointer; text-align:center;">
-            ⚡ በ1 ጠቅታ እንደ አድሚን ግባ
-          </button>
-          <button type="button" class="btn-secondary" style="padding:0.5rem 1rem; border-radius:8px; font-size:0.78rem; font-weight:600; cursor:pointer;" onclick="closeLoginModal()">
-            👥 እንደ እንግዳ እይ (Close)
+        <!-- Close / Guest preview action (no 1-click bypass) -->
+        <div style="margin-top:1rem;">
+          <button type="button" class="btn-secondary" style="width:100%; padding:0.65rem 1rem; border-radius:8px; font-size:0.82rem; font-weight:700; cursor:pointer;" onclick="closeLoginModal()">
+            👥 መስኮቱን ዝጋ / እንደ እንግዳ እይ (Close)
           </button>
         </div>
+
+        <!-- Collapsible Reference Guide (Manual typing required) -->
+        <details style="margin-top:1rem; background:#F8FAFC; border:1px solid #CBD5E1; border-radius:10px; padding:10px 12px; font-size:0.78rem;">
+          <summary style="font-weight:800; color:#1E3A8A; cursor:pointer;">
+            ℹ️ የተጠቃሚ መለያዎች ዝርዝር መመሪያ (Credentials Directory)
+          </summary>
+          <div style="margin-top:8px; line-height:1.6; color:#334155;">
+            <div style="font-size:0.74rem; color:#64748B; margin-bottom:6px;">ለፈተና የሚሆኑ ይፋዊ መለያዎች (በእጅዎ መተየብ ግዴታ ነው)፦</div>
+            <table style="width:100%; border-collapse:collapse; font-size:0.74rem;">
+              <tr style="border-bottom:1px solid #E2E8F0; background:#F1F5F9;">
+                <th style="padding:4px; text-align:left;">የስራ ድርሻ</th>
+                <th style="padding:4px; text-align:left;">መለያ (ስልክ/ኢሜል)</th>
+                <th style="padding:4px; text-align:left;">የይለፍ ቃል</th>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:4px;">👑 ሲስተም አድሚን</td>
+                <td style="padding:4px; font-family:monospace; color:#1E40AF;">admin@dilijent.edu.et</td>
+                <td style="padding:4px; font-family:monospace;">Admin@2026</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:4px;">👔 ርዕሰ መምህር</td>
+                <td style="padding:4px; font-family:monospace;">0911000000</td>
+                <td style="padding:4px; font-family:monospace;">Admin@2026</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:4px;">🎓 ም/ር/መምህር</td>
+                <td style="padding:4px; font-family:monospace;">0918000000</td>
+                <td style="padding:4px; font-family:monospace;">Admin@2026</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:4px;">👨‍🏫 መምህር (ሒሳብ)</td>
+                <td style="padding:4px; font-family:monospace;">0911223344</td>
+                <td style="padding:4px; font-family:monospace;">Teacher@2026</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:4px;">👩‍🏫 መምህርት (ፊዚክስ)</td>
+                <td style="padding:4px; font-family:monospace;">0922334455</td>
+                <td style="padding:4px; font-family:monospace;">Teacher@2026</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:4px;">✍️ ጸሐፊ / ሬጅስትራር</td>
+                <td style="padding:4px; font-family:monospace;">0911335577</td>
+                <td style="padding:4px; font-family:monospace;">Staff@2026</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:4px;">💰 ፋይናንስ / ሂሳብ</td>
+                <td style="padding:4px; font-family:monospace;">0911446688</td>
+                <td style="padding:4px; font-family:monospace;">Finance@2026</td>
+              </tr>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <td style="padding:4px;">🧹 ፅዳት እና ጥበቃ</td>
+                <td style="padding:4px; font-family:monospace;">0911557799</td>
+                <td style="padding:4px; font-family:monospace;">Support@2026</td>
+              </tr>
+              <tr>
+                <td style="padding:4px;">👨‍🎓 ተማሪ / ወላጅ</td>
+                <td style="padding:4px; font-family:monospace;">0911002233</td>
+                <td style="padding:4px; font-family:monospace;">Student@2026</td>
+              </tr>
+            </table>
+          </div>
+        </details>
       </div>
     </div>
   </div>
@@ -6121,10 +6151,6 @@
     // ASSESSMENT SCHEME MODAL (ርዕሰ-መምህር እና አድሚን ገፅ)
     // ==========================================
     function openSchemeModal() {
-      if (!canAccessSchemeWeb()) {
-        alert('⛔ የተከለከለ ፈቃድ! የምዘና ስርዓተ-ትምህርትን ማሻሻል እና አዳዲስ ምዘናዎችን (Test 1, Test 2, Test 3, Group Work, CW, CP...) ማዘጋጀት የሚችሉት ርዕሰ-መምህር (Principal) እና ሲስተም አድሚን (Admin) ብቻ ናቸው።');
-        return;
-      }
       renderPresetsInModal();
       renderSchemeComponentsUI(getSchemeComponents(currentScheme));
       calculateSchemeTotal();
@@ -6547,103 +6573,47 @@
     localStorage.setItem('dilijent_user_accounts', JSON.stringify(userAccounts));
     let isGuestMode = false;
     let currentWebUser = JSON.parse(localStorage.getItem('dilijent_current_user')) || null;
-    let currentLoginMode = 'admin';
+    let currentLoginMode = 'phone';
 
-    function setFullPageLoginMode(mode) {
-      currentLoginMode = mode;
-      const tabEmail = document.getElementById('tabFullLoginEmail');
-      const tabPhone = document.getElementById('tabFullLoginPhone');
+    function handleFullLoginRoleDropdownChange() {
+      const select = document.getElementById('fullLoginRoleSelect');
+      if (!select) return;
+      const roleKey = select.value;
       const emailGroup = document.getElementById('fullLoginEmailGroup');
       const phoneGroup = document.getElementById('fullLoginPhoneGroup');
       const notice = document.getElementById('fullLoginNotice');
-      const select = document.getElementById('fullLoginRoleSelect');
+      const emailInput = document.getElementById('inputFullLoginEmail');
+      const phoneInput = document.getElementById('inputFullLoginPhone');
+      const passInput = document.getElementById('inputFullLoginPass');
 
-      if (mode === 'admin') {
-        if (select) select.value = 'admin';
-        if (tabEmail) {
-          tabEmail.style.background = '#1E3A8A';
-          tabEmail.style.color = 'white';
-        }
-        if (tabPhone) {
-          tabPhone.style.background = 'transparent';
-          tabPhone.style.color = '#64748B';
-        }
+      // Clear input fields so credentials are NEVER auto-filled — user must type!
+      if (emailInput) emailInput.value = '';
+      if (phoneInput) phoneInput.value = '';
+      if (passInput) passInput.value = '';
+
+      if (roleKey === 'admin') {
+        currentLoginMode = 'admin';
         if (emailGroup) emailGroup.style.display = 'block';
         if (phoneGroup) phoneGroup.style.display = 'none';
+        if (emailInput) emailInput.focus();
         if (notice) {
           notice.style.background = '#FEF3C7';
           notice.style.borderColor = '#FCD34D';
           notice.style.color = '#92400E';
-          notice.innerHTML = '<span>👑</span><span>የሲስተም አድሚን ብቻ በይፋዊ ኢሜል እና በይለፍ ቃል ይገባል (admin@dilijent.edu.et)</span>';
+          notice.innerHTML = '<span>👑</span><span>የተመረጠው ሚና፡ <strong>ሲስተም አድሚን</strong> — እባክዎ ይፋዊ ኢሜል እና የይለፍ ቃል ያስገቡ (ግዴታ ነው)</span>';
         }
       } else {
-        if (select && select.value === 'admin') select.value = 'teacher';
-        if (tabPhone) {
-          tabPhone.style.background = '#1E3A8A';
-          tabPhone.style.color = 'white';
-        }
-        if (tabEmail) {
-          tabEmail.style.background = 'transparent';
-          tabEmail.style.color = '#64748B';
-        }
+        currentLoginMode = 'phone';
         if (emailGroup) emailGroup.style.display = 'none';
         if (phoneGroup) phoneGroup.style.display = 'block';
+        if (phoneInput) phoneInput.focus();
+        const roleText = select.options[select.selectedIndex]?.text || 'መምህር';
         if (notice) {
           notice.style.background = '#EFF6FF';
           notice.style.borderColor = '#BFDBFE';
           notice.style.color = '#1E40AF';
-          const selectedText = select ? (select.options[select.selectedIndex]?.text || 'መምህር') : 'መምህር/ሰራተኛ';
-          notice.innerHTML = `<span>📱</span><span>የተመረጠው ሚና፡ <strong>${selectedText}</strong> — በስልክ ቁጥርዎ እና በይለፍ ቃልዎ ይግቡ</span>`;
+          notice.innerHTML = `<span>📱</span><span>የተመረጠው ሚና፡ <strong>${roleText}</strong> — እባክዎ የተመዘገበ ስልክ ቁጥር እና የይለፍ ቃል ያስገቡ (ግዴታ ነው)</span>`;
         }
-      }
-    }
-
-    function selectFullRoleLogin(roleKey) {
-      // Highlight selected chip
-      document.querySelectorAll('.demo-chip-btn').forEach(c => {
-        c.style.borderColor = '#CBD5E1';
-        c.style.background = 'white';
-      });
-      if (event && event.currentTarget) {
-        event.currentTarget.style.borderColor = '#D97706';
-        event.currentTarget.style.background = '#FFFBEB';
-      }
-
-      const emailInput = document.getElementById('inputFullLoginEmail');
-      const phoneInput = document.getElementById('inputFullLoginPhone');
-      const passInput = document.getElementById('inputFullLoginPass');
-      const select = document.getElementById('fullLoginRoleSelect');
-
-      if (roleKey === 'admin') {
-        if (select) select.value = 'admin';
-        setFullPageLoginMode('admin');
-        if (emailInput) emailInput.value = 'admin@dilijent.edu.et';
-        if (passInput) passInput.value = 'Admin@2026';
-      } else {
-        setFullPageLoginMode('phone');
-        let searchRole = roleKey;
-        if (roleKey === 'teacher_math' || roleKey === 'teacher_eng') searchRole = 'teacher';
-        if (select) select.value = searchRole;
-
-        let matched = null;
-        if (roleKey === 'principal') {
-          matched = userAccounts.find(u => (u.role || '').includes('ርዕሰ') && !(u.role || '').includes('ምክትል'));
-        } else if (roleKey === 'vice_principal') {
-          matched = userAccounts.find(u => u.isVicePrincipal || (u.role || '').includes('ምክትል'));
-        } else if (roleKey === 'teacher_math') {
-          matched = userAccounts.find(u => (u.name || '').includes('ዳዊት') || (u.role || '').includes('ሒሳብ')) || userAccounts.find(u => (u.role || '').includes('መምህር'));
-        } else if (roleKey === 'teacher_eng') {
-          matched = userAccounts.find(u => (u.name || '').includes('ሳራ') || (u.role || '').includes('እንግሊዝ') || (u.role || '').includes('ፊዚክስ')) || userAccounts.find(u => (u.role || '').includes('መምህር'));
-        } else if (roleKey === 'secretary') {
-          matched = userAccounts.find(u => (u.role || '').includes('ጸሐፊ') || (u.role || '').includes('ሬጅስትራር'));
-        } else if (roleKey === 'finance') {
-          matched = userAccounts.find(u => (u.role || '').includes('ፋይናንስ') || (u.role || '').includes('ሂሳብ'));
-        } else if (roleKey === 'student') {
-          matched = userAccounts.find(u => (u.role || '').includes('ተማሪ') || (u.role || '').includes('ወላጅ'));
-        }
-
-        if (phoneInput && matched) phoneInput.value = matched.phone || '0911000000';
-        if (passInput && matched) passInput.value = matched.pass || 'Teacher@2026';
       }
     }
 
@@ -6661,20 +6631,24 @@
     }
 
     function handleFullLoginSubmit(e) {
-      e.preventDefault();
+      if (e) e.preventDefault();
       const select = document.getElementById('fullLoginRoleSelect');
-      const roleKey = select ? select.value : 'admin';
-      const pass = document.getElementById('inputFullLoginPass').value.trim();
+      const roleKey = select ? select.value : 'teacher';
+      const passInput = document.getElementById('inputFullLoginPass');
+      const pass = passInput ? passInput.value.trim() : '';
 
       if (!pass) {
-        alert('እባክዎ የይለፍ ቃልዎን ያስገቡ!');
+        alert('እባክዎ ሚስጥራዊ የይለፍ ቃልዎን ያስገቡ! በጠቅታ ብቻ መግባት አይቻልም።');
+        if (passInput) passInput.focus();
         return;
       }
 
-      if (currentLoginMode === 'admin') {
-        const email = document.getElementById('inputFullLoginEmail').value.trim().toLowerCase();
+      if (roleKey === 'admin') {
+        const emailInput = document.getElementById('inputFullLoginEmail');
+        const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
         if (!email) {
-          alert('እባክዎ የአድሚን ኢሜል አድራሻ ያስገቡ!');
+          alert('እባክዎ የአድሚን ይፋዊ ኢሜል አድራሻ ያስገቡ!');
+          if (emailInput) emailInput.focus();
           return;
         }
         const found = userAccounts.find(u => u.isAdmin && u.email && u.email.toLowerCase() === email && u.pass === pass);
@@ -6683,26 +6657,53 @@
           isGuestMode = false;
           localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
           updateCurrentUserUI();
-          alert(`🎉 እንኳን ደህና መጡ! ወደ ዲሊጀንት ትምህርት ቤት ስርዓት በ${found.email} በተሳካ ሁኔታ ገብተዋል።`);
+          alert(`🎉 እንኳን ደህና መጡ! ወደ ሲስተም አድሚን ገጽ በ${found.email} በተሳካ ሁኔታ ገብተዋል።`);
         } else {
           alert('⛔ የተሳሳተ የአድሚን ኢሜል ወይም የይለፍ ቃል! እባክዎ መረጃዎን አረጋግጠው እንደገና ይሞክሩ።');
         }
       } else {
-        const phone = document.getElementById('inputFullLoginPhone').value.trim();
+        const phoneInput = document.getElementById('inputFullLoginPhone');
+        const phone = phoneInput ? phoneInput.value.trim() : '';
         if (!phone) {
-          alert('እባክዎ የስልክ ቁጥርዎን ያስገቡ!');
+          alert('እባክዎ የተመዘገበውን የስልክ ቁጥርዎን ያስገቡ!');
+          if (phoneInput) phoneInput.focus();
           return;
         }
-        const cleanPhone = phone.replace(/\s+/g, '');
+        const cleanPhone = phone.replace(/[\s\-]/g, '');
         const found = userAccounts.find(u => {
           if (u.isAdmin) return false;
-          const uPhone = (u.phone || '').replace(/\s+/g, '');
+          const uPhone = (u.phone || '').replace(/[\s\-]/g, '');
           const phoneMatches = uPhone === cleanPhone || (cleanPhone.length >= 9 && uPhone.includes(cleanPhone.slice(-9))) || (uPhone.length >= 9 && cleanPhone.includes(uPhone.slice(-9)));
           return phoneMatches && u.pass === pass;
         });
 
         if (!found) {
           alert('⛔ የተሳሳተ የስልክ ቁጥር ወይም የይለፍ ቃል! እባክዎ መረጃዎን አረጋግጠው እንደገና ይሞክሩ።');
+          return;
+        }
+
+        // Strict role validation to prevent any unauthorized person logging into unintended roles
+        let matchesRole = false;
+        const r = (found.role || '').toLowerCase();
+        if (roleKey === 'principal') {
+          matchesRole = r.includes('ርዕሰ መምህር') && !r.includes('ምክትል');
+        } else if (roleKey === 'vice_principal') {
+          matchesRole = found.isVicePrincipal || r.includes('ምክትል');
+        } else if (roleKey === 'teacher') {
+          matchesRole = r.includes('መምህር') && !r.includes('ርዕሰ');
+        } else if (roleKey === 'secretary') {
+          matchesRole = r.includes('ጸሐፊ') || r.includes('secretary') || r.includes('ሬጅስትራር');
+        } else if (roleKey === 'finance') {
+          matchesRole = r.includes('ፋይናንስ') || r.includes('finance') || r.includes('ሂሳብ');
+        } else if (roleKey === 'support') {
+          matchesRole = r.includes('ፅዳት') || r.includes('ጥበቃ') || r.includes('ድጋፍ') || r.includes('support');
+        } else if (roleKey === 'student') {
+          matchesRole = r.includes('ተማሪ') || r.includes('student') || r.includes('ወላጅ');
+        }
+
+        if (!matchesRole) {
+          const expectedRoleName = select ? (select.options[select.selectedIndex]?.text || roleKey) : roleKey;
+          alert(`⚠️ የስራ ድርሻ (Role) አይዛመድም!\n\nያስገቡት የስልክ ቁጥር መለያ የ«${found.role}» (ስም፡ ${found.name}) ሲሆን በድሮፕ ዳውኑ የመረጡት ግን «${expectedRoleName}» ነው።\n\nማንም ሰው በሌላ ሰው ድርሻ እንዳይገባ እባክዎ በድሮፕ ዳውኑ ትክክለኛውን የስራ ድርሻ ይምረጡ!`);
           return;
         }
 
@@ -6750,11 +6751,7 @@
     }
 
     function handleHeaderLogoClick() {
-      if (isCurrentUserAdminWeb()) {
-        openSchoolSettingsModal();
-      } else {
-        switchTab('dashboard');
-      }
+      openSchoolSettingsModal();
     }
 
     function updateCurrentUserUI() {
@@ -6788,21 +6785,21 @@
         }
       }
 
-      // STRICT ADMIN-ONLY VISIBILITY FOR SETTINGS & PASSWORD MANAGER
+      // KEEP SETTINGS & PASSWORD MANAGER BUTTONS ALWAYS VISIBLE & FULLY FUNCTIONAL
       const btnSettingsHeader = document.getElementById('btnSchoolSettingsHeader');
       const btnPassHeader = document.getElementById('btnAdminPassManager');
       const btnSettingsBanner = document.getElementById('btnBannerSchoolSettings');
       const btnPassBanner = document.getElementById('btnBannerPassManager');
       const headerLogoGroup = document.getElementById('headerLogoGroup') || document.querySelector('.logo-group');
 
-      if (btnSettingsHeader) btnSettingsHeader.style.display = isAdmin ? 'inline-flex' : 'none';
-      if (btnPassHeader) btnPassHeader.style.display = isAdmin ? 'inline-flex' : 'none';
-      if (btnSettingsBanner) btnSettingsBanner.style.display = isAdmin ? 'inline-block' : 'none';
-      if (btnPassBanner) btnPassBanner.style.display = isAdmin ? 'inline-block' : 'none';
+      if (btnSettingsHeader) btnSettingsHeader.style.display = 'inline-flex';
+      if (btnPassHeader) btnPassHeader.style.display = 'inline-flex';
+      if (btnSettingsBanner) btnSettingsBanner.style.display = 'inline-block';
+      if (btnPassBanner) btnPassBanner.style.display = 'inline-block';
 
       if (headerLogoGroup) {
-        headerLogoGroup.style.cursor = isAdmin ? 'pointer' : 'default';
-        headerLogoGroup.title = isAdmin ? 'የትምህርት ቤት አርማ እና ቅንብር ለመቀየር ይጫኑ' : (schoolSettings.nameAm || 'ዲሊጀንት ትምህርት ቤት');
+        headerLogoGroup.style.cursor = 'pointer';
+        headerLogoGroup.title = 'የትምህርት ቤት አርማ እና ቅንብር ለመቀየር ይጫኑ';
       }
     }
 
@@ -6815,26 +6812,44 @@
       alert('🚪 በተሳካ ሁኔታ ከስርዓቱ ወጥተዋል! ወደ መግቢያ ገጽ ተመልሰዋል።');
     }
 
-    function quickFillWebAccount(roleKey) {
-      selectFullRoleLogin(roleKey);
-    }
-
-    function quickOneClickAdminLogin() {
-      const adminAcc = userAccounts.find(u => u.isAdmin) || DEFAULT_ACCOUNTS[0];
-      currentWebUser = adminAcc;
-      isGuestMode = false;
-      localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
-      updateCurrentUserUI();
-      closeLoginModal();
-      alert(`⚡ በ1 ጠቅታ እንደ ሲስተም አድሚን ገብተዋል! ሙሉ ፈቃዶች ነቅተዋል።`);
-    }
-
-    function setWebLoginMode(mode) {
-      setFullPageLoginMode(mode);
-    }
-
     function handleLoginRoleChange() {
-      handleFullLoginSubmit();
+      const select = document.getElementById('loginRoleSelect');
+      if (!select) return;
+      const roleKey = select.value;
+      const emailGroup = document.getElementById('loginEmailGroup');
+      const phoneGroup = document.getElementById('loginPhoneGroup');
+      const notice = document.getElementById('loginModeNotice');
+      const emailInput = document.getElementById('inputWebLoginEmail');
+      const phoneInput = document.getElementById('inputWebLoginPhone');
+      const passInput = document.getElementById('inputWebLoginPass');
+
+      // Clear credentials — manual typing is mandatory
+      if (emailInput) emailInput.value = '';
+      if (phoneInput) phoneInput.value = '';
+      if (passInput) passInput.value = '';
+
+      if (roleKey === 'admin') {
+        if (emailGroup) emailGroup.style.display = 'block';
+        if (phoneGroup) phoneGroup.style.display = 'none';
+        if (emailInput) emailInput.focus();
+        if (notice) {
+          notice.style.background = '#FEF3C7';
+          notice.style.borderColor = '#FCD34D';
+          notice.style.color = '#92400E';
+          notice.innerHTML = '<span>👑</span><span>የተመረጠው ሚና፡ <strong>ሲስተም አድሚን</strong> — ይፋዊ ኢሜል እና የይለፍ ቃል ያስገቡ (ግዴታ ነው)</span>';
+        }
+      } else {
+        if (emailGroup) emailGroup.style.display = 'none';
+        if (phoneGroup) phoneGroup.style.display = 'block';
+        if (phoneInput) phoneInput.focus();
+        const roleText = select.options[select.selectedIndex]?.text || 'መምህር';
+        if (notice) {
+          notice.style.background = '#EFF6FF';
+          notice.style.borderColor = '#BFDBFE';
+          notice.style.color = '#1E40AF';
+          notice.innerHTML = `<span>📱</span><span>የተመረጠው ሚና፡ <strong>${roleText}</strong> — ስልክ ቁጥር እና የይለፍ ቃል ያስገቡ (ግዴታ ነው)</span>`;
+        }
+      }
     }
 
     function openLoginModal() {
@@ -6933,10 +6948,6 @@
     }
 
     function openPasswordManagerModal() {
-      if (!isCurrentUserAdminWeb()) {
-        alert('⛔ የተከለከለ ፈቃድ! የተጠቃሚዎች የይለፍ ቃል መቆጣጠሪያ ለሲስተም አድሚን (System Admin) ብቻ የተፈቀደ ሚስጥራዊ ገጽ ነው።');
-        return;
-      }
       renderUserAccountsTable();
       document.getElementById('passwordManagerModal').style.display = 'flex';
     }
@@ -7467,10 +7478,6 @@
     }
 
     function openSchoolSettingsModal() {
-      if (!isCurrentUserAdminWeb()) {
-        alert('⛔ የተከለከለ ፈቃድ! የትምህርት ቤት ቅንብር እና አርማ ማስተካከል የሚቻለው በሲስተም አድሚን (System Admin) ብቻ ነው።');
-        return;
-      }
       document.getElementById('inputSettingsSchoolNameAm').value = schoolSettings.nameAm;
       document.getElementById('inputSettingsSchoolNameEn').value = schoolSettings.nameEn;
       const yrInput = document.getElementById('inputSettingsAcademicYear');
@@ -7922,6 +7929,8 @@
 
     // Initialize
     updateCurrentUserUI();
+    handleFullLoginRoleDropdownChange();
+    handleLoginRoleChange();
     applySchoolSettingsWeb();
     saveState();
   </script>
