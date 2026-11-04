@@ -1499,6 +1499,14 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                         repository.deleteStaff(s)
                     }
                 }
+                val currentTeachers = repository.allTeachers.first()
+                for (t in currentTeachers) {
+                    val codeLower = t.teacherCode.trim().lowercase()
+                    val nameLower = t.fullName.trim().lowercase()
+                    if (deletedStaff.contains(codeLower) || deletedStaff.contains(nameLower)) {
+                        repository.deleteTeacher(t)
+                    }
+                }
             }
 
             // Restore any user-registered staff from persistent backup if missing from DB
@@ -1710,7 +1718,12 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                         homeroomClass = "6ኛ ክፍል-A"
                     )
                 )
-                primaryTeachers.forEach { repository.insertTeacher(it) }
+                val deletedStaffForSeed = prefs.getStringSet("deleted_staff_ids", emptySet()) ?: emptySet()
+                primaryTeachers.filter {
+                    val c = it.teacherCode.trim().lowercase()
+                    val n = it.fullName.trim().lowercase()
+                    !deletedStaffForSeed.contains(c) && !deletedStaffForSeed.contains(n)
+                }.forEach { repository.insertTeacher(it) }
 
                 val primarySubjects = listOf(
                     Subject(name = "አጠቃላይ ሳይንስ (General Science)", code = "GSCI-07", gradeLevel = "7ኛ ክፍል", periodsPerWeek = 4, passingScore = 50),
@@ -1786,9 +1799,21 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    // CRUD Operations: Teacher
     fun saveTeacher(teacher: Teacher) {
         viewModelScope.launch {
+            try {
+                val currentDeleted = prefs.getStringSet("deleted_staff_ids", emptySet()) ?: emptySet()
+                val codeLower = teacher.teacherCode.trim().lowercase()
+                val nameLower = teacher.fullName.trim().lowercase()
+                if (currentDeleted.contains(codeLower) || currentDeleted.contains(nameLower)) {
+                    val newDeleted = currentDeleted.toMutableSet().apply {
+                        remove(codeLower)
+                        remove(nameLower)
+                    }
+                    prefs.edit().putStringSet("deleted_staff_ids", newDeleted).apply()
+                }
+            } catch (_: Exception) {}
+
             val id = if (teacher.id == 0L) {
                 repository.insertTeacher(teacher)
             } else {
@@ -1803,9 +1828,45 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
 
     fun deleteTeacher(teacher: Teacher) {
         viewModelScope.launch {
+            try {
+                val currentDeleted = prefs.getStringSet("deleted_staff_ids", emptySet()) ?: emptySet()
+                val codeLower = teacher.teacherCode.trim().lowercase()
+                val nameLower = teacher.fullName.trim().lowercase()
+                val newDeleted = currentDeleted.toMutableSet().apply {
+                    add(codeLower)
+                    add(nameLower)
+                }
+                prefs.edit().putStringSet("deleted_staff_ids", newDeleted).apply()
+
+                // Remove from user registered staff backup
+                val userStaffBackupJson = prefs.getString("user_registered_staff_backup_v1", "[]") ?: "[]"
+                val arr = org.json.JSONArray(userStaffBackupJson)
+                val newArr = org.json.JSONArray()
+                for (i in 0 until arr.length()) {
+                    val obj = arr.getJSONObject(i)
+                    val existingCode = obj.optString("staffCode", "").trim().lowercase()
+                    val existingName = obj.optString("fullName", "").trim().lowercase()
+                    if (existingCode != codeLower && existingName != nameLower) {
+                        newArr.put(obj)
+                    }
+                }
+                prefs.edit().putString("user_registered_staff_backup_v1", newArr.toString()).apply()
+            } catch (_: Exception) {}
+
             repository.deleteTeacher(teacher)
             val docId = "teacher_${teacher.teacherCode.replace(Regex("[^a-zA-Z0-9_]"), "_")}"
             firestoreRepository.deleteTeacher(docId)
+
+            // Also delete matching staff record if any
+            try {
+                val allS = repository.allStaff.first()
+                val match = allS.find { it.fullName == teacher.fullName || (it.phone.isNotBlank() && it.phone == teacher.phone) }
+                if (match != null) {
+                    repository.deleteStaff(match)
+                    firestoreRepository.deleteStaff("staff_${match.staffCode.replace(Regex("[^a-zA-Z0-9_]"), "_")}")
+                }
+            } catch (_: Exception) {}
+
             if (selectedTeacherForDetails.value?.id == teacher.id) {
                 selectedTeacherForDetails.value = null
             }

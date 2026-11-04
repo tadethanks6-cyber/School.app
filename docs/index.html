@@ -685,7 +685,7 @@
             </select>
 
             <span id="rosterHomeroomBadge" class="badge badge-primary" style="font-size:0.75rem; padding:0.4rem 0.65rem;">
-              👨‍🏫 የክፍል ኃላፊ፦ መምህር ዳዊት በቀለ
+              👨‍🏫 የክፍል ኃላፊ፦ <span id="rosterHomeroomTeacherName">ያልተመደበ</span>
             </span>
           </div>
 
@@ -977,8 +977,8 @@
             </table>
           </div>
           <div style="margin-top:1.25rem; font-size:0.8rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
-            <div><strong>የክፍል ኃላፊ ፊርማ:</strong> መምህር ዳዊት በቀለ _________</div>
-            <div><strong>የርዕሰ-መምህር ፊርማ:</strong> አቶ ሙሉጌታ ከበደ _________</div>
+            <div><strong>የክፍል ኃላፊ ፊርማ:</strong> <span id="reportCardPrintTeacher">የክፍል ኃላፊ</span> _________</div>
+            <div><strong>የርዕሰ-መምህር ፊርማ:</strong> <span id="reportCardPrintPrincipal">ርዕሰ-መምህር</span> _________</div>
           </div>
         </div>
       </div>
@@ -1754,11 +1754,11 @@
       <!-- Signature Blocks -->
       <div style="display:flex; justify-content:space-between; align-items:flex-end; border-top:1px solid #E2E8F0; padding-top:0.75rem; margin-top:0.5rem; font-size:0.78rem; flex-wrap:wrap; gap:1rem;">
         <div>
-          <div>የክፍል ኃላፊ መምህር፦ <strong id="cardModalHomeroomTeacher">መምህር ዳዊት በቀለ</strong></div>
+          <div>የክፍል ኃላፊ መምህር፦ <strong id="cardModalHomeroomTeacher">ያልተመደበ</strong></div>
           <div style="margin-top:0.4rem; color:#64748B;">ፊርማ፦ __________________ ቀን፦ _________</div>
         </div>
         <div>
-          <div>የርዕሰ-መምህር ስም፦ <strong>አቶ ሙሉጌታ ከበደ</strong></div>
+          <div>የርዕሰ-መምህር ስም፦ <strong id="cardModalPrincipalName">ርዕሰ መምህር</strong></div>
           <div style="margin-top:0.4rem; color:#64748B;">ፊርማና ማህተም፦ __________________</div>
         </div>
         <div>
@@ -4543,8 +4543,11 @@
     }
 
     function getFilteredStaffWeb() {
-      const lvl = (schoolSettings && schoolSettings.gradeLevel) ? schoolSettings.gradeLevel : '1_8';
-      return staffList.filter(st => isStaffInLevelWeb(st, lvl));
+      return staffList.filter(st => {
+        const sid = (st.id || '').trim().toLowerCase();
+        const sname = (st.name || '').trim().toLowerCase();
+        return !deletedStaffIds.has(sid) && !deletedStaffIds.has(sname);
+      });
     }
 
     function getFilteredAttendanceWeb() {
@@ -4764,38 +4767,7 @@
       });
       if (found) return found;
 
-      // Safe fallback that checks deletedStaffIds
-      const checkFallback = (tName, tDept) => {
-        if (deletedStaffIds.has(tName.toLowerCase())) return null;
-        return { name: tName, dept: tDept };
-      };
-
-      if (s.includes('math') || s.includes('ሒሳብ')) {
-        const fb = checkFallback('መምህር ዳዊት በቀለ', 'Mathematics');
-        if (fb) return fb;
-      }
-      if (s.includes('phys') || s.includes('ፊዚክስ')) {
-        const fb = checkFallback('መምህርት ሳራ መኮንን', 'Physics');
-        if (fb) return fb;
-      }
-      if (s.includes('chem') || s.includes('ኬሚስትሪ')) {
-        const fb = checkFallback('መምህር ዮሴፍ ሀይሉ', 'Chemistry');
-        if (fb) return fb;
-      }
-      if (s.includes('eng') || s.includes('እንግሊዝ')) {
-        const fb = checkFallback('መምህርት ራሔል ተክሌ', 'English');
-        if (fb) return fb;
-      }
-      if (s.includes('bio') || s.includes('ባዮ') || s.includes('ሳይንስ')) {
-        const fb = checkFallback('መምህርት አስቴር ከበደ', 'General Science');
-        if (fb) return fb;
-      }
-      if (s.includes('soc') || s.includes('ማህበራዊ') || s.includes('hist') || s.includes('ታሪክ')) {
-        const fb = checkFallback('መምህር ዮሴፍ ተክሌ', 'Social Science');
-        if (fb) return fb;
-      }
-
-      // If all specific fallbacks are deleted, find any active non-deleted teacher
+      // If no exact match, find any active non-deleted teacher
       const anyTeacher = list.find(st => {
         const sid = (st.id || '').trim().toLowerCase();
         const sname = (st.name || '').trim().toLowerCase();
@@ -4803,7 +4775,7 @@
       });
       if (anyTeacher) return anyTeacher;
 
-      return { name: 'መምህር (' + subjectName + ')', dept: subjectName };
+      return { name: 'የ' + subjectName + ' መምህር', dept: subjectName };
     }
 
     function renderGrades() {
@@ -4985,7 +4957,23 @@
       }
     ];
 
-    let staffAttendanceListWeb = JSON.parse(localStorage.getItem('dilijent_staff_attendance')) || DEFAULT_STAFF_ATTENDANCE;
+    let staffAttendanceListWeb = [];
+    const storedStaffAttRaw = localStorage.getItem('dilijent_staff_attendance');
+    if (storedStaffAttRaw !== null) {
+      try {
+        staffAttendanceListWeb = JSON.parse(storedStaffAttRaw) || [];
+      } catch (e) {
+        staffAttendanceListWeb = [];
+      }
+    } else {
+      if (!localStorage.getItem('dilijent_staff_att_init_v2')) {
+        staffAttendanceListWeb = [...DEFAULT_STAFF_ATTENDANCE];
+        localStorage.setItem('dilijent_staff_att_init_v2', 'true');
+      } else {
+        staffAttendanceListWeb = [];
+      }
+    }
+
     // Upgrade existing stored records if missing dual-shift fields
     staffAttendanceListWeb = staffAttendanceListWeb.map(item => {
       if (!item.morningStatus) {
@@ -5002,11 +4990,12 @@
       return item;
     });
 
-    // CRITICAL FIX: Exclude any permanently deleted staff from attendance
+    // CRITICAL: Exclude any permanently deleted staff from attendance (both ID and Name)
     staffAttendanceListWeb = staffAttendanceListWeb.filter(item => {
       const sid = String(item.id || '').trim().toLowerCase();
       const sname = (item.name || '').trim().toLowerCase();
-      return !deletedStaffIds.has(sid) && !deletedStaffIds.has(sname);
+      const stripped = sname.replace(/^(መምህር|መምህርት|አቶ|ወ\/ሮ|ወ\/ሪት|ዶ\/ር)\s+/g, '').trim();
+      return !deletedStaffIds.has(sid) && !deletedStaffIds.has(sname) && (!stripped || !deletedStaffIds.has(stripped));
     });
 
     // Sync all active staff from staffList into staffAttendanceListWeb
@@ -5635,10 +5624,11 @@
       const selectedGrade = select ? select.value : (availableClasses[0] || '8A');
 
       // Find homeroom teacher matching this section or level
-      const hrTeacher = activeStaff.find(s => s.role.includes('የክፍል ኃላፊ') && (s.role.includes(selectedGrade) || s.dept.includes(selectedGrade)))
-        || activeStaff.find(s => s.role.includes('የክፍል ኃላፊ'))
+      const hrTeacher = activeStaff.find(s => (s.role || '').includes('የክፍል ኃላፊ') && ((s.role || '').includes(selectedGrade) || (s.dept || '').includes(selectedGrade)))
+        || activeStaff.find(s => (s.role || '').includes('የክፍል ኃላፊ'))
+        || activeStaff.find(s => (s.role || '').includes('መምህር'))
         || activeStaff[0]
-        || { name: 'መምህር ዳዊት በቀለ' };
+        || { name: (schoolSettings && schoolSettings.nameAm ? schoolSettings.nameAm + ' መምህር' : 'ያልተመደበ') };
       
       const badge = document.getElementById('rosterHomeroomBadge');
       if (badge) {
@@ -5940,11 +5930,21 @@
       document.getElementById('cardModalRank').innerText = `${rank}ኛ ደረጃ (ከ ${classStudents.length || activeStudents.length} ተማሪዎች)`;
 
       // Homeroom Teacher name strictly matching active level
-      const hrTeacher = activeStaff.find(s => s.role.includes('የክፍል ኃላፊ') && (s.role.includes(selectedGrade) || s.dept.includes(selectedGrade)))
-        || activeStaff.find(s => s.role.includes('የክፍል ኃላፊ'))
+      const hrTeacher = activeStaff.find(s => (s.role || '').includes('የክፍል ኃላፊ') && ((s.role || '').includes(selectedGrade) || (s.dept || '').includes(selectedGrade)))
+        || activeStaff.find(s => (s.role || '').includes('የክፍል ኃላፊ'))
+        || activeStaff.find(s => (s.role || '').includes('መምህር'))
         || activeStaff[0]
-        || { name: 'መምህር ዳዊት በቀለ' };
+        || { name: (schoolSettings && schoolSettings.nameAm ? schoolSettings.nameAm + ' መምህር' : 'ያልተመደበ') };
       document.getElementById('cardModalHomeroomTeacher').innerText = hrTeacher.name;
+      if (document.getElementById('cardModalPrincipalName')) {
+        document.getElementById('cardModalPrincipalName').innerText = (schoolSettings && schoolSettings.principalAm) ? schoolSettings.principalAm : 'ርዕሰ መምህር';
+      }
+      if (document.getElementById('reportCardPrintTeacher')) {
+        document.getElementById('reportCardPrintTeacher').innerText = hrTeacher.name;
+      }
+      if (document.getElementById('reportCardPrintPrincipal')) {
+        document.getElementById('reportCardPrintPrincipal').innerText = (schoolSettings && schoolSettings.principalAm) ? schoolSettings.principalAm : 'ርዕሰ መምህር';
+      }
     }
 
     function closeReportCardModal() {
@@ -6419,6 +6419,9 @@
       // Unblock if previously marked as deleted
       deletedStaffIds.delete(id.toLowerCase());
       deletedStaffIds.delete(name.toLowerCase());
+      const stripped = name.replace(/^(መምህር|መምህርት|አቶ|ወ\/ሮ|ወ\/ሪት|ዶ\/ር)\s+/g, '').trim().toLowerCase();
+      if (stripped) deletedStaffIds.delete(stripped);
+      if (phone) deletedStaffIds.delete(phone.toLowerCase());
       localStorage.setItem('dilijent_deleted_staff_ids', JSON.stringify([...deletedStaffIds]));
 
       const newStaffObj = {
@@ -6506,16 +6509,24 @@
       const targetId = targetStaff ? (targetStaff.id || '').trim() : (typeof idOrIdx === 'string' ? idOrIdx.trim() : '');
       const staffName = targetStaff ? (targetStaff.name || '').trim() : 'ይህን ሰራተኛ';
 
-      if (confirm(`ሰራተኛ/መምህር ${staffName} (${targetId}) ከዝርዝር በቋሚነት እንዲሰረዝ ይፈልጋሉ?`)) {
+      if (confirm(`ሰራተኛ/መምህር ${staffName} (${targetId}) ከዳታቤዝ በቋሚነት እንዲሰረዝ ይፈልጋሉ?`)) {
         if (targetId) deletedStaffIds.add(targetId.toLowerCase());
-        if (staffName && staffName !== 'ይህን ሰራተኛ') deletedStaffIds.add(staffName.toLowerCase());
+        if (staffName && staffName !== 'ይህን ሰራተኛ') {
+          deletedStaffIds.add(staffName.toLowerCase());
+          const stripped = staffName.replace(/^(መምህር|መምህርት|አቶ|ወ\/ሮ|ወ\/ሪት|ዶ\/ር)\s+/g, '').trim().toLowerCase();
+          if (stripped) deletedStaffIds.add(stripped);
+        }
+        if (targetStaff && targetStaff.phone) {
+          deletedStaffIds.add(targetStaff.phone.trim().toLowerCase());
+        }
         localStorage.setItem('dilijent_deleted_staff_ids', JSON.stringify([...deletedStaffIds]));
 
         // 1. Remove from staffList
         staffList = staffList.filter(st => {
           const sid = (st.id || '').trim().toLowerCase();
           const sname = (st.name || '').trim().toLowerCase();
-          return sid !== targetId.toLowerCase() && sname !== staffName.toLowerCase();
+          const stripped = sname.replace(/^(መምህር|መምህርት|አቶ|ወ\/ሮ|ወ\/ሪት|ዶ\/ር)\s+/g, '').trim().toLowerCase();
+          return sid !== targetId.toLowerCase() && sname !== staffName.toLowerCase() && (!stripped || stripped !== staffName.toLowerCase());
         });
 
         // 2. Remove from permanent user-registered staff backup
@@ -6538,13 +6549,17 @@
         saveStaffAttendanceWeb();
 
         // 4. Remove from userAccounts
-        userAccounts = userAccounts.filter(acc => (acc.name || '').trim().toLowerCase() !== staffName.toLowerCase());
+        userAccounts = userAccounts.filter(acc => {
+          const aname = (acc.name || '').trim().toLowerCase();
+          const aphone = (acc.phone || '').trim().toLowerCase();
+          return aname !== staffName.toLowerCase() && (!targetStaff || !targetStaff.phone || aphone !== targetStaff.phone.trim().toLowerCase());
+        });
         localStorage.setItem('dilijent_user_accounts', JSON.stringify(userAccounts));
 
         saveState();
         if (typeof renderStaff === 'function') renderStaff();
         if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
-        alert(`🗑️ ሰራተኛ ${staffName} በቋሚነት ተሰርዟል! ወደፊትም አይመለስም።`);
+        alert(`🗑️ ሰራተኛ ${staffName} ከዳታቤዝ በቋሚነት ተሰርዟል! ወደፊትም በጭራሽ አይመለስም።`);
       }
     }
 
@@ -6563,13 +6578,26 @@
       { name: 'ተማሪ አቤል ታደሰ', role: '👨‍🎓 ተማሪ (12A)', email: '', phone: '0911002233', pass: 'Student@2026', isAdmin: false, isVicePrincipal: false, roleKey: 'student' }
     ];
 
-    let userAccounts = JSON.parse(localStorage.getItem('dilijent_user_accounts')) || DEFAULT_ACCOUNTS;
-    // Ensure all predefined roles exist
-    DEFAULT_ACCOUNTS.forEach(acc => {
-      if (!userAccounts.some(u => (u.email && acc.email && u.email === acc.email) || (u.phone && acc.phone && u.phone === acc.phone))) {
-        userAccounts.push(acc);
-      }
+    let userAccounts = [];
+    try {
+      userAccounts = JSON.parse(localStorage.getItem('dilijent_user_accounts')) || [];
+    } catch (e) {
+      userAccounts = [];
+    }
+    if (!Array.isArray(userAccounts) || userAccounts.length === 0) {
+      userAccounts = [...DEFAULT_ACCOUNTS];
+    }
+    // Filter out any permanently deleted accounts
+    userAccounts = userAccounts.filter(acc => {
+      const aname = (acc.name || '').trim().toLowerCase();
+      const aphone = (acc.phone || '').trim().toLowerCase();
+      const stripped = aname.replace(/^(መምህር|መምህርት|አቶ|ወ\/ሮ|ወ\/ሪት|ዶ\/ር)\s+/g, '').trim().toLowerCase();
+      return !deletedStaffIds.has(aname) && !deletedStaffIds.has(aphone) && (!stripped || !deletedStaffIds.has(stripped));
     });
+    // Ensure System Admin account ALWAYS exists so admin is never locked out
+    if (!userAccounts.some(u => u.isAdmin || u.roleKey === 'admin' || (u.email && u.email.toLowerCase() === 'admin@dilijent.edu.et'))) {
+      userAccounts.unshift(DEFAULT_ACCOUNTS[0]);
+    }
     localStorage.setItem('dilijent_user_accounts', JSON.stringify(userAccounts));
     let isGuestMode = false;
     let currentWebUser = JSON.parse(localStorage.getItem('dilijent_current_user')) || null;
@@ -7228,9 +7256,56 @@
         closeImportModal();
         alert(`🎉 ${parsedImportData.length} አዳዲስ ተማሪዎች ከExcel/CSV ፋይሉ በተሳካ ሁኔታ በLocal Storage ተመዝግበዋል!`);
       } else {
+        let userStaff = [];
+        try {
+          userStaff = JSON.parse(localStorage.getItem('dilijent_user_registered_staff') || '[]');
+        } catch (e) { userStaff = []; }
+
         parsedImportData.forEach(st => {
-          staffList.push(st);
+          st.isUserCreated = true;
+          const sid = (st.id || '').trim().toLowerCase();
+          const sname = (st.name || '').trim().toLowerCase();
+          const stripped = sname.replace(/^(መምህር|መምህርት|አቶ|ወ\/ሮ|ወ\/ሪት|ዶ\/ር)\s+/g, '').trim().toLowerCase();
+          deletedStaffIds.delete(sid);
+          deletedStaffIds.delete(sname);
+          if (stripped) deletedStaffIds.delete(stripped);
+          if (st.phone) deletedStaffIds.delete(st.phone.trim().toLowerCase());
+
+          // Add or update in staffList
+          const existingIdx = staffList.findIndex(x => (x.id || '').trim().toLowerCase() === sid || (x.name || '').trim().toLowerCase() === sname);
+          if (existingIdx >= 0) {
+            staffList[existingIdx] = st;
+          } else {
+            staffList.unshift(st);
+          }
+
+          // Add to permanent userStaff backup
+          userStaff = userStaff.filter(us => (us.id || '').trim().toLowerCase() !== sid && (us.name || '').trim().toLowerCase() !== sname);
+          userStaff.unshift(st);
+
+          // Synchronize with staff attendance
+          const isTeacher = (st.role || '').toLowerCase().includes('መምህር') || (st.dept || '').toLowerCase().includes('መምህር');
+          if (!staffAttendanceListWeb.some(sa => (sa.name || '').trim().toLowerCase() === sname)) {
+            staffAttendanceListWeb.push({
+              id: st.id,
+              name: st.name,
+              role: st.role || 'ሰራተኛ',
+              dept: st.dept || 'አስተዳደር',
+              isTeacher: isTeacher,
+              morningStatus: 'ተገኝቷል',
+              morningTime: '01:30 ጧት',
+              morningRemarks: 'በሰዓቱ ገብተዋል',
+              afternoonStatus: 'ተገኝቷል',
+              afternoonTime: '09:20 ከሰዓት',
+              afternoonRemarks: 'በሰዓቱ ተገኝተዋል',
+              isUserCreated: true
+            });
+          }
         });
+
+        localStorage.setItem('dilijent_deleted_staff_ids', JSON.stringify([...deletedStaffIds]));
+        localStorage.setItem('dilijent_user_registered_staff', JSON.stringify(userStaff));
+        saveStaffAttendanceWeb();
         saveState();
         closeImportModal();
         alert(`🎉 ${parsedImportData.length} አዳዲስ መምህራን/ሰራተኞች ከExcel/CSV ፋይሉ በተሳካ ሁኔታ በLocal Storage ተመዝግበዋል!`);
