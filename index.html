@@ -201,8 +201,7 @@
     .badge-danger { background: #FEE2E2; color: #B91C1C; }
     .badge-id { background: #1E3A8A !important; color: #FFFFFF !important; font-weight: 700 !important; font-family: monospace, sans-serif; padding: 0.22rem 0.55rem !important; border-radius: 6px !important; letter-spacing: 0.5px; box-shadow: 0 1px 3px rgba(0,0,0,0.18); display: inline-block; }
 
-    /* Modal */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; padding: 1rem; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: none; align-items: center; justify-content: center; z-index: 99999 !important; padding: 1rem; overflow-y: auto; }
     .modal-box { background: white; border-radius: var(--radius); width: 100%; max-width: 540px; padding: 1.5rem; max-height: 90vh; overflow-y: auto; }
     .modal-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--primary); }
     .modal-subtitle { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem; }
@@ -446,10 +445,10 @@
       <div style="display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center;">
         <button class="btn-primary" onclick="openLoginModal()">🔑 የመግቢያ ገጽ (Login)</button>
         <button class="btn-primary" style="background:#EF4444; border-color:#DC2626;" onclick="logoutWeb()">🚪 ውጣ (Logout)</button>
-        <button id="btnBannerSchoolSettings" class="btn-accent" style="background:#0284C7; border-color:#0284C7;" onclick="openSchoolSettingsModal()">⚙️ የት/ቤት ቅንብር & አርማ</button>
-        <button id="btnBannerPassManager" class="btn-accent" onclick="openPasswordManagerModal()">🔐 የይለፍ ቃል መቆጣጠሪያ</button>
-        <button class="btn-secondary" onclick="openSchemeModal()">⚙️ የውጤት አሰጣጥ (ርዕሰ መ/ር & አድሚን)</button>
-        <button class="btn-secondary" onclick="shareWebsiteLink()">🔗 ሊንክ ኮፒ</button>
+        <button id="btnBannerSchoolSettings" class="btn-accent" style="background:#0284C7; border-color:#0284C7; cursor:pointer;" onclick="openSchoolSettingsModal()">⚙️ የት/ቤት ቅንብር & አርማ</button>
+        <button id="btnBannerPassManager" class="btn-accent" style="cursor:pointer;" onclick="openPasswordManagerModal()">🔐 የይለፍ ቃል መቆጣጠሪያ</button>
+        <button id="btnBannerScheme" class="btn-secondary" style="cursor:pointer;" onclick="openSchemeModal()">⚙️ የውጤት አሰጣጥ (ርዕሰ መ/ር & አድሚን)</button>
+        <button class="btn-secondary" style="cursor:pointer;" onclick="shareWebsiteLink()">🔗 ሊንክ ኮፒ</button>
       </div>
     </div>
 
@@ -6151,14 +6150,25 @@
     // ASSESSMENT SCHEME MODAL (ርዕሰ-መምህር እና አድሚን ገፅ)
     // ==========================================
     function openSchemeModal() {
-      renderPresetsInModal();
-      renderSchemeComponentsUI(getSchemeComponents(currentScheme));
-      calculateSchemeTotal();
-      document.getElementById('schemeModal').style.display = 'flex';
+      try {
+        renderPresetsInModal();
+        renderSchemeComponentsUI(getSchemeComponents(currentScheme));
+        calculateSchemeTotal();
+        const modal = document.getElementById('schemeModal');
+        if (modal) {
+          modal.style.display = 'flex';
+          modal.style.zIndex = '99999';
+        }
+      } catch (err) {
+        console.error('Error opening scheme modal:', err);
+        const modal = document.getElementById('schemeModal');
+        if (modal) modal.style.display = 'flex';
+      }
     }
 
     function closeSchemeModal() {
-      document.getElementById('schemeModal').style.display = 'none';
+      const modal = document.getElementById('schemeModal');
+      if (modal) modal.style.display = 'none';
     }
 
     function renderPresetsInModal() {
@@ -6635,7 +6645,7 @@
         if (emailGroup) emailGroup.style.display = 'none';
         if (phoneGroup) phoneGroup.style.display = 'block';
         if (phoneInput) phoneInput.focus();
-        const roleText = select.options[select.selectedIndex]?.text || 'መምህር';
+        const roleText = (select.options && select.selectedIndex >= 0 && select.options[select.selectedIndex]) ? select.options[select.selectedIndex].text : 'መምህር';
         if (notice) {
           notice.style.background = '#EFF6FF';
           notice.style.borderColor = '#BFDBFE';
@@ -6976,31 +6986,58 @@
     }
 
     function openPasswordManagerModal() {
-      renderUserAccountsTable();
-      document.getElementById('passwordManagerModal').style.display = 'flex';
+      try {
+        if (!Array.isArray(userAccounts) || userAccounts.length === 0) {
+          try {
+            userAccounts = JSON.parse(localStorage.getItem('dilijent_user_accounts')) || [];
+          } catch(e) { userAccounts = []; }
+          if (!Array.isArray(userAccounts) || userAccounts.length === 0) {
+            userAccounts = [...DEFAULT_ACCOUNTS];
+          }
+        }
+        renderUserAccountsTable();
+        const modal = document.getElementById('passwordManagerModal');
+        if (modal) {
+          modal.style.display = 'flex';
+          modal.style.zIndex = '99999';
+        }
+      } catch (err) {
+        console.error('Error opening password manager modal:', err);
+        const modal = document.getElementById('passwordManagerModal');
+        if (modal) modal.style.display = 'flex';
+      }
     }
 
     function closePasswordManagerModal() {
-      document.getElementById('passwordManagerModal').style.display = 'none';
+      const modal = document.getElementById('passwordManagerModal');
+      if (modal) modal.style.display = 'none';
     }
 
     function renderUserAccountsTable() {
       const tbody = document.getElementById('userAccountsTableBody');
       if (!tbody) return;
+      if (!Array.isArray(userAccounts)) userAccounts = [...DEFAULT_ACCOUNTS];
 
-      tbody.innerHTML = userAccounts.map((acc, idx) => `
+      tbody.innerHTML = userAccounts.map((acc, idx) => {
+        if (!acc) return '';
+        const name = acc.name || 'ያልተገለጸ';
+        const role = acc.role || (acc.isAdmin ? '👑 ሲስተም አድሚን' : 'ተጠቃሚ');
+        const loginId = acc.isAdmin ? (acc.email || 'admin@dilijent.edu.et') : (acc.phone || acc.name || '');
+        const pass = acc.pass || 'Staff@2026';
+        return `
         <tr style="border-bottom:1px solid #E2E8F0;">
-          <td style="padding:7px 8px; font-weight:700;">${acc.name}</td>
-          <td style="padding:7px 8px;"><span class="badge ${acc.isAdmin ? 'badge-primary' : 'badge-warning'}">${acc.role}</span></td>
-          <td style="padding:7px 8px; font-family:monospace; font-size:0.8rem; color:#1E40AF;">${acc.isAdmin ? acc.email : acc.phone}</td>
+          <td style="padding:7px 8px; font-weight:700;">${name}</td>
+          <td style="padding:7px 8px;"><span class="badge ${acc.isAdmin ? 'badge-primary' : 'badge-warning'}">${role}</span></td>
+          <td style="padding:7px 8px; font-family:monospace; font-size:0.8rem; color:#1E40AF;">${loginId}</td>
           <td style="padding:7px 8px; text-align:center;">
-            <input type="text" id="accPassInput_${idx}" value="${acc.pass}" minlength="8" style="width:130px; padding:4px 6px; font-size:0.8rem; border:1px solid #CBD5E1; border-radius:4px; font-family:monospace; text-align:center;" placeholder="min 8 chars">
+            <input type="text" id="accPassInput_${idx}" value="${pass}" minlength="8" style="width:130px; padding:4px 6px; font-size:0.8rem; border:1px solid #CBD5E1; border-radius:4px; font-family:monospace; text-align:center;" placeholder="min 8 chars">
           </td>
           <td style="padding:7px 8px; text-align:center;">
             <button class="btn-primary" style="padding:4px 8px; font-size:0.75rem;" onclick="saveAccountPassword(${idx})">💾 ቀይር</button>
           </td>
         </tr>
-      `).join('');
+      `;
+      }).join('');
     }
 
     function saveAccountPassword(idx) {
@@ -7553,28 +7590,46 @@
     }
 
     function openSchoolSettingsModal() {
-      document.getElementById('inputSettingsSchoolNameAm').value = schoolSettings.nameAm;
-      document.getElementById('inputSettingsSchoolNameEn').value = schoolSettings.nameEn;
-      const yrInput = document.getElementById('inputSettingsAcademicYear');
-      if (yrInput) yrInput.value = schoolSettings.academicYear || '2017 ዓ.ም';
+      try {
+        const nameAmInput = document.getElementById('inputSettingsSchoolNameAm');
+        if (nameAmInput) nameAmInput.value = (schoolSettings && schoolSettings.nameAm) ? schoolSettings.nameAm : 'ዲሊጀንት ትምህርት ቤት';
+        const nameEnInput = document.getElementById('inputSettingsSchoolNameEn');
+        if (nameEnInput) nameEnInput.value = (schoolSettings && schoolSettings.nameEn) ? schoolSettings.nameEn : 'Dilijent School';
+        const yrInput = document.getElementById('inputSettingsAcademicYear');
+        if (yrInput) yrInput.value = (schoolSettings && schoolSettings.academicYear) ? schoolSettings.academicYear : '2017 ዓ.ም';
 
-      const radios = document.getElementsByName('schoolGradeLevelRadio');
-      radios.forEach(r => {
-        r.checked = (r.value === schoolSettings.gradeLevel);
-      });
+        const radios = document.getElementsByName('schoolGradeLevelRadio');
+        if (radios && radios.length > 0) {
+          const currentLevel = (schoolSettings && schoolSettings.gradeLevel) ? schoolSettings.gradeLevel : '1_8';
+          for (let i = 0; i < radios.length; i++) {
+            radios[i].checked = (radios[i].value === currentLevel);
+          }
+        }
 
-      const previewBox = document.getElementById('settingsLogoPreviewBox');
-      if (schoolSettings.logoData) {
-        previewBox.innerHTML = `<img src="${schoolSettings.logoData}" alt="Logo Preview" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />`;
-      } else {
-        previewBox.innerHTML = '<span>🎓</span>';
+        const previewBox = document.getElementById('settingsLogoPreviewBox');
+        if (previewBox) {
+          if (schoolSettings && schoolSettings.logoData) {
+            previewBox.innerHTML = `<img src="${schoolSettings.logoData}" alt="Logo Preview" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />`;
+          } else {
+            previewBox.innerHTML = '<span>🎓</span>';
+          }
+        }
+
+        const modal = document.getElementById('schoolSettingsModal');
+        if (modal) {
+          modal.style.display = 'flex';
+          modal.style.zIndex = '99999';
+        }
+      } catch (err) {
+        console.error('Error opening school settings modal:', err);
+        const modal = document.getElementById('schoolSettingsModal');
+        if (modal) modal.style.display = 'flex';
       }
-
-      document.getElementById('schoolSettingsModal').style.display = 'flex';
     }
 
     function closeSchoolSettingsModal() {
-      document.getElementById('schoolSettingsModal').style.display = 'none';
+      const modal = document.getElementById('schoolSettingsModal');
+      if (modal) modal.style.display = 'none';
     }
 
     function handleSchoolLogoUpload(event) {
@@ -7586,7 +7641,9 @@
         schoolSettings.logoData = base64;
         localStorage.setItem('school_logo_data', base64);
         const previewBox = document.getElementById('settingsLogoPreviewBox');
-        previewBox.innerHTML = `<img src="${base64}" alt="Logo Preview" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />`;
+        if (previewBox) {
+          previewBox.innerHTML = `<img src="${base64}" alt="Logo Preview" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />`;
+        }
         applySchoolSettingsWeb();
       };
       reader.readAsDataURL(file);
@@ -7596,36 +7653,47 @@
       schoolSettings.logoData = '';
       localStorage.removeItem('school_logo_data');
       const previewBox = document.getElementById('settingsLogoPreviewBox');
-      previewBox.innerHTML = '<span>🎓</span>';
+      if (previewBox) {
+        previewBox.innerHTML = '<span>🎓</span>';
+      }
       applySchoolSettingsWeb();
     }
 
     function previewGradeLevel(level) {
-      schoolSettings.gradeLevel = level;
+      if (schoolSettings) schoolSettings.gradeLevel = level;
     }
 
     function saveSchoolSettingsWeb() {
-      const radios = document.getElementsByName('schoolGradeLevelRadio');
-      radios.forEach(r => {
-        if (r.checked) schoolSettings.gradeLevel = r.value;
-      });
+      try {
+        const radios = document.getElementsByName('schoolGradeLevelRadio');
+        if (radios && radios.length > 0) {
+          for (let i = 0; i < radios.length; i++) {
+            if (radios[i].checked) schoolSettings.gradeLevel = radios[i].value;
+          }
+        }
 
-      schoolSettings.nameAm = document.getElementById('inputSettingsSchoolNameAm').value.trim() || 'ዲሊጀንት ትምህርት ቤት';
-      schoolSettings.nameEn = document.getElementById('inputSettingsSchoolNameEn').value.trim() || 'Dilijent School';
-      const yrInput = document.getElementById('inputSettingsAcademicYear');
-      if (yrInput) {
-        schoolSettings.academicYear = yrInput.value.trim() || '2017 ዓ.ም';
-        localStorage.setItem('school_academic_year', schoolSettings.academicYear);
+        const nameAmEl = document.getElementById('inputSettingsSchoolNameAm');
+        if (nameAmEl) schoolSettings.nameAm = nameAmEl.value.trim() || 'ዲሊጀንት ትምህርት ቤት';
+        const nameEnEl = document.getElementById('inputSettingsSchoolNameEn');
+        if (nameEnEl) schoolSettings.nameEn = nameEnEl.value.trim() || 'Dilijent School';
+        const yrInput = document.getElementById('inputSettingsAcademicYear');
+        if (yrInput) {
+          schoolSettings.academicYear = yrInput.value.trim() || '2017 ዓ.ም';
+          localStorage.setItem('school_academic_year', schoolSettings.academicYear);
+        }
+
+        localStorage.setItem('school_grade_level', schoolSettings.gradeLevel);
+        localStorage.setItem('school_name_am', schoolSettings.nameAm);
+        localStorage.setItem('school_name_en', schoolSettings.nameEn);
+
+        applySchoolSettingsWeb();
+        saveState();
+        closeSchoolSettingsModal();
+        alert('✅ የትምህርት ቤት ቅንብር፣ አርማ እና ዓመተ ምህረት በተሳካ ሁኔታ ተቀምጧል!');
+      } catch (err) {
+        console.error('Error saving school settings:', err);
+        alert('ቅንብሩን ማስቀመጥ አልተቻለም፡ ' + err.message);
       }
-
-      localStorage.setItem('school_grade_level', schoolSettings.gradeLevel);
-      localStorage.setItem('school_name_am', schoolSettings.nameAm);
-      localStorage.setItem('school_name_en', schoolSettings.nameEn);
-
-      applySchoolSettingsWeb();
-      saveState();
-      closeSchoolSettingsModal();
-      alert('✅ የትምህርት ቤት ቅንብር፣ አርማ እና ዓመተ ምህረት በተሳካ ሁኔታ ተቀምጧል!');
     }
 
     function downloadMonthlyAttendanceReportWeb() {
@@ -8002,8 +8070,32 @@
       printWindow.document.close();
     }
 
+    // Guarantee event listeners for Settings, Password Manager & Assessment Scheme
+    function attachDirectButtonListeners() {
+      const btnSettingsHeader = document.getElementById('btnSchoolSettingsHeader');
+      if (btnSettingsHeader) btnSettingsHeader.onclick = openSchoolSettingsModal;
+      const btnPassHeader = document.getElementById('btnAdminPassManager');
+      if (btnPassHeader) btnPassHeader.onclick = openPasswordManagerModal;
+      const btnSettingsBanner = document.getElementById('btnBannerSchoolSettings');
+      if (btnSettingsBanner) btnSettingsBanner.onclick = openSchoolSettingsModal;
+      const btnPassBanner = document.getElementById('btnBannerPassManager');
+      if (btnPassBanner) btnPassBanner.onclick = openPasswordManagerModal;
+      const btnSchemeBanner = document.getElementById('btnBannerScheme');
+      if (btnSchemeBanner) btnSchemeBanner.onclick = openSchemeModal;
+      const logoGroup = document.getElementById('headerLogoGroup');
+      if (logoGroup) logoGroup.onclick = openSchoolSettingsModal;
+    }
+
+    // Allow closing modals by clicking outside on overlay background
+    window.addEventListener('click', function(e) {
+      if (e.target && e.target.classList && e.target.classList.contains('modal-overlay')) {
+        e.target.style.display = 'none';
+      }
+    });
+
     // Initialize
     updateCurrentUserUI();
+    attachDirectButtonListeners();
     handleFullLoginRoleDropdownChange();
     handleLoginRoleChange();
     applySchoolSettingsWeb();
