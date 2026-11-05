@@ -74,6 +74,30 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
             seedOfficialStudentsIfNeeded()
             clearSampleGradesIfNeeded()
             purgeDeletedStaffAndRestoreUserStaff()
+            val tadeAdmin = repository.getUserByEmail("tadessemisganaw4@gmail.com")
+            if (tadeAdmin == null) {
+                repository.registerUser(
+                    UserAccount(
+                        fullName = "ታደሰ ምስጋናው (ሲስተም አድሚን)",
+                        email = "tadessemisganaw4@gmail.com",
+                        phone = "0911999999",
+                        password = "tade@2026",
+                        role = "ሲስተም አድሚን (Super Admin)"
+                    )
+                )
+            }
+            val saraSec = repository.getUserByPhone("0960225925")
+            if (saraSec == null) {
+                repository.registerUser(
+                    UserAccount(
+                        fullName = "Sara Niguse",
+                        email = "sara.niguse@dilijent.edu.et",
+                        phone = "0960225925",
+                        password = "sara@123",
+                        role = "ዋና ጸሐፊ (Secretary)"
+                    )
+                )
+            }
             val adminUser = repository.getUserByEmail("admin@dilijent.edu.et")
             if (adminUser == null) {
                 repository.registerUser(
@@ -81,7 +105,7 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                         fullName = "ሲስተም አድሚን (እኔ)",
                         email = "admin@dilijent.edu.et",
                         phone = "0900000000",
-                        password = "admin123",
+                        password = "tade@2026",
                         role = "ሲስተም አድሚን (Super Admin)"
                     )
                 )
@@ -569,7 +593,7 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
     val isSuperAdmin: StateFlow<Boolean> = _currentUser.map {
         val role = it?.role ?: ""
         val email = it?.email ?: ""
-        role.contains("ሲስተም") || email.equals("admin@dilijent.edu.et", ignoreCase = true)
+        role.contains("ሲስተም") || email.equals("tadessemisganaw4@gmail.com", ignoreCase = true) || email.equals("admin@dilijent.edu.et", ignoreCase = true)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     val isAdmin: StateFlow<Boolean> = _currentUser.map {
@@ -589,6 +613,7 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         role.contains("ምክትል") || role.contains("Vice") ||
         role.contains("ርዕሰ መምህር") || role.contains("Principal") ||
         role.contains("Admin") || role.contains("አስተዳዳሪ") || role.contains("ሲስተም") ||
+        email.equals("tadessemisganaw4@gmail.com", ignoreCase = true) ||
         email.equals("admin@dilijent.edu.et", ignoreCase = true)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
@@ -1011,12 +1036,12 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                 // Email login for System Admin
                 val cleanEmail = identifier.trim()
                 val found = repository.authenticateByEmail(cleanEmail, pass.trim())
-                if (found == null && cleanEmail.equals("admin@dilijent.edu.et", ignoreCase = true) && pass.trim() == "admin123") {
+                if (found == null && (cleanEmail.equals("tadessemisganaw4@gmail.com", ignoreCase = true) || cleanEmail.equals("admin@dilijent.edu.et", ignoreCase = true)) && (pass.trim() == "tade@2026" || pass.trim() == "admin123")) {
                     val fallbackAdmin = UserAccount(
-                        fullName = "ሲስተም አድሚን (እኔ)",
-                        email = "admin@dilijent.edu.et",
-                        phone = "0900000000",
-                        password = "admin123",
+                        fullName = "ታደሰ ምስጋናው (ሲስተም አድሚን)",
+                        email = "tadessemisganaw4@gmail.com",
+                        phone = "0911999999",
+                        password = "tade@2026",
                         role = "ሲስተም አድሚን (Super Admin)"
                     )
                     repository.registerUser(fallbackAdmin)
@@ -1026,7 +1051,20 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                 }
             } else {
                 // Phone login for Teachers, Students, Staff, and Principal
-                repository.authenticate(identifier.trim(), pass.trim())
+                val authed = repository.authenticate(identifier.trim(), pass.trim())
+                if (authed == null && identifier.trim() == "0960225925" && (pass.trim() == "sara@123" || pass.trim() == "1234")) {
+                    val fallbackSara = UserAccount(
+                        fullName = "Sara Niguse",
+                        email = "sara.niguse@dilijent.edu.et",
+                        phone = "0960225925",
+                        password = "sara@123",
+                        role = "ዋና ጸሐፊ (Secretary)"
+                    )
+                    repository.registerUser(fallbackSara)
+                    fallbackSara
+                } else {
+                    authed
+                }
             }
 
             // Fallback for teacher/student/staff matching with initial PIN 1234
