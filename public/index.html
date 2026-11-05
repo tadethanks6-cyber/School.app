@@ -1082,6 +1082,7 @@
               <option value="2">2ኛ ሴሚስተር (Semester II)</option>
             </select>
           </div>
+        </div>
         <div class="form-group" style="background:#FEF3C7; border:1px solid #FDE68A; padding:0.6rem 0.85rem; border-radius:8px;">
           <label style="color:#B45309; font-weight:700; margin-bottom:0.25rem;">🔒 የሚያስተምረው መምህር ማረጋገጫ (Subject Teacher Verification) *</label>
           <select id="gradeTeacherSelect" class="form-control" required style="border-color:#F59E0B; background:white; font-weight:600;">
@@ -1773,6 +1774,8 @@
         <button type="button" class="btn-primary" onclick="window.print()">🖨️ ካርድ አትም (Print)</button>
       </div>
     </div>
+  </div>
+
   <!-- Modal: Staff Attendance Edit (እረስቶት ዘግይቶ ቲክ ለማድረግ እና ሰዓት ለማረም) -->
   <div id="staffAttendanceEditModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 480px; width: 95%;">
@@ -4351,27 +4354,11 @@
       ...OFFICIAL_GRADE_7_STUDENTS
     ];
 
-    // Initial Seed Data with strict separation for Primary/Middle (1-8) and High School (9-12)
+    // Initial Official Student Data (genuine official records, no artificial dummy samples)
     const SEED_STUDENTS_PRIMARY = [
-      ...ALL_OFFICIAL_STUDENTS,
-      { id: 'DIL-P01', name: 'ዮናስ ተስፋዬ', gender: 'ወንድ', grade: '8A', phone: '+251 911 334455', scores: [9.5, 9.5, 29.0, 48.0], photo: '', status: 'ንቁ' },
-      { id: 'DIL-P02', name: 'ሶፊያ ጌታቸው', gender: 'ሴት', grade: '7B', phone: '+251 922 445566', scores: [9.0, 9.5, 27.0, 46.5], photo: '', status: 'ንቁ' },
-      { id: 'DIL-P03', name: 'ሚካኤል ዳዊት', gender: 'ወንድ', grade: '5A', phone: '+251 933 556677', scores: [8.5, 8.5, 26.0, 44.0], photo: '', status: 'ንቁ' },
-      { id: 'DIL-P04', name: 'ሩት አበበ', gender: 'ሴት', grade: '3B', phone: '+251 944 667788', scores: [9.0, 9.0, 28.0, 47.0], photo: '', status: 'ንቁ' },
-      { id: 'DIL-P05', name: 'ሳሙኤል ታደሰ', gender: 'ወንድ', grade: '1A', phone: '+251 955 778899', scores: [9.5, 9.0, 28.5, 49.0], photo: '', status: 'ንቁ' },
-      { id: 'DIL-P06', name: 'ትዕግስት ወርቁ', gender: 'ሴት', grade: '8B', phone: '+251 966 889900', scores: [8.0, 8.5, 25.0, 43.0], photo: '', status: 'ንቁ' },
-      { id: 'DIL-P07', name: 'ኪሩቤል ሰለሞን', gender: 'ወንድ', grade: '6A', phone: '+251 977 990011', scores: [9.0, 9.0, 26.5, 45.0], photo: '', status: 'ንቁ' },
-      { id: 'DIL-P08', name: 'ኤልሳቤጥ ካሳ', gender: 'ሴት', grade: '4B', phone: '+251 988 001122', scores: [8.5, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' }
+      ...ALL_OFFICIAL_STUDENTS
     ];
-
-    const SEED_STUDENTS_HIGH = [
-      { id: 'DIL-001', name: 'አቤል ታደሰ', gender: 'ወንድ', grade: '12A', phone: '+251 911 234567', scores: [9.5, 9.5, 28.5, 47.0], photo: '', status: 'ንቁ' },
-      { id: 'DIL-002', name: 'ሄለን ገብሬ', gender: 'ሴት', grade: '11B', phone: '+251 922 345678', scores: [9.0, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
-      { id: 'DIL-003', name: 'ናሆም በቀለ', gender: 'ወንድ', grade: '10A', phone: '+251 933 456789', scores: [7.5, 8.0, 22.0, 38.0], photo: '', status: 'ንቁ' },
-      { id: 'DIL-004', name: 'ቤተልሔም ሰለሞን', gender: 'ሴት', grade: '9A', phone: '+251 944 567890', scores: [9.0, 9.0, 27.5, 46.0], photo: '', status: 'ንቁ' },
-      { id: 'DIL-005', name: 'ዮናስ አለሙ', gender: 'ወንድ', grade: '12B', phone: '+251 955 678901', scores: [8.5, 8.0, 24.0, 42.0], photo: '', status: 'ንቁ' },
-      { id: 'DIL-006', name: 'ሰላም ተስፋዬ', gender: 'ሴት', grade: '11A', phone: '+251 966 789012', scores: [9.0, 9.5, 28.0, 47.0], photo: '', status: 'ንቁ' }
-    ];
+    const SEED_STUDENTS_HIGH = [];
 
     const SEED_STAFF_PRIMARY = [
       { id: 'STF-P01', name: 'መምህርት አስቴር ከበደ', role: 'የክፍል ኃላፊ (8A)', dept: 'አጠቃላይ ሳይንስ (General Science)', phone: '+251 911 881122', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' },
@@ -4407,6 +4394,48 @@
       { name: 'ቤተልሔም ሰለሞን', grade: '9A', status: 'Absent', note: 'የሕመም ፈቃድ' }
     ];
 
+    // ============================================================
+    // Core Normalization & Sector Helpers
+    // ============================================================
+    function normalizeStudentName(name) {
+      if (!name) return '';
+      return String(name).trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    function normalizeStaffName(name) {
+      if (!name) return '';
+      return String(name)
+        .replace(/^(መምህር|መምህርት|አቶ|ወ\/ሮ|ወ\/ሪት|ዶ\/ር|ኢንጂነር|mr|mrs|ms|dr)\.?\s+/gi, '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, ' ');
+    }
+
+    function getStaffSector(role, dept) {
+      const r = (role || '').toLowerCase();
+      const d = (dept || '').toLowerCase();
+      const combo = (r + ' ' + d).trim();
+      if (combo.includes('መምህር') || combo.includes('መምህርት') || combo.includes('አስተማሪ') || combo.includes('teacher') || combo.includes('ክፍል ኃላፊ') || combo.includes('የት/ክፍል ኃላፊ')) {
+        return 'መምህራን (Teaching/Academic)';
+      }
+      if (combo.includes('ርዕሰ') || combo.includes('ር/መ') || combo.includes('ምክትል') || combo.includes('ዳይሬክተር') || combo.includes('ጸሐፊ') || combo.includes('ሬጅስትራር') || combo.includes('አስተዳደር') || combo.includes('admin') || combo.includes('director')) {
+        return 'አስተዳደርና አመራር (Administration)';
+      }
+      if (combo.includes('ፋይናንስ') || combo.includes('ሂሳብ') || combo.includes('ገንዘብ') || combo.includes('finance') || combo.includes('accountant') || combo.includes('cashier')) {
+        return 'ፋይናንስና ሂሳብ (Finance)';
+      }
+      if (combo.includes('ጥበቃ') || combo.includes('ደህንነት') || combo.includes('security') || combo.includes('guard')) {
+        return 'ደህንነትና ጥበቃ (Security)';
+      }
+      if (combo.includes('ፅዳት') || combo.includes('ካፍቴሪያ') || combo.includes('ምግብ') || combo.includes('ሹፌር') || combo.includes('አትክልተኛ') || combo.includes('cleaner') || combo.includes('janitor')) {
+        return 'ድጋፍ ሰጪ እና አገልግሎት (Support & Logistics)';
+      }
+      if (combo.includes('ነርስ') || combo.includes('ክሊኒክ') || combo.includes('ጤና') || combo.includes('nurse')) {
+        return 'ጤና እና ስነ-ልቦና (Health & Wellness)';
+      }
+      return (role || 'አጠቃላይ ሰራተኛ').trim();
+    }
+
     // Initialize state with permanent deletion tracking
     let deletedStudentIds = new Set(
       (JSON.parse(localStorage.getItem('dilijent_deleted_student_ids') || '[]')).map(id => (id || '').trim().toLowerCase())
@@ -4415,6 +4444,7 @@
       (JSON.parse(localStorage.getItem('dilijent_deleted_staff_ids') || '[]')).map(id => (id || '').trim().toLowerCase())
     );
 
+    // 1. STUDENTS: Permanent Persistence & Strict Deduplication (No sample resurrection)
     let storedStudentsRaw = localStorage.getItem('dilijent_students');
     let students = [];
     if (storedStudentsRaw !== null) {
@@ -4424,36 +4454,69 @@
         students = [];
       }
     } else {
-      // First-time fresh seeding
-      students = [...OFFICIAL_GRADE_6_STUDENTS, ...OFFICIAL_GRADE_1_STUDENTS, ...SEED_STUDENTS_PRIMARY, ...SEED_STUDENTS_HIGH];
+      // First-time fresh seeding: strictly official students only
+      students = [...ALL_OFFICIAL_STUDENTS];
     }
 
-    // Ensure official uploaded students are incorporated once, respecting deletions
-    if (!localStorage.getItem('dilijent_official_migrated_v3')) {
-      const existingStudentIds = new Set(students.map(s => (s.id || '').trim().toLowerCase()));
-      const officialToInsert = ALL_OFFICIAL_STUDENTS.filter(
-        os => !existingStudentIds.has(os.id.trim().toLowerCase()) && !deletedStudentIds.has(os.id.trim().toLowerCase())
-      );
-      if (officialToInsert.length > 0) {
-        students = [...officialToInsert, ...students];
+    // Always restore any user-registered students from dedicated permanent backup in localStorage
+    let userStudents = [];
+    try {
+      userStudents = JSON.parse(localStorage.getItem('dilijent_user_registered_students') || '[]');
+    } catch (e) {
+      userStudents = [];
+    }
+    userStudents.forEach(us => {
+      if (!us) return;
+      const uNorm = normalizeStudentName(us.name);
+      const uId = (us.id || '').trim().toLowerCase();
+      const isDeleted = deletedStudentIds.has(uId) || deletedStudentIds.has(uNorm) || deletedStudentIds.has((us.name || '').trim().toLowerCase());
+      const alreadyExists = students.some(s => (s.id || '').trim().toLowerCase() === uId || normalizeStudentName(s.name) === uNorm);
+      if (!alreadyExists && !isDeleted) {
+        students.unshift(us);
       }
-      localStorage.setItem('dilijent_official_migrated_v3', 'true');
-    }
+    });
 
-    // Zero out all sample estimated scores everywhere as requested by user
-    if (!localStorage.getItem('dilijent_scores_zeroed_v5')) {
-      students.forEach(s => {
+    // Remove any legacy dummy placeholder sample students that may linger in localStorage
+    const DUMMY_SAMPLE_NAMES = new Set([
+      'ዮናስ ተስፋዬ', 'ሶፊያ ጌታቸው', 'ሚካኤል ዳዊት', 'ሩት አበበ', 'ሳሙኤል ታደሰ', 'ትዕግስት ወርቁ', 'ኪሩቤል ሰለሞን', 'ኤልሳቤጥ ካሳ',
+      'አቤል ታደሰ', 'ሄለን ገብሬ', 'ናሆም በቀለ', 'ቤተልሔም ሰለሞን', 'ዮናስ አለሙ', 'ሰላም ተስፋዬ'
+    ]);
+    students = students.filter(s => {
+      if (!s) return false;
+      const sId = (s.id || '').trim().toLowerCase();
+      const sNorm = normalizeStudentName(s.name);
+      if (deletedStudentIds.has(sId) || deletedStudentIds.has(sNorm) || deletedStudentIds.has((s.name || '').trim().toLowerCase())) return false;
+      if (DUMMY_SAMPLE_NAMES.has((s.name || '').trim()) && !s.isUserCreated) return false;
+      return true;
+    });
+
+    // Zero out scores for newly added or unscored official students
+    students.forEach(s => {
+      if (!s.scores || !s.subjectGrades) {
         s.scores = [0, 0, 0, 0];
         s.subjectGrades = {};
         s.avg = '0.0%';
-      });
-      localStorage.setItem('dilijent_scores_zeroed_v5', 'true');
-    }
+      }
+    });
 
-    // Always exclude any permanently deleted students
-    students = students.filter(s => !deletedStudentIds.has((s.id || '').trim().toLowerCase()));
+    // CRITICAL: Strict Deduplication: Every student MUST appear ONLY ONCE in the system
+    const seenStudentIds = new Set();
+    const seenStudentNames = new Set();
+    const cleanStudents = [];
+    students.forEach(s => {
+      const sId = (s.id || '').trim().toLowerCase();
+      const sNorm = normalizeStudentName(s.name);
+      if (!sNorm) return;
+      if (sId && seenStudentIds.has(sId)) return;
+      if (seenStudentNames.has(sNorm)) return;
+      if (sId) seenStudentIds.add(sId);
+      seenStudentNames.add(sNorm);
+      cleanStudents.push(s);
+    });
+    students = cleanStudents;
     localStorage.setItem('dilijent_students', JSON.stringify(students));
 
+    // 2. STAFF: Permanent Persistence & Sector Deduplication (No sample resurrection)
     let storedStaffRaw = localStorage.getItem('dilijent_staff_list');
     let staffList = [];
     if (storedStaffRaw !== null) {
@@ -4463,11 +4526,9 @@
         staffList = [];
       }
     } else {
-      // First-time fresh seeding - only if not already seeded or marked empty
-      if (!localStorage.getItem('dilijent_staff_seeded_v1')) {
-        staffList = [...SEED_STAFF_PRIMARY, ...SEED_STAFF_HIGH, ...SEED_STAFF_COMMON];
-        localStorage.setItem('dilijent_staff_seeded_v1', 'true');
-      }
+      // First-time fresh start: clean, never resurrect unwanted staff
+      staffList = [];
+      localStorage.setItem('dilijent_staff_seeded_v1', 'true');
     }
 
     // Restore any user-registered staff from dedicated permanent backup if missing
@@ -4478,19 +4539,38 @@
       userStaff = [];
     }
     userStaff.forEach(us => {
-      const exists = staffList.some(st => (st.id || '').trim().toLowerCase() === (us.id || '').trim().toLowerCase() || (st.name || '').trim().toLowerCase() === (us.name || '').trim().toLowerCase());
-      const isDeleted = deletedStaffIds.has((us.id || '').trim().toLowerCase()) || deletedStaffIds.has((us.name || '').trim().toLowerCase());
-      if (!exists && !isDeleted) {
-        staffList.push(us);
+      if (!us) return;
+      const uNorm = normalizeStaffName(us.name);
+      const uId = (us.id || '').trim().toLowerCase();
+      const isDeleted = deletedStaffIds.has(uId) || deletedStaffIds.has(uNorm) || deletedStaffIds.has((us.name || '').trim().toLowerCase());
+      const alreadyExists = staffList.some(st => (st.id || '').trim().toLowerCase() === uId || normalizeStaffName(st.name) === uNorm);
+      if (!alreadyExists && !isDeleted) {
+        staffList.unshift(us);
       }
     });
 
-    // Always exclude any permanently deleted staff (both by ID and by Name)
+    // Exclude permanently deleted staff (by ID, by Name, by stripped Name)
     staffList = staffList.filter(st => {
+      if (!st) return false;
       const sid = (st.id || '').trim().toLowerCase();
       const sname = (st.name || '').trim().toLowerCase();
-      return !deletedStaffIds.has(sid) && !deletedStaffIds.has(sname);
+      const stripped = normalizeStaffName(st.name);
+      return !deletedStaffIds.has(sid) && !deletedStaffIds.has(sname) && (!stripped || !deletedStaffIds.has(stripped));
     });
+
+    // CRITICAL: Deduplicate staff - No staff member can be registered more than once in the SAME work sector
+    const seenStaffSectors = new Set();
+    const cleanStaff = [];
+    staffList.forEach(st => {
+      const norm = normalizeStaffName(st.name);
+      const sector = getStaffSector(st.role, st.dept);
+      const key = `${norm}__${sector}`;
+      if (!norm) return;
+      if (seenStaffSectors.has(key)) return;
+      seenStaffSectors.add(key);
+      cleanStaff.push(st);
+    });
+    staffList = cleanStaff;
     localStorage.setItem('dilijent_staff_list', JSON.stringify(staffList));
 
     let attendance = JSON.parse(localStorage.getItem('dilijent_attendance')) || SEED_ATTENDANCE;
@@ -5951,21 +6031,44 @@
     }
 
     function removeStudent(idOrIdx) {
-      let targetId = '';
+      let targetStudent = null;
       if (typeof idOrIdx === 'string') {
-        targetId = idOrIdx.trim();
+        targetStudent = students.find(s => (s.id || '').trim().toLowerCase() === idOrIdx.trim().toLowerCase());
       } else if (typeof idOrIdx === 'number' && students[idOrIdx]) {
-        targetId = (students[idOrIdx].id || '').trim();
+        targetStudent = students[idOrIdx];
       }
-      const stName = students.find(s => s.id === targetId)?.name || 'ይህን ተማሪ';
+      const targetId = targetStudent ? (targetStudent.id || '').trim() : (typeof idOrIdx === 'string' ? idOrIdx.trim() : '');
+      const stName = targetStudent ? (targetStudent.name || '').trim() : 'ይህን ተማሪ';
+
       if (confirm(`ተማሪ ${stName} (${targetId}) ከመዝገብ በቋሚነት እንዲሰረዝ ይፈልጋሉ?`)) {
-        if (targetId) {
-          deletedStudentIds.add(targetId.toLowerCase());
-          localStorage.setItem('dilijent_deleted_student_ids', JSON.stringify([...deletedStudentIds]));
-          students = students.filter(s => (s.id || '').trim().toLowerCase() !== targetId.toLowerCase());
-        } else if (typeof idOrIdx === 'number') {
-          students.splice(idOrIdx, 1);
+        if (targetId) deletedStudentIds.add(targetId.toLowerCase());
+        if (stName && stName !== 'ይህን ተማሪ') {
+          deletedStudentIds.add(stName.toLowerCase());
+          const norm = normalizeStudentName(stName);
+          if (norm) deletedStudentIds.add(norm);
         }
+        localStorage.setItem('dilijent_deleted_student_ids', JSON.stringify([...deletedStudentIds]));
+
+        // 1. Remove from students
+        students = students.filter(s => {
+          const sid = (s.id || '').trim().toLowerCase();
+          const sname = (s.name || '').trim().toLowerCase();
+          const snorm = normalizeStudentName(s.name);
+          return sid !== targetId.toLowerCase() && sname !== stName.toLowerCase() && (!snorm || snorm !== normalizeStudentName(stName));
+        });
+
+        // 2. Remove from permanent user-registered students backup
+        try {
+          let userStudents = JSON.parse(localStorage.getItem('dilijent_user_registered_students') || '[]');
+          userStudents = userStudents.filter(us => {
+            const usId = (us.id || '').trim().toLowerCase();
+            const usName = (us.name || '').trim().toLowerCase();
+            const usNorm = normalizeStudentName(us.name);
+            return usId !== targetId.toLowerCase() && usName !== stName.toLowerCase() && (!usNorm || usNorm !== normalizeStudentName(stName));
+          });
+          localStorage.setItem('dilijent_user_registered_students', JSON.stringify(userStudents));
+        } catch (e) {}
+
         saveState();
       }
     }
@@ -6359,28 +6462,60 @@
 
     function saveNewStudent(e) {
       e.preventDefault();
-      const name = document.getElementById('newStudentName').value;
+      const name = document.getElementById('newStudentName').value.trim();
       const gender = document.getElementById('newStudentGender').value;
       const grade = document.getElementById('newStudentGrade').value;
-      const phone = document.getElementById('newStudentPhone').value;
-      const id = 'DIL-00' + (students.length + 1);
+      const phone = document.getElementById('newStudentPhone').value.trim();
 
-      students.push({
+      const normName = normalizeStudentName(name);
+
+      // Check if student with same normalized name already exists
+      const existingStudent = students.find(s => normalizeStudentName(s.name) === normName);
+      if (existingStudent) {
+        alert(`⚠️ ተማሪ "${name}" ቀደም ሲል በክፍል ${existingStudent.grade} (መለያ: ${existingStudent.id}) ተመዝግቧል!\n\nአንድ ተማሪ በሲስተሙ ውስጥ ከአንድ ጊዜ በላይ መመዝገብ አይችልም።`);
+        return;
+      }
+
+      const id = 'DIL-' + Date.now().toString().slice(-4) + '-' + Math.floor(100 + Math.random() * 900);
+
+      // Unblock if previously marked as deleted
+      deletedStudentIds.delete(id.toLowerCase());
+      deletedStudentIds.delete(normName);
+      deletedStudentIds.delete(name.toLowerCase());
+      localStorage.setItem('dilijent_deleted_student_ids', JSON.stringify([...deletedStudentIds]));
+
+      const newStudentObj = {
         id,
         name,
         gender,
         grade,
         phone,
-        scores: [8.5, 8.5, 25.0, 42.0],
+        scores: [0, 0, 0, 0],
+        subjectGrades: {},
+        avg: '0.0%',
         photo: selectedStudentPhotoBase64,
-        status: 'ንቁ'
-      });
+        status: 'ንቁ',
+        isUserCreated: true
+      };
+
+      // 1. Add to students
+      students.unshift(newStudentObj);
+
+      // 2. Save to permanent user-registered students backup in localStorage
+      let userStudents = [];
+      try {
+        userStudents = JSON.parse(localStorage.getItem('dilijent_user_registered_students') || '[]');
+      } catch (err) { userStudents = []; }
+      userStudents = userStudents.filter(us => normalizeStudentName(us.name) !== normName && (us.id || '').toLowerCase() !== id.toLowerCase());
+      userStudents.unshift(newStudentObj);
+      localStorage.setItem('dilijent_user_registered_students', JSON.stringify(userStudents));
+
       attendance.push({ name, grade, status: 'Present', note: 'በሰዓቱ ገብቷል' });
       saveState();
       closeAddStudentModal();
       e.target.reset();
       clearStudentPhoto();
-      alert(`ተማሪ ${name} ከፎቶ ጋር በተሳካ ሁኔታ በLocal Storage ተመዝግቧል!`);
+      alert(`✅ ተማሪ ${name} (ክፍል: ${grade}) በተሳካ ሁኔታ በዳታቤዝ ተመዝግቧል!`);
     }
 
     // Staff Photo Upload State & Handlers
@@ -6422,6 +6557,21 @@
       const phone = document.getElementById('newStaffPhone').value.trim();
       const qual = document.getElementById('newStaffQual').value.trim();
       
+      const normStaffName = normalizeStaffName(name);
+      const newSector = getStaffSector(role, dept);
+
+      // Check if staff already exists in this SAME sector:
+      const duplicateInSector = staffList.find(st => {
+        const existingNorm = normalizeStaffName(st.name);
+        const existingSector = getStaffSector(st.role, st.dept);
+        return existingNorm === normStaffName && existingSector === newSector;
+      });
+
+      if (duplicateInSector) {
+        alert(`⚠️ ሰራተኛ "${name}" በዚህ የስራ ዘርፍ [${newSector}] ቀደም ሲል ተመዝግቧል!\n\nአንድ ተጠቃሚ በአንድ የስራ ዘርፍ ከአንድ ጊዜ በላይ መመዝገብ አይችልም።\n(በሌላ የስራ ዘርፍ ግን መመዝገብ ይችላሉ)።`);
+        return;
+      }
+
       // Collision-free unique ID that never collides with deleted or existing sample IDs
       const uniqueSuffix = Date.now().toString().slice(-4) + '-' + Math.floor(100 + Math.random() * 900);
       const id = 'STF-' + uniqueSuffix;
@@ -7285,14 +7435,51 @@
       }
 
       if (activeImportTarget === 'students') {
+        let addedCount = 0;
+        let skippedDuplicateCount = 0;
+        let userStudents = [];
+        try {
+          userStudents = JSON.parse(localStorage.getItem('dilijent_user_registered_students') || '[]');
+        } catch (e) { userStudents = []; }
+
         parsedImportData.forEach(s => {
-          students.push(s);
-          attendance.push({ name: s.name, grade: s.grade, status: 'Present', note: 'በCSV የተመዘገበ' });
+          const normName = normalizeStudentName(s.name);
+          const sId = (s.id || '').trim().toLowerCase();
+          const isDuplicate = students.some(existing => normalizeStudentName(existing.name) === normName || (sId && (existing.id || '').trim().toLowerCase() === sId));
+          if (isDuplicate) {
+            skippedDuplicateCount++;
+            return;
+          }
+
+          s.isUserCreated = true;
+          s.scores = [0, 0, 0, 0];
+          s.subjectGrades = {};
+          s.avg = '0.0%';
+
+          deletedStudentIds.delete(sId);
+          deletedStudentIds.delete(normName);
+          deletedStudentIds.delete((s.name || '').trim().toLowerCase());
+
+          students.unshift(s);
+          attendance.push({ name: s.name, grade: s.grade, status: 'Present', note: 'በExcel የተመዘገበ' });
+
+          userStudents = userStudents.filter(us => normalizeStudentName(us.name) !== normName && (us.id || '').toLowerCase() !== sId);
+          userStudents.unshift(s);
+          addedCount++;
         });
+
+        localStorage.setItem('dilijent_user_registered_students', JSON.stringify(userStudents));
+        localStorage.setItem('dilijent_deleted_student_ids', JSON.stringify([...deletedStudentIds]));
         saveState();
         closeImportModal();
-        alert(`🎉 ${parsedImportData.length} አዳዲስ ተማሪዎች ከExcel/CSV ፋይሉ በተሳካ ሁኔታ በLocal Storage ተመዝግበዋል!`);
+        let msg = `🎉 ${addedCount} አዳዲስ ተማሪዎች በተሳካ ሁኔታ ተመዝግበዋል!`;
+        if (skippedDuplicateCount > 0) {
+          msg += `\n⚠️ ${skippedDuplicateCount} ቀደም ሲል የተመዘገቡ የተደጋገሙ ተማሪዎች ተዘለዋል (አንድ ተማሪ ከአንድ ጊዜ በላይ አይመዘገብም)።`;
+        }
+        alert(msg);
       } else {
+        let addedCount = 0;
+        let skippedDuplicateCount = 0;
         let userStaff = [];
         try {
           userStaff = JSON.parse(localStorage.getItem('dilijent_user_registered_staff') || '[]');
@@ -7300,52 +7487,43 @@
 
         parsedImportData.forEach(st => {
           st.isUserCreated = true;
+          const normStaffName = normalizeStaffName(st.name);
+          const sector = getStaffSector(st.role, st.dept);
+
+          // Check same sector duplicate
+          const duplicateInSector = staffList.find(existing => {
+            const existingNorm = normalizeStaffName(existing.name);
+            const existingSector = getStaffSector(existing.role, existing.dept);
+            return existingNorm === normStaffName && existingSector === sector;
+          });
+
+          if (duplicateInSector) {
+            skippedDuplicateCount++;
+            return;
+          }
+
           const sid = (st.id || '').trim().toLowerCase();
           const sname = (st.name || '').trim().toLowerCase();
-          const stripped = sname.replace(/^(መምህር|መምህርት|አቶ|ወ\/ሮ|ወ\/ሪት|ዶ\/ር)\s+/g, '').trim().toLowerCase();
           deletedStaffIds.delete(sid);
           deletedStaffIds.delete(sname);
-          if (stripped) deletedStaffIds.delete(stripped);
+          if (normStaffName) deletedStaffIds.delete(normStaffName);
           if (st.phone) deletedStaffIds.delete(st.phone.trim().toLowerCase());
 
-          // Add or update in staffList
-          const existingIdx = staffList.findIndex(x => (x.id || '').trim().toLowerCase() === sid || (x.name || '').trim().toLowerCase() === sname);
-          if (existingIdx >= 0) {
-            staffList[existingIdx] = st;
-          } else {
-            staffList.unshift(st);
-          }
-
-          // Add to permanent userStaff backup
-          userStaff = userStaff.filter(us => (us.id || '').trim().toLowerCase() !== sid && (us.name || '').trim().toLowerCase() !== sname);
+          staffList.unshift(st);
+          userStaff = userStaff.filter(us => (us.id || '').trim().toLowerCase() !== sid && (normalizeStaffName(us.name) !== normStaffName || getStaffSector(us.role, us.dept) !== sector));
           userStaff.unshift(st);
-
-          // Synchronize with staff attendance
-          const isTeacher = (st.role || '').toLowerCase().includes('መምህር') || (st.dept || '').toLowerCase().includes('መምህር');
-          if (!staffAttendanceListWeb.some(sa => (sa.name || '').trim().toLowerCase() === sname)) {
-            staffAttendanceListWeb.push({
-              id: st.id,
-              name: st.name,
-              role: st.role || 'ሰራተኛ',
-              dept: st.dept || 'አስተዳደር',
-              isTeacher: isTeacher,
-              morningStatus: 'ተገኝቷል',
-              morningTime: '01:30 ጧት',
-              morningRemarks: 'በሰዓቱ ገብተዋል',
-              afternoonStatus: 'ተገኝቷል',
-              afternoonTime: '09:20 ከሰዓት',
-              afternoonRemarks: 'በሰዓቱ ተገኝተዋል',
-              isUserCreated: true
-            });
-          }
+          addedCount++;
         });
 
-        localStorage.setItem('dilijent_deleted_staff_ids', JSON.stringify([...deletedStaffIds]));
         localStorage.setItem('dilijent_user_registered_staff', JSON.stringify(userStaff));
-        saveStaffAttendanceWeb();
+        localStorage.setItem('dilijent_deleted_staff_ids', JSON.stringify([...deletedStaffIds]));
         saveState();
         closeImportModal();
-        alert(`🎉 ${parsedImportData.length} አዳዲስ መምህራን/ሰራተኞች ከExcel/CSV ፋይሉ በተሳካ ሁኔታ በLocal Storage ተመዝግበዋል!`);
+        let msg = `🎉 ${addedCount} አዳዲስ ሰራተኞች/መምህራን በተሳካ ሁኔታ ተመዝግበዋል!`;
+        if (skippedDuplicateCount > 0) {
+          msg += `\n⚠️ ${skippedDuplicateCount} በአንድ የስራ ዘርፍ ቀደም ሲል የተመዘገቡ ሰራተኞች ተዘለዋል (በአንድ የስራ ዘርፍ ከአንድ ጊዜ በላይ አይመዘገብም)።`;
+        }
+        alert(msg);
       }
     }
 
