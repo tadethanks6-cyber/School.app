@@ -4360,38 +4360,15 @@
     ];
     const SEED_STUDENTS_HIGH = [];
 
-    const SEED_STAFF_PRIMARY = [
-      { id: 'STF-P01', name: 'መምህርት አስቴር ከበደ', role: 'የክፍል ኃላፊ (8A)', dept: 'አጠቃላይ ሳይንስ (General Science)', phone: '+251 911 881122', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' },
-      { id: 'STF-P02', name: 'መምህር በለጠ ታምሩ', role: 'የክፍል ኃላፊ (5A)', dept: 'ሒሳብ (Mathematics)', phone: '+251 922 882233', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' },
-      { id: 'STF-P03', name: 'መምህርት ቅድስት አባተ', role: 'መምህርት (3B)', dept: 'እንግሊዝኛ (English)', phone: '+251 933 883344', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' },
-      { id: 'STF-P04', name: 'መምህር ዮሴፍ ተክሌ', role: 'መምህር (7B)', dept: 'ማህበራዊ ሳይንስ (Social Science)', phone: '+251 944 884455', qual: 'ዲፕሎማ', photo: '', status: 'ንቁ' }
-    ];
+    // Strictly clean - no dummy sample staff. Only real staff registered by school will exist.
+    const SEED_STAFF_PRIMARY = [];
+    const SEED_STAFF_HIGH = [];
+    const SEED_STAFF_COMMON = [];
 
-    const SEED_STAFF_HIGH = [
-      { id: 'STF-001', name: 'መምህር ዳዊት በቀለ', role: 'የክፍል ኃላፊ (12A)', dept: 'Mathematics (ሒሳብ)', phone: '+251 911 112233', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' },
-      { id: 'STF-002', name: 'መምህርት ሳራ መኮንን', role: 'የት/ክፍል ኃላፊ (11A)', dept: 'Physics (ፊዚክስ)', phone: '+251 922 223344', qual: 'ማስተርስ', photo: '', status: 'ንቁ' },
-      { id: 'STF-003', name: 'መምህር ዮሴፍ ሀይሉ', role: 'መምህር (10A)', dept: 'Chemistry (ኬሚስትሪ)', phone: '+251 933 334455', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' },
-      { id: 'STF-004', name: 'መምህርት ራሔል ተክሌ', role: 'መምህርት (9A)', dept: 'English (እንግሊዝኛ)', phone: '+251 944 445566', qual: 'ባችለር ዲግሪ', photo: '', status: 'ንቁ' }
-    ];
-
-    const SEED_STAFF_COMMON = [
-      { id: 'STF-005', name: 'ወ/ሮ አለምነሽ ካሳሁን', role: 'ዋና ጸሐፊ', dept: 'አስተዳደር እና ፋይናንስ', phone: '+251 955 556677', qual: 'ዲፕሎማ', photo: '', status: 'ንቁ' },
-      { id: 'STF-006', name: 'አቶ አበራ ተፈራ', role: 'የጥበቃ ኃላፊ', dept: 'አገልግሎትና ደህንነት', phone: '+251 966 667788', qual: '12ኛ ያጠናቀቀ', photo: '', status: 'ንቁ' }
-    ];
-
-    // Seed attendance
+    // Official student attendance baseline
     const SEED_ATTENDANCE = [
       { name: 'Abigiya Tsegaye Kebede', grade: '6A', status: 'Present', note: 'በሰዓቱ ገብቷል' },
-      { name: 'Abem Mideyem Degu', grade: '1A', status: 'Present', note: 'በሰዓቱ ገብቷል' },
-      { name: 'ዮናስ ተስፋዬ', grade: '8A', status: 'Present', note: 'በሰዓቱ ገብቷል' },
-      { name: 'ሶፊያ ጌታቸው', grade: '7B', status: 'Present', note: 'በሰዓቱ ገብቷል' },
-      { name: 'ሚካኤል ዳዊት', grade: '5A', status: 'Present', note: 'በሰዓቱ ገብቷል' },
-      { name: 'ሩት አበበ', grade: '3B', status: 'Late', note: '10 ደቂቃ ዘግይቷል' },
-      { name: 'ሳሙኤል ታደሰ', grade: '1A', status: 'Present', note: 'በሰዓቱ ገብቷል' },
-      { name: 'አቤል ታደሰ', grade: '12A', status: 'Present', note: 'በሰዓቱ ገብቷል' },
-      { name: 'ሄለን ገብሬ', grade: '11B', status: 'Present', note: 'በሰዓቱ ገብቷል' },
-      { name: 'ናሆም በቀለ', grade: '10A', status: 'Late', note: '15 ደቂቃ ዘግይቷል' },
-      { name: 'ቤተልሔም ሰለሞን', grade: '9A', status: 'Absent', note: 'የሕመም ፈቃድ' }
+      { name: 'Abem Mideyem Degu', grade: '1A', status: 'Present', note: 'በሰዓቱ ገብቷል' }
     ];
 
     // ============================================================
@@ -4444,133 +4421,116 @@
       (JSON.parse(localStorage.getItem('dilijent_deleted_staff_ids') || '[]')).map(id => (id || '').trim().toLowerCase())
     );
 
-    // 1. STUDENTS: Permanent Persistence & Strict Deduplication (No sample resurrection)
-    let storedStudentsRaw = localStorage.getItem('dilijent_students');
-    let students = [];
-    if (storedStudentsRaw !== null) {
-      try {
-        students = JSON.parse(storedStudentsRaw) || [];
-      } catch (e) {
-        students = [];
-      }
-    } else {
-      // First-time fresh seeding: strictly official students only
-      students = [...ALL_OFFICIAL_STUDENTS];
+    // 1. STUDENTS: Strictly official uploaded list + user-registered students only (Total 88 baseline, all duplicates & past 242 samples purged)
+    let rawStoredStudents = [];
+    try {
+      rawStoredStudents = JSON.parse(localStorage.getItem('dilijent_students') || '[]');
+      if (!Array.isArray(rawStoredStudents)) rawStoredStudents = [];
+    } catch (e) {
+      rawStoredStudents = [];
     }
 
-    // Always restore any user-registered students from dedicated permanent backup in localStorage
+    // Map existing scores & photos by normalized name so user's grade entries are preserved
+    const existingStudentDataMap = new Map();
+    rawStoredStudents.forEach(s => {
+      if (!s) return;
+      const n = normalizeStudentName(s.name);
+      if (n && !existingStudentDataMap.has(n)) {
+        existingStudentDataMap.set(n, s);
+      }
+    });
+
+    // Clean official students: ONLY students in ALL_OFFICIAL_STUDENTS (Grade 1: 60, Grade 6: 28 = 88 students)
+    const cleanOfficialStudents = [];
+    const seenOfficialNames = new Set();
+    ALL_OFFICIAL_STUDENTS.forEach(os => {
+      if (!os) return;
+      const norm = normalizeStudentName(os.name);
+      const idLower = (os.id || '').trim().toLowerCase();
+      // If deleted by user, exclude
+      if (deletedStudentIds.has(idLower) || deletedStudentIds.has(norm) || deletedStudentIds.has((os.name || '').trim().toLowerCase())) return;
+      if (seenOfficialNames.has(norm)) return;
+      seenOfficialNames.add(norm);
+
+      const prev = existingStudentDataMap.get(norm);
+      cleanOfficialStudents.push({
+        id: os.id,
+        name: os.name,
+        gender: os.gender,
+        grade: os.grade,
+        phone: os.phone || '+251 911 000000',
+        scores: (prev && Array.isArray(prev.scores)) ? prev.scores : [0, 0, 0, 0],
+        subjectGrades: (prev && prev.subjectGrades) ? prev.subjectGrades : {},
+        avg: (prev && prev.avg) ? prev.avg : '0.0%',
+        photo: (prev && prev.photo) ? prev.photo : '',
+        status: (prev && prev.status) ? prev.status : 'ንቁ',
+        isUserCreated: false
+      });
+    });
+
+    // Restore genuine user-registered students from dilijent_user_registered_students
     let userStudents = [];
     try {
       userStudents = JSON.parse(localStorage.getItem('dilijent_user_registered_students') || '[]');
+      if (!Array.isArray(userStudents)) userStudents = [];
     } catch (e) {
       userStudents = [];
     }
+
+    const finalStudents = [...cleanOfficialStudents];
+    const seenAllNames = new Set(cleanOfficialStudents.map(s => normalizeStudentName(s.name)));
+    const seenAllIds = new Set(cleanOfficialStudents.map(s => (s.id || '').trim().toLowerCase()));
+
     userStudents.forEach(us => {
       if (!us) return;
       const uNorm = normalizeStudentName(us.name);
       const uId = (us.id || '').trim().toLowerCase();
-      const isDeleted = deletedStudentIds.has(uId) || deletedStudentIds.has(uNorm) || deletedStudentIds.has((us.name || '').trim().toLowerCase());
-      const alreadyExists = students.some(s => (s.id || '').trim().toLowerCase() === uId || normalizeStudentName(s.name) === uNorm);
-      if (!alreadyExists && !isDeleted) {
-        students.unshift(us);
-      }
+      if (deletedStudentIds.has(uId) || deletedStudentIds.has(uNorm) || deletedStudentIds.has((us.name || '').trim().toLowerCase())) return;
+      if (seenAllNames.has(uNorm) || (uId && seenAllIds.has(uId))) return;
+      seenAllNames.add(uNorm);
+      if (uId) seenAllIds.add(uId);
+      us.isUserCreated = true;
+      finalStudents.unshift(us);
     });
 
-    // Remove any legacy dummy placeholder sample students that may linger in localStorage
-    const DUMMY_SAMPLE_NAMES = new Set([
-      'ዮናስ ተስፋዬ', 'ሶፊያ ጌታቸው', 'ሚካኤል ዳዊት', 'ሩት አበበ', 'ሳሙኤል ታደሰ', 'ትዕግስት ወርቁ', 'ኪሩቤል ሰለሞን', 'ኤልሳቤጥ ካሳ',
-      'አቤል ታደሰ', 'ሄለን ገብሬ', 'ናሆም በቀለ', 'ቤተልሔም ሰለሞን', 'ዮናስ አለሙ', 'ሰላም ተስፋዬ'
-    ]);
-    students = students.filter(s => {
-      if (!s) return false;
-      const sId = (s.id || '').trim().toLowerCase();
-      const sNorm = normalizeStudentName(s.name);
-      if (deletedStudentIds.has(sId) || deletedStudentIds.has(sNorm) || deletedStudentIds.has((s.name || '').trim().toLowerCase())) return false;
-      if (DUMMY_SAMPLE_NAMES.has((s.name || '').trim()) && !s.isUserCreated) return false;
-      return true;
-    });
-
-    // Zero out scores for newly added or unscored official students
-    students.forEach(s => {
-      if (!s.scores || !s.subjectGrades) {
-        s.scores = [0, 0, 0, 0];
-        s.subjectGrades = {};
-        s.avg = '0.0%';
-      }
-    });
-
-    // CRITICAL: Strict Deduplication: Every student MUST appear ONLY ONCE in the system
-    const seenStudentIds = new Set();
-    const seenStudentNames = new Set();
-    const cleanStudents = [];
-    students.forEach(s => {
-      const sId = (s.id || '').trim().toLowerCase();
-      const sNorm = normalizeStudentName(s.name);
-      if (!sNorm) return;
-      if (sId && seenStudentIds.has(sId)) return;
-      if (seenStudentNames.has(sNorm)) return;
-      if (sId) seenStudentIds.add(sId);
-      seenStudentNames.add(sNorm);
-      cleanStudents.push(s);
-    });
-    students = cleanStudents;
+    students = finalStudents;
+    // Overwrite localStorage to permanently eliminate the old 242 corrupted/duplicate entries
     localStorage.setItem('dilijent_students', JSON.stringify(students));
 
-    // 2. STAFF: Permanent Persistence & Sector Deduplication (No sample resurrection)
-    let storedStaffRaw = localStorage.getItem('dilijent_staff_list');
-    let staffList = [];
-    if (storedStaffRaw !== null) {
-      try {
-        staffList = JSON.parse(storedStaffRaw) || [];
-      } catch (e) {
-        staffList = [];
-      }
-    } else {
-      // First-time fresh start: clean, never resurrect unwanted staff
-      staffList = [];
-      localStorage.setItem('dilijent_staff_seeded_v1', 'true');
-    }
-
-    // Restore any user-registered staff from dedicated permanent backup if missing
+    // 2. STAFF: Strictly ONLY user/school-registered staff (all dummy template staff 100% purged)
     let userStaff = [];
     try {
       userStaff = JSON.parse(localStorage.getItem('dilijent_user_registered_staff') || '[]');
+      if (!Array.isArray(userStaff)) userStaff = [];
     } catch (e) {
       userStaff = [];
     }
-    userStaff.forEach(us => {
-      if (!us) return;
-      const uNorm = normalizeStaffName(us.name);
-      const uId = (us.id || '').trim().toLowerCase();
-      const isDeleted = deletedStaffIds.has(uId) || deletedStaffIds.has(uNorm) || deletedStaffIds.has((us.name || '').trim().toLowerCase());
-      const alreadyExists = staffList.some(st => (st.id || '').trim().toLowerCase() === uId || normalizeStaffName(st.name) === uNorm);
-      if (!alreadyExists && !isDeleted) {
-        staffList.unshift(us);
-      }
-    });
 
-    // Exclude permanently deleted staff (by ID, by Name, by stripped Name)
-    staffList = staffList.filter(st => {
-      if (!st) return false;
-      const sid = (st.id || '').trim().toLowerCase();
-      const sname = (st.name || '').trim().toLowerCase();
-      const stripped = normalizeStaffName(st.name);
+    // Exclude any staff in deletedStaffIds
+    userStaff = userStaff.filter(us => {
+      if (!us) return false;
+      const sid = (us.id || '').trim().toLowerCase();
+      const sname = (us.name || '').trim().toLowerCase();
+      const stripped = normalizeStaffName(us.name);
       return !deletedStaffIds.has(sid) && !deletedStaffIds.has(sname) && (!stripped || !deletedStaffIds.has(stripped));
     });
 
-    // CRITICAL: Deduplicate staff - No staff member can be registered more than once in the SAME work sector
+    // Deduplicate userStaff: at most one registration per person in the SAME work sector
     const seenStaffSectors = new Set();
-    const cleanStaff = [];
-    staffList.forEach(st => {
+    const cleanStaffList = [];
+    userStaff.forEach(st => {
       const norm = normalizeStaffName(st.name);
       const sector = getStaffSector(st.role, st.dept);
       const key = `${norm}__${sector}`;
       if (!norm) return;
       if (seenStaffSectors.has(key)) return;
       seenStaffSectors.add(key);
-      cleanStaff.push(st);
+      st.isUserCreated = true;
+      cleanStaffList.push(st);
     });
-    staffList = cleanStaff;
+
+    staffList = cleanStaffList;
+    localStorage.setItem('dilijent_user_registered_staff', JSON.stringify(staffList));
     localStorage.setItem('dilijent_staff_list', JSON.stringify(staffList));
 
     let attendance = JSON.parse(localStorage.getItem('dilijent_attendance')) || SEED_ATTENDANCE;
@@ -4993,48 +4953,7 @@
     let currentStaffAttCategory = 'all';
     let currentStaffWebShift = 'morning'; // 'morning' (1:30 - 1:51) or 'afternoon' (9:15 - 9:40)
 
-    const DEFAULT_STAFF_ATTENDANCE = [
-      {
-        id: 1, name: 'መምህር ዳዊት በቀለ', role: 'የሒሳብ መምህር', dept: 'የተፈጥሮ ሳይንስ', isTeacher: true,
-        morningStatus: 'ተገኝቷል', morningTime: '01:42 ጧት', morningRemarks: 'በሰዓቱ ገብተዋል',
-        afternoonStatus: 'ተገኝቷል', afternoonTime: '09:25 ከሰዓት', afternoonRemarks: 'በሰዓቱ ተገኝተዋል'
-      },
-      {
-        id: 2, name: 'መምህርት ሳራ መኮንን', role: 'የፊዚክስ መምህርት', dept: 'የተፈጥሮ ሳይንስ', isTeacher: true,
-        morningStatus: 'ተገኝቷል', morningTime: '01:38 ጧት', morningRemarks: 'በሰዓቱ ገብተዋል',
-        afternoonStatus: 'ተገኝቷል', afternoonTime: '09:20 ከሰዓት', afternoonRemarks: 'በሰዓቱ ተገኝተዋል'
-      },
-      {
-        id: 3, name: 'መምህር ዮናስ አለሙ', role: 'የእንግሊዝኛ መምህር', dept: 'ቋንቋዎች', isTeacher: true,
-        morningStatus: 'አርፍዷል', morningTime: '01:56 ጧት', morningRemarks: 'የትራፊክ መጨናነቅ',
-        afternoonStatus: 'ተገኝቷል', afternoonTime: '09:30 ከሰዓት', afternoonRemarks: 'በሰዓቱ ተገኝተዋል'
-      },
-      {
-        id: 4, name: 'መምህርት ቤቴልሔም ግርማ', role: 'የስነ-ዜጋ መምህርት', dept: 'ማህበራዊ ሳይንስ', isTeacher: true,
-        morningStatus: 'ተገኝቷል', morningTime: '01:45 ጧት', morningRemarks: 'በሰዓቱ ገብተዋል',
-        afternoonStatus: 'ተገኝቷል', afternoonTime: '09:22 ከሰዓት', afternoonRemarks: 'በሰዓቱ ተገኝተዋል'
-      },
-      {
-        id: 5, name: 'ወ/ሮ ትዕግስት አስፋው', role: 'ዋና ፀሐፊ', dept: 'አስተዳደርና ፋይናንስ', isTeacher: false,
-        morningStatus: 'ተገኝቷል', morningTime: '01:35 ጧት', morningRemarks: 'በሰዓቱ ገብተዋል',
-        afternoonStatus: 'ተገኝቷል', afternoonTime: '09:18 ከሰዓት', afternoonRemarks: 'በሰዓቱ ተገኝተዋል'
-      },
-      {
-        id: 6, name: 'አቶ ታምራት በቀለ', role: 'የደህንነትና ጥበቃ ኃላፊ', dept: 'ደህንነት', isTeacher: false,
-        morningStatus: 'ተገኝቷል', morningTime: '01:25 ጧት', morningRemarks: 'የሌሊት ሺፍት ርክክብ',
-        afternoonStatus: 'ተገኝቷል', afternoonTime: '09:15 ከሰዓት', afternoonRemarks: 'በሰዓቱ ተገኝተዋል'
-      },
-      {
-        id: 7, name: 'አቶ አበበ ካሳሁን', role: 'የቴክኒክና ጥገና ሰራተኛ', dept: 'አገልግሎትና ጥገና', isTeacher: false,
-        morningStatus: 'ፍቃድ', morningTime: '-', morningRemarks: 'የህክምና ፍቃድ',
-        afternoonStatus: 'ፍቃድ', afternoonTime: '-', afternoonRemarks: 'የህክምና ፍቃድ'
-      },
-      {
-        id: 8, name: 'ወ/ሮ ሮዛ ሀይሌ', role: 'የካፍቴሪያና ምግብ አዘጋጅ', dept: 'አገልግሎት', isTeacher: false,
-        morningStatus: 'ተገኝቷል', morningTime: '01:30 ጧት', morningRemarks: 'በሰዓቱ ገብተዋል',
-        afternoonStatus: 'ተገኝቷል', afternoonTime: '09:20 ከሰዓት', afternoonRemarks: 'በሰዓቱ ተገኝተዋል'
-      }
-    ];
+    const DEFAULT_STAFF_ATTENDANCE = [];
 
     let staffAttendanceListWeb = [];
     const storedStaffAttRaw = localStorage.getItem('dilijent_staff_attendance');
@@ -5069,379 +4988,42 @@
       return item;
     });
 
-    // CRITICAL: Exclude any permanently deleted staff from attendance (both ID and Name)
+    // CRITICAL: Staff attendance contains ONLY genuine registered staff (all dummy template staff purged)
+    const validStaffNamesMap = new Set(staffList.map(st => normalizeStaffName(st.name)));
     staffAttendanceListWeb = staffAttendanceListWeb.filter(item => {
+      if (!item) return false;
       const sid = String(item.id || '').trim().toLowerCase();
       const sname = (item.name || '').trim().toLowerCase();
-      const stripped = sname.replace(/^(መምህር|መምህርት|አቶ|ወ\/ሮ|ወ\/ሪት|ዶ\/ር)\s+/g, '').trim();
-      return !deletedStaffIds.has(sid) && !deletedStaffIds.has(sname) && (!stripped || !deletedStaffIds.has(stripped));
+      const norm = normalizeStaffName(item.name);
+      if (deletedStaffIds.has(sid) || deletedStaffIds.has(sname) || (norm && deletedStaffIds.has(norm))) return false;
+      return validStaffNamesMap.has(norm);
     });
-
-    // Sync all active staff from staffList into staffAttendanceListWeb
-    if (typeof staffList !== 'undefined' && Array.isArray(staffList)) {
-      staffList.forEach(st => {
-        const sname = (st.name || '').trim();
-        const sid = (st.id || '').trim();
-        if (deletedStaffIds.has(sid.toLowerCase()) || deletedStaffIds.has(sname.toLowerCase())) return;
+    // Add any registered staff who doesn't have an attendance entry yet
+    staffList.forEach(st => {
+      const norm = normalizeStaffName(st.name);
+      if (!staffAttendanceListWeb.some(sa => normalizeStaffName(sa.name) === norm)) {
         const isTeacher = (st.role || '').toLowerCase().includes('መምህር') || (st.dept || '').toLowerCase().includes('መምህር');
-        if (!staffAttendanceListWeb.some(sa => (sa.name || '').trim().toLowerCase() === sname.toLowerCase() || String(sa.id || '').trim().toLowerCase() === sid.toLowerCase())) {
-          staffAttendanceListWeb.push({
-            id: sid,
-            name: sname,
-            role: st.role || 'ሰራተኛ',
-            dept: st.dept || 'አስተዳደር',
-            isTeacher: isTeacher,
-            morningStatus: 'ተገኝቷል',
-            morningTime: '01:30 ጧት',
-            morningRemarks: 'በሰዓቱ ገብተዋል',
-            afternoonStatus: 'ተገኝቷል',
-            afternoonTime: '09:20 ከሰዓት',
-            afternoonRemarks: 'በሰዓቱ ተገኝተዋል',
-            isUserCreated: !!st.isUserCreated
-          });
-        }
-      });
-    }
-    localStorage.setItem('dilijent_staff_attendance', JSON.stringify(staffAttendanceListWeb));
-
+        staffAttendanceListWeb.push({
+          id: st.id,
+          name: st.name,
+          role: st.role || 'ሰራተኛ',
+          dept: st.dept || 'አስተዳደር',
+          isTeacher: isTeacher,
+          morningStatus: 'ተገኝቷል',
+          morningTime: '01:30 ጧት',
+          morningRemarks: 'በሰዓቱ ገብተዋል',
+          afternoonStatus: 'ተገኝቷል',
+          afternoonTime: '09:20 ከሰዓት',
+          afternoonRemarks: 'በሰዓቱ ተገኝተዋል',
+          isUserCreated: true
+        });
+      }
+    });
     function saveStaffAttendanceWeb() {
       localStorage.setItem('dilijent_staff_attendance', JSON.stringify(staffAttendanceListWeb));
-    }
-
-    // Default Staff Role Schedules (የስራ ሰዓት ገደብ)
-    const DEFAULT_STAFF_ROLE_SCHEDULES = [
-      { roleCategory: "መምህራን", entryStart: "01:30 ጧት", entryEnd: "01:51 ጧት", exitStart: "09:15 ከሰዓት", exitEnd: "09:40 ከሰዓት", description: "የመማር ማስተማር መደበኛ ክፍለ ጊዜያት" },
-      { roleCategory: "ፅዳት ሰራተኞች", entryStart: "12:30 ጧት", entryEnd: "01:15 ጧት", exitStart: "08:30 ከሰዓት", exitEnd: "09:00 ከሰዓት", description: "የትምህርት ቤቱን ግቢና ክፍሎች ቀድመው ማዘጋጀት" },
-      { roleCategory: "ደህንነትና ጥበቃ", entryStart: "12:00 ጧት", entryEnd: "12:45 ጧት", exitStart: "11:30 ከሰዓት", exitEnd: "12:00 ከሰዓት", description: "የበርና የግቢ ጥበቃ የስራ ፈረቃ" },
-      { roleCategory: "አስተዳደርና ፋይናንስ", entryStart: "01:45 ጧት", entryEnd: "02:00 ጧት", exitStart: "10:00 ከሰዓት", exitEnd: "10:30 ከሰዓት", description: "የጽህፈት ቤት፣ የሂሳብና የሰው ኃይል ሰዓት" },
-      { roleCategory: "ሌሎች ሰራተኞች", entryStart: "01:30 ጧት", entryEnd: "02:00 ጧት", exitStart: "09:00 ከሰዓት", exitEnd: "09:30 ከሰዓት", description: "አጠቃላይ ድጋፍ ሰጪ ሰራተኞች" }
-    ];
-
-    let staffRoleSchedulesWeb = JSON.parse(localStorage.getItem('dilijent_role_schedules') || 'null') || DEFAULT_STAFF_ROLE_SCHEDULES;
-
-    function saveStaffRoleSchedulesWeb() {
-      localStorage.setItem('dilijent_role_schedules', JSON.stringify(staffRoleSchedulesWeb));
-    }
-
-    function getStaffRoleCategoryWeb(isTeacher, role, dept) {
-      if (isTeacher) return "መምህራን";
-      const combined = ((role || '') + ' ' + (dept || '')).toLowerCase();
-      if (combined.includes('ፅዳት') || combined.includes('cleaner')) return "ፅዳት ሰራተኞች";
-      if (combined.includes('ጥበቃ') || combined.includes('ደህንነት') || combined.includes('guard') || combined.includes('security')) return "ደህንነትና ጥበቃ";
-      if (combined.includes('አስተዳደር') || combined.includes('ፋይናንስ') || combined.includes('ሂሳብ') || combined.includes('ጸሐፊ') || combined.includes('መዝጋቢ') || combined.includes('admin') || combined.includes('finance')) return "አስተዳደርና ፋይናንስ";
-      return "ሌሎች ሰራተኞች";
-    }
-
-    function getRoleScheduleWeb(category) {
-      return staffRoleSchedulesWeb.find(s => s.roleCategory === category) || DEFAULT_STAFF_ROLE_SCHEDULES[0];
-    }
-
-    function parseTimeToMinutesWeb(timeStr) {
-      const clean = (timeStr || '').replace('ጧት', '').replace('ከሰዓት', '').trim();
-      const parts = clean.split(':');
-      const h = parseInt(parts[0], 10) || 0;
-      const m = parseInt(parts[1], 10) || 0;
-      const normH = (h === 12) ? 0 : h;
-      return normH * 60 + m;
-    }
-
-    /**
-     * Real-time Ethiopian 12-hour clock (6 hours shifted)
-     */
-    function getEthiopianClockTime(isEntry) {
-      const now = new Date();
-      const h24 = now.getHours();
-      const m = now.getMinutes();
-      const ethHourRaw = (h24 - 6 + 24) % 24;
-      let ethHour = ethHourRaw % 12;
-      if (ethHour === 0) ethHour = 12;
-      const padM = m < 10 ? '0' + m : m;
-      const padH = ethHour < 10 ? '0' + ethHour : ethHour;
-      const period = isEntry ? 'ጧት' : 'ከሰዓት';
-      return `${padH}:${padM} ${period}`;
-    }
-
-    /**
-     * Evaluates attendance against official windows per staff category:
-     * - የመግቢያ (Check-In):
-     *   * Within or before role's entryEnd -> "ተገኝቷል" ("በሰዓቱ ገብተዋል")
-     *   * After role's entryEnd -> "አርፍዷል" ("ከ... በኋላ አርፍደዋል")
-     * - የመውጫ (Check-Out):
-     *   * Before role's exitStart -> "ቀድሞ ወጥቷል" ("ከ... በፊት ቀድመው ወጥተዋል")
-     *   * Between exitStart and exitEnd -> "ተገኝቷል" ("በሰዓቱ ወጥተዋል")
-     *   * After role's exitEnd -> "ዘግይቶ ወጥቷል" ("የትርፍ ሰዓት/ከ... በኋላ ወጥተዋል")
-     */
-    function evaluateStaffAttendanceTime(timeStr, isEntry, roleCategory) {
-      const sched = getRoleScheduleWeb(roleCategory);
-      const timeMin = parseTimeToMinutesWeb(timeStr);
-
-      if (isEntry) {
-        const entryEndMin = parseTimeToMinutesWeb(sched.entryEnd);
-        if (timeMin <= entryEndMin) {
-          return { status: 'ተገኝቷል', remarks: `በሰዓቱ ገብተዋል (${sched.entryStart} - ${sched.entryEnd})` };
-        } else {
-          return { status: 'አርፍዷል', remarks: `ከ${sched.entryEnd} በኋላ አርፍደዋል` };
-        }
-      } else {
-        const exitStartMin = parseTimeToMinutesWeb(sched.exitStart);
-        const exitEndMin = parseTimeToMinutesWeb(sched.exitEnd);
-        if (timeMin < exitStartMin) {
-          return { status: 'ቀድሞ ወጥቷል', remarks: `ከ${sched.exitStart} በፊት ቀድመው ወጥተዋል` };
-        } else if (timeMin <= exitEndMin) {
-          return { status: 'ተገኝቷል', remarks: `በሰዓቱ ወጥተዋል (${sched.exitStart} - ${sched.exitEnd})` };
-        } else {
-          return { status: 'ዘግይቶ ወጥቷል', remarks: `የትርፍ ሰዓት/ከ${sched.exitEnd} በኋላ ወጥተዋል` };
-        }
-      }
-    }
-
-    function setStaffAttendanceWebShift(shift) {
-      currentStaffWebShift = shift;
-      const btnM = document.getElementById('btnWebShiftMorning');
-      const btnA = document.getElementById('btnWebShiftAfternoon');
-      const banner = document.getElementById('webShiftNoticeBanner');
-
-      if (shift === 'morning' || shift === 'entry') {
-        if (btnM) { btnM.className = 'btn-primary'; btnM.style.background = 'var(--primary)'; btnM.style.color = 'white'; }
-        if (btnA) { btnA.className = 'btn-secondary'; btnA.style.background = '#F1F5F9'; btnA.style.color = '#334155'; }
-        if (banner) {
-          banner.style.background = '#FEF3C7';
-          banner.style.color = '#92400E';
-          banner.innerHTML = '<span>⚡ የመግቢያ አቴንዳንስ (Check-In)፦ ም/ር ወይም አድሚን ቲክ ሲያደርግ የአሁን ሰዓት ይመዘገባል • እንደየስራ መደቡ ገደብ ተገኝቷል/አርፍዷል ይወሰናል</span>';
-        }
-      } else {
-        if (btnM) { btnM.className = 'btn-secondary'; btnM.style.background = '#F1F5F9'; btnM.style.color = '#334155'; }
-        if (btnA) { btnA.className = 'btn-primary'; btnA.style.background = 'var(--primary)'; btnA.style.color = 'white'; }
-        if (banner) {
-          banner.style.background = '#EFF6FF';
-          banner.style.color = '#1E40AF';
-          banner.innerHTML = '<span>⚡ የመውጫ አቴንዳንስ (Check-Out)፦ ም/ር ወይም አድሚን ቲክ ሲያደርግ የአሁን ሰዓት ይመዘገባል • እንደየስራ መደቡ ገደብ በሰዓቱ/ቀድሞ/ዘግይቶ መውጣት ይወሰናል</span>';
-        }
-      }
       renderStaffAttendanceWeb();
     }
-
-    function setAttendanceSubMode(mode) {
-      currentAttendanceSubMode = mode;
-      const btnStudents = document.getElementById('btnAttendanceSubStudents');
-      const btnStaff = document.getElementById('btnAttendanceSubStaff');
-      const secStudents = document.getElementById('attendanceStudentsSection');
-      const secStaff = document.getElementById('attendanceStaffSection');
-      const badge = document.getElementById('attendanceSubBadge');
-
-      if (mode === 'students') {
-        if (btnStudents) { btnStudents.className = 'btn-primary'; btnStudents.style.background = 'var(--primary)'; btnStudents.style.color = 'white'; }
-        if (btnStaff) { btnStaff.className = 'btn-secondary'; btnStaff.style.background = 'transparent'; btnStaff.style.color = 'var(--text-muted)'; }
-        if (secStudents) secStudents.style.display = 'block';
-        if (secStaff) secStaff.style.display = 'none';
-        if (badge) {
-          badge.innerHTML = '👨‍🎓 የተማሪዎች ክትትል እይታ';
-          badge.className = 'badge badge-primary';
-        }
-      } else {
-        if (btnStudents) { btnStudents.className = 'btn-secondary'; btnStudents.style.background = 'transparent'; btnStudents.style.color = 'var(--text-muted)'; }
-        if (btnStaff) { btnStaff.className = 'btn-primary'; btnStaff.style.background = '#0284C7'; btnStaff.style.color = 'white'; }
-        if (secStudents) secStudents.style.display = 'none';
-        if (secStaff) secStaff.style.display = 'block';
-        if (badge) {
-          badge.innerHTML = '👩‍🏫 የሰራተኞች ክትትል (ምክትል/አድሚን 🔒)';
-          badge.className = 'badge badge-success';
-        }
-        renderStaffAttendanceWeb();
-      }
-    }
-
-    function filterStaffAttCategory(cat, btn) {
-      currentStaffAttCategory = cat;
-      document.querySelectorAll('.staff-dept-filter').forEach(b => {
-        b.style.background = 'transparent';
-        b.style.color = 'var(--text-muted)';
-      });
-      if (btn) {
-        btn.style.background = 'var(--primary)';
-        btn.style.color = 'white';
-      }
-      renderStaffAttendanceWeb();
-    }
-
-    function renderStaffAttendanceWeb() {
-      const authorized = canAccessStaffAttendanceWeb();
-      const restrictedBanner = document.getElementById('staffAttendanceRestrictedBanner');
-      const authorizedContent = document.getElementById('staffAttendanceAuthorizedContent');
-
-      if (!authorized) {
-        if (restrictedBanner) restrictedBanner.style.display = 'block';
-        if (authorizedContent) authorizedContent.style.display = 'none';
-        return;
-      }
-
-      if (restrictedBanner) restrictedBanner.style.display = 'none';
-      if (authorizedContent) authorizedContent.style.display = 'block';
-
-      const isMorning = currentStaffWebShift === 'morning';
-
-      // Update counters based on active shift
-      const total = staffAttendanceListWeb.length;
-      const present = staffAttendanceListWeb.filter(s => (isMorning ? s.morningStatus : s.afternoonStatus) === 'ተገኝቷል').length;
-      const absent = staffAttendanceListWeb.filter(s => (isMorning ? s.morningStatus : s.afternoonStatus) === 'ቀርቷል').length;
-      const late = staffAttendanceListWeb.filter(s => (isMorning ? s.morningStatus : s.afternoonStatus) === 'አርፍዷል').length;
-      const leave = staffAttendanceListWeb.filter(s => (isMorning ? s.morningStatus : s.afternoonStatus) === 'ፍቃድ').length;
-
-      const elTotal = document.getElementById('staffAttStatTotal');
-      const elPresent = document.getElementById('staffAttStatPresent');
-      const elAbsent = document.getElementById('staffAttStatAbsent');
-      const elLate = document.getElementById('staffAttStatLate');
-      const elLeave = document.getElementById('staffAttStatLeave');
-
-      if (elTotal) elTotal.innerText = total;
-      if (elPresent) elPresent.innerText = present;
-      if (elAbsent) elAbsent.innerText = absent;
-      if (elLate) elLate.innerText = late;
-      if (elLeave) elLeave.innerText = leave;
-
-      // Filter list
-      const query = (document.getElementById('staffAttSearchInput')?.value || '').trim().toLowerCase();
-      let filtered = staffAttendanceListWeb.filter(s => {
-        const matchesQuery = !query || s.name.toLowerCase().includes(query) || s.role.toLowerCase().includes(query) || s.dept.toLowerCase().includes(query);
-        let matchesCat = true;
-        if (currentStaffAttCategory === 'teachers') {
-          matchesCat = s.isTeacher || s.role.includes('መምህር');
-        } else if (currentStaffAttCategory === 'admin_sec') {
-          matchesCat = !s.isTeacher && !s.role.includes('መምህር');
-        }
-        return matchesQuery && matchesCat;
-      });
-
-      const tbody = document.getElementById('staffAttendanceTableBody');
-      if (!tbody) return;
-
-      if (filtered.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="7" style="text-align:center; padding:1.5rem; color:#64748B;">
-              ምንም የተገኘ ሰራተኛ የለም (No staff found)
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      tbody.innerHTML = filtered.map(item => {
-        const roleCat = getStaffRoleCategoryWeb(item.isTeacher, item.role, item.dept);
-        const sched = getRoleScheduleWeb(roleCat);
-
-        const curStatus = isMorning ? item.morningStatus : item.afternoonStatus;
-        const curTime = isMorning ? item.morningTime : item.afternoonTime;
-        const curRemarks = isMorning ? item.morningRemarks : item.afternoonRemarks;
-
-        let badgeClass = 'badge-success';
-        if (curStatus === 'ቀርቷል') badgeClass = 'badge-danger';
-        else if (curStatus === 'አርፍዷል' || curStatus === 'ቀድሞ ወጥቷል') badgeClass = 'badge-warning';
-        else if (curStatus === 'ዘግይቶ ወጥቷል') badgeClass = 'badge-primary';
-        else if (curStatus === 'ፍቃድ') badgeClass = 'badge-primary';
-
-        const actionButtons = isMorning ? `
-          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#10B981; color:#065F46; background:#ECFDF5;" title="በሰዓቱ ገብቷል" onclick="autoTickStaffAttendanceWeb(${item.id}, 'ተገኝቷል')">✓ በሰዓቱ ገብቷል</button>
-          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#F59E0B; color:#92400E; background:#FFFBEB;" onclick="autoTickStaffAttendanceWeb(${item.id}, 'አርፍዷል')">⏱ አርፍዷል</button>
-          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#EF4444; color:#991B1B; background:#FEF2F2;" onclick="autoTickStaffAttendanceWeb(${item.id}, 'ቀርቷል')">✕ ቀርቷል</button>
-          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#8B5CF6; color:#5B21B6; background:#F5F3FF;" onclick="autoTickStaffAttendanceWeb(${item.id}, 'ፍቃድ')">📝 ፍቃድ</button>
-          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#0284C7; color:#0369A1; background:#E0F2FE; font-weight:700;" onclick="openStaffAttEditModal(${item.id})">✏️ ሰዓት አርም</button>
-        ` : `
-          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#10B981; color:#065F46; background:#ECFDF5;" title="በሰዓቱ ወጥቷል" onclick="autoTickStaffAttendanceWeb(${item.id}, 'ተገኝቷል')">✓ በሰዓቱ ወጥቷል</button>
-          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#F59E0B; color:#92400E; background:#FFFBEB;" onclick="autoTickStaffAttendanceWeb(${item.id}, 'ቀድሞ ወጥቷል')">🏃‍♂️ ቀድሞ ወጥቷል</button>
-          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#3B82F6; color:#1D4ED8; background:#EFF6FF;" onclick="autoTickStaffAttendanceWeb(${item.id}, 'ዘግይቶ ወጥቷል')">⌛ ዘግይቶ ወጥቷል</button>
-          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#EF4444; color:#991B1B; background:#FEF2F2;" onclick="autoTickStaffAttendanceWeb(${item.id}, 'ቀርቷል')">✕ ቀርቷል</button>
-          <button class="btn-secondary" style="padding:3px 6px; font-size:0.72rem; border-color:#0284C7; color:#0369A1; background:#E0F2FE; font-weight:700;" onclick="openStaffAttEditModal(${item.id})">✏️ ሰዓት አርም</button>
-        `;
-
-        return `
-          <tr style="border-bottom:1px solid #E2E8F0;">
-            <td style="padding:8px 10px;">
-              <strong>${item.name}</strong>
-              <div style="font-size:0.72rem; color:#64748B;">${roleCat} • ${item.isTeacher ? '👨‍🏫 መምህር' : '💼 ሰራተኛ'}</div>
-              <div style="font-size:0.7rem; color:#0284C7;">⏱ ገደብ፡ ${sched.entryStart}-${sched.entryEnd} | ${sched.exitStart}-${sched.exitEnd}</div>
-            </td>
-            <td style="padding:8px 10px;">
-              <span class="badge badge-primary">${item.role}</span>
-              <div style="font-size:0.75rem; color:#475569; margin-top:2px;">${item.dept}</div>
-            </td>
-            <td style="padding:8px 10px;">
-              <div style="display:flex; flex-direction:column; gap:2px; font-size:0.75rem;">
-                <span style="color:${isMorning ? '#1E3A8A' : '#64748B'}; font-weight:${isMorning ? '700' : '500'};">
-                  🚪 መግቢያ: <strong>${item.morningTime}</strong> (${item.morningStatus})
-                </span>
-                <span style="color:${!isMorning ? '#1E3A8A' : '#64748B'}; font-weight:${!isMorning ? '700' : '500'};">
-                  🚶‍♂️ መውጫ: <strong>${item.afternoonTime}</strong> (${item.afternoonStatus})
-                </span>
-              </div>
-            </td>
-            <td style="padding:8px 10px; font-weight:700; color:#1E293B;">
-              ${curStatus === 'ቀርቷል' ? '-' : curTime}
-            </td>
-            <td style="padding:8px 10px;">
-              <span class="badge ${badgeClass}" style="font-weight:700;">${curStatus}</span>
-            </td>
-            <td style="padding:8px 10px; font-size:0.8rem; color:#475569;">
-              ${curRemarks || '-'}
-            </td>
-            <td style="padding:8px 10px;">
-              <div style="display:flex; gap:0.25rem; flex-wrap:wrap; align-items:center;">
-                ${actionButtons}
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    /**
-     * Auto tick staff attendance with automatic Ethiopian clock time capture per role
-     */
-    function autoTickStaffAttendanceWeb(id, statusOverride) {
-      if (!canAccessStaffAttendanceWeb()) {
-        alert('🔒 የተከለከለ ፈቃድ! የሰራተኞች አቴንዳንስ መመዝገብ የሚችሉት ምክትል ርዕሰ መምህር ወይም ሲስተም አድሚን ብቻ ናቸው።');
-        return;
-      }
-      const item = staffAttendanceListWeb.find(s => s.id === id);
-      if (!item) return;
-
-      const isMorning = currentStaffWebShift === 'morning';
-      const roleCat = getStaffRoleCategoryWeb(item.isTeacher, item.role, item.dept);
-      const nowEthTime = getEthiopianClockTime(isMorning);
-      const evalResult = evaluateStaffAttendanceTime(nowEthTime, isMorning, roleCat);
-
-      let finalStatus = statusOverride || evalResult.status;
-      let finalRemarks = evalResult.remarks;
-
-      if (finalStatus === 'ተገኝቷል') {
-        finalRemarks = evalResult.remarks;
-      } else if (finalStatus === 'አርፍዷል') {
-        finalRemarks = evalResult.remarks.includes('አርፍደዋል') ? evalResult.remarks : 'ዘግይቶ መግባት ተመዝግቧል';
-      } else if (finalStatus === 'ቀድሞ ወጥቷል') {
-        finalRemarks = evalResult.remarks;
-      } else if (finalStatus === 'ዘግይቶ ወጥቷል') {
-        finalRemarks = evalResult.remarks;
-      } else if (finalStatus === 'ቀርቷል') {
-        finalRemarks = 'ያለፈቃድ የቀረ';
-      } else if (finalStatus === 'ፍቃድ') {
-        finalRemarks = 'የህመም ወይም የስራ ፍቃድ';
-      }
-
-      const formattedTime = (finalStatus === 'ቀርቷል' || finalStatus === 'ፍቃድ') ? '-' : nowEthTime;
-
-      if (isMorning) {
-        item.morningStatus = finalStatus;
-        item.morningTime = formattedTime;
-        item.morningRemarks = finalRemarks;
-      } else {
-        item.afternoonStatus = finalStatus;
-        item.afternoonTime = formattedTime;
-        item.afternoonRemarks = finalRemarks;
-      }
-
-      saveStaffAttendanceWeb();
-      renderStaffAttendanceWeb();
-    }
+    saveStaffAttendanceWeb();
 
     /**
      * Role Schedule Configuration Modal Functions
