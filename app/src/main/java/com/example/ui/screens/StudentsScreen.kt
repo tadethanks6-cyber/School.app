@@ -1047,6 +1047,18 @@ fun StudentsDataTable(
     onViewGrades: (Student) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var sortColumn by remember { mutableStateOf<String?>("name") }
+    var sortAscending by remember { mutableStateOf(true) }
+
+    val sortedStudents = remember(students, sortColumn, sortAscending) {
+        when (sortColumn) {
+            "name" -> if (sortAscending) students.sortedBy { it.fullName } else students.sortedByDescending { it.fullName }
+            "grade" -> if (sortAscending) students.sortedWith(compareBy({ it.grade }, { it.section })) else students.sortedWith(compareByDescending<Student> { it.grade }.thenByDescending { it.section })
+            "id" -> if (sortAscending) students.sortedBy { it.studentIdNumber } else students.sortedByDescending { it.studentIdNumber }
+            else -> students
+        }
+    }
+
     Card(
         modifier = modifier.testTag("students_data_table"),
         shape = RoundedCornerShape(12.dp),
@@ -1080,28 +1092,91 @@ fun StudentsDataTable(
                             fontSize = 11.sp,
                             textAlign = TextAlign.Center
                         )
-                        Text(
-                            text = if (isAmharic) "የተማሪው ሙሉ ስም" else "Student Full Name",
-                            modifier = Modifier.width(190.dp),
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 11.sp
-                        )
-                        Text(
-                            text = if (isAmharic) "መለያ ቁጥር" else "ID",
-                            modifier = Modifier.width(90.dp),
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 11.sp
-                        )
-                        Text(
-                            text = if (isAmharic) "ክፍል" else "Grade",
-                            modifier = Modifier.width(85.dp),
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 11.sp,
-                            textAlign = TextAlign.Center
-                        )
+                        // Full Name Header (Clickable Sort)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .width(190.dp)
+                                .clickable {
+                                    if (sortColumn == "name") {
+                                        sortAscending = !sortAscending
+                                    } else {
+                                        sortColumn = "name"
+                                        sortAscending = true
+                                    }
+                                }
+                        ) {
+                            Text(
+                                text = if (isAmharic) "የተማሪው ሙሉ ስም" else "Student Full Name",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 11.sp
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = if (sortColumn == "name") (if (sortAscending) "▲" else "▼") else "⇅",
+                                color = if (sortColumn == "name") GoldAccent else Color.White.copy(alpha = 0.6f),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        // ID Header (Clickable Sort)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .width(90.dp)
+                                .clickable {
+                                    if (sortColumn == "id") {
+                                        sortAscending = !sortAscending
+                                    } else {
+                                        sortColumn = "id"
+                                        sortAscending = true
+                                    }
+                                }
+                        ) {
+                            Text(
+                                text = if (isAmharic) "መለያ ቁጥር" else "ID",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 11.sp
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = if (sortColumn == "id") (if (sortAscending) "▲" else "▼") else "⇅",
+                                color = if (sortColumn == "id") GoldAccent else Color.White.copy(alpha = 0.6f),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        // Grade Header (Clickable Sort)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .width(85.dp)
+                                .clickable {
+                                    if (sortColumn == "grade") {
+                                        sortAscending = !sortAscending
+                                    } else {
+                                        sortColumn = "grade"
+                                        sortAscending = true
+                                    }
+                                }
+                        ) {
+                            Text(
+                                text = if (isAmharic) "ክፍል" else "Grade",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 11.sp,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = if (sortColumn == "grade") (if (sortAscending) "▲" else "▼") else "⇅",
+                                color = if (sortColumn == "grade") GoldAccent else Color.White.copy(alpha = 0.6f),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                         Text(
                             text = if (isAmharic) "ጾታ" else "Gender",
                             modifier = Modifier.width(60.dp),
@@ -1141,7 +1216,7 @@ fun StudentsDataTable(
                     LazyColumn(
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        itemsIndexed(students, key = { _, s -> s.id }) { index, student ->
+                        itemsIndexed(sortedStudents, key = { _, s -> s.id }) { index, student ->
                             val isEven = index % 2 == 0
                             val rowBg = if (isEven) {
                                 MaterialTheme.colorScheme.surface
