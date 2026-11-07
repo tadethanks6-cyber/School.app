@@ -442,6 +442,7 @@
       </div>
       <div style="display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center;">
         <button class="btn-primary" onclick="openLoginModal()">🔑 የመግቢያ ገጽ (Login)</button>
+        <button id="btnBannerStaffAttendance" class="btn-primary" style="background:#0F766E; border-color:#0D9488; cursor:pointer;" onclick="switchTab('attendance'); setAttendanceSubMode('staff');">👩‍🏫 የሰራተኞች ክትትል</button>
         <button class="btn-primary" style="background:#EF4444; border-color:#DC2626;" onclick="logoutWeb()">🚪 ውጣ (Logout)</button>
         <button id="btnBannerSchoolSettings" class="btn-accent" style="background:#0284C7; border-color:#0284C7; cursor:pointer;" onclick="openSchoolSettingsModal()">⚙️ የት/ቤት ቅንብር & አርማ</button>
         <button id="btnBannerPassManager" class="btn-accent" style="cursor:pointer;" onclick="openPasswordManagerModal()">🔐 የይለፍ ቃል መቆጣጠሪያ</button>
@@ -4892,6 +4893,19 @@
       if (target) target.style.display = 'block';
       if (tabId === 'roster') {
         renderHomeroomRoster();
+      } else if (tabId === 'students') {
+        renderStudents();
+      } else if (tabId === 'staff') {
+        renderStaff();
+        renderStaffAttendanceWeb();
+      } else if (tabId === 'attendance') {
+        renderAttendance();
+        setAttendanceSubMode(currentAttendanceSubMode || 'students');
+        renderStaffAttendanceWeb();
+      } else if (tabId === 'dashboard') {
+        renderDashboard();
+      } else if (tabId === 'grades') {
+        renderGrades();
       }
       if (window.event && window.event.currentTarget) {
         window.event.currentTarget.classList.add('active');
@@ -5334,10 +5348,11 @@
       currentAttendanceSubMode = mode;
       const btnStudents = document.getElementById('btnAttendanceSubStudents');
       const btnStaff = document.getElementById('btnAttendanceSubStaff');
-      const studentContainer = document.getElementById('studentAttendanceContainer');
-      const staffContainer = document.getElementById('staffAttendanceContainer');
+      const studentContainer = document.getElementById('attendanceStudentsSection') || document.getElementById('studentAttendanceContainer');
+      const staffContainer = document.getElementById('attendanceStaffSection') || document.getElementById('staffAttendanceContainer');
       const restrictedBanner = document.getElementById('staffAttendanceRestrictedBanner');
       const authorizedContent = document.getElementById('staffAttendanceAuthorizedContent');
+      const subBadge = document.getElementById('attendanceSubBadge');
 
       if (mode === 'students') {
         if (btnStudents) {
@@ -5352,6 +5367,7 @@
         }
         if (studentContainer) studentContainer.style.display = 'block';
         if (staffContainer) staffContainer.style.display = 'none';
+        if (subBadge) subBadge.innerHTML = '👨‍🎓 የተማሪዎች ክትትል እይታ';
       } else {
         if (btnStudents) {
           btnStudents.className = 'btn-secondary';
@@ -5360,11 +5376,12 @@
         }
         if (btnStaff) {
           btnStaff.className = 'btn-primary';
-          btnStaff.style.background = 'var(--primary)';
+          btnStaff.style.background = '#0F766E';
           btnStaff.style.color = 'white';
         }
         if (studentContainer) studentContainer.style.display = 'none';
         if (staffContainer) staffContainer.style.display = 'block';
+        if (subBadge) subBadge.innerHTML = '👩‍🏫 የመምህራን እና ሰራተኞች ክትትል እይታ';
 
         const hasAccess = canAccessStaffAttendanceWeb();
         if (restrictedBanner) restrictedBanner.style.display = hasAccess ? 'none' : 'block';
@@ -7597,6 +7614,8 @@
       if (btnSettingsBanner) btnSettingsBanner.style.display = isAdmin ? 'inline-block' : 'none';
       if (btnPassBanner) btnPassBanner.style.display = isAdmin ? 'inline-block' : 'none';
       if (btnSchemeBanner) btnSchemeBanner.style.display = isAdmin ? 'inline-block' : 'none';
+      const btnStaffAttBanner = document.getElementById('btnBannerStaffAttendance');
+      if (btnStaffAttBanner) btnStaffAttBanner.style.display = canAccessStaffAttendanceWeb() ? 'inline-block' : 'none';
 
       if (headerLogoGroup) {
         if (isAdmin) {
