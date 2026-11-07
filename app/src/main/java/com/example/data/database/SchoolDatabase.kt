@@ -212,6 +212,13 @@ abstract class SchoolDatabase : RoomDatabase() {
                     phone = "0960225925",
                     password = "sara@123",
                     role = "ዋና ጸሐፊ / ሬጅስትራር"
+                ),
+                UserAccount(
+                    fullName = "ምክትል ርዕሰ መምህር",
+                    email = "vp@dilijent.edu.et",
+                    phone = "0918000000",
+                    password = "vp1234",
+                    role = "ምክትል ርዕሰ መምህር"
                 )
             )
             defaultUsers.forEach { database.userAccountDao().insertUser(it) }

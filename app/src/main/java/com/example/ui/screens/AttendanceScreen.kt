@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
@@ -42,7 +43,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -1275,79 +1280,155 @@ fun AttendanceScreen(
 
                                     Spacer(modifier = Modifier.height(8.dp))
 
-                                    // Action buttons for Vice Principal & Admin
-                                    // Clicking automatically records exact current time and checks role limits
+                                    var showStaffStatusDropdown by remember { mutableStateOf(false) }
+
+                                    // Compact Dynamic Status Dropdown Selector (ተለዋዋጭ ድሮፕ ዳወን አዝራር)
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        if (isEntry) {
-                                            // CHECK-IN BUTTONS
-                                            AttendanceStatusButton(
-                                                label = "✓ በሰዓቱ ገብቷል",
-                                                isSelected = currentStatus == "ተገኝቷል",
-                                                color = EthioGreen,
-                                                onClick = {
-                                                    onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "ተገኝቷል")
+                                        Box(modifier = Modifier.weight(1f)) {
+                                            Surface(
+                                                shape = RoundedCornerShape(10.dp),
+                                                color = when (currentStatus) {
+                                                    "ተገኝቷል" -> EthioGreen.copy(alpha = 0.12f)
+                                                    "ቀርቷል" -> EthioRed.copy(alpha = 0.12f)
+                                                    "አርፍዷል", "ቀድሞ ወጥቷል" -> Color(0xFFD97706).copy(alpha = 0.12f)
+                                                    else -> Color(0xFF2563EB).copy(alpha = 0.12f)
+                                                },
+                                                border = androidx.compose.foundation.BorderStroke(
+                                                    1.dp,
+                                                    when (currentStatus) {
+                                                        "ተገኝቷል" -> EthioGreen.copy(alpha = 0.5f)
+                                                        "ቀርቷል" -> EthioRed.copy(alpha = 0.5f)
+                                                        "አርፍዷል", "ቀድሞ ወጥቷል" -> Color(0xFFD97706).copy(alpha = 0.5f)
+                                                        else -> Color(0xFF2563EB).copy(alpha = 0.5f)
+                                                    }
+                                                ),
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .clip(RoundedCornerShape(10.dp))
+                                                    .clickable { showStaffStatusDropdown = true }
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
+                                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                                        Text(
+                                                            text = when (currentStatus) {
+                                                                "ተገኝቷል" -> "✓"
+                                                                "ቀርቷል" -> "✕"
+                                                                "አርፍዷል", "ቀድሞ ወጥቷል" -> "⏱"
+                                                                else -> "📝"
+                                                            },
+                                                            fontSize = 14.sp,
+                                                            fontWeight = FontWeight.ExtraBold,
+                                                            color = when (currentStatus) {
+                                                                "ተገኝቷል" -> EthioGreen
+                                                                "ቀርቷል" -> EthioRed
+                                                                "አርፍዷል", "ቀድሞ ወጥቷል" -> Color(0xFFD97706)
+                                                                else -> Color(0xFF2563EB)
+                                                            }
+                                                        )
+                                                        Spacer(modifier = Modifier.width(6.dp))
+                                                        Text(
+                                                            text = "የአቴንዳንስ ሁኔታ፦ $currentStatus ▼",
+                                                            fontSize = 12.sp,
+                                                            fontWeight = FontWeight.Bold,
+                                                            color = when (currentStatus) {
+                                                                "ተገኝቷል" -> EthioGreen
+                                                                "ቀርቷል" -> EthioRed
+                                                                "አርፍዷል", "ቀድሞ ወጥቷል" -> Color(0xFFD97706)
+                                                                else -> Color(0xFF2563EB)
+                                                            }
+                                                        )
+                                                    }
+                                                    Icon(
+                                                        imageVector = Icons.Default.ArrowDropDown,
+                                                        contentDescription = "Dropdown",
+                                                        tint = Color(0xFF64748B),
+                                                        modifier = Modifier.size(20.dp)
+                                                    )
                                                 }
-                                            )
-                                            AttendanceStatusButton(
-                                                label = "⏱ አርፍዷል",
-                                                isSelected = currentStatus == "አርፍዷል",
-                                                color = Color(0xFFD97706),
-                                                onClick = {
-                                                    onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "አርፍዷል")
-                                                }
-                                            )
-                                            AttendanceStatusButton(
-                                                label = "✕ ቀርቷል",
-                                                isSelected = currentStatus == "ቀርቷል",
-                                                color = EthioRed,
-                                                onClick = {
-                                                    onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "ቀርቷል")
-                                                }
-                                            )
-                                            AttendanceStatusButton(
-                                                label = "📝 ፍቃድ",
-                                                isSelected = currentStatus == "በፍቃድ",
-                                                color = Color(0xFF2563EB),
-                                                onClick = {
-                                                    onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "በፍቃድ")
-                                                }
-                                            )
-                                        } else {
-                                            // CHECK-OUT BUTTONS
-                                            AttendanceStatusButton(
-                                                label = "✓ በሰዓቱ ወጥቷል",
-                                                isSelected = currentStatus == "ተገኝቷል",
-                                                color = EthioGreen,
-                                                onClick = {
-                                                    onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "ተገኝቷል")
-                                                }
-                                            )
-                                            AttendanceStatusButton(
-                                                label = "🏃‍♂️ ቀድሞ ወጥቷል",
-                                                isSelected = currentStatus == "ቀድሞ ወጥቷል",
-                                                color = Color(0xFFD97706),
-                                                onClick = {
-                                                    onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "ቀድሞ ወጥቷል")
-                                                }
-                                            )
-                                            AttendanceStatusButton(
-                                                label = "⌛ ዘግይቶ ወጥቷል",
-                                                isSelected = currentStatus == "ዘግይቶ ወጥቷል",
-                                                color = Color(0xFF2563EB),
-                                                onClick = {
-                                                    onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "ዘግይቶ ወጥቷል")
-                                                }
-                                            )
-                                            AttendanceStatusButton(
-                                                label = "✕ ቀርቷል",
-                                                isSelected = currentStatus == "ቀርቷል",
-                                                color = EthioRed,
-                                                onClick = {
-                                                    onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "ቀርቷል")
-                                                }
+                                            }
+
+                                            DropdownMenu(
+                                                expanded = showStaffStatusDropdown,
+                                                onDismissRequest = { showStaffStatusDropdown = false },
+                                                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                                            ) {
+                                                DropdownMenuItem(
+                                                    text = { Text("✓ ተገኝቷል (በሰዓቱ)", fontWeight = FontWeight.Bold, color = EthioGreen) },
+                                                    leadingIcon = { Text("✓", color = EthioGreen, fontWeight = FontWeight.Bold) },
+                                                    onClick = {
+                                                        showStaffStatusDropdown = false
+                                                        onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "ተገኝቷል")
+                                                    }
+                                                )
+                                                DropdownMenuItem(
+                                                    text = { Text(if (isEntry) "⏱ ዘግይቷል (አርፍዷል)" else "🏃‍♂️ ቀድሞ ወጥቷል", fontWeight = FontWeight.Bold, color = Color(0xFFD97706)) },
+                                                    leadingIcon = { Text("⏱", color = Color(0xFFD97706)) },
+                                                    onClick = {
+                                                        showStaffStatusDropdown = false
+                                                        onAutoTickStaffAttendance(staffItem.id, activeStaffSession, if (isEntry) "አርፍዷል" else "ቀድሞ ወጥቷል")
+                                                    }
+                                                )
+                                                DropdownMenuItem(
+                                                    text = { Text("✕ ቀርቷል (አልተገኘም)", fontWeight = FontWeight.Bold, color = EthioRed) },
+                                                    leadingIcon = { Text("✕", color = EthioRed, fontWeight = FontWeight.Bold) },
+                                                    onClick = {
+                                                        showStaffStatusDropdown = false
+                                                        onAutoTickStaffAttendance(staffItem.id, activeStaffSession, "ቀርቷል")
+                                                    }
+                                                )
+                                                DropdownMenuItem(
+                                                    text = { Text(if (isEntry) "📝 በፍቃድ ላይ" else "⌛ ዘግይቶ ወጥቷል", fontWeight = FontWeight.Bold, color = Color(0xFF2563EB)) },
+                                                    leadingIcon = { Text("📝", color = Color(0xFF2563EB)) },
+                                                    onClick = {
+                                                        showStaffStatusDropdown = false
+                                                        onAutoTickStaffAttendance(staffItem.id, activeStaffSession, if (isEntry) "በፍቃድ" else "ዘግይቶ ወጥቷል")
+                                                    }
+                                                )
+                                                HorizontalDivider()
+                                                DropdownMenuItem(
+                                                    text = { Text("✏️ ሰዓት እና ማስታወሻ አርም...", fontWeight = FontWeight.Bold, color = Color(0xFF0369A1)) },
+                                                    leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null, tint = Color(0xFF0369A1), modifier = Modifier.size(16.dp)) },
+                                                    onClick = {
+                                                        showStaffStatusDropdown = false
+                                                        editingStaffItem = staffItem
+                                                        editSession = activeStaffSession
+                                                        editTime = if (activeStaffSession == StaffAttendanceSession.CHECK_IN) staffItem.entryTime else staffItem.exitTime
+                                                        editStatus = if (activeStaffSession == StaffAttendanceSession.CHECK_IN) staffItem.entryStatus else staffItem.exitStatus
+                                                        editRemarks = if (activeStaffSession == StaffAttendanceSession.CHECK_IN) staffItem.entryRemarks else staffItem.exitRemarks
+                                                    }
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.width(8.dp))
+
+                                        // Direct quick edit icon button
+                                        IconButton(
+                                            onClick = {
+                                                editingStaffItem = staffItem
+                                                editSession = activeStaffSession
+                                                editTime = if (activeStaffSession == StaffAttendanceSession.CHECK_IN) staffItem.entryTime else staffItem.exitTime
+                                                editStatus = if (activeStaffSession == StaffAttendanceSession.CHECK_IN) staffItem.entryStatus else staffItem.exitStatus
+                                                editRemarks = if (activeStaffSession == StaffAttendanceSession.CHECK_IN) staffItem.entryRemarks else staffItem.exitRemarks
+                                            },
+                                            modifier = Modifier
+                                                .size(38.dp)
+                                                .background(Color(0xFFEFF6FF), RoundedCornerShape(8.dp))
+                                                .border(1.dp, Color(0xFFBFDBFE), RoundedCornerShape(8.dp))
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Edit Time",
+                                                tint = Color(0xFF1E40AF),
+                                                modifier = Modifier.size(16.dp)
                                             )
                                         }
                                     }

@@ -909,7 +909,7 @@
                     <th>የነቃው ክፍለ-ጊዜ ሰዓት</th>
                     <th>ሁኔታ (Status)</th>
                     <th>ማስታወሻ (Remarks)</th>
-                    <th>አቴንዳንስ መዝግብ (ምክትል/አድሚን)</th>
+                    <th>የአቴንዳንስ ሁኔታ (ተለዋዋጭ ድሮፕ ዳወን)</th>
                   </tr>
                 </thead>
                 <tbody id="staffAttendanceTableBody">
@@ -1244,6 +1244,166 @@
         <div class="modal-actions">
           <button type="button" class="btn-secondary" onclick="closeAddStaffModal()">ሰርዝ (Cancel)</button>
           <button type="submit" class="btn-primary">💾 መዝግብ (Save Staff)</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Student -->
+  <div id="editStudentModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">✏️ የተማሪ መረጃ ማሻሻያ (Edit Student)</div>
+      <p style="font-size:0.8rem; color:#475569; margin-bottom:1rem;">የተማሪውን መረጃ በማንኛውም ሰዓት አሻሽለው ማዳን ይችላሉ።</p>
+      <form onsubmit="saveEditedStudent(event)">
+        <input type="hidden" id="editStudentId" value="">
+        <!-- Photo Upload Box -->
+        <div class="form-group" style="text-align:center;">
+          <label style="display:block; margin-bottom:0.4rem; font-weight:600;">የተማሪው ፎቶ</label>
+          <div style="display:flex; flex-direction:column; align-items:center;">
+            <input type="file" id="editStudentPhotoInput" accept="image/*" style="display:none;" onchange="handleEditStudentPhotoSelected(event)">
+            <div id="editStudentPhotoPreview" onclick="document.getElementById('editStudentPhotoInput').click()" style="width:90px; height:90px; border-radius:50%; border:2.5px dashed var(--primary); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; background-size:cover; background-position:center; background-color:#EFF6FF; overflow:hidden; transition:0.2s; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+              <span style="font-size:1.8rem;">📸</span>
+              <span style="font-size:0.65rem; color:var(--primary); font-weight:700;">ፎቶ ቀይር</span>
+            </div>
+            <div style="margin-top:0.4rem; display:flex; gap:0.4rem;">
+              <button type="button" class="btn-secondary" style="padding:0.25rem 0.6rem; font-size:0.72rem;" onclick="document.getElementById('editStudentPhotoInput').click()">📁 ፎቶ ምረጥ</button>
+              <button type="button" class="btn-secondary" style="padding:0.25rem 0.6rem; font-size:0.72rem; color:var(--danger);" onclick="clearEditStudentPhoto()">🗑️ አስወግድ</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>የተማሪው ሙሉ ስም *</label>
+          <input type="text" id="editStudentName" class="form-control" required placeholder="ሙሉ ስም">
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+          <div class="form-group">
+            <label>ጾታ *</label>
+            <select id="editStudentGender" class="form-control">
+              <option value="ወንድ">ወንድ (Male)</option>
+              <option value="ሴት">ሴት (Female)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>ክፍል *</label>
+            <select id="editStudentGrade" class="form-control">
+              <option value="12A">12A (Natural Science)</option>
+              <option value="12B">12B (Social Science)</option>
+              <option value="11A">11A (Natural Science)</option>
+              <option value="11B">11B (Social Science)</option>
+              <option value="10A">10A</option>
+              <option value="9A">9A</option>
+              <option value="8ኛ ክፍል">8ኛ ክፍል</option>
+              <option value="7ኛ ክፍል">7ኛ ክፍል</option>
+              <option value="6ኛ ክፍል">6ኛ ክፍል</option>
+              <option value="5ኛ ክፍል">5ኛ ክፍል</option>
+              <option value="4ኛ ክፍል">4ኛ ክፍል</option>
+              <option value="3ኛ ክፍል">3ኛ ክፍል</option>
+              <option value="2ኛ ክፍል">2ኛ ክፍል</option>
+              <option value="1ኛ ክፍል">1ኛ ክፍል</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+          <div class="form-group">
+            <label>የወላጅ/አሳዳጊ ስልክ ቁጥር *</label>
+            <input type="tel" id="editStudentPhone" class="form-control" required placeholder="09XXXXXXXX">
+          </div>
+          <div class="form-group">
+            <label>የተማሪው ሁኔታ (Status) *</label>
+            <select id="editStudentStatus" class="form-control">
+              <option value="ንቁ">ንቁ (Active)</option>
+              <option value="ያቋረጠ">ያቋረጠ (Dropped)</option>
+              <option value="የተዛወረ">የተዛወረ (Transferred)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeEditStudentModal()">ሰርዝ (Cancel)</button>
+          <button type="submit" class="btn-primary" style="background:#2563EB;">💾 አሻሽልና መዝግብ (Update Student)</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Staff/Teacher -->
+  <div id="editStaffModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">✏️ የመምህር / ሰራተኛ መረጃ ማሻሻያ (Edit Staff)</div>
+      <p style="font-size:0.8rem; color:#475569; margin-bottom:1rem;">የሰራተኛውን ወይም የመምህሩን መረጃ በማንኛውም ሰዓት አሻሽለው ማዳን ይችላሉ።</p>
+      <form onsubmit="saveEditedStaff(event)">
+        <input type="hidden" id="editStaffId" value="">
+        <!-- Photo Upload Box -->
+        <div class="form-group" style="text-align:center;">
+          <label style="display:block; margin-bottom:0.4rem; font-weight:600;">የሰራተኛው / መምህሩ ፎቶ</label>
+          <div style="display:flex; flex-direction:column; align-items:center;">
+            <input type="file" id="editStaffPhotoInput" accept="image/*" style="display:none;" onchange="handleEditStaffPhotoSelected(event)">
+            <div id="editStaffPhotoPreview" onclick="document.getElementById('editStaffPhotoInput').click()" style="width:90px; height:90px; border-radius:50%; border:2.5px dashed var(--primary); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; background-size:cover; background-position:center; background-color:#EFF6FF; overflow:hidden; transition:0.2s; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+              <span style="font-size:1.8rem;">📸</span>
+              <span style="font-size:0.65rem; color:var(--primary); font-weight:700;">ፎቶ ቀይር</span>
+            </div>
+            <div style="margin-top:0.4rem; display:flex; gap:0.4rem;">
+              <button type="button" class="btn-secondary" style="padding:0.25rem 0.6rem; font-size:0.72rem;" onclick="document.getElementById('editStaffPhotoInput').click()">📁 ፎቶ ምረጥ</button>
+              <button type="button" class="btn-secondary" style="padding:0.25rem 0.6rem; font-size:0.72rem; color:var(--danger);" onclick="clearEditStaffPhoto()">🗑️ አስወግድ</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>ሙሉ ስም *</label>
+          <input type="text" id="editStaffName" class="form-control" required placeholder="ሙሉ ስም">
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+          <div class="form-group">
+            <label>የስራ መደብ (Role) *</label>
+            <select id="editStaffRole" class="form-control">
+              <option value="መምህር">መምህር (Teacher)</option>
+              <option value="የክፍል ኃላፊ">የክፍል ኃላፊ (Homeroom)</option>
+              <option value="የት/ክፍል ኃላፊ">የት/ክፍል ኃላፊ (Dept. Head)</option>
+              <option value="ርዕሰ መምህር">ርዕሰ መምህር (Principal)</option>
+              <option value="ምክትል ርዕሰ መምህር">ምክትል ርዕሰ መምህር</option>
+              <option value="ዋና ጸሐፊ">ዋና ጸሐፊ (Secretary)</option>
+              <option value="ፋይናንስ/ሂሳብ ሹም">ፋይናንስ / ሂሳብ ሹም</option>
+              <option value="የጥበቃ ኃላፊ">የጥበቃ ኃላፊ</option>
+              <option value="የፅዳት ሰራተኛ">የፅዳት ሰራተኛ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>የትምህርት/ስራ ዘርፍ *</label>
+            <input type="text" id="editStaffDept" class="form-control" required placeholder="ዘርፍ">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+          <div class="form-group">
+            <label>ስልክ ቁጥር *</label>
+            <input type="tel" id="editStaffPhone" class="form-control" required placeholder="09XXXXXXXX">
+          </div>
+          <div class="form-group">
+            <label>የትምህርት ደረጃ</label>
+            <select id="editStaffQual" class="form-control">
+              <option value="ባችለር ዲግሪ">ባችለር ዲግሪ (BA/BSc)</option>
+              <option value="ማስተርስ">ማስተርስ (MA/MSc)</option>
+              <option value="ዲፕሎማ">ዲፕሎማ (Diploma)</option>
+              <option value="ሰርተፊኬት">ሰርተፊኬት</option>
+              <option value="ሌላ">ሌላ</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>የሰራተኛው ሁኔታ (Status) *</label>
+          <select id="editStaffStatus" class="form-control">
+            <option value="ንቁ">ንቁ (Active)</option>
+            <option value="ፈቃድ ላይ">ፈቃድ ላይ (On Leave)</option>
+            <option value="የተዛወረ">የተዛወረ (Transferred)</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeEditStaffModal()">ሰርዝ (Cancel)</button>
+          <button type="submit" class="btn-primary" style="background:#2563EB;">💾 አሻሽልና መዝግብ (Update Staff)</button>
         </div>
       </form>
     </div>
@@ -4860,8 +5020,9 @@
           <td><span class="badge badge-primary">${s.grade}</span></td>
           <td><a href="tel:${s.phone}" style="color:var(--primary); text-decoration:none; font-weight:600;">${s.phone}</a></td>
           <td><span class="badge badge-success">${s.status}</span></td>
-          <td style="text-align:center;">
-            <button class="btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.75rem; color:var(--danger);" onclick="removeStudent('${s.id}')">🗑️ ሰርዝ</button>
+          <td style="text-align:center; white-space:nowrap;">
+            <button class="btn-secondary" style="padding:0.25rem 0.55rem; font-size:0.75rem; color:#2563EB; font-weight:700; border-color:#93C5FD; margin-right:4px;" onclick="openEditStudentModal('${s.id}')">✏️ አሻሽል</button>
+            <button class="btn-secondary" style="padding:0.25rem 0.55rem; font-size:0.75rem; color:var(--danger); font-weight:700; border-color:#FCA5A5;" onclick="removeStudent('${s.id}')">🗑️ ሰርዝ</button>
           </td>
         </tr>
       `}).join('');
@@ -4896,8 +5057,9 @@
           <td><a href="tel:${st.phone}" style="color:var(--primary); text-decoration:none; font-weight:600;">${st.phone}</a></td>
           <td><span class="badge badge-warning">${st.qual}</span></td>
           <td><span class="badge badge-success">${st.status}</span></td>
-          <td style="text-align:center;">
-            <button class="btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.75rem; color:var(--danger);" onclick="removeStaff('${st.id}')">🗑️ ሰርዝ</button>
+          <td style="text-align:center; white-space:nowrap;">
+            <button class="btn-secondary" style="padding:0.25rem 0.55rem; font-size:0.75rem; color:#2563EB; font-weight:700; border-color:#93C5FD; margin-right:4px;" onclick="openEditStaffModal('${st.id}')">✏️ አሻሽል</button>
+            <button class="btn-secondary" style="padding:0.25rem 0.55rem; font-size:0.75rem; color:var(--danger); font-weight:700; border-color:#FCA5A5;" onclick="removeStaff('${st.id}')">🗑️ ሰርዝ</button>
           </td>
         </tr>
       `}).join('');
@@ -5307,6 +5469,14 @@
         const aStatus = item.afternoonStatus || 'ተገኝቷል';
 
         const statusBadgeClass = statusVal === 'ተገኝቷል' ? 'badge-success' : (statusVal === 'ዘግይቷል' ? 'badge-warning' : (statusVal === 'ፍቃድ' ? 'badge-info' : 'badge-danger'));
+        let selectStyle = 'background:#DCFCE7; color:#166534; border:1.5px solid #86EFAC;';
+        if (statusVal === 'ዘግይቷል') {
+          selectStyle = 'background:#FEF3C7; color:#92400E; border:1.5px solid #FCD34D;';
+        } else if (statusVal === 'ቀርቷል') {
+          selectStyle = 'background:#FEE2E2; color:#991B1B; border:1.5px solid #FCA5A5;';
+        } else if (statusVal === 'ፍቃድ') {
+          selectStyle = 'background:#EDE9FE; color:#5B21B6; border:1.5px solid #C4B5FD;';
+        }
 
         return `
           <tr>
@@ -5327,8 +5497,20 @@
             <td><strong style="color:var(--primary); font-family:monospace;">${timeVal}</strong></td>
             <td><span class="badge ${statusBadgeClass}">${statusVal}</span></td>
             <td><small style="color:#475569;">${remarksVal}</small></td>
-            <td style="text-align:center;">
-              <button class="btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.75rem;" onclick="openStaffAttEditModal('${item.id}')">✏️ አስተካክል</button>
+            <td style="text-align:center; white-space:nowrap; min-width:175px;">
+              <div style="display:inline-flex; align-items:center; gap:5px; justify-content:center;">
+                <select onchange="handleStaffAttDropdownChange('${item.id}', this.value)"
+                        style="padding:5px 9px; border-radius:18px; font-weight:800; font-size:0.78rem; cursor:pointer; outline:none; transition:all 0.15s; box-shadow:0 1px 3px rgba(0,0,0,0.06); ${selectStyle}">
+                  <option value="ተገኝቷል" ${statusVal === 'ተገኝቷል' ? 'selected' : ''}>✓ ተገኝቷል</option>
+                  <option value="ዘግይቷል" ${statusVal === 'ዘግይቷል' ? 'selected' : ''}>⏱ ዘግይቷል</option>
+                  <option value="ቀርቷል" ${statusVal === 'ቀርቷል' ? 'selected' : ''}>✕ ቀርቷል</option>
+                  <option value="ፍቃድ" ${statusVal === 'ፍቃድ' ? 'selected' : ''}>📝 ፍቃድ</option>
+                  <option value="edit_time">✏️ ሰዓት አርም...</option>
+                </select>
+                <button type="button" class="btn-secondary" style="padding:3px 7px; border-radius:8px; font-size:0.74rem; border-color:#CBD5E1; color:#1E3A8A; font-weight:700;" onclick="openStaffAttEditModal('${item.id}')" title="ሰዓት እና ማስታወሻ በእጅ አርም">
+                  ✏️ ሰዓት
+                </button>
+              </div>
             </td>
           </tr>
         `;
@@ -5932,6 +6114,326 @@
 
     function closeReportCardModal() {
       document.getElementById('ethiopianReportCardModal').style.display = 'none';
+    }
+
+
+    // ==========================================
+    // EDIT STUDENT & EDIT STAFF HANDLERS
+    // ==========================================
+    let editingStudentId = null;
+    let selectedEditStudentPhotoBase64 = '';
+
+    function openEditStudentModal(id) {
+      const student = students.find(s => String(s.id).toLowerCase() === String(id).toLowerCase());
+      if (!student) {
+        alert('⚠️ ተማሪው በዳታቤዝ ውስጥ አልተገኘም!');
+        return;
+      }
+      editingStudentId = student.id;
+      selectedEditStudentPhotoBase64 = student.photo || '';
+
+      const idEl = document.getElementById('editStudentId');
+      const nameEl = document.getElementById('editStudentName');
+      const genderEl = document.getElementById('editStudentGender');
+      const gradeEl = document.getElementById('editStudentGrade');
+      const phoneEl = document.getElementById('editStudentPhone');
+      const statusEl = document.getElementById('editStudentStatus');
+      const previewEl = document.getElementById('editStudentPhotoPreview');
+
+      if (idEl) idEl.value = student.id;
+      if (nameEl) nameEl.value = student.name || '';
+      if (genderEl) genderEl.value = student.gender || 'ወንድ';
+      if (gradeEl) {
+        let found = false;
+        for (let opt of gradeEl.options) {
+          if (opt.value === student.grade) {
+            opt.selected = true;
+            found = true;
+            break;
+          }
+        }
+        if (!found && student.grade) {
+          const newOpt = document.createElement('option');
+          newOpt.value = student.grade;
+          newOpt.innerText = student.grade;
+          newOpt.selected = true;
+          gradeEl.appendChild(newOpt);
+        }
+      }
+      if (phoneEl) phoneEl.value = student.phone || '';
+      if (statusEl) statusEl.value = student.status || 'ንቁ';
+
+      if (previewEl) {
+        if (student.photo) {
+          previewEl.style.backgroundImage = `url('${student.photo}')`;
+          previewEl.innerHTML = '';
+        } else {
+          previewEl.style.backgroundImage = 'none';
+          previewEl.innerHTML = '<span style="font-size:1.8rem;">📸</span><span style="font-size:0.65rem; color:var(--primary); font-weight:700;">ፎቶ ቀይር</span>';
+        }
+      }
+
+      const modal = document.getElementById('editStudentModal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeEditStudentModal() {
+      const modal = document.getElementById('editStudentModal');
+      if (modal) modal.style.display = 'none';
+      editingStudentId = null;
+      selectedEditStudentPhotoBase64 = '';
+    }
+
+    function handleEditStudentPhotoSelected(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        selectedEditStudentPhotoBase64 = evt.target.result;
+        const preview = document.getElementById('editStudentPhotoPreview');
+        if (preview) {
+          preview.style.backgroundImage = `url('${selectedEditStudentPhotoBase64}')`;
+          preview.innerHTML = '';
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearEditStudentPhoto() {
+      selectedEditStudentPhotoBase64 = '';
+      const preview = document.getElementById('editStudentPhotoPreview');
+      const input = document.getElementById('editStudentPhotoInput');
+      if (input) input.value = '';
+      if (preview) {
+        preview.style.backgroundImage = 'none';
+        preview.innerHTML = '<span style="font-size:1.8rem;">📸</span><span style="font-size:0.65rem; color:var(--primary); font-weight:700;">ፎቶ ምረጥ</span>';
+      }
+    }
+
+    function saveEditedStudent(e) {
+      if (e) e.preventDefault();
+      if (!editingStudentId) return;
+
+      const student = students.find(s => String(s.id).toLowerCase() === String(editingStudentId).toLowerCase());
+      if (!student) {
+        alert('⚠️ ተማሪው አልተገኘም!');
+        return;
+      }
+
+      const newName = (document.getElementById('editStudentName')?.value || '').trim();
+      const newGender = document.getElementById('editStudentGender')?.value || 'ወንድ';
+      const newGrade = document.getElementById('editStudentGrade')?.value || student.grade;
+      const newPhone = (document.getElementById('editStudentPhone')?.value || '').trim();
+      const newStatus = document.getElementById('editStudentStatus')?.value || 'ንቁ';
+
+      if (!newName) {
+        alert('እባክዎ የተማሪውን ሙሉ ስም ያስገቡ!');
+        return;
+      }
+
+      student.name = newName;
+      student.gender = newGender;
+      student.grade = newGrade;
+      student.phone = newPhone;
+      student.status = newStatus;
+      if (selectedEditStudentPhotoBase64) {
+        student.photo = selectedEditStudentPhotoBase64;
+      }
+
+      localStorage.setItem('dilijent_students', JSON.stringify(students));
+      saveState();
+      closeEditStudentModal();
+      renderStudents();
+      renderHomeroomRoster();
+      renderGrades();
+      renderDashboard();
+      alert(`✅ የተማሪ ${newName} (${student.id}) መረጃ በተሳካ ሁኔታ ተሻሽሏል!`);
+    }
+
+    let editingStaffId = null;
+    let selectedEditStaffPhotoBase64 = '';
+
+    function openEditStaffModal(id) {
+      const staff = staffList.find(st => String(st.id).toLowerCase() === String(id).toLowerCase());
+      if (!staff) {
+        alert('⚠️ ሰራተኛው በዳታቤዝ ውስጥ አልተገኘም!');
+        return;
+      }
+      editingStaffId = staff.id;
+      selectedEditStaffPhotoBase64 = staff.photo || '';
+
+      const idEl = document.getElementById('editStaffId');
+      const nameEl = document.getElementById('editStaffName');
+      const roleEl = document.getElementById('editStaffRole');
+      const deptEl = document.getElementById('editStaffDept');
+      const phoneEl = document.getElementById('editStaffPhone');
+      const qualEl = document.getElementById('editStaffQual');
+      const statusEl = document.getElementById('editStaffStatus');
+      const previewEl = document.getElementById('editStaffPhotoPreview');
+
+      if (idEl) idEl.value = staff.id;
+      if (nameEl) nameEl.value = staff.name || '';
+      if (roleEl) roleEl.value = staff.role || 'መምህር';
+      if (deptEl) deptEl.value = staff.dept || '';
+      if (phoneEl) phoneEl.value = staff.phone || '';
+      if (qualEl) qualEl.value = staff.qual || 'ባችለር ዲግሪ';
+      if (statusEl) statusEl.value = staff.status || 'ንቁ';
+
+      if (previewEl) {
+        if (staff.photo) {
+          previewEl.style.backgroundImage = `url('${staff.photo}')`;
+          previewEl.innerHTML = '';
+        } else {
+          previewEl.style.backgroundImage = 'none';
+          previewEl.innerHTML = '<span style="font-size:1.8rem;">📸</span><span style="font-size:0.65rem; color:var(--primary); font-weight:700;">ፎቶ ቀይር</span>';
+        }
+      }
+
+      const modal = document.getElementById('editStaffModal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeEditStaffModal() {
+      const modal = document.getElementById('editStaffModal');
+      if (modal) modal.style.display = 'none';
+      editingStaffId = null;
+      selectedEditStaffPhotoBase64 = '';
+    }
+
+    function handleEditStaffPhotoSelected(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        selectedEditStaffPhotoBase64 = evt.target.result;
+        const preview = document.getElementById('editStaffPhotoPreview');
+        if (preview) {
+          preview.style.backgroundImage = `url('${selectedEditStaffPhotoBase64}')`;
+          preview.innerHTML = '';
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearEditStaffPhoto() {
+      selectedEditStaffPhotoBase64 = '';
+      const preview = document.getElementById('editStaffPhotoPreview');
+      const input = document.getElementById('editStaffPhotoInput');
+      if (input) input.value = '';
+      if (preview) {
+        preview.style.backgroundImage = 'none';
+        preview.innerHTML = '<span style="font-size:1.8rem;">📸</span><span style="font-size:0.65rem; color:var(--primary); font-weight:700;">ፎቶ ምረጥ</span>';
+      }
+    }
+
+    function saveEditedStaff(e) {
+      if (e) e.preventDefault();
+      if (!editingStaffId) return;
+
+      const staff = staffList.find(st => String(st.id).toLowerCase() === String(editingStaffId).toLowerCase());
+      if (!staff) {
+        alert('⚠️ ሰራተኛው አልተገኘም!');
+        return;
+      }
+
+      const oldName = staff.name;
+      const newName = (document.getElementById('editStaffName')?.value || '').trim();
+      const newRole = (document.getElementById('editStaffRole')?.value || '').trim();
+      const newDept = (document.getElementById('editStaffDept')?.value || '').trim();
+      const newPhone = (document.getElementById('editStaffPhone')?.value || '').trim();
+      const newQual = (document.getElementById('editStaffQual')?.value || '').trim();
+      const newStatus = document.getElementById('editStaffStatus')?.value || 'ንቁ';
+
+      if (!newName) {
+        alert('እባክዎ ሙሉ ስም ያስገቡ!');
+        return;
+      }
+
+      staff.name = newName;
+      staff.role = newRole;
+      staff.dept = newDept;
+      staff.phone = newPhone;
+      staff.qual = newQual;
+      staff.status = newStatus;
+      if (selectedEditStaffPhotoBase64) {
+        staff.photo = selectedEditStaffPhotoBase64;
+      }
+
+      localStorage.setItem('dilijent_staff_list', JSON.stringify(staffList));
+
+      try {
+        let uStaff = JSON.parse(localStorage.getItem('dilijent_user_registered_staff') || '[]');
+        const idx = uStaff.findIndex(us => String(us.id).toLowerCase() === String(editingStaffId).toLowerCase() || us.name === oldName);
+        if (idx >= 0) {
+          uStaff[idx] = { ...uStaff[idx], ...staff };
+        } else {
+          uStaff.push(staff);
+        }
+        localStorage.setItem('dilijent_user_registered_staff', JSON.stringify(uStaff));
+      } catch (err) {}
+
+      const attMatch = staffAttendanceListWeb.find(sa => String(sa.id).toLowerCase() === String(editingStaffId).toLowerCase() || sa.name === oldName);
+      if (attMatch) {
+        attMatch.name = newName;
+        attMatch.role = newRole;
+        attMatch.dept = newDept;
+        attMatch.isTeacher = newRole.toLowerCase().includes('መምህር') || newDept.toLowerCase().includes('መምህር');
+        saveStaffAttendanceWeb();
+      }
+
+      const accMatch = userAccounts.find(acc => acc.name === oldName || (staff.phone && acc.phone === staff.phone));
+      if (accMatch) {
+        accMatch.name = newName;
+        accMatch.role = newRole;
+        accMatch.phone = newPhone;
+        localStorage.setItem('dilijent_user_accounts', JSON.stringify(userAccounts));
+      }
+
+      saveState();
+      closeEditStaffModal();
+      renderStaff();
+      renderStaffAttendanceWeb();
+      renderDashboard();
+      alert(`✅ የሰራተኛ ${newName} (${staff.id}) መረጃ በተሳካ ሁኔታ ተሻሽሏል!`);
+    }
+
+    function quickMarkStaffAttendanceWeb(id, status) {
+      if (!canAccessStaffAttendanceWeb()) {
+        alert('🔒 የተከለከለ ፈቃድ! የሰራተኞች አቴንዳንስ መመዝገብ የሚችሉት ምክትል ርዕሰ መምህር ወይም ሲስተም አድሚን ብቻ ናቸው።');
+        return;
+      }
+      const item = staffAttendanceListWeb.find(s => String(s.id).toLowerCase() === String(id).toLowerCase());
+      if (!item) return;
+
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const isMorning = currentStaffWebShift === 'morning';
+      const period = hours < 12 ? 'ጧት' : 'ከሰዓት';
+      const displayHours = String(hours % 12 || 12).padStart(2, '0');
+      const currentTimeStr = `${displayHours}:${minutes} ${period}`;
+
+      if (isMorning) {
+        item.morningStatus = status;
+        item.morningTime = (status === 'ቀርቷል' || status === 'ፍቃድ') ? '-' : currentTimeStr;
+        item.morningRemarks = (status === 'ተገኝቷል') ? 'በሰዓቱ ገብተዋል' : ((status === 'ዘግይቷል') ? 'ዘግይተው ገብተዋል' : ((status === 'ፍቃድ') ? 'በፈቃድ ላይ ናቸው' : 'ያልተገኙ (ቀሪ)'));
+      } else {
+        item.afternoonStatus = status;
+        item.afternoonTime = (status === 'ቀርቷል' || status === 'ፍቃድ') ? '-' : currentTimeStr;
+        item.afternoonRemarks = (status === 'ተገኝቷል') ? 'በሰዓቱ ወጥተዋል' : ((status === 'ዘግይቷል') ? 'ቀደም ብለው ወጥተዋል' : ((status === 'ፍቃድ') ? 'በፈቃድ ወጥተዋል' : 'ሳይፈርሙ ወጥተዋል'));
+      }
+
+      saveStaffAttendanceWeb();
+      renderStaffAttendanceWeb();
+    }
+
+    function handleStaffAttDropdownChange(id, val) {
+      if (val === 'edit_time') {
+        openStaffAttEditModal(id);
+        renderStaffAttendanceWeb();
+      } else {
+        quickMarkStaffAttendanceWeb(id, val);
+      }
     }
 
     function removeStudent(idOrIdx) {
@@ -6639,7 +7141,8 @@
     // ==========================================
     const DEFAULT_ACCOUNTS = [
       { name: 'እኔ (ታደሰ ምስጋናው - ሲስተም አድሚን)', role: '👑 ሲስተም አድሚን', email: 'tadessemisganaw4@gmail.com', phone: '0911999999', pass: 'tade@2026', isAdmin: true, isVicePrincipal: false, roleKey: 'admin' },
-      { name: 'Sara Niguse', role: '✍️ ዋና ጸሐፊ / ሬጅስትራር', email: 'sara.niguse@dilijent.edu.et', phone: '0960225925', pass: 'sara@123', isAdmin: false, isVicePrincipal: false, roleKey: 'secretary' }
+      { name: 'Sara Niguse', role: '✍️ ዋና ጸሐፊ / ሬጅስትራር', email: 'sara.niguse@dilijent.edu.et', phone: '0960225925', pass: 'sara@123', isAdmin: false, isVicePrincipal: false, roleKey: 'secretary' },
+      { name: 'ምክትል ርዕሰ መምህር', role: '🎓 ምክትል ርዕሰ መምህር', email: 'vp@dilijent.edu.et', phone: '0918000000', pass: 'vp1234', isAdmin: false, isVicePrincipal: true, roleKey: 'vice_principal' }
     ];
 
     let userAccounts = [];
@@ -6810,6 +7313,9 @@
     function handleFullLoginSubmit(e) {
       if (e) e.preventDefault();
 
+      const roleSelect = document.getElementById('fullLoginRoleSelect');
+      const roleKey = roleSelect ? roleSelect.value : 'teacher';
+
       const identEl = document.getElementById('inputFullLoginIdentifier') || document.getElementById('inputFullLoginPhone') || document.getElementById('inputFullLoginEmail');
       const passEl = document.getElementById('inputFullLoginPass');
 
@@ -6835,9 +7341,15 @@
         cleanIdent === 'tadessemisganaw4@gmail.com' ||
         cleanIdent === 'admin@dilijent.edu.et' ||
         cleanIdent === 'admin' ||
-        cleanPhone === '0911999999'
+        cleanIdent.includes('tadesse') ||
+        cleanPhone === '0911999999' ||
+        roleKey === 'admin'
       ) && (
-        pass === 'tade@2026' || pass === 'Admin@2026' || pass === 'admin123'
+        pass === 'tade@2026' ||
+        pass === 'Admin@2026' ||
+        pass === 'admin123' ||
+        pass === 'tade2026' ||
+        pass.toLowerCase() === 'tade@2026'
       );
 
       if (isAdminMatch) {
@@ -6858,12 +7370,17 @@
         // Ensure in userAccounts
         let accs = [];
         try { accs = JSON.parse(localStorage.getItem('dilijent_user_accounts') || '[]'); } catch(err){}
-        const idx = accs.findIndex(u => u.isAdmin || u.roleKey === 'admin');
+        const idx = accs.findIndex(u => u.isAdmin || u.roleKey === 'admin' || (u.email && u.email.toLowerCase() === 'tadessemisganaw4@gmail.com'));
         if (idx >= 0) accs[idx] = adminUser; else accs.unshift(adminUser);
         localStorage.setItem('dilijent_user_accounts', JSON.stringify(accs));
         userAccounts = accs;
 
         updateCurrentUserUI();
+        if (typeof renderAttendance === 'function') renderAttendance();
+        if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
+        if (typeof renderStudents === 'function') renderStudents();
+        if (typeof renderStaff === 'function') renderStaff();
+        if (typeof renderDashboard === 'function') renderDashboard();
         alert('🎉 እንኳን ደህና መጡ ታደሰ ምስጋናው! ወደ ሲስተም አድሚን ገጽ በሙሉ ፈቃድ ገብተዋል።');
         return;
       }
@@ -6874,9 +7391,10 @@
         cleanPhone.endsWith('60225925') ||
         cleanIdent === '0960225925' ||
         cleanIdent.includes('sara.niguse') ||
-        cleanIdent === 'sara'
+        cleanIdent === 'sara' ||
+        roleKey === 'secretary'
       ) && (
-        pass === 'sara@123' || pass === '1234'
+        pass === 'sara@123' || pass === '1234' || pass === 'sara123'
       );
 
       if (isSaraMatch) {
@@ -6897,7 +7415,7 @@
         // Ensure in userAccounts
         let accs = [];
         try { accs = JSON.parse(localStorage.getItem('dilijent_user_accounts') || '[]'); } catch(err){}
-        const idx = accs.findIndex(u => u.roleKey === 'secretary' || (u.phone && u.phone === '0960225925'));
+        const idx = accs.findIndex(u => u.roleKey === 'secretary' || (u.phone && u.phone === '0960225925') || (u.name && u.name.toLowerCase().includes('sara')));
         if (idx >= 0) accs[idx] = saraUser; else accs.push(saraUser);
         localStorage.setItem('dilijent_user_accounts', JSON.stringify(accs));
         userAccounts = accs;
@@ -6922,7 +7440,44 @@
         updateCurrentUserUI();
         if (typeof renderStaff === 'function') renderStaff();
         if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
+        if (typeof renderStudents === 'function') renderStudents();
+        if (typeof renderDashboard === 'function') renderDashboard();
         alert('🎉 እንኳን ደህና መጡ Sara Niguse! ወደ ዋና ጸሐፊ ገጽ በተሳካ ሁኔታ ገብተዋል።');
+        return;
+      }
+
+      // 3. DIRECT VICE PRINCIPAL LOGIN
+      const isVpMatch = (
+        cleanPhone === '0918000000' ||
+        cleanIdent === '0918000000' ||
+        cleanIdent.includes('vp') ||
+        roleKey === 'vice_principal'
+      ) && (
+        pass === 'vp1234' || pass === '1234' || pass === 'vp@1234'
+      );
+
+      if (isVpMatch) {
+        const vpUser = {
+          name: 'ምክትል ርዕሰ መምህር',
+          role: '🎓 ምክትል ርዕሰ መምህር',
+          email: 'vp@dilijent.edu.et',
+          phone: '0918000000',
+          pass: 'vp1234',
+          isAdmin: false,
+          isVicePrincipal: true,
+          roleKey: 'vice_principal'
+        };
+        currentWebUser = vpUser;
+        isGuestMode = false;
+        localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
+
+        updateCurrentUserUI();
+        if (typeof renderAttendance === 'function') renderAttendance();
+        if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
+        if (typeof renderStudents === 'function') renderStudents();
+        if (typeof renderStaff === 'function') renderStaff();
+        if (typeof renderDashboard === 'function') renderDashboard();
+        alert('🎉 እንኳን ደህና መጡ ምክትል ርዕሰ መምህር! ወደ የሰራተኞች ክትትልና የስራ አመራር ገጽ በተሳካ ሁኔታ ገብተዋል።');
         return;
       }
 
@@ -6969,7 +7524,16 @@
 
     function isCurrentUserAdminWeb() {
       if (!currentWebUser) return false;
-      return !!(currentWebUser.isAdmin || (currentWebUser.role && currentWebUser.role.toLowerCase().includes('አድሚን')) || (currentWebUser.email && currentWebUser.email.toLowerCase().includes('admin')));
+      const email = (currentWebUser.email || '').toLowerCase();
+      const role = (currentWebUser.role || '').toLowerCase();
+      return !!(
+        currentWebUser.isAdmin === true ||
+        currentWebUser.roleKey === 'admin' ||
+        email === 'tadessemisganaw4@gmail.com' ||
+        email.includes('admin') ||
+        role.includes('አድሚን') ||
+        role.includes('admin')
+      );
     }
 
     function toggleWebLoginPasswordVisibility() {
@@ -7020,21 +7584,28 @@
         }
       }
 
-      // KEEP SETTINGS & PASSWORD MANAGER BUTTONS ALWAYS VISIBLE & FULLY FUNCTIONAL
+      // PASSWORD MANAGER & SETTINGS: STRICTLY RESTRICTED TO SYSTEM ADMIN ONLY
       const btnSettingsHeader = document.getElementById('btnSchoolSettingsHeader');
       const btnPassHeader = document.getElementById('btnAdminPassManager');
       const btnSettingsBanner = document.getElementById('btnBannerSchoolSettings');
       const btnPassBanner = document.getElementById('btnBannerPassManager');
+      const btnSchemeBanner = document.getElementById('btnBannerScheme');
       const headerLogoGroup = document.getElementById('headerLogoGroup') || document.querySelector('.logo-group');
 
-      if (btnSettingsHeader) btnSettingsHeader.style.display = 'inline-flex';
-      if (btnPassHeader) btnPassHeader.style.display = 'inline-flex';
-      if (btnSettingsBanner) btnSettingsBanner.style.display = 'inline-block';
-      if (btnPassBanner) btnPassBanner.style.display = 'inline-block';
+      if (btnSettingsHeader) btnSettingsHeader.style.display = isAdmin ? 'inline-flex' : 'none';
+      if (btnPassHeader) btnPassHeader.style.display = isAdmin ? 'inline-flex' : 'none';
+      if (btnSettingsBanner) btnSettingsBanner.style.display = isAdmin ? 'inline-block' : 'none';
+      if (btnPassBanner) btnPassBanner.style.display = isAdmin ? 'inline-block' : 'none';
+      if (btnSchemeBanner) btnSchemeBanner.style.display = isAdmin ? 'inline-block' : 'none';
 
       if (headerLogoGroup) {
-        headerLogoGroup.style.cursor = 'pointer';
-        headerLogoGroup.title = 'የትምህርት ቤት አርማ እና ቅንብር ለመቀየር ይጫኑ';
+        if (isAdmin) {
+          headerLogoGroup.style.cursor = 'pointer';
+          headerLogoGroup.title = 'የትምህርት ቤት አርማ እና ቅንብር ለመቀየር ይጫኑ';
+        } else {
+          headerLogoGroup.style.cursor = 'default';
+          headerLogoGroup.title = 'ዲሊጀንት ትምህርት ቤት';
+        }
       }
     }
 
@@ -7188,7 +7759,44 @@
         return;
       }
 
-      // 2. DIRECT SECRETARY CHECK (Sara Niguse)
+      // 2.5 DIRECT VICE PRINCIPAL CHECK
+      const isVpIdent = (
+        cleanDigits === '0918000000' ||
+        cleanLower === '0918000000' ||
+        cleanLower.includes('vp') ||
+        roleKey === 'vice_principal'
+      );
+      const isVpPass = (
+        pass === 'vp1234' || pass === '1234' || pass === 'vp@1234'
+      );
+
+      if (isVpIdent && isVpPass) {
+        const vpUser = {
+          name: 'ምክትል ርዕሰ መምህር',
+          role: '🎓 ምክትል ርዕሰ መምህር',
+          email: 'vp@dilijent.edu.et',
+          phone: '0918000000',
+          pass: 'vp1234',
+          isAdmin: false,
+          isVicePrincipal: true,
+          roleKey: 'vice_principal'
+        };
+        currentWebUser = vpUser;
+        isGuestMode = false;
+        localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
+
+        updateCurrentUserUI();
+        if (typeof renderAttendance === 'function') renderAttendance();
+        if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
+        if (typeof renderStudents === 'function') renderStudents();
+        if (typeof renderStaff === 'function') renderStaff();
+        if (typeof renderDashboard === 'function') renderDashboard();
+        closeLoginModal();
+        alert('🎉 እንኳን ደህና መጡ ምክትል ርዕሰ መምህር! ወደ የሰራተኞች ክትትልና የስራ አመራር ገጽ በተሳካ ሁኔታ ገብተዋል።');
+        return;
+      }
+
+            // 2. DIRECT SECRETARY CHECK (Sara Niguse)
       const isSaraIdent = (
         cleanDigits === '0960225925' ||
         cleanDigits.endsWith('60225925') ||
@@ -7269,6 +7877,10 @@
     }
 
     function openPasswordManagerModal() {
+      if (!isCurrentUserAdminWeb()) {
+        alert('⛔ የተከለከለ ፈቃድ!\n\nየተጠቃሚዎችን የይለፍ ቃል መቆጣጠር እና መቀየር የሚቻለው በሲስተም አድሚን (System Admin) ገጽ ብቻ ነው።');
+        return;
+      }
       try {
         if (!Array.isArray(userAccounts) || userAccounts.length === 0) {
           try {
@@ -7901,6 +8513,10 @@
     }
 
     function openSchoolSettingsModal() {
+      if (!isCurrentUserAdminWeb()) {
+        alert('⛔ የተከለከለ ፈቃድ!\n\nየትምህርት ቤት ቅንብር እና አርማ (Logo) የመቀየር ፈቃድ የተሰጠው ለሲስተም አድሚን (System Admin) ብቻ ነው።');
+        return;
+      }
       try {
         const nameAmInput = document.getElementById('inputSettingsSchoolNameAm');
         if (nameAmInput) nameAmInput.value = (schoolSettings && schoolSettings.nameAm) ? schoolSettings.nameAm : 'ዲሊጀንት ትምህርት ቤት';

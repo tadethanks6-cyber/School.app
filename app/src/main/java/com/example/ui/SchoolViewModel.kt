@@ -1078,6 +1078,16 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                     )
                     repository.registerUser(fallbackSara)
                     fallbackSara
+                } else if (authed == null && (cleanId == "0918000000" || cleanId.contains("vp", ignoreCase = true)) && (cleanPass == "vp1234" || cleanPass == "1234")) {
+                    val fallbackVp = UserAccount(
+                        fullName = "ምክትል ርዕሰ መምህር",
+                        email = "vp@dilijent.edu.et",
+                        phone = "0918000000",
+                        password = "vp1234",
+                        role = "ምክትል ርዕሰ መምህር (Vice Principal)"
+                    )
+                    repository.registerUser(fallbackVp)
+                    fallbackVp
                 } else {
                     authed
                 }
