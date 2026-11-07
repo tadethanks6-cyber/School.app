@@ -97,69 +97,8 @@ abstract class SchoolDatabase : RoomDatabase() {
             )
             database.subjectDao().insertSubjects(subjects)
 
-            // 2. Initial Teachers (Ethiopian School Teachers)
-            val teachers = listOf(
-                Teacher(
-                    teacherCode = "T-201",
-                    fullName = "አቶ ሙሉጌታ ታከለ",
-                    title = "አቶ",
-                    gender = "ወንድ",
-                    phone = "0911223344",
-                    email = "mulugeta.t@ethioschool.edu.et",
-                    qualification = "ባችለር ዲግሪ (BSc)",
-                    specialization = "ሂሳብ (Mathematics)",
-                    isHomeroomTeacher = true,
-                    homeroomClass = "9ኛ ክፍል-A"
-                ),
-                Teacher(
-                    teacherCode = "T-202",
-                    fullName = "ወ/ሮ ትእግስት አስፋው",
-                    title = "ወ/ሮ",
-                    gender = "ሴት",
-                    phone = "0922334455",
-                    email = "tsega.a@ethioschool.edu.et",
-                    qualification = "ማስተርስ (MA)",
-                    specialization = "እንግሊዝኛ (English)",
-                    isHomeroomTeacher = true,
-                    homeroomClass = "9ኛ ክፍል-B"
-                ),
-                Teacher(
-                    teacherCode = "T-203",
-                    fullName = "አቶ ቴዎድሮስ ግርማ",
-                    title = "አቶ",
-                    gender = "ወንድ",
-                    phone = "0933445566",
-                    email = "tedros.g@ethioschool.edu.et",
-                    qualification = "ባችለር ዲግሪ (BSc)",
-                    specialization = "ፊዚክስ (Physics)",
-                    isHomeroomTeacher = false,
-                    homeroomClass = ""
-                ),
-                Teacher(
-                    teacherCode = "T-204",
-                    fullName = "ወ/ሪት ቤተልሔም ወርቁ",
-                    title = "ወ/ሪት",
-                    gender = "ሴት",
-                    phone = "0944556677",
-                    email = "betelhem.w@ethioschool.edu.et",
-                    qualification = "ባችለር ዲግሪ (BSc)",
-                    specialization = "ባዮሎጂ (Biology)",
-                    isHomeroomTeacher = false,
-                    homeroomClass = ""
-                ),
-                Teacher(
-                    teacherCode = "T-205",
-                    fullName = "አቶ ደረጀ በቀለ",
-                    title = "አቶ",
-                    gender = "ወንድ",
-                    phone = "0955667788",
-                    email = "dereje.b@ethioschool.edu.et",
-                    qualification = "ባችለር ዲግሪ (BA)",
-                    specialization = "አማርኛ ቋንቋ",
-                    isHomeroomTeacher = true,
-                    homeroomClass = "10ኛ ክፍል-A"
-                )
-            )
+            // 2. Initial Teachers (Empty by default - exclusively user-registered)
+            val teachers = emptyList<Teacher>()
             database.teacherDao().insertTeachers(teachers)
 
             // 3. Initial Students
@@ -246,245 +185,33 @@ abstract class SchoolDatabase : RoomDatabase() {
             val allInitialStudents = students + com.example.data.model.OfficialStudentsData.getAllOfficialStudents()
             database.studentDao().insertStudents(allInitialStudents)
 
-            // 4. Initial Teacher Workload Allotments (የሥራ ክፍፍል)
-            val workloads = listOf(
-                TeacherWorkload(
-                    teacherId = 1,
-                    teacherName = "አቶ ሙሉጌታ ታከለ",
-                    subjectId = 3,
-                    subjectName = "ሂሳብ (Mathematics)",
-                    grade = "9ኛ ክፍል",
-                    section = "A",
-                    periodsPerWeek = 5,
-                    daysAllotted = "ሰኞ፣ ማክሰኞ፣ ረቡዕ፣ ሐሙስ፣ አርብ"
-                ),
-                TeacherWorkload(
-                    teacherId = 1,
-                    teacherName = "አቶ ሙሉጌታ ታከለ",
-                    subjectId = 3,
-                    subjectName = "ሂሳብ (Mathematics)",
-                    grade = "9ኛ ክፍል",
-                    section = "B",
-                    periodsPerWeek = 5,
-                    daysAllotted = "ሰኞ፣ ማክሰኞ፣ ረቡዕ፣ ሐሙስ፣ አርብ"
-                ),
-                TeacherWorkload(
-                    teacherId = 2,
-                    teacherName = "ወ/ሮ ትእግስት አስፋው",
-                    subjectId = 2,
-                    subjectName = "እንግሊዝኛ (English)",
-                    grade = "9ኛ ክፍል",
-                    section = "A",
-                    periodsPerWeek = 5,
-                    daysAllotted = "ሰኞ፣ ማክሰኞ፣ ረቡዕ፣ ሐሙስ፣ አርብ"
-                ),
-                TeacherWorkload(
-                    teacherId = 3,
-                    teacherName = "አቶ ቴዎድሮስ ግርማ",
-                    subjectId = 4,
-                    subjectName = "ፊዚክስ (Physics)",
-                    grade = "9ኛ ክፍል",
-                    section = "A",
-                    periodsPerWeek = 4,
-                    daysAllotted = "ሰኞ፣ ረቡዕ፣ ሐሙስ፣ አርብ"
-                ),
-                TeacherWorkload(
-                    teacherId = 4,
-                    teacherName = "ወ/ሪት ቤተልሔም ወርቁ",
-                    subjectId = 6,
-                    subjectName = "ባዮሎጂ (Biology)",
-                    grade = "9ኛ ክፍል",
-                    section = "A",
-                    periodsPerWeek = 4,
-                    daysAllotted = "ማክሰኞ፣ ረቡዕ፣ ሐሙስ፣ አርብ"
-                )
-            )
+            // 4. Initial Teacher Workload Allotments (Empty by default)
+            val workloads = emptyList<TeacherWorkload>()
             database.workloadDao().insertWorkloads(workloads)
 
             // 5. Initial Grades (Do not pre-fill estimated sample scores; marks are entered exclusively by subject teachers)
-            // Empty initially as requested by user
             val sampleGrades = emptyList<StudentGrade>()
             database.gradeDao().insertGrades(sampleGrades)
 
-            // 6. Initial Administrative Staff Members (የአስተዳደር ሰራተኞች)
-            val sampleStaff = listOf(
-                Staff(
-                    staffCode = "ADM-001",
-                    fullName = "ዶ/ር ተስፋዬ ገብረመድህን",
-                    title = "ዶ/ር",
-                    role = "ርዕሰ መምህር",
-                    department = "አስተዳደር",
-                    phone = "0911000000",
-                    email = "principal@dilijentschool.edu.et",
-                    gender = "ወንድ",
-                    qualification = "ዶክትሬት (PhD)",
-                    employmentType = "ቋሚ",
-                    salary = "28,000 ብር",
-                    hiringDate = "2012 ዓ.ም",
-                    responsibilities = "የትምህርት ቤቱን አጠቃላይ የአስተዳደር፣ የአካዳሚክ እና የልማት ስራዎችን በበላይነት መምራት፤ ከወላጆችና ከትምህርት ቢሮ ጋር ግንኙነት ማድረግ።"
-                ),
-                Staff(
-                    staffCode = "ADM-002",
-                    fullName = "ወ/ሮ መስከረም በቀለ",
-                    title = "ወ/ሮ",
-                    role = "ምክትል ርዕሰ መምህር",
-                    department = "አስተዳደር",
-                    phone = "0911223311",
-                    email = "v.principal@dilijentschool.edu.et",
-                    gender = "ሴት",
-                    qualification = "ማስተርስ (MA)",
-                    employmentType = "ቋሚ",
-                    salary = "22,000 ብር",
-                    hiringDate = "2014 ዓ.ም",
-                    responsibilities = "የመምህራን እና የተማሪዎች የዕለት ተዕለት ስነ-ስርዓት፣ የአካዳሚክ መርሃ-ግብር አፈፃፀም እና የመማር ማስተማር ክትትል ማድረግ።"
-                ),
-                Staff(
-                    staffCode = "ADM-003",
-                    fullName = "ወ/ሪት ትዕግስት ወርቁ",
-                    title = "ወ/ሪት",
-                    role = "ዋና ጸሐፊ",
-                    department = "አስተዳደር",
-                    phone = "0912334455",
-                    email = "secretary@dilijentschool.edu.et",
-                    gender = "ሴት",
-                    qualification = "ዲፕሎማ",
-                    employmentType = "ቋሚ",
-                    salary = "11,500 ብር",
-                    hiringDate = "2016 ዓ.ም",
-                    responsibilities = "ደብዳቤዎችን መጻፍ፣ የተማሪዎች እና የመምህራን ፋይል አያያዝ፣ የጽህፈት መሳሪያዎች ጥያቄ መቀበል እና የስልክ ጥሪዎችን ማስተናገድ።"
-                ),
-                Staff(
-                    staffCode = "ADM-004",
-                    fullName = "አቶ ዳዊት ብርሃኑ",
-                    title = "አቶ",
-                    role = "ፋይናንስ / ሂሳብ ሹም",
-                    department = "ፋይናንስ እና ንብረት",
-                    phone = "0913445566",
-                    email = "finance@dilijentschool.edu.et",
-                    gender = "ወንድ",
-                    qualification = "የመጀመሪያ ዲግሪ (BA)",
-                    employmentType = "ቋሚ",
-                    salary = "16,000 ብር",
-                    hiringDate = "2015 ዓ.ም",
-                    responsibilities = "የወርሃዊ የትምህርት ቤት ክፍያ መሰብሰብ፣ የደመወዝ ክፍያ ማዘጋጀት፣ የበጀት እቅድ እና የፋይናንስ ሪፖርቶችን ማዘጋጀት።"
-                ),
-                Staff(
-                    staffCode = "ADM-005",
-                    fullName = "አቶ ግርማ አየለ",
-                    title = "አቶ",
-                    role = "ንብረት ክፍል ኃላፊ",
-                    department = "ፋይናንስ እና ንብረት",
-                    phone = "0914556677",
-                    email = "property@dilijentschool.edu.et",
-                    gender = "ወንድ",
-                    qualification = "ዲፕሎማ",
-                    employmentType = "ቋሚ",
-                    salary = "12,000 ብር",
-                    hiringDate = "2016 ዓ.ም",
-                    responsibilities = "የትምህርት ቤቱን ቋሚ እና አላቂ ንብረቶች መመዝገብ፣ ማከፋፈል፣ አመታዊ የንብረት ቆጠራ ማካሄድ እና የጥገና ፍላጎቶችን መከታተል።"
-                ),
-                Staff(
-                    staffCode = "ADM-006",
-                    fullName = "ወ/ሮ ዓለሚቱ ታደሰ",
-                    title = "ወ/ሮ",
-                    role = "የፅዳት ሰራተኛ",
-                    department = "አገልግሎትና ደህንነት",
-                    phone = "0915667788",
-                    email = "",
-                    gender = "ሴት",
-                    qualification = "10ኛ ያጠናቀቀች",
-                    employmentType = "ቋሚ",
-                    salary = "7,500 ብር",
-                    hiringDate = "2017 ዓ.ም",
-                    responsibilities = "የመማሪያ ክፍሎችን፣ የቢሮዎችን፣ የመጸዳጃ ቤቶችን እና የግቢውን ንጽህና በየቀኑ መጠበቅ።"
-                ),
-                Staff(
-                    staffCode = "ADM-007",
-                    fullName = "አቶ በላይነህ ጥላሁን",
-                    title = "አቶ",
-                    role = "የጥበቃ ኃላፊ",
-                    department = "አገልግሎትና ደህንነት",
-                    phone = "0916778899",
-                    email = "",
-                    gender = "ወንድ",
-                    qualification = "ሰርተፍኬት",
-                    employmentType = "ቋሚ",
-                    salary = "8,000 ብር",
-                    hiringDate = "2015 ዓ.ም",
-                    responsibilities = "የትምህርት ቤቱን ግቢ ደህንነት መጠበቅ፣ የተማሪዎችን እና የእንግዶችን መግቢያና መውጫ መቆጣጠር።"
-                )
-            )
+            // 6. Initial Administrative Staff Members (Empty by default - exclusively user-registered)
+            val sampleStaff = emptyList<Staff>()
             database.staffDao().insertStaffList(sampleStaff)
 
             // 7. Initial Role-Based Users for Login Gate (መግቢያ በር)
             val defaultUsers = listOf(
                 UserAccount(
-                    fullName = "ሲስተም አድሚን (እኔ)",
-                    email = "admin@dilijent.edu.et",
-                    phone = "0900000000",
-                    password = "admin123",
+                    fullName = "ሲስተም አድሚን (ታደሰ ምስጋናው)",
+                    email = "tadessemisganaw4@gmail.com",
+                    phone = "0911999999",
+                    password = "tade@2026",
                     role = "ሲስተም አድሚን (Super Admin)"
                 ),
                 UserAccount(
-                    fullName = "ዶ/ር ተስፋዬ ገብረመድህን (ርዕሰ መምህር)",
-                    email = "principal@dilijent.edu.et",
-                    phone = "0911000000",
-                    password = "1234",
-                    role = "ርዕሰ መምህር (Principal)"
-                ),
-                UserAccount(
-                    fullName = "አቶ ከበደ ለማ",
-                    phone = "0918000000",
-                    password = "1234",
-                    role = "ምክትል ርዕሰ መምህር"
-                ),
-                UserAccount(
-                    fullName = "አቶ ሙሉጌታ ታከለ",
-                    phone = "0911223344",
-                    password = "1234",
-                    role = "መምህር (Teacher)"
-                ),
-                UserAccount(
-                    fullName = "ወ/ሮ ትእግስት አስፋው",
-                    phone = "0922334455",
-                    password = "1234",
-                    role = "መምህር (Teacher)"
-                ),
-                UserAccount(
-                    fullName = "ዮናስ አለሙ (ተማሪ)",
-                    phone = "0911002233",
-                    password = "1234",
-                    role = "ተማሪ (Student)"
-                ),
-                UserAccount(
-                    fullName = "አቶ ዮናስ ብርሃኑ",
-                    phone = "0913445566",
-                    password = "1234",
-                    role = "ፋይናንስ / ሂሳብ ሹም"
-                ),
-                UserAccount(
-                    fullName = "ወ/ሪት ሰላማዊት አበበ",
-                    phone = "0912334455",
-                    password = "1234",
-                    role = "ዋና ጸሐፊ"
-                ),
-                UserAccount(
-                    fullName = "አቶ ግርማ አየለ",
-                    phone = "0914556677",
-                    password = "1234",
-                    role = "ንብረት ክፍል ኃላፊ"
-                ),
-                UserAccount(
-                    fullName = "ወ/ሮ ዓለሚቱ ታደሰ",
-                    phone = "0915667788",
-                    password = "1234",
-                    role = "የፅዳት ሰራተኛ"
-                ),
-                UserAccount(
-                    fullName = "አቶ በላይነህ ጥላሁን",
-                    phone = "0916778899",
-                    password = "1234",
-                    role = "የጥበቃ ኃላፊ"
+                    fullName = "Sara Niguse",
+                    email = "sara.niguse@dilijent.edu.et",
+                    phone = "0960225925",
+                    password = "sara@123",
+                    role = "ዋና ጸሐፊ / ሬጅስትራር"
                 )
             )
             defaultUsers.forEach { database.userAccountDao().insertUser(it) }

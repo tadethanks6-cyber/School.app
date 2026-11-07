@@ -326,7 +326,12 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         rawWorkloads,
         _schoolGradeLevel
     ) { teachers, workloads, level ->
-        teachers.filter { isTeacherInLevel(it, workloads, level) }
+        val deleted = prefs.getStringSet("deleted_staff_ids", emptySet()) ?: emptySet()
+        teachers.filter {
+            val codeLower = it.teacherCode.trim().lowercase()
+            val nameLower = it.fullName.trim().lowercase()
+            !deleted.contains(codeLower) && !deleted.contains(nameLower) && isTeacherInLevel(it, workloads, level)
+        }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val allSubjects: StateFlow<List<Subject>> = combine(
@@ -393,6 +398,14 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
 
     // Staff Members (የአስተዳደር ሰራተኞች)
     val allStaff: StateFlow<List<Staff>> = repository.allStaff
+        .map { staffList ->
+            val deleted = prefs.getStringSet("deleted_staff_ids", emptySet()) ?: emptySet()
+            staffList.filter {
+                val codeLower = it.staffCode.trim().lowercase()
+                val nameLower = it.fullName.trim().lowercase()
+                !deleted.contains(codeLower) && !deleted.contains(nameLower)
+            }
+        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val staffSearchQuery = MutableStateFlow("")
@@ -1530,32 +1543,56 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
 
     private suspend fun purgeDeletedStaffAndRestoreUserStaff() {
         try {
-            val deletedStaff = prefs.getStringSet("deleted_staff_ids", emptySet()) ?: emptySet()
-            if (deletedStaff.isNotEmpty()) {
-                val currentStaff = repository.allStaff.first()
-                for (s in currentStaff) {
-                    val codeLower = s.staffCode.trim().lowercase()
-                    val nameLower = s.fullName.trim().lowercase()
-                    if (deletedStaff.contains(codeLower) || deletedStaff.contains(nameLower)) {
-                        repository.deleteStaff(s)
-                    }
+            val dummyStaffNamesToPurge = setOf(
+                "አቶ ሙሉጌታ ታከለ", "ወ/ሮ ትእግስት አስፋው", "አቶ ቴዎድሮስ ግርማ", "ወ/ሪት ቤተልሔም ወርቁ", "አቶ ደረጀ በቀለ",
+                "ዶ/ር ተስፋዬ ገብረመድህን", "ወ/ሮ መስከረም በቀለ", "ወ/ሪት ትዕግስት ወርቁ", "አቶ ዳዊት ብርሃኑ", "አቶ ግርማ አየለ",
+                "ወ/ሮ ዓለሚቱ ታደሰ", "አቶ በላይነህ ጥላሁን", "አቶ ግርማቸው አሰፋ", "ወ/ሮ ሰላማዊት አበራ", "አቶ በየነ ኃይሉ",
+                "ወ/ሪት ትዕግስት ወርቄ", "አቶ ከበደ ለማ", "ወ/ሪት ሰላማዊት አበበ", "አቶ ዮናስ ብርሃኑ", "አቶ ሙሉጌታ ከበደ",
+                "አቶ ዮሐንስ ታደሰ", "ወ/ሮ ብርቱካን በቀለ", "ተማሪ አቤል ታደሰ"
+            )
+            val dummyStaffCodesToPurge = setOf(
+                "t-101", "t-102", "t-103", "t-104", "t-201", "t-202", "t-203", "t-204", "t-205",
+                "adm-001", "adm-002", "adm-003", "adm-004", "adm-005", "adm-006", "adm-007"
+            )
+
+            val currentDeleted = (prefs.getStringSet("deleted_staff_ids", emptySet()) ?: emptySet()).toMutableSet()
+            dummyStaffNamesToPurge.forEach { currentDeleted.add(it.trim().lowercase()) }
+            dummyStaffCodesToPurge.forEach { currentDeleted.add(it) }
+            prefs.edit().putStringSet("deleted_staff_ids", currentDeleted).apply()
+
+            // Purge matching staff from Room
+            val currentStaff = repository.allStaff.first()
+            for (s in currentStaff) {
+                val codeLower = s.staffCode.trim().lowercase()
+                val nameLower = s.fullName.trim().lowercase()
+                if (currentDeleted.contains(codeLower) || currentDeleted.contains(nameLower)) {
+                    repository.deleteStaff(s)
                 }
-                val currentTeachers = repository.allTeachers.first()
-                for (t in currentTeachers) {
-                    val codeLower = t.teacherCode.trim().lowercase()
-                    val nameLower = t.fullName.trim().lowercase()
-                    if (deletedStaff.contains(codeLower) || deletedStaff.contains(nameLower)) {
-                        repository.deleteTeacher(t)
-                    }
+            }
+            // Purge matching teachers from Room
+            val currentTeachers = repository.allTeachers.first()
+            for (t in currentTeachers) {
+                val codeLower = t.teacherCode.trim().lowercase()
+                val nameLower = t.fullName.trim().lowercase()
+                if (currentDeleted.contains(codeLower) || currentDeleted.contains(nameLower)) {
+                    repository.deleteTeacher(t)
+                }
+            }
+            // Purge dummy teacher workloads from Room
+            val currentWorkloads = repository.allWorkloads.first()
+            for (w in currentWorkloads) {
+                val nameLower = w.teacherName.trim().lowercase()
+                if (currentDeleted.contains(nameLower)) {
+                    repository.deleteWorkload(w)
                 }
             }
 
-            // Restore any user-registered staff from persistent backup if missing from DB
+            // Restore any genuine user-registered staff from persistent backup if missing from DB
             val userStaffBackupJson = prefs.getString("user_registered_staff_backup_v1", null)
             if (!userStaffBackupJson.isNullOrBlank()) {
-                val currentStaff = repository.allStaff.first()
-                val existingCodes = currentStaff.map { it.staffCode.trim().lowercase() }.toSet()
-                val existingNames = currentStaff.map { it.fullName.trim().lowercase() }.toSet()
+                val existingStaff = repository.allStaff.first()
+                val existingCodes = existingStaff.map { it.staffCode.trim().lowercase() }.toSet()
+                val existingNames = existingStaff.map { it.fullName.trim().lowercase() }.toSet()
                 val arr = org.json.JSONArray(userStaffBackupJson)
                 for (i in 0 until arr.length()) {
                     val obj = arr.getJSONObject(i)
@@ -1563,7 +1600,7 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                     val name = obj.optString("fullName", "")
                     val codeLower = code.trim().lowercase()
                     val nameLower = name.trim().lowercase()
-                    if (!deletedStaff.contains(codeLower) && !deletedStaff.contains(nameLower) &&
+                    if (!currentDeleted.contains(codeLower) && !currentDeleted.contains(nameLower) &&
                         !existingCodes.contains(codeLower) && !existingNames.contains(nameLower) &&
                         name.isNotBlank()) {
                         val restored = Staff(
@@ -1705,67 +1742,6 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                 )
                 primaryStudents.forEach { repository.insertStudent(it) }
 
-                val primaryTeachers = listOf(
-                    Teacher(
-                        teacherCode = "T-101",
-                        fullName = "አቶ ግርማቸው አሰፋ",
-                        title = "አቶ",
-                        gender = "ወንድ",
-                        phone = "0911778899",
-                        email = "girmachew.a@ethioschool.edu.et",
-                        qualification = "ዲፕሎማ",
-                        specialization = "አጠቃላይ ሳይንስ (General Science 1-8)",
-                        department = "የመሰረታዊ ሳይንስ ክፍል",
-                        isHomeroomTeacher = true,
-                        homeroomClass = "7ኛ ክፍል-A"
-                    ),
-                    Teacher(
-                        teacherCode = "T-102",
-                        fullName = "ወ/ሮ ሰላማዊት አበራ",
-                        title = "ወ/ሮ",
-                        gender = "ሴት",
-                        phone = "0922889900",
-                        email = "selamawit.a@ethioschool.edu.et",
-                        qualification = "ባችለር ዲግሪ (BEd)",
-                        specialization = "ሂሳብ (Mathematics 1-8)",
-                        department = "የሂሳብ ክፍል",
-                        isHomeroomTeacher = true,
-                        homeroomClass = "8ኛ ክፍል-A"
-                    ),
-                    Teacher(
-                        teacherCode = "T-103",
-                        fullName = "አቶ በየነ ኃይሉ",
-                        title = "አቶ",
-                        gender = "ወንድ",
-                        phone = "0933990011",
-                        email = "beyene.h@ethioschool.edu.et",
-                        qualification = "ባችለር ዲግሪ (BA)",
-                        specialization = "እንግሊዝኛ (English 1-8)",
-                        department = "የቋንቋዎች ክፍል",
-                        isHomeroomTeacher = false,
-                        homeroomClass = ""
-                    ),
-                    Teacher(
-                        teacherCode = "T-104",
-                        fullName = "ወ/ሪት ትዕግስት ወርቄ",
-                        title = "ወ/ሪት",
-                        gender = "ሴት",
-                        phone = "0944001122",
-                        email = "tigist.w@ethioschool.edu.et",
-                        qualification = "ዲፕሎማ",
-                        specialization = "ህብረተሰብ ጥናት (Social Studies 1-8)",
-                        department = "የማህበራዊ ሳይንስ ክፍል",
-                        isHomeroomTeacher = true,
-                        homeroomClass = "6ኛ ክፍል-A"
-                    )
-                )
-                val deletedStaffForSeed = prefs.getStringSet("deleted_staff_ids", emptySet()) ?: emptySet()
-                primaryTeachers.filter {
-                    val c = it.teacherCode.trim().lowercase()
-                    val n = it.fullName.trim().lowercase()
-                    !deletedStaffForSeed.contains(c) && !deletedStaffForSeed.contains(n)
-                }.forEach { repository.insertTeacher(it) }
-
                 val primarySubjects = listOf(
                     Subject(name = "አጠቃላይ ሳይንስ (General Science)", code = "GSCI-07", gradeLevel = "7ኛ ክፍል", periodsPerWeek = 4, passingScore = 50),
                     Subject(name = "አጠቃላይ ሳይንስ (General Science)", code = "GSCI-08", gradeLevel = "8ኛ ክፍል", periodsPerWeek = 4, passingScore = 50),
@@ -1778,15 +1754,8 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                     Subject(name = "የሙያ እና የቴክኒክ ትምህርት (CTE)", code = "CTE-08", gradeLevel = "8ኛ ክፍል", periodsPerWeek = 2, passingScore = 50)
                 )
                 primarySubjects.forEach { repository.insertSubject(it) }
-
-                val primaryWorkloads = listOf(
-                    TeacherWorkload(teacherId = 6, teacherName = "አቶ ግርማቸው አሰፋ", subjectId = 11, subjectName = "አጠቃላይ ሳይንስ (General Science)", grade = "7ኛ ክፍል", section = "A", periodsPerWeek = 4),
-                    TeacherWorkload(teacherId = 7, teacherName = "ወ/ሮ ሰላማዊት አበራ", subjectId = 16, subjectName = "ሂሳብ (Mathematics)", grade = "8ኛ ክፍል", section = "A", periodsPerWeek = 5),
-                    TeacherWorkload(teacherId = 8, teacherName = "አቶ በየነ ኃይሉ", subjectId = 17, subjectName = "እንግሊዝኛ (English)", grade = "7ኛ ክፍል", section = "A", periodsPerWeek = 5)
-                )
-                primaryWorkloads.forEach { repository.insertWorkload(it) }
             }
-            prefs.edit().putBoolean("primary_school_seeded_v2", true).apply()
+            prefs.edit().putBoolean("primary_school_seeded_v3", true).apply()
         } catch (_: Exception) {}
     }
 
