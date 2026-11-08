@@ -1440,7 +1440,7 @@ fun EthiopianReportCardDialog(
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         Text("_____________________", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         Text("የርዕሰ-መምህር ፊርማና ማህተም", fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                        Text("ዶ/ር ተስፋዬ ገብረመድህን", fontSize = 9.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text("ርዕሰ-መምህር (Principal)", fontSize = 9.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     }
 
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {

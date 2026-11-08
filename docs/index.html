@@ -5089,7 +5089,40 @@
     DUMMY_TEMPLATE_STAFF_CODES.forEach(c => deletedStaffIds.add(c));
     localStorage.setItem('dilijent_deleted_staff_ids', JSON.stringify([...deletedStaffIds]));
 
-    // Load from BOTH dilijent_user_registered_staff AND dilijent_staff_list to ensure newly registered staff are never lost
+    // Helper: Generate next sequential staff ID in clean order (STF-001, STF-002, STF-003...)
+    function getNextSequentialStaffId(existingStaff) {
+      const list = Array.isArray(existingStaff) ? existingStaff : [];
+      let maxNum = 0;
+      list.forEach(st => {
+        if (!st || !st.id) return;
+        const m = String(st.id).match(/STF[-_]?(\d+)/i);
+        if (m && m[1]) {
+          const val = parseInt(m[1], 10);
+          if (!isNaN(val) && val < 9000 && val > maxNum) {
+            maxNum = val;
+          }
+        }
+      });
+      return 'STF-' + String(maxNum + 1).padStart(3, '0');
+    }
+
+    // Helper: Sort staff array cleanly by ID in ascending sequential order
+    function sortStaffBySequentialId(list) {
+      if (!Array.isArray(list)) return [];
+      return [...list].sort((a, b) => {
+        const parseIdNum = (idStr) => {
+          if (!idStr) return 999999;
+          const m = String(idStr).match(/STF[-_]?(\d+)/i);
+          return m && m[1] ? parseInt(m[1], 10) : 999999;
+        };
+        const numA = parseIdNum(a.id);
+        const numB = parseIdNum(b.id);
+        if (numA !== numB) return numA - numB;
+        return String(a.id || '').localeCompare(String(b.id || ''));
+      });
+    }
+
+    // Load from BOTH dilijent_user_registered_staff AND dilijent_staff_list to ensure user-registered staff are strictly validated and preserved
     let storedUserStaff = [];
     try {
       storedUserStaff = JSON.parse(localStorage.getItem('dilijent_user_registered_staff') || '[]');
@@ -5108,6 +5141,7 @@
 
     const cleanStaffList = [];
     const seenStaffKeys = new Set();
+    const seenStaffIds = new Set();
 
     combinedCandidateStaff.forEach(st => {
       if (!st || !st.name) return;
@@ -5133,26 +5167,16 @@
       cleanStaffList.push(st);
     });
 
-    // Ensure Sara Niguse (School Secretary) is always present unless explicitly deleted
-    const saraNorm = normalizeStaffName('Sara Niguse');
-    if (!deletedStaffIds.has(saraNorm) && !deletedStaffIds.has('0960225925') && !deletedStaffIds.has('stf-sec-01')) {
-      const hasSara = cleanStaffList.some(st => normalizeStaffName(st.name) === saraNorm || st.phone === '0960225925');
-      if (!hasSara) {
-        cleanStaffList.push({
-          id: 'STF-SEC-01',
-          name: 'Sara Niguse',
-          role: 'ዋና ጸሐፊ (School Secretary)',
-          dept: 'አስተዳደር እና ፋይናንስ (Administration)',
-          phone: '0960225925',
-          qual: 'ዲፕሎማ / ቢኤ (BA/Diploma)',
-          photo: '',
-          status: 'ንቁ',
-          isUserCreated: true
-        });
-      }
-    }
+    // Enforce strictly sequential IDs (STF-001, STF-002, STF-003...) for all registered staff
+    // This normalizes any legacy random suffix IDs (e.g. STF-0390-684, STF-3183-507) or STF-SEC-01 into clean sequence
+    let assignedIndex = 1;
+    cleanStaffList.forEach(st => {
+      st.id = 'STF-' + String(assignedIndex).padStart(3, '0');
+      assignedIndex++;
+    });
 
-    staffList = cleanStaffList;
+    // Sort clean staff in sequential order by ID
+    staffList = sortStaffBySequentialId(cleanStaffList);
     localStorage.setItem('dilijent_user_registered_staff', JSON.stringify(staffList));
     localStorage.setItem('dilijent_staff_list', JSON.stringify(staffList));
 
@@ -5284,11 +5308,12 @@
     }
 
     function getFilteredStaffWeb() {
-      return staffList.filter(st => {
+      const filtered = staffList.filter(st => {
         const sid = (st.id || '').trim().toLowerCase();
         const sname = (st.name || '').trim().toLowerCase();
         return !deletedStaffIds.has(sid) && !deletedStaffIds.has(sname);
       });
+      return (typeof sortStaffBySequentialId === 'function') ? sortStaffBySequentialId(filtered) : filtered;
     }
 
     function getFilteredAttendanceWeb() {
@@ -6212,6 +6237,20 @@
         });
       }
     });
+
+    // Update staffAttendanceListWeb IDs to match canonical staffList IDs
+    staffAttendanceListWeb.forEach(item => {
+      const norm = normalizeStaffName(item.name);
+      const match = staffList.find(st => normalizeStaffName(st.name) === norm);
+      if (match && match.id) {
+        item.id = match.id;
+      }
+    });
+
+    if (typeof sortStaffBySequentialId === 'function') {
+      staffAttendanceListWeb = sortStaffBySequentialId(staffAttendanceListWeb);
+    }
+    localStorage.setItem('dilijent_staff_attendance', JSON.stringify(staffAttendanceListWeb));
         // Safe LocalStorage JSON helper to guarantee zero crashes on corrupted browser data
     function safeGetJSON(key, defaultVal) {
       try {
@@ -8258,9 +8297,10 @@
         return;
       }
 
-      // Collision-free unique ID that never collides with deleted or existing sample IDs
-      const uniqueSuffix = Date.now().toString().slice(-4) + '-' + Math.floor(100 + Math.random() * 900);
-      const id = 'STF-' + uniqueSuffix;
+      // Orderly sequential ID (STF-001, STF-002...) for clean chronological registry
+      const id = typeof getNextSequentialStaffId === 'function' 
+        ? getNextSequentialStaffId(staffList) 
+        : 'STF-' + String(staffList.length + 1).padStart(3, '0');
 
       // Unblock if previously marked as deleted
       deletedStaffIds.delete(id.toLowerCase());
@@ -8317,17 +8357,23 @@
         localStorage.setItem('dilijent_homeroom_attendance', JSON.stringify(homeroomAttendanceSubmissions));
       }
 
-      // 1. Add to main staffList & dilijent_staff_list
-      staffList.unshift(newStaffObj);
+      // 1. Add to main staffList & dilijent_staff_list, sorted sequentially by ID
+      staffList.push(newStaffObj);
+      if (typeof sortStaffBySequentialId === 'function') {
+        staffList = sortStaffBySequentialId(staffList);
+      }
       localStorage.setItem('dilijent_staff_list', JSON.stringify(staffList));
 
-      // 2. Save to permanent user-registered staff backup in localStorage
+      // 2. Save to permanent user-registered staff backup in localStorage, sorted sequentially by ID
       let userStaff = [];
       try {
         userStaff = JSON.parse(localStorage.getItem('dilijent_user_registered_staff') || '[]');
       } catch (err) { userStaff = []; }
       userStaff = userStaff.filter(us => (us.id || '').toLowerCase() !== id.toLowerCase() && (us.name || '').trim().toLowerCase() !== name.toLowerCase() && normalizeStaffName(us.name) !== normStaffName);
-      userStaff.unshift(newStaffObj);
+      userStaff.push(newStaffObj);
+      if (typeof sortStaffBySequentialId === 'function') {
+        userStaff = sortStaffBySequentialId(userStaff);
+      }
       localStorage.setItem('dilijent_user_registered_staff', JSON.stringify(userStaff));
 
       // 3. Synchronize with staffAttendanceListWeb
@@ -8533,8 +8579,9 @@
     localStorage.setItem('dilijent_user_accounts', JSON.stringify(userAccounts));
 
     // Register Sara Niguse in staffList & permanent user staff backup
+    const saraNextId = (typeof getNextSequentialStaffId === 'function') ? getNextSequentialStaffId(staffList) : 'STF-005';
     const saraStaffObj = {
-      id: 'STF-SEC-01',
+      id: saraNextId,
       name: 'Sara Niguse',
       role: 'ዋና ጸሐፊ (School Secretary)',
       dept: 'አስተዳደር እና ፋይናንስ (Administration)',
@@ -8552,11 +8599,13 @@
     const existingSaraStaff = staffList.find(st => normalizeStaffName(st.name) === normalizeStaffName('Sara Niguse') || st.phone === '0960225925');
     if (!existingSaraStaff) {
       staffList.push(saraStaffObj);
+      if (typeof sortStaffBySequentialId === 'function') staffList = sortStaffBySequentialId(staffList);
       localStorage.setItem('dilijent_staff_list', JSON.stringify(staffList));
       let uStaff = [];
       try { uStaff = JSON.parse(localStorage.getItem('dilijent_user_registered_staff') || '[]'); } catch(e){}
       if (!uStaff.some(st => normalizeStaffName(st.name) === normalizeStaffName('Sara Niguse') || st.phone === '0960225925')) {
         uStaff.push(saraStaffObj);
+        if (typeof sortStaffBySequentialId === 'function') uStaff = sortStaffBySequentialId(uStaff);
         localStorage.setItem('dilijent_user_registered_staff', JSON.stringify(uStaff));
       }
     }
@@ -8738,7 +8787,7 @@
 
         // Ensure Sara in staffList & attendance
         const saraStaff = {
-          id: 'STF-SEC-01',
+          id: (typeof getNextSequentialStaffId === 'function') ? getNextSequentialStaffId(staffList) : 'STF-005',
           name: 'Sara Niguse',
           role: 'ዋና ጸሐፊ (School Secretary)',
           dept: 'አስተዳደር እና ፋይናንስ (Administration)',
@@ -8750,6 +8799,7 @@
         };
         if (!staffList.some(st => normalizeStaffName(st.name) === normalizeStaffName('Sara Niguse') || st.phone === '0960225925')) {
           staffList.push(saraStaff);
+          if (typeof sortStaffBySequentialId === 'function') staffList = sortStaffBySequentialId(staffList);
           localStorage.setItem('dilijent_staff_list', JSON.stringify(staffList));
         }
 
@@ -9572,17 +9622,27 @@
           if (normStaffName) deletedStaffIds.delete(normStaffName);
           if (st.phone) deletedStaffIds.delete(st.phone.trim().toLowerCase());
 
-          staffList.unshift(st);
+          if (typeof getNextSequentialStaffId === 'function') {
+            st.id = getNextSequentialStaffId(staffList);
+          }
+
+          staffList.push(st);
           userStaff = userStaff.filter(us => (us.id || '').trim().toLowerCase() !== sid && (normalizeStaffName(us.name) !== normStaffName || getStaffSector(us.role, us.dept) !== sector));
-          userStaff.unshift(st);
+          userStaff.push(st);
           addedCount++;
         });
 
+        if (typeof sortStaffBySequentialId === 'function') {
+          staffList = sortStaffBySequentialId(staffList);
+          userStaff = sortStaffBySequentialId(userStaff);
+        }
+
         localStorage.setItem('dilijent_user_registered_staff', JSON.stringify(userStaff));
+        localStorage.setItem('dilijent_staff_list', JSON.stringify(staffList));
         localStorage.setItem('dilijent_deleted_staff_ids', JSON.stringify([...deletedStaffIds]));
         saveState();
         closeImportModal();
-        let msg = `🎉 ${addedCount} አዳዲስ ሰራተኞች/መምህራን በተሳካ ሁኔታ ተመዝግበዋል!`;
+        let msg = `🎉 ${addedCount} አዳዲስ ሰራተኞች/መምህራን በቅደም ተከተል መለያ (ID) በተሳካ ሁኔታ ተመዝግበዋል!`;
         if (skippedDuplicateCount > 0) {
           msg += `\n⚠️ ${skippedDuplicateCount} በአንድ የስራ ዘርፍ ቀደም ሲል የተመዘገቡ ሰራተኞች ተዘለዋል (በአንድ የስራ ዘርፍ ከአንድ ጊዜ በላይ አይመዘገብም)።`;
         }
