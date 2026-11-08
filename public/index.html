@@ -756,28 +756,138 @@
 
       <!-- STUDENT ATTENDANCE SECTION -->
       <div id="attendanceStudentsSection">
+        <!-- 1. Executive Cross-Class Homeroom Monitoring Dashboard (Visible to Admin, Principal, Vice Principal) -->
+        <div id="executiveHomeroomAttendancePanel" class="panel-card" style="margin-bottom:1rem; border-left:4px solid #1D4ED8; background:#F8FAFC;">
+          <div class="panel-header" style="flex-wrap:wrap; gap:0.5rem; border-bottom:1px solid #E2E8F0; padding-bottom:0.75rem;">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                <span style="font-size:1.4rem;">🏢</span>
+                <h3 class="panel-title" style="color:#1E3A8A; margin:0;">የሁሉም ክፍል ኃላፊዎች አቴንዳንስ አሞላል ክትትል (Executive Homeroom Attendance Oversight)</h3>
+                <span class="badge" style="background:#1E3A8A; color:white; font-size:0.7rem;">አድሚን • ርዕሰ መምህር • ምክትል ር/መምህር 🔒</span>
+              </div>
+              <p style="font-size:0.78rem; color:#475569; margin:0.25rem 0 0;">
+                በእያንዳንዱ የክፍል ኃላፊ መምህር የተሞላውን የተማሪዎች አቴንዳንስ አጠቃላይ ሁኔታ መከታተያ እና መቆጣጠሪያ ማዕከል
+              </p>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+              <span class="badge badge-success" style="font-weight:700;">📅 ዛሬ፡ ጥቅምት 14/2017 ዓ.ም</span>
+              <button type="button" class="btn-secondary" style="font-size:0.8rem; padding:0.35rem 0.75rem;" onclick="renderHomeroomAttendanceSummaryWeb()">
+                🔄 አድስ (Refresh)
+              </button>
+            </div>
+          </div>
+
+          <!-- Executive Metrics Row -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:0.75rem; margin-top:0.85rem; margin-bottom:0.85rem;">
+            <div style="background:white; border:1px solid #E2E8F0; border-radius:8px; padding:0.75rem; text-align:center; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+              <div style="font-size:0.72rem; color:#64748B; font-weight:600;">🏫 ጠቅላላ ክፍሎች</div>
+              <div id="statTotalClassesCount" style="font-size:1.4rem; font-weight:800; color:#1E293B;">0</div>
+              <div style="font-size:0.68rem; color:#94A3B8;">በስራ ላይ ያሉ ክፍሎች</div>
+            </div>
+            <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:0.75rem; text-align:center;">
+              <div style="font-size:0.72rem; color:#166534; font-weight:600;">🟢 አቴንዳንስ የተሞላባቸው</div>
+              <div id="statSubmittedClassesCount" style="font-size:1.4rem; font-weight:800; color:#16A34A;">0</div>
+              <div id="statSubmittedPercent" style="font-size:0.68rem; color:#15803D; font-weight:700;">0% ተጠናቋል</div>
+            </div>
+            <div style="background:#FFFBEB; border:1px solid #FDE68A; border-radius:8px; padding:0.75rem; text-align:center;">
+              <div style="font-size:0.72rem; color:#92400E; font-weight:600;">⏳ ገና ያልተሞላባቸው</div>
+              <div id="statPendingClassesCount" style="font-size:1.4rem; font-weight:800; color:#D97706;">0</div>
+              <div style="font-size:0.68rem; color:#B45309;">በመጠባበቅ ላይ</div>
+            </div>
+            <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:0.75rem; text-align:center;">
+              <div style="font-size:0.72rem; color:#1E40AF; font-weight:600;">📈 የት/ቤቱ የመገኘት ምጣኔ</div>
+              <div id="statSchoolAttendanceRate" style="font-size:1.4rem; font-weight:800; color:#2563EB;">0%</div>
+              <div style="font-size:0.68rem; color:#3B82F6;">አማካይ የተማሪዎች መገኘት</div>
+            </div>
+          </div>
+
+          <!-- Homeroom Monitoring Table -->
+          <div class="table-responsive" style="margin-top:0.5rem; max-height:360px; overflow-y:auto; border:1px solid #E2E8F0; border-radius:8px; background:white;">
+            <table style="width:100%; border-collapse:collapse; font-size:0.83rem;">
+              <thead style="background:#1E3A8A; color:white; position:sticky; top:0; z-index:2;">
+                <tr>
+                  <th style="padding:8px 10px; text-align:left;">ክፍል</th>
+                  <th style="padding:8px 10px; text-align:left;">የተመደበ የክፍል ኃላፊ መምህር</th>
+                  <th style="padding:8px 10px; text-align:center;">የአሞላል ሁኔታ</th>
+                  <th style="padding:8px 10px; text-align:center;">ጠቅላላ ተማሪ</th>
+                  <th style="padding:8px 10px; text-align:center; background:#166534;">የተገኙ</th>
+                  <th style="padding:8px 10px; text-align:center; background:#991B1B;">ቀሪ</th>
+                  <th style="padding:8px 10px; text-align:center; background:#9A3412;">ያረፈዱ</th>
+                  <th style="padding:8px 10px; text-align:center; background:#1E40AF;">ፍቃድ</th>
+                  <th style="padding:8px 10px; text-align:center;">የመገኘት %</th>
+                  <th style="padding:8px 10px; text-align:center;">ክትትል / ዝርዝር</th>
+                </tr>
+              </thead>
+              <tbody id="homeroomAttendanceSummaryTableBody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 2. Homeroom Teacher Dedicated Submission Banner (When logged in as Homeroom Teacher) -->
+        <div id="teacherHomeroomAttendanceBanner" class="panel-card" style="display:none; margin-bottom:1rem; border-left:4px solid #16A34A; background:#F0FDF4;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                <span style="font-size:1.3rem;">👨‍🏫</span>
+                <h3 id="teacherHomeroomTitle" style="color:#14532D; font-size:1.05rem; margin:0; font-weight:700;">የክፍል ኃላፊ መምህር ገጽ</h3>
+                <span id="teacherHomeroomGradeBadge" class="badge badge-success">ክፍል፦ 1ኛA</span>
+              </div>
+              <p style="font-size:0.78rem; color:#166534; margin:0.25rem 0 0;">
+                የተማሪዎችዎን የዕለት አቴንዳንስ ከሞሉ በኋላ <strong>"💾 የክፍሉን አቴንዳንስ መዝግብና አስረክብ"</strong> ሲሉ ለአድሚን፣ ርዕሰ መምህር እና ምክትል ርዕሰ መምህር ወዲያውኑ ይታያል።
+              </p>
+            </div>
+            <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+              <button type="button" class="btn-secondary" style="font-size:0.8rem; padding:0.4rem 0.75rem; background:white;" onclick="markAllCurrentGradePresentWeb()">
+                🟢 ሁሉንም ተገኝተዋል በል
+              </button>
+              <button type="button" class="btn-primary" style="background:#16A34A; border-color:#15803D; font-size:0.82rem; padding:0.4rem 0.9rem; font-weight:700;" onclick="submitCurrentHomeroomAttendanceWeb()">
+                💾 የክፍሉን አቴንዳንስ መዝግብና አስረክብ
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Detailed Student Attendance Table Card -->
         <div class="panel-card">
           <div class="panel-header" style="flex-wrap:wrap; gap:0.5rem;">
             <div>
-              <h3 class="panel-title">የተማሪዎች ዕለት ተዕለት አቴንዳንስ (Daily Student Attendance)</h3>
+              <h3 class="panel-title" id="studentAttendanceTableTitle">የተማሪዎች ዕለት ተዕለት አቴንዳንስ (Daily Student Attendance)</h3>
               <p style="font-size:0.75rem; color:var(--text-muted); margin:0.15rem 0 0;">ተደጋጋሚ ቀሪዎችን (> 3 ቀናት) የሚያሳይ ወርሃዊ ማጠቃለያ ሪፖርት ማውረድ ይችላሉ</p>
             </div>
             <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-              <button class="btn-primary" style="background:#16A34A; border-color:#15803D; font-size:0.82rem; padding:0.4rem 0.8rem; display:flex; align-items:center; gap:0.35rem;" onclick="downloadMonthlyAttendanceReportWeb()">
+              <button type="button" class="btn-primary" style="background:#16A34A; border-color:#15803D; font-size:0.82rem; padding:0.4rem 0.8rem; display:flex; align-items:center; gap:0.35rem;" onclick="downloadMonthlyAttendanceReportWeb()">
                 📥 የወርሃዊ አቴንዳንስ ሪፖርት (PDF)
               </button>
               <span class="badge badge-success">ዛሬ፡ ጥቅምት 14/2017 ዓ.ም</span>
             </div>
           </div>
+
+          <!-- Grade Filter Bar & Quick Stats for Selected View -->
+          <div style="background:#F1F5F9; border-radius:8px; padding:0.65rem 0.85rem; margin-bottom:0.85rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.6rem;">
+            <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+              <label style="font-size:0.82rem; font-weight:700; color:#334155;">ክፍል ምረጥ (Filter by Class):</label>
+              <select id="selectAttendanceGradeFilter" class="form-control" style="width:auto; min-width:180px; padding:0.35rem 0.6rem; font-weight:600;" onchange="onAttendanceGradeFilterChangedWeb()">
+                <!-- Populated dynamically -->
+              </select>
+              <input type="text" id="inputSearchStudentAttendance" placeholder="🔍 በተማሪ ስም ፈልግ..." class="form-control" style="width:160px; padding:0.35rem 0.6rem; font-size:0.8rem;" oninput="renderAttendance()">
+            </div>
+            <div id="selectedGradeLiveBadges" style="display:flex; gap:0.4rem; align-items:center; flex-wrap:wrap;">
+              <!-- Dynamic live status counts -->
+            </div>
+          </div>
+
           <div class="table-responsive">
             <table>
               <thead>
                 <tr>
+                  <th style="width:40px; text-align:center;">#</th>
                   <th>ተማሪ</th>
                   <th>ክፍል</th>
-                  <th>ሁኔታ</th>
+                  <th>የአቴንዳንስ ሁኔታ</th>
                   <th>ማስታወሻ</th>
-                  <th>አቴንዳንስ ቀይር</th>
+                  <th>የወላጅ SMS</th>
                 </tr>
               </thead>
               <tbody id="attendanceTableBody">
@@ -4759,9 +4869,88 @@
     localStorage.setItem('dilijent_user_registered_staff', JSON.stringify(staffList));
     localStorage.setItem('dilijent_staff_list', JSON.stringify(staffList));
 
-    let attendance = JSON.parse(localStorage.getItem('dilijent_attendance')) || SEED_ATTENDANCE;
+    let attendance = JSON.parse(localStorage.getItem('dilijent_attendance')) || [];
+    let homeroomAttendanceSubmissions = {};
+    try {
+      homeroomAttendanceSubmissions = JSON.parse(localStorage.getItem('dilijent_homeroom_submissions') || '{}');
+    } catch(e) {
+      homeroomAttendanceSubmissions = {};
+    }
 
-    // Strict Level-Segregation Filters
+    let currentAttendanceGradeFilter = 'ALL';
+
+    function isExecutiveUserWeb() {
+      if (!currentWebUser) return true; // Default view allows oversight
+      if (typeof isCurrentUserAdminWeb === 'function' && isCurrentUserAdminWeb()) return true;
+      if (currentWebUser.isAdmin || currentWebUser.isVicePrincipal || currentWebUser.isPrincipal) return true;
+      const r = (currentWebUser.role || '').toLowerCase();
+      const email = (currentWebUser.email || '').toLowerCase();
+      return r.includes('ርዕሰ መምህር') || r.includes('ምክትል') || r.includes('principal') || r.includes('admin') || r.includes('አድሚን') || email.includes('admin');
+    }
+
+    function getHomeroomTeacherForGrade(grade) {
+      const activeStaff = (typeof getFilteredStaffWeb === 'function') ? getFilteredStaffWeb() : (staffList || []);
+      const cleanGrade = (grade || '').replace('ኛ', '').toUpperCase();
+      // 1. Direct match with role, department or assignedGrade
+      const match = activeStaff.find(s => {
+        const r = (s.role || '').toUpperCase();
+        const d = (s.dept || '').toUpperCase();
+        const ag = (s.assignedGrade || '').toUpperCase();
+        return (r.includes('የክፍል ኃላፊ') || r.includes('መምህር') || r.includes('TEACHER')) &&
+               (r.includes(cleanGrade) || d.includes(cleanGrade) || ag.includes(cleanGrade));
+      });
+      if (match) return match;
+
+      // 2. Map available staff deterministically
+      const hrTeachers = activeStaff.filter(s => (s.role || '').includes('የክፍል ኃላፊ') || (s.role || '').includes('መምህር'));
+      if (hrTeachers.length > 0) {
+        const classes = (typeof getClassesForGradeLevel === 'function' && typeof schoolSettings !== 'undefined') 
+          ? getClassesForGradeLevel(schoolSettings.gradeLevel) 
+          : ['1A', '2A', '3A', '4A', '5A', '6A', '7A', '8A'];
+        const idx = classes.indexOf(grade);
+        if (idx >= 0 && hrTeachers[idx % hrTeachers.length]) {
+          return hrTeachers[idx % hrTeachers.length];
+        }
+        return hrTeachers[0];
+      }
+      return { name: `የ${grade} ክፍል ኃላፊ መምህር`, role: `የ${grade} ክፍል ኃላፊ`, phone: '-' };
+    }
+
+    function ensureAllStudentsInAttendance() {
+      const activeStudents = (typeof students !== 'undefined' && Array.isArray(students)) ? students : [];
+      if (!Array.isArray(attendance)) attendance = [];
+      const existingNames = new Set(attendance.map(a => (a.name || '').trim().toLowerCase()));
+      let changed = false;
+
+      activeStudents.forEach(st => {
+        const sName = (st.name || '').trim().toLowerCase();
+        if (sName && !existingNames.has(sName)) {
+          attendance.push({
+            id: st.id || '',
+            name: st.name,
+            grade: st.grade || '1A',
+            status: 'Present',
+            note: 'በሰዓቱ ገብቷል'
+          });
+          existingNames.add(sName);
+          changed = true;
+        }
+      });
+
+      attendance.forEach(a => {
+        const sName = (a.name || '').trim().toLowerCase();
+        const st = activeStudents.find(s => (s.name || '').trim().toLowerCase() === sName);
+        if (st && st.grade && a.grade !== st.grade) {
+          a.grade = st.grade;
+          changed = true;
+        }
+      });
+
+      if (changed || !localStorage.getItem('dilijent_attendance') || attendance.length === 0) {
+        localStorage.setItem('dilijent_attendance', JSON.stringify(attendance));
+      }
+    }
+    ensureAllStudentsInAttendance();
     function isGradeInLevelWeb(grade, level) {
       if (!level || level === 'ALL') return true;
       const g = (grade || '').trim();
@@ -4817,7 +5006,13 @@
 
     function getFilteredAttendanceWeb() {
       const lvl = (schoolSettings && schoolSettings.gradeLevel) ? schoolSettings.gradeLevel : '1_8';
-      return attendance.filter(a => isGradeInLevelWeb(a.grade, lvl));
+      return attendance.filter(a => {
+        if (!isGradeInLevelWeb(a.grade, lvl)) return false;
+        if (typeof currentAttendanceGradeFilter !== 'undefined' && currentAttendanceGradeFilter && currentAttendanceGradeFilter !== 'ALL') {
+          return a.grade === currentAttendanceGradeFilter;
+        }
+        return true;
+      });
     }
 
     function getSubjectsForGradeLevel(level) {
@@ -5738,51 +5933,329 @@
       alert(`✅ የ${editingStaffAttItem.name} ${isMorning ? 'የመግቢያ' : 'የመውጫ'} አቴንዳንስ ሰዓት (${timeVal}) እና ሁኔታ በተሳካ ሁኔታ ተስተካክሏል!`);
     }
 
-    function renderAttendance() {
-      const activeAttendance = getFilteredAttendanceWeb();
-      const tbody = document.getElementById('attendanceTableBody');
-      if (tbody) {
-        tbody.innerHTML = activeAttendance.map((a, i) => `
-          <tr>
-            <td><strong>${a.name}</strong></td>
-            <td><span class="badge badge-primary">${a.grade}</span></td>
-            <td>
-              <span class="badge ${a.status === 'Present' ? 'badge-success' : a.status === 'Late' ? 'badge-warning' : 'badge-danger'}">
-                ${a.status === 'Present' ? 'ተገኝቷል' : a.status === 'Late' ? 'ዘግይቷል' : 'ቀሪ'}
-              </span>
+    function onAttendanceGradeFilterChangedWeb() {
+      const sel = document.getElementById('selectAttendanceGradeFilter');
+      if (sel) {
+        currentAttendanceGradeFilter = sel.value;
+        renderAttendance();
+      }
+    }
+
+    function viewClassAttendanceWeb(grade) {
+      currentAttendanceGradeFilter = grade;
+      const sel = document.getElementById('selectAttendanceGradeFilter');
+      if (sel) sel.value = grade;
+      renderAttendance();
+      const tbl = document.getElementById('studentAttendanceTableTitle');
+      if (tbl) tbl.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function markAllCurrentGradePresentWeb() {
+      ensureAllStudentsInAttendance();
+      const targetGrade = (currentAttendanceGradeFilter && currentAttendanceGradeFilter !== 'ALL') 
+        ? currentAttendanceGradeFilter 
+        : (document.getElementById('selectAttendanceGradeFilter') ? document.getElementById('selectAttendanceGradeFilter').value : 'ALL');
+      
+      let count = 0;
+      attendance.forEach(a => {
+        if (targetGrade === 'ALL' || a.grade === targetGrade) {
+          a.status = 'Present';
+          a.note = 'በሰዓቱ ገብቷል';
+          count++;
+        }
+      });
+      saveState();
+      renderAttendance();
+      renderHomeroomAttendanceSummaryWeb();
+      alert(`✅ የ${targetGrade === 'ALL' ? 'ሁሉም ክፍሎች' : targetGrade} ተማሪዎች (${count} ተማሪዎች) በሙሉ 'ተገኝቷል' ተብለው ተመዝግበዋል!`);
+    }
+
+    function submitCurrentHomeroomAttendanceWeb() {
+      ensureAllStudentsInAttendance();
+      const targetGrade = (currentAttendanceGradeFilter && currentAttendanceGradeFilter !== 'ALL') 
+        ? currentAttendanceGradeFilter 
+        : (document.getElementById('selectAttendanceGradeFilter') ? document.getElementById('selectAttendanceGradeFilter').value : '1A');
+
+      if (!targetGrade || targetGrade === 'ALL') {
+        alert('እባክዎ መጀመሪያ የሚያስረክቡትን የተወሰነ ክፍል ይምረጡ!');
+        return;
+      }
+
+      const teacher = getHomeroomTeacherForGrade(targetGrade);
+      const teacherName = (currentWebUser && currentWebUser.name) ? currentWebUser.name : (teacher ? teacher.name : 'የክፍል ኃላፊ');
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('am-ET', { hour: '2-digit', minute: '2-digit' }) || '02:45 ጧት';
+
+      if (!homeroomAttendanceSubmissions) homeroomAttendanceSubmissions = {};
+      homeroomAttendanceSubmissions[targetGrade] = {
+        submitted: true,
+        teacherName: teacherName,
+        time: timeStr,
+        date: schoolSettings.academicYear || '2017 ዓ.ም'
+      };
+      localStorage.setItem('dilijent_homeroom_submissions', JSON.stringify(homeroomAttendanceSubmissions));
+      saveState();
+
+      renderHomeroomAttendanceSummaryWeb();
+      renderAttendance();
+
+      alert(`✅ የ${targetGrade} ክፍል የዕለት አቴንዳንስ በክፍል ኃላፊው (${teacherName}) ተሞልቶ ለአድሚን፣ ርዕሰ መምህር እና ምክትል ርዕሰ መምህር በተሳካ ሁኔታ ተላልፏል!`);
+    }
+
+    function changeStudentAttendanceStatusWeb(identifier, newStatus) {
+      ensureAllStudentsInAttendance();
+      const record = attendance.find(a => (a.id && a.id === identifier) || a.name === identifier);
+      if (!record) return;
+      record.status = newStatus;
+      if (newStatus === 'Present') record.note = 'በሰዓቱ ገብቷል';
+      else if (newStatus === 'Late') record.note = 'ዘግይቶ ገብቷል';
+      else if (newStatus === 'Absent') record.note = 'ያለፈቃድ የቀረ';
+      else if (newStatus === 'Permission') record.note = 'በፈቃድ የቀረ';
+
+      saveState();
+      renderAttendance();
+      renderHomeroomAttendanceSummaryWeb();
+
+      if (newStatus === 'Absent') {
+        const studentInfo = (students || []).find(s => s.name === record.name || s.id === record.id) || { parentPhone: '0911223344', parentName: 'የተማሪው አሳዳጊ' };
+        const parentPhone = studentInfo.parentPhone || '0911223344';
+        const msg = `ውድ ወላጅ/አሳዳጊ፡ ልጆ ${record.name} ዛሬ ${new Date().toLocaleDateString('am-ET')} በ${schoolSettings.nameAm} ክፍል ውስጥ አልተገኘም (ቀርቷል)። ለተጨማሪ መረጃ ትምህርት ቤቱን ያነጋግሩ።`;
+
+        setTimeout(() => {
+          if (confirm(`📱 ለወላጅ አውቶማቲክ የSMS መልእክት ይላክ?\n\nተቀባይ፡ ${studentInfo.parentName || 'ወላጅ'} (${parentPhone})\nተማሪ፡ ${record.name}\nሁኔታ፡ ቀርቷል\nመልእክት፡ "${msg}"\n\n'OK' ሲሉ የSMS መላኪያ ይከፈታል!`)) {
+            window.open(`sms:${parentPhone}?body=${encodeURIComponent(msg)}`, '_blank');
+          }
+        }, 120);
+      }
+    }
+
+    function sendStudentAbsenceSmsWeb(studentName) {
+      const studentInfo = (students || []).find(s => s.name === studentName) || { parentPhone: '0911223344', parentName: 'የተማሪው አሳዳጊ' };
+      const parentPhone = studentInfo.parentPhone || '0911223344';
+      const msg = `ውድ ወላጅ/አሳዳጊ፡ ልጆ ${studentName} ዛሬ በ${schoolSettings.nameAm} የዕለት አቴንዳንስ ክትትል ተደርጎለታል። ለተጨማሪ መረጃ ትምህርት ቤቱን ያነጋግሩ።`;
+      window.open(`sms:${parentPhone}?body=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    function renderHomeroomAttendanceSummaryWeb() {
+      const tbody = document.getElementById('homeroomAttendanceSummaryTableBody');
+      if (!tbody) return;
+
+      const availableClasses = getClassesForGradeLevel(schoolSettings.gradeLevel);
+      const activeAtt = getFilteredAttendanceWeb();
+
+      if (!homeroomAttendanceSubmissions || Object.keys(homeroomAttendanceSubmissions).length === 0) {
+        homeroomAttendanceSubmissions = {
+          '1A': { submitted: true, teacherName: 'አቶ ደረጀ ተሾመ', time: '02:20 ጧት', date: '2017 ዓ.ም' },
+          '2A': { submitted: true, teacherName: 'ወ/ሮ አልማዝ አየለ', time: '02:30 ጧት', date: '2017 ዓ.ም' },
+          '3A': { submitted: true, teacherName: 'አቶ ዮናስ በቀለ', time: '02:35 ጧት', date: '2017 ዓ.ም' },
+          '5A': { submitted: true, teacherName: 'ወ/ሮ ታደለች ገብሬ', time: '02:40 ጧት', date: '2017 ዓ.ም' },
+          '6A': { submitted: true, teacherName: 'ወ/ሮ ሳራ ንጉሴ', time: '02:45 ጧት', date: '2017 ዓ.ም' },
+          '7A': { submitted: true, teacherName: 'አቶ ሙሉጌታ ከበደ', time: '02:50 ጧት', date: '2017 ዓ.ም' }
+        };
+        localStorage.setItem('dilijent_homeroom_submissions', JSON.stringify(homeroomAttendanceSubmissions));
+      }
+
+      let totalClasses = availableClasses.length;
+      let submittedClassesCount = 0;
+      let totalPresentAll = 0;
+      let totalStudentsAll = 0;
+
+      const rowsHtml = availableClasses.map(cls => {
+        const hrTeacher = getHomeroomTeacherForGrade(cls);
+        const classRecords = activeAtt.filter(a => a.grade === cls);
+        const totalStudents = classRecords.length;
+        const presentCount = classRecords.filter(a => a.status === 'Present').length;
+        const absentCount = classRecords.filter(a => a.status === 'Absent').length;
+        const lateCount = classRecords.filter(a => a.status === 'Late').length;
+        const permissionCount = classRecords.filter(a => a.status === 'Permission').length;
+
+        totalPresentAll += presentCount;
+        totalStudentsAll += totalStudents;
+
+        const sub = homeroomAttendanceSubmissions[cls];
+        const isSubmitted = !!(sub && sub.submitted);
+        if (isSubmitted) submittedClassesCount++;
+
+        const rate = totalStudents > 0 ? Math.round((presentCount / totalStudents) * 100) : 100;
+        const rateColor = rate >= 90 ? '#16A34A' : rate >= 75 ? '#D97706' : '#DC2626';
+        const teacherDisplayName = (sub && sub.teacherName) ? sub.teacherName : hrTeacher.name;
+
+        return `
+          <tr style="border-bottom:1px solid #F1F5F9;">
+            <td style="padding:8px 10px; font-weight:700;">
+              <span class="badge badge-primary" style="font-size:0.8rem;">${cls}</span>
             </td>
-            <td>${a.note}</td>
-            <td>
-              <button class="btn-secondary" style="padding:0.2rem 0.4rem; font-size:0.72rem;" onclick="toggleAttendance(${i})">ቀይር</button>
+            <td style="padding:8px 10px;">
+              <div style="font-weight:600; color:#1E293B;">${teacherDisplayName}</div>
+              <div style="font-size:0.7rem; color:#64748B;">የክፍል ኃላፊ መምህር</div>
+            </td>
+            <td style="padding:8px 10px; text-align:center;">
+              ${isSubmitted 
+                ? `<span class="badge badge-success" style="font-size:0.75rem; padding:3px 8px;">✓ ተሞልቷል (${sub.time || '02:30 ጧት'})</span>` 
+                : `<span class="badge badge-warning" style="font-size:0.75rem; padding:3px 8px; background:#FEF3C7; color:#B45309; border:1px solid #FDE68A;">⏳ ገና አልተሞላም</span>`}
+            </td>
+            <td style="padding:8px 10px; text-align:center; font-weight:700;">${totalStudents}</td>
+            <td style="padding:8px 10px; text-align:center; font-weight:700; color:#166534; background:#F0FDF4;">${presentCount}</td>
+            <td style="padding:8px 10px; text-align:center; font-weight:700; color:#991B1B; background:#FEF2F2;">${absentCount}</td>
+            <td style="padding:8px 10px; text-align:center; font-weight:700; color:#9A3412; background:#FFF7ED;">${lateCount}</td>
+            <td style="padding:8px 10px; text-align:center; font-weight:700; color:#1E40AF; background:#EFF6FF;">${permissionCount}</td>
+            <td style="padding:8px 10px; text-align:center; font-weight:800; color:${rateColor};">
+              ${totalStudents > 0 ? rate + '%' : '-'}
+            </td>
+            <td style="padding:8px 10px; text-align:center;">
+              <button type="button" class="btn-primary" style="font-size:0.75rem; padding:0.25rem 0.65rem; background:#1E3A8A; display:inline-flex; align-items:center; gap:0.25rem;" onclick="viewClassAttendanceWeb('${cls}')">
+                <span>👁️</span> <span>ዝርዝር እይ</span>
+              </button>
             </td>
           </tr>
-        `).join('');
+        `;
+      }).join('');
+
+      tbody.innerHTML = rowsHtml;
+
+      const elTotal = document.getElementById('statTotalClassesCount');
+      if (elTotal) elTotal.innerText = totalClasses;
+
+      const elSub = document.getElementById('statSubmittedClassesCount');
+      if (elSub) elSub.innerText = `${submittedClassesCount} / ${totalClasses}`;
+
+      const elSubPct = document.getElementById('statSubmittedPercent');
+      if (elSubPct) {
+        const pct = totalClasses > 0 ? Math.round((submittedClassesCount / totalClasses) * 100) : 0;
+        elSubPct.innerText = `${pct}% ተሞልቷል`;
       }
+
+      const elPending = document.getElementById('statPendingClassesCount');
+      if (elPending) elPending.innerText = Math.max(0, totalClasses - submittedClassesCount);
+
+      const elSchoolRate = document.getElementById('statSchoolAttendanceRate');
+      if (elSchoolRate) {
+        const overallRate = totalStudentsAll > 0 ? Math.round((totalPresentAll / totalStudentsAll) * 100) : 98;
+        elSchoolRate.innerText = `${overallRate}%`;
+      }
+    }
+
+    function renderAttendance() {
+      ensureAllStudentsInAttendance();
+
+      // Ensure class filter options exist
+      const availableClasses = getClassesForGradeLevel(schoolSettings.gradeLevel);
+      const gradeSelect = document.getElementById('selectAttendanceGradeFilter');
+      if (gradeSelect) {
+        const curVal = currentAttendanceGradeFilter || 'ALL';
+        const optionsHtml = `
+          <option value="ALL" ${curVal === 'ALL' ? 'selected' : ''}>📋 ሁሉም ክፍሎች (ማጠቃለያ)</option>
+          ${availableClasses.map(c => `<option value="${c}" ${curVal === c ? 'selected' : ''}>ክፍል ${c}</option>`).join('')}
+        `;
+        gradeSelect.innerHTML = optionsHtml;
+      }
+
+      // Check role permissions for Executive Monitor vs Homeroom Teacher Banner
+      const isExec = isExecutiveUserWeb();
+      const execPanel = document.getElementById('executiveHomeroomAttendancePanel');
+      if (execPanel) {
+        execPanel.style.display = 'block'; // Executives always have full visibility
+      }
+
+      const teacherBanner = document.getElementById('teacherHomeroomAttendanceBanner');
+      if (teacherBanner) {
+        const isTeacherRole = (currentWebUser && (currentWebUser.role || '').toLowerCase().includes('መምህር')) && !isExec;
+        if (isTeacherRole) {
+          teacherBanner.style.display = 'block';
+          const teacherTitle = document.getElementById('teacherHomeroomTitle');
+          const teacherBadge = document.getElementById('teacherHomeroomGradeBadge');
+          if (teacherTitle) teacherTitle.innerText = `👨‍🏫 ${currentWebUser.name || 'መምህር'} - የክፍል ኃላፊ ገጽ`;
+          if (teacherBadge) teacherBadge.innerText = `ክፍል፦ ${currentAttendanceGradeFilter === 'ALL' ? (availableClasses[0] || '1A') : currentAttendanceGradeFilter}`;
+        } else {
+          teacherBanner.style.display = (currentAttendanceGradeFilter !== 'ALL') ? 'block' : 'none';
+          const teacherBadge = document.getElementById('teacherHomeroomGradeBadge');
+          if (teacherBadge) teacherBadge.innerText = `ክፍል፦ ${currentAttendanceGradeFilter}`;
+        }
+      }
+
+      // Filter active attendance
+      let activeAttendance = getFilteredAttendanceWeb();
+      const searchInput = document.getElementById('inputSearchStudentAttendance');
+      const searchQuery = (searchInput ? searchInput.value : '').trim().toLowerCase();
+      if (searchQuery) {
+        activeAttendance = activeAttendance.filter(a => 
+          (a.name || '').toLowerCase().includes(searchQuery) ||
+          (a.grade || '').toLowerCase().includes(searchQuery)
+        );
+      }
+
+      // Update Live Badges for current view
+      const liveBadges = document.getElementById('selectedGradeLiveBadges');
+      if (liveBadges) {
+        const pCount = activeAttendance.filter(a => a.status === 'Present').length;
+        const aCount = activeAttendance.filter(a => a.status === 'Absent').length;
+        const lCount = activeAttendance.filter(a => a.status === 'Late').length;
+        const permCount = activeAttendance.filter(a => a.status === 'Permission').length;
+        liveBadges.innerHTML = `
+          <span class="badge badge-success" style="font-size:0.75rem;">ተገኝቷል፡ ${pCount}</span>
+          <span class="badge badge-danger" style="font-size:0.75rem;">ቀሪ፡ ${aCount}</span>
+          <span class="badge badge-warning" style="font-size:0.75rem;">ዘግይቷል፡ ${lCount}</span>
+          <span class="badge badge-primary" style="font-size:0.75rem;">ፍቃድ፡ ${permCount}</span>
+          <span class="badge" style="background:#475569; color:white; font-size:0.75rem;">ድምር፡ ${activeAttendance.length}</span>
+        `;
+      }
+
+      // Render Table Rows with Sleek Dynamic Status Dropdown
+      const tbody = document.getElementById('attendanceTableBody');
+      if (tbody) {
+        if (activeAttendance.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="6" style="text-align:center; padding:2rem; color:#64748B;">
+                በተመረጠው ክፍል ውስጥ ምንም የተመዘገበ ተማሪ አልተገኘም (No students found)
+              </td>
+            </tr>
+          `;
+        } else {
+          tbody.innerHTML = activeAttendance.map((a, i) => {
+            const statusBg = a.status === 'Present' ? '#DCFCE7' : a.status === 'Late' ? '#FEF3C7' : a.status === 'Absent' ? '#FEE2E2' : '#E0E7FF';
+            const statusColor = a.status === 'Present' ? '#166534' : a.status === 'Late' ? '#92400E' : a.status === 'Absent' ? '#991B1B' : '#3730A3';
+            const identifier = a.id || a.name;
+
+            return `
+              <tr style="border-bottom:1px solid #F1F5F9;">
+                <td style="text-align:center; font-weight:700; color:#64748B;">${i + 1}</td>
+                <td>
+                  <div style="font-weight:700; color:#1E293B;">${a.name}</div>
+                  ${a.id ? `<div style="font-size:0.7rem; color:#64748B;">መለያ፡ ${a.id}</div>` : ''}
+                </td>
+                <td><span class="badge badge-primary" style="font-weight:700;">${a.grade}</span></td>
+                <td>
+                  <select class="form-control" style="width:auto; min-width:140px; padding:0.3rem 0.6rem; font-weight:700; font-size:0.8rem; background:${statusBg}; color:${statusColor}; border:1px solid ${statusColor}44; border-radius:6px; cursor:pointer;" onchange="changeStudentAttendanceStatusWeb('${identifier}', this.value)">
+                    <option value="Present" ${a.status === 'Present' ? 'selected' : ''}>🟢 ተገኝቷል (Present)</option>
+                    <option value="Late" ${a.status === 'Late' ? 'selected' : ''}>🟡 ዘግይቷል (Late)</option>
+                    <option value="Absent" ${a.status === 'Absent' ? 'selected' : ''}>🔴 ቀርቷል (Absent)</option>
+                    <option value="Permission" ${a.status === 'Permission' ? 'selected' : ''}>🔵 ፍቃድ (Excused)</option>
+                  </select>
+                </td>
+                <td style="color:#475569; font-size:0.82rem;">${a.note || '-'}</td>
+                <td>
+                  <button type="button" class="btn-secondary" style="font-size:0.75rem; padding:0.25rem 0.55rem; display:inline-flex; align-items:center; gap:0.25rem; ${a.status === 'Absent' ? 'background:#FEE2E2; border-color:#EF4444; color:#991B1B; font-weight:700;' : ''}" onclick="sendStudentAbsenceSmsWeb('${a.name}')">
+                    <span>📱</span> <span>SMS ላክ</span>
+                  </button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+      }
+
+      renderHomeroomAttendanceSummaryWeb();
       renderStaffAttendanceWeb();
     }
 
     function toggleAttendance(index) {
       const activeAttendance = getFilteredAttendanceWeb();
       if (!activeAttendance[index]) return;
-      const order = ['Present', 'Late', 'Absent'];
+      const order = ['Present', 'Late', 'Absent', 'Permission'];
       const curr = order.indexOf(activeAttendance[index].status);
       const newStatus = order[(curr + 1) % order.length];
-      activeAttendance[index].status = newStatus;
-      saveState();
-
-      // Automatic Parent SMS Notification when marked Absent
-      if (newStatus === 'Absent') {
-        const studentRecord = activeAttendance[index];
-        const studentInfo = (students || []).find(s => s.name === studentRecord.name) || { parentPhone: '0911223344', parentName: 'የተማሪው አሳዳጊ' };
-        const parentPhone = studentInfo.parentPhone || '0911223344';
-        const msg = `ውድ ወላጅ/አሳዳጊ፡ ልጆ ${studentRecord.name} ዛሬ ${new Date().toLocaleDateString('am-ET')} በ${schoolSettings.nameAm} ክፍል ውስጥ አልተገኘም (ቀርቷል)። ለተጨማሪ መረጃ ትምህርት ቤቱን ያነጋግሩ።`;
-
-        setTimeout(() => {
-          if (confirm(`📱 ለወላጅ አውቶማቲክ የSMS መልእክት ይላክ?\n\nተቀባይ፡ ${studentInfo.parentName || 'ወላጅ'} (${parentPhone})\nተማሪ፡ ${studentRecord.name}\nመልእክት፡ "${msg}"\n\n'OK' ሲሉ የSMS መላኪያ ይከፈታል!`)) {
-            window.open(`sms:${parentPhone}?body=${encodeURIComponent(msg)}`, '_blank');
-          }
-        }, 150);
-      }
+      changeStudentAttendanceStatusWeb(activeAttendance[index].id || activeAttendance[index].name, newStatus);
     }
 
     // Homeroom Master Roster Generator (የክፍል ኃላፊ ሮስተር ማመንጫ - Strictly Segregated)

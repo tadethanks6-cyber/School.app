@@ -174,6 +174,43 @@ fun AttendanceScreen(
         mutableStateMapOf<Long, String>()
     }
 
+    // Cross-class homeroom submission status map: "Grade-Section" -> isSubmitted
+    val homeroomSubmissionMap = remember {
+        mutableStateMapOf<String, Boolean>().apply {
+            put("9ኛ ክፍል-A", true)
+            put("9ኛ ክፍል-B", true)
+            put("10ኛ ክፍል-A", true)
+            put("11ኛ ክፍል-A", true)
+        }
+    }
+
+    fun getHomeroomTeacherName(gr: String, sec: String): String {
+        val targetClass = "$gr-$sec"
+        return if (targetClass == currentTeacher?.homeroomClass && currentTeacher != null) {
+            currentTeacher.fullName
+        } else {
+            when {
+                gr.contains("9") && sec == "A" -> "አቶ ደረጀ ተሾመ"
+                gr.contains("9") && sec == "B" -> "ወ/ሮ አልማዝ አየለ"
+                gr.contains("10") && sec == "A" -> "አቶ ዮናስ በቀለ"
+                gr.contains("10") && sec == "B" -> "ወ/ሮ ታደለች ገብሬ"
+                gr.contains("11") && sec == "A" -> "አቶ ሙሉጌታ ከበደ"
+                gr.contains("11") && sec == "B" -> "ወ/ሮ ሳራ ንጉሴ"
+                gr.contains("12") && sec == "A" -> "ዶ/ር ቴዎድሮስ ካሳ"
+                gr.contains("12") && sec == "B" -> "አቶ ብርሃኑ ተፈራ"
+                gr.contains("1") -> "አቶ ደረጀ ተሾመ"
+                gr.contains("2") -> "ወ/ሮ አልማዝ አየለ"
+                gr.contains("3") -> "አቶ ዮናስ በቀለ"
+                gr.contains("4") -> "ወ/ሮ ታደለች ገብሬ"
+                gr.contains("5") -> "አቶ ሙሉጌታ ከበደ"
+                gr.contains("6") -> "ወ/ሮ ሳራ ንጉሴ"
+                gr.contains("7") -> "አቶ ፍሰሃ ተክሌ"
+                gr.contains("8") -> "ወ/ሮ ዘውዲቱ ሀይሌ"
+                else -> "የክፍል ኃላፊ መምህር"
+            }
+        }
+    }
+
     val classStudents = remember(students, isStudent, currentStudent, selectedGrade, selectedSection) {
         if (isStudent && currentStudent != null) {
             listOf(currentStudent)
@@ -554,7 +591,296 @@ fun AttendanceScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            // Executive Cross-Class Homeroom Attendance Oversight Card (Admin & Vice Principal)
+            if (canAccessStaffAttendance || isAdmin || isVicePrincipal) {
+                var isExpanded by remember { mutableStateOf(true) }
+                val activeGradesList = availableGrades.filter { it != "ሁሉም" }
+                val totalClassesCount = remember(activeGradesList, usableSections) {
+                    activeGradesList.size * usableSections.size
+                }
+                val submittedCount = remember(homeroomSubmissionMap) {
+                    homeroomSubmissionMap.count { it.value }
+                }
+
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFCBD5E1)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp)
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("🏢", fontSize = 16.sp)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Column {
+                                    Text(
+                                        text = if (isAmharic) "የክፍል ኃላፊዎች አቴንዳንስ አሞላል ክትትል" else "Homeroom Attendance Oversight",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 13.sp,
+                                        color = NavyPrimary
+                                    )
+                                    Text(
+                                        text = if (isAmharic) "በአድሚን፣ ርዕሰ መምህር እና ም/ርዕሰ መምህር ገፅ የሚገኝ ማጠቃለያ" else "Admin, Principal & Vice Principal Oversight",
+                                        fontSize = 10.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                            IconButton(
+                                onClick = { isExpanded = !isExpanded },
+                                modifier = Modifier.size(28.dp)
+                            ) {
+                                Icon(
+                                    imageVector = if (isExpanded) Icons.Default.Tune else Icons.Default.ArrowDropDown,
+                                    contentDescription = null,
+                                    tint = NavyPrimary
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Quick metrics row
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = EthioGreen.copy(alpha = 0.12f),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(vertical = 6.dp, horizontal = 4.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = if (isAmharic) "ተሞልቷል" else "Submitted",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = EthioGreen
+                                    )
+                                    Text(
+                                        text = "$submittedCount ክፍሎች",
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = EthioGreen
+                                    )
+                                }
+                            }
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = GoldAccent.copy(alpha = 0.15f),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(vertical = 6.dp, horizontal = 4.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = if (isAmharic) "ገና አልተሞላም" else "Pending",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = Color(0xFFB45309)
+                                    )
+                                    Text(
+                                        text = "${maxOf(0, totalClassesCount - submittedCount)} ክፍሎች",
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = Color(0xFFB45309)
+                                    )
+                                }
+                            }
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = NavyPrimary.copy(alpha = 0.10f),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(vertical = 6.dp, horizontal = 4.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = if (isAmharic) "ጠቅላላ ክፍሎች" else "Total Classes",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = NavyPrimary
+                                    )
+                                    Text(
+                                        text = "$totalClassesCount ክፍሎች",
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = NavyPrimary
+                                    )
+                                }
+                            }
+                        }
+
+                        if (isExpanded) {
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Text(
+                                text = if (isAmharic) "የክፍሎች አቴንዳንስ ዝርዝር ሁኔታ (ክፍል ለመምረጥ ይጫኑ)፦" else "Class attendance status (Tap to view details):",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                activeGradesList.take(4).forEach { gr ->
+                                    usableSections.forEach { sec ->
+                                        val classKey = "$gr-$sec"
+                                        val isSub = homeroomSubmissionMap[classKey] == true
+                                        val hrTeacherName = getHomeroomTeacherName(gr, sec)
+                                        val isCurrentlySelected = (selectedGrade == gr && selectedSection == sec)
+
+                                        Surface(
+                                            shape = RoundedCornerShape(8.dp),
+                                            color = if (isCurrentlySelected) NavyPrimary.copy(alpha = 0.08f) else Color.White,
+                                            border = androidx.compose.foundation.BorderStroke(
+                                                1.dp,
+                                                if (isCurrentlySelected) NavyPrimary else Color(0xFFE2E8F0)
+                                            ),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clickable {
+                                                    selectedGrade = gr
+                                                    selectedSection = sec
+                                                }
+                                        ) {
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 10.dp, vertical = 7.dp),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Surface(
+                                                        shape = RoundedCornerShape(6.dp),
+                                                        color = if (isCurrentlySelected) NavyPrimary else Color(0xFFE2E8F0)
+                                                    ) {
+                                                        Text(
+                                                            text = "$gr-$sec",
+                                                            fontSize = 11.sp,
+                                                            fontWeight = FontWeight.Bold,
+                                                            color = if (isCurrentlySelected) Color.White else Color(0xFF334155),
+                                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                                        )
+                                                    }
+                                                    Spacer(modifier = Modifier.width(8.dp))
+                                                    Column {
+                                                        Text(
+                                                            text = hrTeacherName,
+                                                            fontSize = 11.sp,
+                                                            fontWeight = FontWeight.SemiBold,
+                                                            color = Color(0xFF1E293B)
+                                                        )
+                                                        Text(
+                                                            text = if (isAmharic) "የክፍል ኃላፊ" else "Homeroom Teacher",
+                                                            fontSize = 9.sp,
+                                                            color = Color(0xFF64748B)
+                                                        )
+                                                    }
+                                                }
+
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Surface(
+                                                        shape = RoundedCornerShape(6.dp),
+                                                        color = if (isSub) EthioGreen.copy(alpha = 0.15f) else GoldAccent.copy(alpha = 0.15f)
+                                                    ) {
+                                                        Text(
+                                                            text = if (isSub) (if (isAmharic) "✓ ተሞልቷል" else "Submitted")
+                                                            else (if (isAmharic) "⏳ ገና አልተሞላም" else "Pending"),
+                                                            fontSize = 10.sp,
+                                                            fontWeight = FontWeight.Bold,
+                                                            color = if (isSub) EthioGreen else Color(0xFFB45309),
+                                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                                        )
+                                                    }
+                                                    Spacer(modifier = Modifier.width(6.dp))
+                                                    Text(
+                                                        text = if (isCurrentlySelected) "●" else "👁️",
+                                                        fontSize = 12.sp,
+                                                        color = NavyPrimary
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Homeroom Teacher Class Submission Banner
+            if (isTeacher) {
+                val currentClassKey = "$selectedGrade-$selectedSection"
+                val isSubmitted = homeroomSubmissionMap[currentClassKey] == true
+
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF0FDF4)),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, EthioGreen.copy(alpha = 0.4f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp)
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = if (isAmharic) "👨‍🏫 የክፍል ኃላፊ ገጽ፦ ${currentTeacher?.fullName ?: "መምህር"}" else "👨‍🏫 Homeroom Teacher: ${currentTeacher?.fullName ?: "Teacher"}",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp,
+                                    color = Color(0xFF14532D)
+                                )
+                                Text(
+                                    text = if (isAmharic) "የክፍል $selectedGrade-$selectedSection አቴንዳንስ ሞልተው ለአስተዳደሩ ያስረክቡ።" else "Submit attendance for section $selectedGrade-$selectedSection",
+                                    fontSize = 10.sp,
+                                    color = Color(0xFF166534)
+                                )
+                            }
+                            Button(
+                                onClick = {
+                                    homeroomSubmissionMap[currentClassKey] = true
+                                    Toast.makeText(
+                                        context,
+                                        if (isAmharic) "✅ የ$selectedGrade-$selectedSection ክፍል የዕለት አቴንዳንስ ለአድሚን፣ ርዕሰ መምህር እና ም/ርዕሰ መምህር ተላልፏል!"
+                                        else "✅ Section $selectedGrade-$selectedSection attendance submitted!",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = EthioGreen),
+                                shape = RoundedCornerShape(8.dp),
+                                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                            ) {
+                                Text(
+                                    text = if (isSubmitted) (if (isAmharic) "✓ ተሞልቷል (አድስ)" else "✓ Submitted")
+                                    else (if (isAmharic) "💾 አቴንዳንስ አስረክብ" else "💾 Submit"),
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(6.dp))
 
             // Grade selector
             Text(
