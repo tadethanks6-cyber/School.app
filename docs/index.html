@@ -565,37 +565,158 @@
 
     <!-- TAB 3: TEACHERS & STAFF -->
     <div id="tab-teachers" class="tab-content" style="display:none;">
-      <div class="panel-card">
-        <div class="panel-header">
-          <div>
-            <h3 class="panel-title">የመምህራን እና የአስተዳደር ሰራተኞች ዝርዝር</h3>
-            <p style="font-size:0.78rem; color:var(--text-muted); margin-top:0.2rem;">ፎቶ፣ የስራ መደብ፣ ስልክ እና ኃላፊነት በLocal Storage የሚቀመጥ</p>
+      <!-- Sub-Navigation for Staff & Workload -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;">
+        <div style="display:flex; gap:0.4rem; background:#E2E8F0; padding:4px; border-radius:10px;">
+          <button id="btnStaffSubDirectory" class="btn-primary" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="setStaffSubMode('directory')">
+            👩‍🏫 የመምህራንና ሰራተኞች ዝርዝር (Staff Directory)
+          </button>
+          <button id="btnStaffSubWorkload" class="btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.85rem;" onclick="setStaffSubMode('workload')">
+            💼 የመምህራን የስራ ክፍፍል ሰሌዳ (Workload Distribution)
+          </button>
+        </div>
+        <div id="staffSubModeBadge" class="badge badge-primary">
+          👩‍🏫 የመምህራን መዝገብ እይታ
+        </div>
+      </div>
+
+      <!-- SECTION 1: STAFF DIRECTORY -->
+      <div id="staffDirectorySection">
+        <div class="panel-card">
+          <div class="panel-header" style="flex-wrap:wrap; gap:0.5rem;">
+            <div>
+              <h3 class="panel-title">የመምህራን እና የአስተዳደር ሰራተኞች ዝርዝር</h3>
+              <p style="font-size:0.78rem; color:var(--text-muted); margin-top:0.2rem;">ፎቶ፣ የስራ መደብ፣ የክፍል ኃላፊነት፣ የሚያስተምሯቸው ክፍሎች እና ስልክ ቁጥር</p>
+            </div>
+            <div style="display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center;">
+              <span id="totalStaffBadge" class="badge badge-primary">ጠቅላላ ሰራተኞች</span>
+              <button class="btn-accent" style="font-size:0.8rem;" onclick="openImportModal('teachers')">📥 ከExcel/CSV/PDF ጫን</button>
+              <button class="btn-secondary" style="font-size:0.8rem;" onclick="exportDataToCsv('teachers')">📤 ወደ CSV ላክ</button>
+              <button class="btn-primary" style="font-size:0.8rem;" onclick="openAddStaffModal()">➕ አዲስ መምህር / ሰራተኛ</button>
+            </div>
           </div>
-          <div style="display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center;">
-            <span id="totalStaffBadge" class="badge badge-primary">ጠቅላላ 6 ሰራተኞች</span>
-            <button class="btn-accent" style="font-size:0.8rem;" onclick="openImportModal('teachers')">📥 ከExcel/CSV/PDF ጫን</button>
-            <button class="btn-secondary" style="font-size:0.8rem;" onclick="exportDataToCsv('teachers')">📤 ወደ CSV ላክ</button>
-            <button class="btn-primary" style="font-size:0.8rem;" onclick="openAddStaffModal()">➕ አዲስ መምህር / ሰራተኛ</button>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:40px; text-align:center;">ተ.ቁ</th>
+                  <th>ፎቶ እና ሙሉ ስም</th>
+                  <th>የስራ መደብ (Role)</th>
+                  <th>የክፍል ኃላፊነት (Homeroom)</th>
+                  <th>የሚያስተምራቸው ትምህርቶች & ክፍሎች</th>
+                  <th style="text-align:center;">ሳምንታዊ ክፍለ-ጊዜ</th>
+                  <th>ስልክ ቁጥር</th>
+                  <th>ሁኔታ</th>
+                  <th style="text-align:center; min-width:180px;">እርምጃ</th>
+                </tr>
+              </thead>
+              <tbody id="staffTableBody">
+                <!-- Dynamic Staff Rows -->
+              </tbody>
+            </table>
           </div>
         </div>
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th style="width:50px; text-align:center;">ተ.ቁ</th>
-                <th>ፎቶ እና ሙሉ ስም</th>
-                <th>የስራ መደብ (Role)</th>
-                <th>ክፍል / የስራ ዘርፍ</th>
-                <th>ስልክ ቁጥር</th>
-                <th>የትምህርት ደረጃ</th>
-                <th>ሁኔታ</th>
-                <th style="text-align:center;">እርምጃ</th>
-              </tr>
-            </thead>
-            <tbody id="staffTableBody">
-              <!-- Dynamic Staff Rows -->
-            </tbody>
-          </table>
+      </div>
+
+      <!-- SECTION 2: WORKLOAD DISTRIBUTION DASHBOARD -->
+      <div id="staffWorkloadSection" style="display:none;">
+        <div class="panel-card" style="margin-bottom:1rem; border-left:4px solid #1E3A8A; background:#F8FAFC;">
+          <div class="panel-header" style="flex-wrap:wrap; gap:0.5rem; border-bottom:1px solid #E2E8F0; padding-bottom:0.75rem;">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                <span style="font-size:1.4rem;">💼</span>
+                <h3 class="panel-title" style="color:#1E3A8A; margin:0;">የመምህራን የስራ ክፍፍልና የስራ ድርሻ ሰሌዳ (Teacher Workload Distribution)</h3>
+                <span class="badge badge-success">2017 ዓ.ም የትምህርት ዘመን</span>
+              </div>
+              <p style="font-size:0.78rem; color:#475569; margin:0.25rem 0 0;">
+                የክፍል ኃላፊነት፣ የሚያስተምሯቸው የትምህርት ዓይነቶች፣ ክፍሎችና ሴክሽኖች እንዲሁም ሳምንታዊ ክፍለ-ጊዜ ማጠቃለያ
+              </p>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+              <button class="btn-primary" style="font-size:0.82rem; padding:0.4rem 0.8rem; background:#16A34A; border-color:#15803D;" onclick="openAddStaffModal()">
+                ➕ አዲስ የስራ ድርሻ መድብ
+              </button>
+              <button class="btn-secondary" style="font-size:0.82rem; padding:0.4rem 0.8rem;" onclick="renderWorkloadDistributionWeb()">
+                🔄 አድስ
+              </button>
+            </div>
+          </div>
+
+          <!-- Workload Stats Cards -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.75rem; margin-top:0.85rem; margin-bottom:0.85rem;">
+            <div style="background:white; border:1px solid #E2E8F0; border-radius:8px; padding:0.75rem; text-align:center;">
+              <div style="font-size:0.72rem; color:#64748B; font-weight:600;">👩‍🏫 ጠቅላላ መምህራን</div>
+              <div id="statTotalTeachersWorkload" style="font-size:1.4rem; font-weight:800; color:#1E293B;">0</div>
+              <div style="font-size:0.68rem; color:#94A3B8;">በስራ ላይ ያሉ</div>
+            </div>
+            <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:0.75rem; text-align:center;">
+              <div style="font-size:0.72rem; color:#166534; font-weight:600;">👨‍🏫 የተመደቡ የክፍል ኃላፊዎች</div>
+              <div id="statAssignedHomeroomCount" style="font-size:1.4rem; font-weight:800; color:#16A34A;">0</div>
+              <div id="statHomeroomCoverage" style="font-size:0.68rem; color:#15803D; font-weight:700;">100% ሽፋን</div>
+            </div>
+            <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:0.75rem; text-align:center;">
+              <div style="font-size:0.72rem; color:#1E40AF; font-weight:600;">⏱️ አማካይ ሳምንታዊ ክፍለ-ጊዜ</div>
+              <div id="statAvgWeeklyPeriods" style="font-size:1.4rem; font-weight:800; color:#2563EB;">18</div>
+              <div style="font-size:0.68rem; color:#3B82F6;">ክፍለ-ጊዜ በሳምንት</div>
+            </div>
+            <div style="background:#FAF5FF; border:1px solid #E9D5FF; border-radius:8px; padding:0.75rem; text-align:center;">
+              <div style="font-size:0.72rem; color:#6B21A8; font-weight:600;">📋 የትምህርት ክፍሎች (Depts)</div>
+              <div id="statTotalDeptsCount" style="font-size:1.4rem; font-weight:800; color:#7E22CE;">6</div>
+              <div style="font-size:0.68rem; color:#A855F7;">የትምህርት መስኮች</div>
+            </div>
+          </div>
+
+          <!-- Section 2A: Teacher-by-Teacher Workload Table -->
+          <div style="margin-top:1rem;">
+            <div style="font-weight:700; color:#1E3A8A; font-size:0.95rem; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.4rem;">
+              <span>📋</span> <span>የእያንዳንዱ መምህር ዝርዝር የስራ ድርሻና የክፍለ-ጊዜ ክፍፍል</span>
+            </div>
+            <div class="table-responsive" style="border:1px solid #E2E8F0; border-radius:8px; background:white;">
+              <table>
+                <thead style="background:#1E3A8A; color:white;">
+                  <tr>
+                    <th style="width:40px; text-align:center;">ተ.ቁ</th>
+                    <th>መምህር</th>
+                    <th>የክፍል ኃላፊነት (Homeroom)</th>
+                    <th>የሚያስተምራቸው የትምህርት ዓይነቶች</th>
+                    <th>ክፍሎች እና ሴክሽኖች</th>
+                    <th style="text-align:center;">ሳምንታዊ ክፍለ-ጊዜ</th>
+                    <th>ተጨማሪ የስራ ድርሻ (Duty)</th>
+                    <th style="text-align:center;">እርምጃ</th>
+                  </tr>
+                </thead>
+                <tbody id="teacherWorkloadTableBody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Section 2B: Class-by-Class Subject Teacher Allocation Matrix -->
+          <div style="margin-top:1.5rem;">
+            <div style="font-weight:700; color:#1E3A8A; font-size:0.95rem; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.4rem;">
+              <span>🏫</span> <span>በክፍል ደረጃ የመምህራን ምደባ ሰንጠረዥ (Class-by-Class Allocation)</span>
+            </div>
+            <div class="table-responsive" style="border:1px solid #E2E8F0; border-radius:8px; background:white;">
+              <table>
+                <thead style="background:#0F172A; color:white;">
+                  <tr>
+                    <th style="width:70px; text-align:center;">ክፍል</th>
+                    <th>የተመደበ የክፍል ኃላፊ መምህር</th>
+                    <th>ሒሳብ (Math)</th>
+                    <th>እንግሊዝኛ (English)</th>
+                    <th>አማርኛ (Amharic)</th>
+                    <th>ሳይንስ (Science/Phys/Chem)</th>
+                    <th>ማህበራዊ ሳይንስ / ስነ-ዜጋ</th>
+                    <th style="text-align:center;">እርምጃ</th>
+                  </tr>
+                </thead>
+                <tbody id="classSubjectAllocationTableBody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1352,6 +1473,54 @@
           </div>
         </div>
 
+        <!-- Teacher Workload & Duty Assignment Section -->
+        <div style="background:#F8FAFC; border:1px solid #CBD5E1; border-radius:8px; padding:0.75rem; margin-top:0.6rem; margin-bottom:0.75rem;">
+          <div style="font-weight:700; color:#1E3A8A; font-size:0.85rem; margin-bottom:0.4rem; display:flex; align-items:center; gap:0.35rem;">
+            <span>💼</span> <span>የመምህራን የስራ ክፍፍልና የስራ ድርሻ (Workload & Assignment)</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+            <div class="form-group" style="margin-bottom:0.4rem;">
+              <label style="font-size:0.78rem; font-weight:600;">የክፍል ኃላፊ ነው? (Homeroom)</label>
+              <select id="newStaffIsHomeroom" class="form-control" onchange="toggleNewStaffHomeroomClass(this.value)">
+                <option value="no">አይደለም (No)</option>
+                <option value="yes">አዎ - የክፍል ኃላፊ ነው (Yes)</option>
+              </select>
+            </div>
+            <div class="form-group" id="newStaffHomeroomGroup" style="margin-bottom:0.4rem; display:none;">
+              <label style="font-size:0.78rem; font-weight:600;">የሚመራበት ክፍል እና ሴክሽን *</label>
+              <select id="newStaffHomeroomClass" class="form-control">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0.4rem;">
+            <label style="font-size:0.78rem; font-weight:600;">የሚያስተምራቸው የትምህርት ዓይነቶች (Subjects Taught)</label>
+            <div id="newStaffSubjectsContainer" style="display:flex; flex-wrap:wrap; gap:0.3rem; margin-top:0.25rem;">
+              <!-- Subject chips -->
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0.4rem;">
+            <label style="font-size:0.78rem; font-weight:600;">የሚያስተምርባቸው ክፍሎች እና ሴክሽኖች (Classes Taught)</label>
+            <div id="newStaffClassesContainer" style="display:flex; flex-wrap:wrap; gap:0.3rem; margin-top:0.25rem;">
+              <!-- Class chips -->
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="font-size:0.78rem; font-weight:600;">ሳምንታዊ ክፍለ-ጊዜ (Periods/Week)</label>
+              <input type="number" id="newStaffPeriods" class="form-control" value="18" min="0" max="40" placeholder="18">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="font-size:0.78rem; font-weight:600;">ተጨማሪ የስራ ድርሻ (Extra Duty)</label>
+              <input type="text" id="newStaffExtraDuty" class="form-control" placeholder="ለምሳሌ፡ የፈተና ኮሚቴ / የት/ክፍል ኃላፊ">
+            </div>
+          </div>
+        </div>
+
         <div class="modal-actions">
           <button type="button" class="btn-secondary" onclick="closeAddStaffModal()">ሰርዝ (Cancel)</button>
           <button type="submit" class="btn-primary">💾 መዝግብ (Save Staff)</button>
@@ -1512,9 +1681,127 @@
           </select>
         </div>
 
+        <!-- Teacher Workload & Duty Assignment Section -->
+        <div style="background:#F8FAFC; border:1px solid #CBD5E1; border-radius:8px; padding:0.75rem; margin-top:0.6rem; margin-bottom:0.75rem;">
+          <div style="font-weight:700; color:#1E3A8A; font-size:0.85rem; margin-bottom:0.4rem; display:flex; align-items:center; gap:0.35rem;">
+            <span>💼</span> <span>የመምህራን የስራ ክፍፍልና የስራ ድርሻ (Workload & Assignment)</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+            <div class="form-group" style="margin-bottom:0.4rem;">
+              <label style="font-size:0.78rem; font-weight:600;">የክፍል ኃላፊ ነው? (Homeroom)</label>
+              <select id="editStaffIsHomeroom" class="form-control" onchange="toggleEditStaffHomeroomClass(this.value)">
+                <option value="no">አይደለም (No)</option>
+                <option value="yes">አዎ - የክፍል ኃላፊ ነው (Yes)</option>
+              </select>
+            </div>
+            <div class="form-group" id="editStaffHomeroomGroup" style="margin-bottom:0.4rem; display:none;">
+              <label style="font-size:0.78rem; font-weight:600;">የሚመራበት ክፍል እና ሴክሽን *</label>
+              <select id="editStaffHomeroomClass" class="form-control">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0.4rem;">
+            <label style="font-size:0.78rem; font-weight:600;">የሚያስተምራቸው የትምህርት ዓይነቶች (Subjects Taught)</label>
+            <div id="editStaffSubjectsContainer" style="display:flex; flex-wrap:wrap; gap:0.3rem; margin-top:0.25rem;">
+              <!-- Subject chips -->
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0.4rem;">
+            <label style="font-size:0.78rem; font-weight:600;">የሚያስተምርባቸው ክፍሎች እና ሴክሽኖች (Classes Taught)</label>
+            <div id="editStaffClassesContainer" style="display:flex; flex-wrap:wrap; gap:0.3rem; margin-top:0.25rem;">
+              <!-- Class chips -->
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="font-size:0.78rem; font-weight:600;">ሳምንታዊ ክፍለ-ጊዜ (Periods/Week)</label>
+              <input type="number" id="editStaffPeriods" class="form-control" value="18" min="0" max="40" placeholder="18">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="font-size:0.78rem; font-weight:600;">ተጨማሪ የስራ ድርሻ (Extra Duty)</label>
+              <input type="text" id="editStaffExtraDuty" class="form-control" placeholder="ለምሳሌ፡ የፈተና ኮሚቴ / የት/ክፍል ኃላፊ">
+            </div>
+          </div>
+        </div>
+
         <div class="modal-actions">
           <button type="button" class="btn-secondary" onclick="closeEditStaffModal()">ሰርዝ (Cancel)</button>
           <button type="submit" class="btn-primary" style="background:#2563EB;">💾 አሻሽልና መዝግብ (Update Staff)</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Dedicated Workload Assignment Modal (የስራ ክፍፍል መመደቢያ) -->
+  <div id="assignWorkloadModal" class="modal-overlay">
+    <div class="modal-box" style="max-width:540px;">
+      <div class="modal-title" style="display:flex; align-items:center; gap:0.4rem;">
+        <span>💼</span> <span>የመምህራን የስራ ክፍፍልና የስራ ድርሻ መመደቢያ</span>
+      </div>
+      <p style="font-size:0.8rem; color:#475569; margin-bottom:0.75rem;">
+        ለመምህሩ የክፍል ኃላፊነት፣ የሚያስተምሯቸውን የትምህርት ዓይነቶች፣ ክፍሎችና ሴክሽኖች እንዲሁም ሳምንታዊ ክፍለ-ጊዜ መድቡ።
+      </p>
+      <form onsubmit="saveQuickWorkloadAssignment(event)">
+        <input type="hidden" id="quickWorkloadStaffId" value="">
+        <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:0.6rem 0.85rem; margin-bottom:0.75rem; display:flex; align-items:center; gap:0.6rem;">
+          <div id="quickWorkloadStaffAvatar" style="width:38px; height:38px; border-radius:50%; background:#1E3A8A; color:white; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.9rem;">
+            መ
+          </div>
+          <div>
+            <div id="quickWorkloadStaffName" style="font-weight:700; color:#1E3A8A; font-size:0.95rem;">-</div>
+            <div id="quickWorkloadStaffRole" style="font-size:0.75rem; color:#3B82F6;">-</div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:0.5rem;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:0.78rem; font-weight:600;">የክፍል ኃላፊ ነው? (Homeroom)</label>
+            <select id="quickWorkloadIsHomeroom" class="form-control" onchange="toggleQuickWorkloadHomeroomClass(this.value)">
+              <option value="no">አይደለም (No)</option>
+              <option value="yes">አዎ - የክፍል ኃላፊ ነው (Yes)</option>
+            </select>
+          </div>
+          <div class="form-group" id="quickWorkloadHomeroomGroup" style="margin-bottom:0; display:none;">
+            <label style="font-size:0.78rem; font-weight:600;">የሚመራበት ክፍል እና ሴክሽን *</label>
+            <select id="quickWorkloadHomeroomClass" class="form-control">
+              <!-- Dynamically populated classes -->
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:0.5rem;">
+          <label style="font-size:0.78rem; font-weight:600;">የሚያስተምራቸው የትምህርት ዓይነቶች (Subjects Taught)</label>
+          <div id="quickWorkloadSubjectsContainer" style="display:flex; flex-wrap:wrap; gap:0.3rem; margin-top:0.25rem;">
+            <!-- Checkbox chips -->
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:0.5rem;">
+          <label style="font-size:0.78rem; font-weight:600;">የሚያስተምርባቸው ክፍሎች እና ሴክሽኖች (Classes Taught)</label>
+          <div id="quickWorkloadClassesContainer" style="display:flex; flex-wrap:wrap; gap:0.3rem; margin-top:0.25rem;">
+            <!-- Checkbox chips -->
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:0.85rem;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:0.78rem; font-weight:600;">ሳምንታዊ ክፍለ-ጊዜ (Periods/Week)</label>
+            <input type="number" id="quickWorkloadPeriods" class="form-control" value="18" min="0" max="40" placeholder="18">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:0.78rem; font-weight:600;">ተጨማሪ የስራ ድርሻ (Extra Duty)</label>
+            <input type="text" id="quickWorkloadExtraDuty" class="form-control" placeholder="ለምሳሌ፡ የፈተና ኮሚቴ / የት/ክፍል ኃላፊ">
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeAssignWorkloadModal()">ሰርዝ (Cancel)</button>
+          <button type="submit" class="btn-primary" style="background:#16A34A; border-color:#15803D;">💾 የስራ ክፍፍል መዝግብ (Save Workload)</button>
         </div>
       </form>
     </div>
@@ -5241,6 +5528,165 @@
       }
     }
 
+    const STANDARD_ETHIO_SUBJECTS = [
+      'ሒሳብ', 'እንግሊዝኛ', 'አማርኛ', 'አጠቃላይ ሳይንስ', 'ማህበራዊ ሳይንስ',
+      'ስነ-ዜጋ', 'ፊዚክስ', 'ኬሚስትሪ', 'ባዮሎጂ', 'ታሪክ', 'ጆግራፊ',
+      'ኢንፎርሜሽን ቴክኖሎጂ (IT)', 'ስነ-ጥበብ', 'የሰውነት ማጎልመሻ', 'የአካባቢ ሳይንስ'
+    ];
+
+    function getStandardClassesList() {
+      if (typeof getClassesForGradeLevel === 'function' && typeof schoolSettings !== 'undefined') {
+        return getClassesForGradeLevel(schoolSettings.gradeLevel || '1_8');
+      }
+      return ['1A', '1B', '2A', '2B', '3A', '3B', '4A', '4B', '5A', '5B', '6A', '6B', '7A', '7B', '8A', '8B'];
+    }
+
+    function renderSubjectChips(containerId, selectedSubs = []) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const selSet = new Set((selectedSubs || []).map(s => String(s).trim().toLowerCase()));
+
+      container.innerHTML = STANDARD_ETHIO_SUBJECTS.map(sub => {
+        const isChecked = selSet.has(sub.trim().toLowerCase());
+        return `
+          <label style="display:inline-flex; align-items:center; gap:0.25rem; background:${isChecked ? '#DBEAFE' : '#F1F5F9'}; color:${isChecked ? '#1E40AF' : '#334155'}; border:1px solid ${isChecked ? '#93C5FD' : '#CBD5E1'}; padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:600; cursor:pointer; user-select:none;">
+            <input type="checkbox" value="${sub}" ${isChecked ? 'checked' : ''} style="margin:0; cursor:pointer;" onchange="this.parentElement.style.background = this.checked ? '#DBEAFE' : '#F1F5F9'; this.parentElement.style.color = this.checked ? '#1E40AF' : '#334155'; this.parentElement.style.borderColor = this.checked ? '#93C5FD' : '#CBD5E1';">
+            ${sub}
+          </label>
+        `;
+      }).join('');
+    }
+
+    function renderClassChips(containerId, selectedClasses = []) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const classes = getStandardClassesList();
+      const selSet = new Set((selectedClasses || []).map(c => String(c).trim().toUpperCase()));
+
+      container.innerHTML = classes.map(cls => {
+        const isChecked = selSet.has(cls.trim().toUpperCase());
+        return `
+          <label style="display:inline-flex; align-items:center; gap:0.25rem; background:${isChecked ? '#DCFCE7' : '#F1F5F9'}; color:${isChecked ? '#166534' : '#334155'}; border:1px solid ${isChecked ? '#86EFAC' : '#CBD5E1'}; padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:700; cursor:pointer; user-select:none;">
+            <input type="checkbox" value="${cls}" ${isChecked ? 'checked' : ''} style="margin:0; cursor:pointer;" onchange="this.parentElement.style.background = this.checked ? '#DCFCE7' : '#F1F5F9'; this.parentElement.style.color = this.checked ? '#166534' : '#334155'; this.parentElement.style.borderColor = this.checked ? '#86EFAC' : '#CBD5E1';">
+            ${cls}
+          </label>
+        `;
+      }).join('');
+    }
+
+    function populateHomeroomDropdown(selectId, selectedCls = '') {
+      const sel = document.getElementById(selectId);
+      if (!sel) return;
+      const classes = getStandardClassesList();
+      sel.innerHTML = classes.map(c => `
+        <option value="${c}" ${c === selectedCls ? 'selected' : ''}>ክፍል ${c}</option>
+      `).join('');
+    }
+
+    function getSelectedChipsFromContainer(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return [];
+      const checked = container.querySelectorAll('input[type="checkbox"]:checked');
+      return Array.from(checked).map(cb => cb.value);
+    }
+
+    function toggleNewStaffHomeroomClass(val) {
+      const grp = document.getElementById('newStaffHomeroomGroup');
+      if (grp) grp.style.display = (val === 'yes') ? 'block' : 'none';
+    }
+
+    function toggleEditStaffHomeroomClass(val) {
+      const grp = document.getElementById('editStaffHomeroomGroup');
+      if (grp) grp.style.display = (val === 'yes') ? 'block' : 'none';
+    }
+
+    function toggleQuickWorkloadHomeroomClass(val) {
+      const grp = document.getElementById('quickWorkloadHomeroomGroup');
+      if (grp) grp.style.display = (val === 'yes') ? 'block' : 'none';
+    }
+
+    function setStaffSubMode(mode) {
+      const dirSec = document.getElementById('staffDirectorySection');
+      const wlSec = document.getElementById('staffWorkloadSection');
+      const btnDir = document.getElementById('btnStaffSubDirectory');
+      const btnWl = document.getElementById('btnStaffSubWorkload');
+      const badge = document.getElementById('staffSubModeBadge');
+
+      if (mode === 'workload') {
+        if (dirSec) dirSec.style.display = 'none';
+        if (wlSec) wlSec.style.display = 'block';
+        if (btnWl) {
+          btnWl.className = 'btn-primary';
+          btnWl.style.background = 'var(--primary)';
+          btnWl.style.color = 'white';
+        }
+        if (btnDir) {
+          btnDir.className = 'btn-secondary';
+          btnDir.style.background = '#F1F5F9';
+          btnDir.style.color = '#334155';
+        }
+        if (badge) badge.innerText = '💼 የመምህራን የስራ ክፍፍል ሰሌዳ';
+        renderWorkloadDistributionWeb();
+      } else {
+        if (dirSec) dirSec.style.display = 'block';
+        if (wlSec) wlSec.style.display = 'none';
+        if (btnDir) {
+          btnDir.className = 'btn-primary';
+          btnDir.style.background = 'var(--primary)';
+          btnDir.style.color = 'white';
+        }
+        if (btnWl) {
+          btnWl.className = 'btn-secondary';
+          btnWl.style.background = '#F1F5F9';
+          btnWl.style.color = '#334155';
+        }
+        if (badge) badge.innerText = '👩‍🏫 የመምህራን መዝገብ እይታ';
+        renderStaff();
+      }
+    }
+
+    function getStaffWorkload(st) {
+      let isHr = st.isHomeroom;
+      let hrCls = st.homeroomClass || '';
+      if (isHr === undefined) {
+        const r = (st.role || '') + ' ' + (st.dept || '');
+        isHr = r.includes('የክፍል ኃላፊ') || r.includes('Homeroom');
+        if (isHr && !hrCls) {
+          const m = r.match(/([1-9]|1[0-2])\s*([A-Za-z]|ኛ[A-Za-z]?)/i);
+          hrCls = m ? (m[1] + (m[2] || 'A').toUpperCase().replace('ኛ', '')) : '1A';
+        }
+      }
+
+      let subs = Array.isArray(st.subjects) ? st.subjects : [];
+      if (subs.length === 0 && st.dept) {
+        const d = st.dept;
+        if (d.includes('ሒሳብ') || d.includes('Math')) subs.push('ሒሳብ');
+        if (d.includes('እንግሊዝ') || d.includes('Eng')) subs.push('እንግሊዝኛ');
+        if (d.includes('አማርኛ') || d.includes('Amh')) subs.push('አማርኛ');
+        if (d.includes('ሳይንስ') || d.includes('Sci')) subs.push('አጠቃላይ ሳይንስ');
+        if (d.includes('ፊዚክስ') || d.includes('Phys')) subs.push('ፊዚክስ');
+        if (d.includes('ኬሚስትሪ') || d.includes('Chem')) subs.push('ኬሚስትሪ');
+        if (d.includes('ባዮሎጂ') || d.includes('Bio')) subs.push('ባዮሎጂ');
+        if (d.includes('ማህበራዊ') || d.includes('Social')) subs.push('ማህበራዊ ሳይንስ');
+        if (d.includes('ዜጋ') || d.includes('Civ')) subs.push('ስነ-ዜጋ');
+        if (subs.length === 0 && (st.role || '').includes('መምህር')) subs.push(d);
+      }
+
+      let tClasses = Array.isArray(st.teachingClasses) ? st.teachingClasses : [];
+      if (tClasses.length === 0 && hrCls) {
+        tClasses.push(hrCls);
+      }
+
+      return {
+        isHomeroom: !!isHr,
+        homeroomClass: hrCls,
+        subjects: subs,
+        teachingClasses: tClasses,
+        periodsPerWeek: st.periodsPerWeek || 18,
+        extraDuties: st.extraDuties || (st.role && st.role.includes('የት/ክፍል ኃላፊ') ? 'የትምህርት ክፍል ኃላፊ' : '-')
+      };
+    }
+
     function renderStaff() {
       const activeStaff = getFilteredStaffWeb();
       const tbody = document.getElementById('staffTableBody');
@@ -5249,6 +5695,20 @@
         const avatar = st.photo
           ? `<img src="${st.photo}" alt="${st.name}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid var(--accent); vertical-align:middle; margin-right:8px; box-shadow:0 1px 4px rgba(0,0,0,0.1);">`
           : `<span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; background:#FEF3C7; color:#B45309; font-weight:bold; font-size:0.85rem; margin-right:8px; vertical-align:middle;">${st.name.replace('መምህር ', '').replace('መምህርት ', '').replace('አቶ ', '').replace('ወ/ሮ ', '').charAt(0)}</span>`;
+        
+        const wl = getStaffWorkload(st);
+        const hrBadge = wl.isHomeroom 
+          ? `<span class="badge badge-success" style="font-size:0.75rem; padding:3px 7px;">👨‍🏫 የ${wl.homeroomClass || '1A'} ክፍል ኃላፊ</span>`
+          : `<span style="color:#94A3B8; font-size:0.75rem;">-</span>`;
+
+        const subBadges = wl.subjects.length > 0
+          ? wl.subjects.map(s => `<span class="badge badge-primary" style="font-size:0.7rem; padding:2px 5px; margin-right:2px;">${s}</span>`).join('')
+          : `<span style="color:#64748B; font-size:0.75rem;">${st.dept || '-'}</span>`;
+
+        const classBadges = wl.teachingClasses.length > 0
+          ? `<div style="font-size:0.7rem; color:#1E3A8A; font-weight:700; margin-top:2px;">ክፍሎች፦ ${wl.teachingClasses.join(', ')}</div>`
+          : '';
+
         return `
         <tr>
           <td style="text-align:center; font-weight:bold; color:#64748B;">${index + 1}</td>
@@ -5262,11 +5722,18 @@
             </div>
           </td>
           <td><span class="badge badge-primary">${st.role}</span></td>
-          <td>${st.dept}</td>
+          <td>${hrBadge}</td>
+          <td>
+            <div>${subBadges}</div>
+            ${classBadges}
+          </td>
+          <td style="text-align:center; font-weight:700; color:#1E40AF;">
+            <span class="badge" style="background:#EFF6FF; color:#1D4ED8; font-size:0.75rem;">${wl.periodsPerWeek} ክፍለ-ጊዜ</span>
+          </td>
           <td><a href="tel:${st.phone}" style="color:var(--primary); text-decoration:none; font-weight:600;">${st.phone}</a></td>
-          <td><span class="badge badge-warning">${st.qual}</span></td>
           <td><span class="badge badge-success">${st.status}</span></td>
           <td style="text-align:center; white-space:nowrap;">
+            <button class="btn-primary" style="padding:0.25rem 0.55rem; font-size:0.75rem; background:#16A34A; border-color:#15803D; margin-right:4px;" onclick="openAssignWorkloadModal('${st.id}')">💼 የስራ ክፍፍል</button>
             <button class="btn-secondary" style="padding:0.25rem 0.55rem; font-size:0.75rem; color:#2563EB; font-weight:700; border-color:#93C5FD; margin-right:4px;" onclick="openEditStaffModal('${st.id}')">✏️ አሻሽል</button>
             <button class="btn-secondary" style="padding:0.25rem 0.55rem; font-size:0.75rem; color:var(--danger); font-weight:700; border-color:#FCA5A5;" onclick="removeStaff('${st.id}')">🗑️ ሰርዝ</button>
           </td>
@@ -5277,9 +5744,241 @@
       }
     }
 
+    function renderWorkloadDistributionWeb() {
+      const activeStaff = getFilteredStaffWeb();
+      const teachers = activeStaff.filter(st => {
+        const r = (st.role || '').toLowerCase();
+        const d = (st.dept || '').toLowerCase();
+        return r.includes('መምህር') || r.includes('ኃላፊ') || d.includes('math') || d.includes('ሳይንስ') || d.includes('ቋንቋ');
+      });
+
+      const totalTeachers = teachers.length;
+      let hrCount = 0;
+      let totalPeriods = 0;
+      const depts = new Set();
+
+      teachers.forEach(t => {
+        const wl = getStaffWorkload(t);
+        if (wl.isHomeroom) hrCount++;
+        totalPeriods += (wl.periodsPerWeek || 18);
+        if (t.dept) depts.add(t.dept);
+      });
+
+      const avgPeriods = totalTeachers > 0 ? Math.round(totalPeriods / totalTeachers) : 18;
+
+      const elTotalT = document.getElementById('statTotalTeachersWorkload');
+      if (elTotalT) elTotalT.innerText = totalTeachers;
+
+      const elHr = document.getElementById('statAssignedHomeroomCount');
+      if (elHr) elHr.innerText = hrCount;
+
+      const elAvg = document.getElementById('statAvgWeeklyPeriods');
+      if (elAvg) elAvg.innerText = avgPeriods;
+
+      const elDepts = document.getElementById('statTotalDeptsCount');
+      if (elDepts) elDepts.innerText = Math.max(depts.size, 6);
+
+      // 1. Render Teacher Workload Rows
+      const tbodyTeacher = document.getElementById('teacherWorkloadTableBody');
+      if (tbodyTeacher) {
+        tbodyTeacher.innerHTML = teachers.map((st, i) => {
+          const wl = getStaffWorkload(st);
+          const hrText = wl.isHomeroom 
+            ? `<span class="badge badge-success" style="font-size:0.75rem;">✓ የ${wl.homeroomClass} ክፍል ኃላፊ</span>`
+            : `<span style="color:#64748B; font-size:0.75rem;">አልተመደበም</span>`;
+
+          const subBadges = wl.subjects.length > 0
+            ? wl.subjects.map(s => `<span class="badge badge-primary" style="font-size:0.7rem; margin-right:3px;">${s}</span>`).join('')
+            : `<span style="color:#64748B;">${st.dept || '-'}</span>`;
+
+          const classBadges = wl.teachingClasses.length > 0
+            ? wl.teachingClasses.map(c => `<span class="badge" style="background:#F1F5F9; color:#1E293B; font-size:0.7rem; border:1px solid #CBD5E1; margin-right:3px;">${c}</span>`).join('')
+            : `<span style="color:#64748B;">-</span>`;
+
+          return `
+            <tr style="border-bottom:1px solid #F1F5F9;">
+              <td style="text-align:center; font-weight:700; color:#64748B;">${i + 1}</td>
+              <td>
+                <div style="font-weight:700; color:#1E293B;">${st.name}</div>
+                <div style="font-size:0.7rem; color:#64748B;">${st.role} • ${st.phone}</div>
+              </td>
+              <td>${hrText}</td>
+              <td>${subBadges}</td>
+              <td>${classBadges}</td>
+              <td style="text-align:center; font-weight:700; color:#1E40AF;">${wl.periodsPerWeek} ክፍለ-ጊዜ</td>
+              <td style="font-size:0.75rem; color:#475569;">${wl.extraDuties || '-'}</td>
+              <td style="text-align:center;">
+                <button type="button" class="btn-primary" style="padding:0.25rem 0.6rem; font-size:0.75rem; background:#16A34A; border-color:#15803D;" onclick="openAssignWorkloadModal('${st.id}')">
+                  ⚙️ የስራ ድርሻ መድብ
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // 2. Render Class-by-Class Subject Teacher Allocation
+      const tbodyClass = document.getElementById('classSubjectAllocationTableBody');
+      if (tbodyClass) {
+        const availableClasses = getStandardClassesList();
+        tbodyClass.innerHTML = availableClasses.map(cls => {
+          const hr = getHomeroomTeacherForGrade(cls);
+          const mathTeacher = getAssignedTeacherForSubject('ሒሳብ');
+          const engTeacher = getAssignedTeacherForSubject('እንግሊዝኛ');
+          const amhTeacher = getAssignedTeacherForSubject('አማርኛ');
+          const sciTeacher = getAssignedTeacherForSubject('አጠቃላይ ሳይንስ');
+          const socTeacher = getAssignedTeacherForSubject('ማህበራዊ ሳይንስ');
+
+          return `
+            <tr style="border-bottom:1px solid #F1F5F9;">
+              <td style="text-align:center; font-weight:800;">
+                <span class="badge badge-primary">${cls}</span>
+              </td>
+              <td>
+                <div style="font-weight:700; color:#14532D; font-size:0.85rem;">👨‍🏫 ${hr.name}</div>
+                <div style="font-size:0.68rem; color:#15803D;">የክፍል ኃላፊ መምህር</div>
+              </td>
+              <td style="font-size:0.8rem; font-weight:600; color:#1E293B;">${mathTeacher.name}</td>
+              <td style="font-size:0.8rem; font-weight:600; color:#1E293B;">${engTeacher.name}</td>
+              <td style="font-size:0.8rem; font-weight:600; color:#1E293B;">${amhTeacher.name}</td>
+              <td style="font-size:0.8rem; font-weight:600; color:#1E293B;">${sciTeacher.name}</td>
+              <td style="font-size:0.8rem; font-weight:600; color:#1E293B;">${socTeacher.name}</td>
+              <td style="text-align:center;">
+                <button type="button" class="btn-secondary" style="padding:0.25rem 0.55rem; font-size:0.75rem; color:#1E3A8A; font-weight:700;" onclick="openAssignWorkloadModal('${hr.id || ''}')">
+                  💼 አሻሽል
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    function openAssignWorkloadModal(staffId) {
+      const staff = staffList.find(st => String(st.id).toLowerCase() === String(staffId).toLowerCase()) || staffList[0];
+      if (!staff) {
+        alert('እባክዎ መጀመሪያ መምህር ይምረጡ!');
+        return;
+      }
+
+      const idEl = document.getElementById('quickWorkloadStaffId');
+      const nameEl = document.getElementById('quickWorkloadStaffName');
+      const roleEl = document.getElementById('quickWorkloadStaffRole');
+      const avatarEl = document.getElementById('quickWorkloadStaffAvatar');
+
+      if (idEl) idEl.value = staff.id;
+      if (nameEl) nameEl.innerText = staff.name;
+      if (roleEl) roleEl.innerText = `${staff.role} • ${staff.dept}`;
+      if (avatarEl) {
+        if (staff.photo) {
+          avatarEl.style.backgroundImage = `url('${staff.photo}')`;
+          avatarEl.style.backgroundSize = 'cover';
+          avatarEl.innerHTML = '';
+        } else {
+          avatarEl.style.backgroundImage = 'none';
+          avatarEl.innerHTML = staff.name.charAt(0);
+        }
+      }
+
+      const wl = getStaffWorkload(staff);
+
+      const isHrEl = document.getElementById('quickWorkloadIsHomeroom');
+      if (isHrEl) isHrEl.value = wl.isHomeroom ? 'yes' : 'no';
+
+      toggleQuickWorkloadHomeroomClass(wl.isHomeroom ? 'yes' : 'no');
+      populateHomeroomDropdown('quickWorkloadHomeroomClass', wl.homeroomClass);
+
+      renderSubjectChips('quickWorkloadSubjectsContainer', wl.subjects);
+      renderClassChips('quickWorkloadClassesContainer', wl.teachingClasses);
+
+      const periodsEl = document.getElementById('quickWorkloadPeriods');
+      if (periodsEl) periodsEl.value = wl.periodsPerWeek || 18;
+
+      const extraDutyEl = document.getElementById('quickWorkloadExtraDuty');
+      if (extraDutyEl) extraDutyEl.value = wl.extraDuties || '';
+
+      const modal = document.getElementById('assignWorkloadModal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeAssignWorkloadModal() {
+      const modal = document.getElementById('assignWorkloadModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function saveQuickWorkloadAssignment(e) {
+      if (e) e.preventDefault();
+      const staffId = document.getElementById('quickWorkloadStaffId').value;
+      const staff = staffList.find(st => String(st.id).toLowerCase() === String(staffId).toLowerCase());
+      if (!staff) {
+        alert('መምህሩ አልተገኘም!');
+        return;
+      }
+
+      const isHomeroom = document.getElementById('quickWorkloadIsHomeroom').value === 'yes';
+      const homeroomClass = isHomeroom ? document.getElementById('quickWorkloadHomeroomClass').value : '';
+      const subjects = getSelectedChipsFromContainer('quickWorkloadSubjectsContainer');
+      const teachingClasses = getSelectedChipsFromContainer('quickWorkloadClassesContainer');
+      const periodsPerWeek = parseInt(document.getElementById('quickWorkloadPeriods').value) || 18;
+      const extraDuties = (document.getElementById('quickWorkloadExtraDuty').value || '').trim();
+
+      staff.isHomeroom = isHomeroom;
+      staff.homeroomClass = homeroomClass;
+      staff.subjects = subjects;
+      staff.teachingClasses = teachingClasses;
+      staff.periodsPerWeek = periodsPerWeek;
+      staff.extraDuties = extraDuties;
+
+      if (isHomeroom && homeroomClass) {
+        if (!homeroomAttendanceSubmissions) homeroomAttendanceSubmissions = {};
+        if (!homeroomAttendanceSubmissions[homeroomClass]) {
+          homeroomAttendanceSubmissions[homeroomClass] = {
+            submitted: false,
+            teacherName: staff.name,
+            time: '',
+            date: '2017 ዓ.ም'
+          };
+        } else {
+          homeroomAttendanceSubmissions[homeroomClass].teacherName = staff.name;
+        }
+        localStorage.setItem('dilijent_homeroom_submissions', JSON.stringify(homeroomAttendanceSubmissions));
+      }
+
+      localStorage.setItem('dilijent_staff_list', JSON.stringify(staffList));
+
+      try {
+        let uStaff = JSON.parse(localStorage.getItem('dilijent_user_registered_staff') || '[]');
+        const idx = uStaff.findIndex(us => String(us.id).toLowerCase() === String(staff.id).toLowerCase() || us.name === staff.name);
+        if (idx >= 0) {
+          uStaff[idx] = { ...uStaff[idx], ...staff };
+        } else {
+          uStaff.push(staff);
+        }
+        localStorage.setItem('dilijent_user_registered_staff', JSON.stringify(uStaff));
+      } catch (err) {}
+
+      closeAssignWorkloadModal();
+      renderStaff();
+      renderWorkloadDistributionWeb();
+      renderHomeroomAttendanceSummaryWeb();
+      renderHomeroomRoster();
+      renderGrades();
+
+      alert(`✅ የመምህር ${staff.name} የስራ ክፍፍልና የስራ ድርሻ (የክፍል ኃላፊነት፡ ${isHomeroom ? homeroomClass : 'የለም'}፣ የት/ት ዓይነት፡ ${subjects.join(', ') || 'አጠቃላይ'}) በተሳካ ሁኔታ ተመድቧል!`);
+    }
+
     function getAssignedTeacherForSubject(subjectName) {
       const s = (subjectName || '').toLowerCase();
-      const list = (typeof staffList !== 'undefined' && Array.isArray(staffList)) ? staffList : [];
+      const list = (typeof getFilteredStaffWeb === 'function') ? getFilteredStaffWeb() : (staffList || []);
+
+      // 1. Direct match with staff.subjects array
+      const matchedBySubject = list.find(st => {
+        const wl = getStaffWorkload(st);
+        return wl.subjects.some(sub => sub.toLowerCase().includes(s) || s.includes(sub.toLowerCase()));
+      });
+      if (matchedBySubject) return matchedBySubject;
+
+      // 2. Substring match on dept or role
       const found = list.find(st => {
         const sid = (st.id || '').trim().toLowerCase();
         const sname = (st.name || '').trim().toLowerCase();
@@ -5300,7 +5999,7 @@
       });
       if (found) return found;
 
-      // If no exact match, find any active non-deleted teacher
+      // 3. Fallback to any teacher
       const anyTeacher = list.find(st => {
         const sid = (st.id || '').trim().toLowerCase();
         const sname = (st.name || '').trim().toLowerCase();
@@ -6780,6 +7479,40 @@
       }
 
       const modal = document.getElementById('editStaffModal');
+      // Load Workload settings
+      const wl = (typeof getStaffWorkload === 'function') ? getStaffWorkload(staff) : {
+        isHomeroom: false,
+        homeroomClass: '',
+        subjects: [],
+        teachingClasses: [],
+        periodsPerWeek: 18,
+        extraDuties: ''
+      };
+
+      const isHmEl = document.getElementById('editStaffIsHomeroom');
+      if (isHmEl) isHmEl.value = wl.isHomeroom ? 'yes' : 'no';
+
+      const hmGrp = document.getElementById('editStaffHomeroomGroup');
+      if (hmGrp) hmGrp.style.display = wl.isHomeroom ? 'block' : 'none';
+
+      if (typeof populateHomeroomDropdown === 'function') {
+        populateHomeroomDropdown('editStaffHomeroomClass', wl.homeroomClass || '7A');
+      }
+
+      if (typeof renderSubjectChips === 'function') {
+        renderSubjectChips('editStaffSubjectsContainer', wl.subjects || []);
+      }
+
+      if (typeof renderClassChips === 'function') {
+        renderClassChips('editStaffClassesContainer', wl.teachingClasses || []);
+      }
+
+      const periodsEl = document.getElementById('editStaffPeriods');
+      if (periodsEl) periodsEl.value = wl.periodsPerWeek || 18;
+
+      const extraEl = document.getElementById('editStaffExtraDuty');
+      if (extraEl) extraEl.value = wl.extraDuties || '';
+
       if (modal) modal.style.display = 'flex';
     }
 
@@ -6839,6 +7572,14 @@
         return;
       }
 
+      // Workload fields
+      const isHomeroom = (document.getElementById('editStaffIsHomeroom')?.value === 'yes');
+      const homeroomClass = isHomeroom ? (document.getElementById('editStaffHomeroomClass')?.value || '') : '';
+      const subjects = typeof getSelectedChipsFromContainer === 'function' ? getSelectedChipsFromContainer('editStaffSubjectsContainer') : [];
+      const teachingClasses = typeof getSelectedChipsFromContainer === 'function' ? getSelectedChipsFromContainer('editStaffClassesContainer') : [];
+      const periodsPerWeek = parseInt(document.getElementById('editStaffPeriods')?.value || '18', 10) || 18;
+      const extraDuties = (document.getElementById('editStaffExtraDuty')?.value || '').trim();
+
       staff.name = newName;
       staff.role = newRole;
       staff.dept = newDept;
@@ -6847,6 +7588,34 @@
       staff.status = newStatus;
       if (selectedEditStaffPhotoBase64) {
         staff.photo = selectedEditStaffPhotoBase64;
+      }
+
+      staff.isHomeroom = isHomeroom;
+      staff.homeroomClass = homeroomClass;
+      staff.subjects = subjects;
+      staff.teachingClasses = teachingClasses;
+      staff.periodsPerWeek = periodsPerWeek;
+      staff.extraDuties = extraDuties;
+
+      // Update homeroom roster link
+      if (isHomeroom && homeroomClass) {
+        if (!homeroomAttendanceSubmissions[homeroomClass]) {
+          homeroomAttendanceSubmissions[homeroomClass] = {
+            submitted: false,
+            date: '2017-02-15',
+            submittedAt: null,
+            teacherName: newName,
+            totalStudents: 40,
+            present: 0,
+            absent: 0,
+            late: 0,
+            permission: 0,
+            remarks: 'በስራ ክፍፍል የክፍል ኃላፊነት ተመድቧል'
+          };
+        } else {
+          homeroomAttendanceSubmissions[homeroomClass].teacherName = newName;
+        }
+        localStorage.setItem('dilijent_homeroom_attendance', JSON.stringify(homeroomAttendanceSubmissions));
       }
 
       localStorage.setItem('dilijent_staff_list', JSON.stringify(staffList));
@@ -6881,10 +7650,11 @@
 
       saveState();
       closeEditStaffModal();
-      renderStaff();
-      renderStaffAttendanceWeb();
-      renderDashboard();
-      alert(`✅ የሰራተኛ ${newName} (${staff.id}) መረጃ በተሳካ ሁኔታ ተሻሽሏል!`);
+      if (typeof renderStaff === 'function') renderStaff();
+      if (typeof renderWorkloadDistributionWeb === 'function') renderWorkloadDistributionWeb();
+      if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
+      if (typeof renderDashboard === 'function') renderDashboard();
+      alert(`✅ የሰራተኛ ${newName} (${staff.id}) መረጃ እና የስራ ድርሻ ክፍፍል በተሳካ ሁኔታ ተሻሽሏል!`);
     }
 
     function quickMarkStaffAttendanceWeb(id, status) {
@@ -7418,6 +8188,26 @@
     let selectedStaffPhotoBase64 = '';
 
     function openAddStaffModal() {
+      // Initialize workload fields
+      const isHmEl = document.getElementById('newStaffIsHomeroom');
+      if (isHmEl) isHmEl.value = 'no';
+      const hmGrp = document.getElementById('newStaffHomeroomGroup');
+      if (hmGrp) hmGrp.style.display = 'none';
+
+      if (typeof populateHomeroomDropdown === 'function') {
+        populateHomeroomDropdown('newStaffHomeroomClass', '7A');
+      }
+      if (typeof renderSubjectChips === 'function') {
+        renderSubjectChips('newStaffSubjectsContainer', ['ሒሳብ']);
+      }
+      if (typeof renderClassChips === 'function') {
+        renderClassChips('newStaffClassesContainer', ['7A', '7B']);
+      }
+      const periodsEl = document.getElementById('newStaffPeriods');
+      if (periodsEl) periodsEl.value = '18';
+      const extraEl = document.getElementById('newStaffExtraDuty');
+      if (extraEl) extraEl.value = '';
+
       document.getElementById('addStaffModal').style.display = 'flex';
     }
     function closeAddStaffModal() {
@@ -7480,6 +8270,14 @@
       if (phone) deletedStaffIds.delete(phone.toLowerCase());
       localStorage.setItem('dilijent_deleted_staff_ids', JSON.stringify([...deletedStaffIds]));
 
+      // Extract teacher workload fields
+      const isHomeroom = (document.getElementById('newStaffIsHomeroom')?.value === 'yes');
+      const homeroomClass = isHomeroom ? (document.getElementById('newStaffHomeroomClass')?.value || '') : '';
+      const subjects = typeof getSelectedChipsFromContainer === 'function' ? getSelectedChipsFromContainer('newStaffSubjectsContainer') : [];
+      const teachingClasses = typeof getSelectedChipsFromContainer === 'function' ? getSelectedChipsFromContainer('newStaffClassesContainer') : [];
+      const periodsPerWeek = parseInt(document.getElementById('newStaffPeriods')?.value || '18', 10) || 18;
+      const extraDuties = (document.getElementById('newStaffExtraDuty')?.value || '').trim();
+
       const newStaffObj = {
         id,
         name,
@@ -7489,8 +8287,35 @@
         qual,
         photo: selectedStaffPhotoBase64,
         status: 'ንቁ',
-        isUserCreated: true
+        isUserCreated: true,
+        isHomeroom: isHomeroom,
+        homeroomClass: homeroomClass,
+        subjects: subjects,
+        teachingClasses: teachingClasses,
+        periodsPerWeek: periodsPerWeek,
+        extraDuties: extraDuties
       };
+
+      // If this teacher is assigned as homeroom, register them in homeroomAttendanceSubmissions
+      if (isHomeroom && homeroomClass) {
+        if (!homeroomAttendanceSubmissions[homeroomClass]) {
+          homeroomAttendanceSubmissions[homeroomClass] = {
+            submitted: false,
+            date: '2017-02-15',
+            submittedAt: null,
+            teacherName: name,
+            totalStudents: 40,
+            present: 0,
+            absent: 0,
+            late: 0,
+            permission: 0,
+            remarks: 'በአዲሱ መምህር የክፍል ኃላፊነት ተመድቧል'
+          };
+        } else {
+          homeroomAttendanceSubmissions[homeroomClass].teacherName = name;
+        }
+        localStorage.setItem('dilijent_homeroom_attendance', JSON.stringify(homeroomAttendanceSubmissions));
+      }
 
       // 1. Add to main staffList & dilijent_staff_list
       staffList.unshift(newStaffObj);
@@ -7552,8 +8377,9 @@
       e.target.reset();
       clearStaffPhoto();
       if (typeof renderStaff === 'function') renderStaff();
+      if (typeof renderWorkloadDistributionWeb === 'function') renderWorkloadDistributionWeb();
       if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
-      alert(`✅ መምህር/ሰራተኛ ${name} (${id}) በቋሚነት ተመዝግቧል!`);
+      alert(`✅ መምህር/ሰራተኛ ${name} (${id}) በስራ ድርሻ ክፍፍል ጋር በቋሚነት ተመዝግቧል!`);
     }
 
     function removeStaff(idOrIdx) {
