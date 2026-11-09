@@ -1643,6 +1643,147 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                     }
                 }
             }
+            // Ensure official registered school staff (STF-001 through STF-005) are always present in Room database
+            val existingStaffNow = repository.allStaff.first()
+            val existingNamesNow = existingStaffNow.map { it.fullName.trim().lowercase() }.toSet()
+            val defaultOfficialStaff = listOf(
+                Staff(
+                    id = 0L,
+                    staffCode = "STF-001",
+                    fullName = "Mr.Bizuneh",
+                    title = "አቶ",
+                    role = "ርዕሰ መምህር (Principal)",
+                    department = "አስተዳደር (Administration)",
+                    phone = "0911000001",
+                    email = "bizuneh@dilijent.edu.et",
+                    gender = "ወንድ",
+                    qualification = "ማስተርስ ዲግሪ (MA/MSc)",
+                    employmentType = "ቋሚ",
+                    salary = "",
+                    hiringDate = "2017 ዓ.ም",
+                    responsibilities = "የትምህርት ቤት ርዕሰ መምህር",
+                    emergencyContact = "",
+                    photoUri = "",
+                    status = "ንቁ",
+                    teachingSubject = "ማህበራዊ ሳይንስ",
+                    assignedGrade = "8",
+                    assignedSection = "A",
+                    isHomeroomTeacher = false,
+                    homeroomClass = "",
+                    dutyLocation = "",
+                    shift = "ቀን"
+                ),
+                Staff(
+                    id = 0L,
+                    staffCode = "STF-002",
+                    fullName = "Genber Gebru",
+                    title = "አቶ",
+                    role = "ምክትል ርዕሰ መምህር (Vice Principal)",
+                    department = "አስተዳደር እና ስነ-ምግባር",
+                    phone = "0918000000",
+                    email = "vp@dilijent.edu.et",
+                    gender = "ወንድ",
+                    qualification = "ማስተርስ / ቢኤ (MA/BA)",
+                    employmentType = "ቋሚ",
+                    salary = "",
+                    hiringDate = "2017 ዓ.ም",
+                    responsibilities = "ምክትል ርዕሰ መምህርና የስነ-ምግባር ኃላፊ",
+                    emergencyContact = "",
+                    photoUri = "",
+                    status = "ንቁ",
+                    teachingSubject = "ሒሳብ",
+                    assignedGrade = "7",
+                    assignedSection = "A",
+                    isHomeroomTeacher = false,
+                    homeroomClass = "",
+                    dutyLocation = "",
+                    shift = "ቀን"
+                ),
+                Staff(
+                    id = 0L,
+                    staffCode = "STF-003",
+                    fullName = "Tadesse Misganaw",
+                    title = "መምህር",
+                    role = "መምህር (Teacher)",
+                    department = "አጠቃላይ ሳይንስ / ሒሳብ",
+                    phone = "0911999999",
+                    email = "tadessemisganaw4@gmail.com",
+                    gender = "ወንድ",
+                    qualification = "ባችለር ዲግሪ (BSc)",
+                    employmentType = "ቋሚ",
+                    salary = "",
+                    hiringDate = "2017 ዓ.ም",
+                    responsibilities = "የ7ኛA ክፍል ኃላፊ መምህር",
+                    emergencyContact = "",
+                    photoUri = "",
+                    status = "ንቁ",
+                    teachingSubject = "ሒሳብ",
+                    assignedGrade = "7",
+                    assignedSection = "A",
+                    isHomeroomTeacher = true,
+                    homeroomClass = "7A",
+                    dutyLocation = "",
+                    shift = "ቀን"
+                ),
+                Staff(
+                    id = 0L,
+                    staffCode = "STF-004",
+                    fullName = "Mr Siyum Getnet",
+                    title = "መምህር",
+                    role = "መምህር (Teacher)",
+                    department = "ቋንቋዎች (እንግሊዝኛ / አማርኛ)",
+                    phone = "0911888888",
+                    email = "siyum.getnet@dilijent.edu.et",
+                    gender = "ወንድ",
+                    qualification = "ባችለር ዲግሪ (BEd)",
+                    employmentType = "ቋሚ",
+                    salary = "",
+                    hiringDate = "2017 ዓ.ም",
+                    responsibilities = "የ8ኛA ክፍል ኃላፊ መምህር",
+                    emergencyContact = "",
+                    photoUri = "",
+                    status = "ንቁ",
+                    teachingSubject = "እንግሊዝኛ",
+                    assignedGrade = "8",
+                    assignedSection = "A",
+                    isHomeroomTeacher = true,
+                    homeroomClass = "8A",
+                    dutyLocation = "",
+                    shift = "ቀን"
+                ),
+                Staff(
+                    id = 0L,
+                    staffCode = "STF-005",
+                    fullName = "Sara Niguse",
+                    title = "ወ/ሪት",
+                    role = "ዋና ጸሐፊ (School Secretary)",
+                    department = "አስተዳደር እና ፋይናንስ (Administration)",
+                    phone = "0960225925",
+                    email = "sara.niguse@dilijent.edu.et",
+                    gender = "ሴት",
+                    qualification = "ዲፕሎማ / ቢኤ (BA/Diploma)",
+                    employmentType = "ቋሚ",
+                    salary = "",
+                    hiringDate = "2017 ዓ.ም",
+                    responsibilities = "ዋና ጸሐፊና ሬጅስትራር",
+                    emergencyContact = "",
+                    photoUri = "",
+                    status = "ንቁ",
+                    teachingSubject = "",
+                    assignedGrade = "",
+                    assignedSection = "",
+                    isHomeroomTeacher = false,
+                    homeroomClass = "",
+                    dutyLocation = "",
+                    shift = "ቀን"
+                )
+            )
+            for (st in defaultOfficialStaff) {
+                val nLower = st.fullName.trim().lowercase()
+                if (!currentDeleted.contains(nLower) && !existingNamesNow.contains(nLower)) {
+                    repository.insertStaff(st)
+                }
+            }
         } catch (e: Exception) {
             android.util.Log.e("SchoolViewModel", "purgeDeletedStaff error: ${e.message}")
         }

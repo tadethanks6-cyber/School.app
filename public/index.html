@@ -4913,8 +4913,94 @@
     ];
     const SEED_STUDENTS_HIGH = [];
 
-    // Strictly clean - no dummy sample staff. Only real staff registered by school will exist.
-    const SEED_STAFF_PRIMARY = [];
+    // Official registered school staff (per user registration & school records)
+    const SEED_STAFF_PRIMARY = [
+      {
+        id: 'STF-001',
+        name: 'Mr.Bizuneh',
+        role: 'ርዕሰ መምህር (Principal)',
+        dept: 'አስተዳደር (Administration)',
+        phone: '0911000001',
+        qual: 'ማስተርስ ዲግሪ (MA/MSc)',
+        photo: '',
+        status: 'ንቁ',
+        isUserCreated: true,
+        isHomeroom: false,
+        homeroomClass: '',
+        subjects: ['ማህበራዊ ሳይንስ'],
+        teachingClasses: ['8A'],
+        periodsPerWeek: 6,
+        extraDuties: 'የትምህርት ቤት ርዕሰ መምህር'
+      },
+      {
+        id: 'STF-002',
+        name: 'Genber Gebru',
+        role: 'ምክትል ርዕሰ መምህር (Vice Principal)',
+        dept: 'አስተዳደር እና ስነ-ምግባር',
+        phone: '0918000000',
+        qual: 'ማስተርስ / ቢኤ (MA/BA)',
+        photo: '',
+        status: 'ንቁ',
+        isUserCreated: true,
+        isHomeroom: false,
+        homeroomClass: '',
+        subjects: ['ሒሳብ'],
+        teachingClasses: ['7A', '8A'],
+        periodsPerWeek: 12,
+        extraDuties: 'ምክትል ርዕሰ መምህርና የስነ-ምግባር ኃላፊ'
+      },
+      {
+        id: 'STF-003',
+        name: 'Tadesse Misganaw',
+        role: 'መምህር (Teacher)',
+        dept: 'አጠቃላይ ሳይንስ / ሒሳብ',
+        phone: '0911999999',
+        qual: 'ባችለር ዲግሪ (BSc)',
+        photo: '',
+        status: 'ንቁ',
+        isUserCreated: true,
+        isHomeroom: true,
+        homeroomClass: '7A',
+        subjects: ['ሒሳብ', 'አጠቃላይ ሳይንስ'],
+        teachingClasses: ['7A', '7B'],
+        periodsPerWeek: 18,
+        extraDuties: 'የ7ኛA ክፍል ኃላፊ መምህር'
+      },
+      {
+        id: 'STF-004',
+        name: 'Mr Siyum Getnet',
+        role: 'መምህር (Teacher)',
+        dept: 'ቋንቋዎች (እንግሊዝኛ / አማርኛ)',
+        phone: '0911888888',
+        qual: 'ባችለር ዲግሪ (BEd)',
+        photo: '',
+        status: 'ንቁ',
+        isUserCreated: true,
+        isHomeroom: true,
+        homeroomClass: '8A',
+        subjects: ['እንግሊዝኛ', 'አማርኛ'],
+        teachingClasses: ['8A', '8B'],
+        periodsPerWeek: 18,
+        extraDuties: 'የ8ኛA ክፍል ኃላፊ መምህር'
+      },
+      {
+        id: 'STF-005',
+        name: 'Sara Niguse',
+        role: 'ዋና ጸሐፊ (School Secretary)',
+        dept: 'አስተዳደር እና ፋይናንስ (Administration)',
+        phone: '0960225925',
+        qual: 'ዲፕሎማ / ቢኤ (BA/Diploma)',
+        photo: '',
+        status: 'ንቁ',
+        isUserCreated: true,
+        isHomeroom: false,
+        homeroomClass: '',
+        subjects: [],
+        teachingClasses: [],
+        periodsPerWeek: 0,
+        extraDuties: 'ዋና ጸሐፊና ሬጅስትራር'
+      }
+    ];
     const SEED_STAFF_HIGH = [];
     const SEED_STAFF_COMMON = [];
 
@@ -5122,7 +5208,7 @@
       });
     }
 
-    // Load from BOTH dilijent_user_registered_staff AND dilijent_staff_list to ensure user-registered staff are strictly validated and preserved
+    // Load from SEED_STAFF_PRIMARY, dilijent_user_registered_staff AND dilijent_staff_list to guarantee staff are never lost
     let storedUserStaff = [];
     try {
       storedUserStaff = JSON.parse(localStorage.getItem('dilijent_user_registered_staff') || '[]');
@@ -5135,7 +5221,8 @@
       if (!Array.isArray(storedStaffList)) storedStaffList = [];
     } catch (e) { storedStaffList = []; }
 
-    const combinedCandidateStaff = [...storedUserStaff, ...storedStaffList];
+    // Official seed staff + persistent user-registered staff
+    const combinedCandidateStaff = [...storedUserStaff, ...storedStaffList, ...SEED_STAFF_PRIMARY];
     const dummyStaffNameSet = new Set(DUMMY_TEMPLATE_STAFF_NAMES.map(n => normalizeStaffName(n)));
     const dummyStaffCodeSet = new Set(DUMMY_TEMPLATE_STAFF_CODES);
 
@@ -8503,8 +8590,11 @@
     // ==========================================
     const DEFAULT_ACCOUNTS = [
       { name: 'እኔ (ታደሰ ምስጋናው - ሲስተም አድሚን)', role: '👑 ሲስተም አድሚን', email: 'tadessemisganaw4@gmail.com', phone: '0911999999', pass: 'tade@2026', isAdmin: true, isVicePrincipal: false, roleKey: 'admin' },
-      { name: 'Sara Niguse', role: '✍️ ዋና ጸሐፊ / ሬጅስትራር', email: 'sara.niguse@dilijent.edu.et', phone: '0960225925', pass: 'sara@123', isAdmin: false, isVicePrincipal: false, roleKey: 'secretary' },
-      { name: 'ምክትል ርዕሰ መምህር', role: '🎓 ምክትል ርዕሰ መምህር', email: 'vp@dilijent.edu.et', phone: '0918000000', pass: 'vp1234', isAdmin: false, isVicePrincipal: true, roleKey: 'vice_principal' }
+      { name: 'Mr.Bizuneh', role: 'ርዕሰ መምህር (Principal)', email: 'bizuneh@dilijent.edu.et', phone: '0911000001', pass: 'Staff@2026', isAdmin: false, isVicePrincipal: false, isPrincipal: true, roleKey: 'principal' },
+      { name: 'Genber Gebru', role: '🎓 ምክትል ርዕሰ መምህር', email: 'vp@dilijent.edu.et', phone: '0918000000', pass: 'vp1234', isAdmin: false, isVicePrincipal: true, roleKey: 'vice_principal' },
+      { name: 'Tadesse Misganaw', role: 'መምህር (Teacher)', email: 'tadesse.teacher@dilijent.edu.et', phone: '0911999999', pass: 'Staff@2026', isAdmin: false, isVicePrincipal: false, roleKey: 'teacher' },
+      { name: 'Mr Siyum Getnet', role: 'መምህር (Teacher)', email: 'siyum.getnet@dilijent.edu.et', phone: '0911888888', pass: 'Staff@2026', isAdmin: false, isVicePrincipal: false, roleKey: 'teacher' },
+      { name: 'Sara Niguse', role: '✍️ ዋና ጸሐፊ / ሬጅስትራር', email: 'sara.niguse@dilijent.edu.et', phone: '0960225925', pass: 'sara@123', isAdmin: false, isVicePrincipal: false, roleKey: 'secretary' }
     ];
 
     let userAccounts = [];
