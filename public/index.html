@@ -5227,8 +5227,23 @@
     const dummyStaffCodeSet = new Set(DUMMY_TEMPLATE_STAFF_CODES);
 
     const cleanStaffList = [];
-    const seenStaffKeys = new Set();
-    const seenStaffIds = new Set();
+    // Explicitly protect and unblock the genuine registered school staff so they can NEVER be blocked by legacy deletedStaffIds
+    const PROTECTED_STAFF_NAMES = [
+      'Mr.Bizuneh', 'Bizuneh',
+      'Genber Gebru', 'Genber',
+      'Tadesse Misganaw', 'Tadesse',
+      'Mr Siyum Getnet', 'Siyum Getnet', 'Siyum',
+      'Sara Niguse', 'Sara'
+    ];
+    PROTECTED_STAFF_NAMES.forEach(pn => {
+      deletedStaffIds.delete(pn.toLowerCase());
+      const pNorm = normalizeStaffName(pn);
+      if (pNorm) deletedStaffIds.delete(pNorm);
+    });
+    ['stf-001', 'stf-002', 'stf-003', 'stf-004', 'stf-005', 'stf-sec-01', '0911000001', '0918000000', '0911999999', '0911888888', '0960225925'].forEach(code => {
+      deletedStaffIds.delete(code.toLowerCase());
+    });
+    localStorage.setItem('dilijent_deleted_staff_ids', JSON.stringify([...deletedStaffIds]));
 
     combinedCandidateStaff.forEach(st => {
       if (!st || !st.name) return;
@@ -5237,13 +5252,16 @@
       const sNorm = normalizeStaffName(st.name);
       const sPhone = (st.phone || '').trim().toLowerCase();
 
-      // Check if blocked by deletedStaffIds
-      if (deletedStaffIds.has(sId) || deletedStaffIds.has(sName) || (sNorm && deletedStaffIds.has(sNorm)) || (sPhone && deletedStaffIds.has(sPhone))) {
-        return;
-      }
-      // Check if this is a dummy template code or name
-      if (dummyStaffCodeSet.has(sId) || dummyStaffNameSet.has(sNorm)) {
-        return;
+      // Check if blocked by deletedStaffIds (protected official staff are never blocked)
+      const isProtected = PROTECTED_STAFF_NAMES.some(pn => normalizeStaffName(pn) === sNorm || sName.includes(pn.toLowerCase()));
+      if (!isProtected) {
+        if (deletedStaffIds.has(sId) || deletedStaffIds.has(sName) || (sNorm && deletedStaffIds.has(sNorm)) || (sPhone && deletedStaffIds.has(sPhone))) {
+          return;
+        }
+        // Check if this is a dummy template code or name
+        if (dummyStaffCodeSet.has(sId) || dummyStaffNameSet.has(sNorm)) {
+          return;
+        }
       }
 
       const dedupeKey = `${sNorm || sName}__${getStaffSector(st.role, st.dept)}`;
@@ -5398,6 +5416,9 @@
       const filtered = staffList.filter(st => {
         const sid = (st.id || '').trim().toLowerCase();
         const sname = (st.name || '').trim().toLowerCase();
+        const sNorm = normalizeStaffName(st.name);
+        const isProtected = (typeof PROTECTED_STAFF_NAMES !== 'undefined') && PROTECTED_STAFF_NAMES.some(pn => normalizeStaffName(pn) === sNorm || sName.includes(pn.toLowerCase()));
+        if (isProtected) return true;
         return !deletedStaffIds.has(sid) && !deletedStaffIds.has(sname);
       });
       return (typeof sortStaffBySequentialId === 'function') ? sortStaffBySequentialId(filtered) : filtered;
