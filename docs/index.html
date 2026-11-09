@@ -281,8 +281,33 @@
         </div>
 
         <!-- Role Guidance Notice Banner -->
-        <div id="fullLoginNotice" style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:10px 14px; margin-bottom:1.15rem; font-size:0.8rem; color:#1E40AF; display:flex; align-items:center; gap:8px;">
-          <span>📱</span><span>የተመረጠው ሚና፡ <strong>መምህር / መምህርት</strong> — እባክዎ የተመዘገበ ስልክ ቁጥር እና የይለፍ ቃል ያስገቡ (ግዴታ ነው)</span>
+        <div id="fullLoginNotice" style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:10px 14px; margin-bottom:1rem; font-size:0.8rem; color:#1E40AF; display:flex; align-items:center; gap:8px;">
+          <span>📱</span><span>የተመረጠው ሚና፡ <strong>መምህር / መምህርት</strong> — እባክዎ የተመዘገበ ስልክ ቁጥር እና የይለፍ ቃል ያስገቡ ወይም ከስር <strong>«ፈጣን መግቢያ»</strong>ን ይጠቀሙ</span>
+        </div>
+
+        <!-- Quick 1-Click Role Direct Login Bar -->
+        <div style="margin-bottom:1.15rem; background:#F8FAFC; border:1.5px solid #CBD5E1; border-radius:14px; padding:10px 12px;">
+          <div style="font-size:0.75rem; font-weight:800; color:#1E3A8A; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+            <span>⚡ ፈጣን መግቢያ (Quick 1-Click Login)፦</span>
+            <span style="font-size:0.68rem; color:#16A34A; background:#DCFCE7; font-weight:700; padding:2px 7px; border-radius:6px;">ያለ ድካም በ1 ጠቅታ ግባ</span>
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;">
+            <button type="button" onclick="quickFillAndLogin('admin')" style="background:#FEF3C7; color:#92400E; border:1px solid #FCD34D; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+              👑 ሲስተም አድሚን (ታደሰ ምስጋናው)
+            </button>
+            <button type="button" onclick="quickFillAndLogin('principal')" style="background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+              👔 ርዕሰ መምህር (Mr.Bizuneh)
+            </button>
+            <button type="button" onclick="quickFillAndLogin('vp')" style="background:#F0FDF4; color:#166534; border:1px solid #86EFAC; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+              🎓 ም/ር/መምህር (Genber Gebru)
+            </button>
+            <button type="button" onclick="quickFillAndLogin('teacher')" style="background:#F5F3FF; color:#6D28D9; border:1px solid #DDD6FE; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+              👨‍🏫 መምህር (Mr Siyum Getnet)
+            </button>
+            <button type="button" onclick="quickFillAndLogin('secretary')" style="background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+              ✍️ ዋና ጸሐፊ (Sara Niguse)
+            </button>
+          </div>
         </div>
 
         <form id="fullLoginForm" onsubmit="handleFullLoginSubmit(event)">
@@ -334,63 +359,49 @@
           </button>
         </div>
 
-        <!-- Collapsible Reference Guide (Manual typing required) -->
+        <!-- Collapsible Reference Guide (Manual typing or Click-to-Login) -->
         <details style="margin-top:1rem; background:#F8FAFC; border:1px solid #CBD5E1; border-radius:10px; padding:10px 12px; font-size:0.78rem;">
           <summary style="font-weight:800; color:#1E3A8A; cursor:pointer;">
-            ℹ️ የተጠቃሚ መለያዎች ዝርዝር መመሪያ (Credentials Directory)
+            ℹ️ የተጠቃሚ መለያዎች ዝርዝር መመሪያ (Credentials Directory) — ጠቅ በማድረግ መግባት ይችላሉ
           </summary>
           <div style="margin-top:8px; line-height:1.6; color:#334155;">
-            <div style="font-size:0.74rem; color:#64748B; margin-bottom:6px;">ለፈተና የሚሆኑ ይፋዊ መለያዎች (በእጅዎ መተየብ ግዴታ ነው)፦</div>
+            <div style="font-size:0.74rem; color:#64748B; margin-bottom:6px;">በቀጥታ ለመግባት ከስር ያለውን ማንኛውንም ረድፍ (Row) ጠቅ ማድረግ ይችላሉ፦</div>
             <table style="width:100%; border-collapse:collapse; font-size:0.74rem;">
               <tr style="border-bottom:1px solid #E2E8F0; background:#F1F5F9;">
                 <th style="padding:4px; text-align:left;">የስራ ድርሻ</th>
                 <th style="padding:4px; text-align:left;">መለያ (ስልክ/ኢሜል)</th>
                 <th style="padding:4px; text-align:left;">የይለፍ ቃል</th>
+                <th style="padding:4px; text-align:center;">እርምጃ</th>
               </tr>
-              <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:4px;">👑 ሲስተም አድሚን</td>
+              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('admin')">
+                <td style="padding:4px; font-weight:700;">👑 ሲስተም አድሚን</td>
                 <td style="padding:4px; font-family:monospace; color:#1E40AF;">tadessemisganaw4@gmail.com</td>
                 <td style="padding:4px; font-family:monospace;">tade@2026</td>
+                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
               </tr>
-              <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:4px;">👔 ርዕሰ መምህር</td>
-                <td style="padding:4px; font-family:monospace;">0911000000</td>
-                <td style="padding:4px; font-family:monospace;">tade@2026</td>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:4px;">🎓 ም/ር/መምህር</td>
-                <td style="padding:4px; font-family:monospace;">0918000000</td>
-                <td style="padding:4px; font-family:monospace;">tade@2026</td>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:4px;">👨‍🏫 መምህር (ሒሳብ)</td>
-                <td style="padding:4px; font-family:monospace;">0911223344</td>
-                <td style="padding:4px; font-family:monospace;">Teacher@2026</td>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:4px;">👩‍🏫 መምህርት (ፊዚክስ)</td>
-                <td style="padding:4px; font-family:monospace;">0922334455</td>
-                <td style="padding:4px; font-family:monospace;">Teacher@2026</td>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:4px;">✍️ ጸሐፊ / ሬጅስትራር</td>
-                <td style="padding:4px; font-family:monospace;">0960225925</td>
+              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('principal')">
+                <td style="padding:4px; font-weight:700;">👔 ርዕሰ መምህር</td>
+                <td style="padding:4px; font-family:monospace;">0911000001 (STF-001)</td>
                 <td style="padding:4px; font-family:monospace;">Staff@2026</td>
+                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
               </tr>
-              <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:4px;">💰 ፋይናንስ / ሂሳብ</td>
-                <td style="padding:4px; font-family:monospace;">0911446688</td>
-                <td style="padding:4px; font-family:monospace;">Finance@2026</td>
+              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('vp')">
+                <td style="padding:4px; font-weight:700;">🎓 ም/ር/መምህር</td>
+                <td style="padding:4px; font-family:monospace;">0918000000 (STF-002)</td>
+                <td style="padding:4px; font-family:monospace;">vp1234</td>
+                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
               </tr>
-              <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:4px;">🧹 ፅዳት እና ጥበቃ</td>
-                <td style="padding:4px; font-family:monospace;">0911557799</td>
-                <td style="padding:4px; font-family:monospace;">Support@2026</td>
+              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('teacher')">
+                <td style="padding:4px; font-weight:700;">👨‍🏫 መምህር (Mr Siyum)</td>
+                <td style="padding:4px; font-family:monospace;">0911888888 (STF-004)</td>
+                <td style="padding:4px; font-family:monospace;">Staff@2026</td>
+                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
               </tr>
-              <tr>
-                <td style="padding:4px;">👨‍🎓 ተማሪ / ወላጅ</td>
-                <td style="padding:4px; font-family:monospace;">0911002233</td>
-                <td style="padding:4px; font-family:monospace;">Student@2026</td>
+              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('secretary')">
+                <td style="padding:4px; font-weight:700;">✍️ ዋና ጸሐፊ (Sara)</td>
+                <td style="padding:4px; font-family:monospace;">0960225925 (STF-005)</td>
+                <td style="padding:4px; font-family:monospace;">sara@123</td>
+                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
               </tr>
             </table>
           </div>
@@ -2046,7 +2057,32 @@
 
         <!-- Mode explanation notice banner -->
         <div id="loginModeNotice" style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:10px 14px; margin-bottom:1.15rem; font-size:0.8rem; color:#1E40AF; display:flex; align-items:center; gap:8px;">
-          <span>📱</span><span>የተመረጠው ሚና፡ <strong>መምህር / መምህርት</strong> — እባክዎ የተመዘገበ ስልክ ቁጥር እና የይለፍ ቃል ያስገቡ (ግዴታ ነው)</span>
+          <span>📱</span><span>የተመረጠው ሚና፡ <strong>መምህር / መምህርት</strong> — እባክዎ የተመዘገበ ስልክ ቁጥር እና የይለፍ ቃል ያስገቡ ወይም ከስር <strong>«ፈጣን መግቢያ»</strong>ን ይጠቀሙ</span>
+        </div>
+
+        <!-- Quick 1-Click Direct Role Login Bar -->
+        <div style="margin-bottom:1.15rem; background:#F8FAFC; border:1.5px solid #CBD5E1; border-radius:14px; padding:10px 12px;">
+          <div style="font-size:0.75rem; font-weight:800; color:#1E3A8A; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+            <span>⚡ ፈጣን መግቢያ (Quick 1-Click Login)፦</span>
+            <span style="font-size:0.68rem; color:#16A34A; background:#DCFCE7; font-weight:700; padding:2px 7px; border-radius:6px;">ያለ ድካም በ1 ጠቅታ ግባ</span>
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;">
+            <button type="button" onclick="quickFillAndLogin('admin')" style="background:#FEF3C7; color:#92400E; border:1px solid #FCD34D; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+              👑 ሲስተም አድሚን (ታደሰ ምስጋናው)
+            </button>
+            <button type="button" onclick="quickFillAndLogin('principal')" style="background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+              👔 ርዕሰ መምህር (Mr.Bizuneh)
+            </button>
+            <button type="button" onclick="quickFillAndLogin('vp')" style="background:#F0FDF4; color:#166534; border:1px solid #86EFAC; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+              🎓 ም/ር/መምህር (Genber Gebru)
+            </button>
+            <button type="button" onclick="quickFillAndLogin('teacher')" style="background:#F5F3FF; color:#6D28D9; border:1px solid #DDD6FE; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+              👨‍🏫 መምህር (Mr Siyum Getnet)
+            </button>
+            <button type="button" onclick="quickFillAndLogin('secretary')" style="background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+              ✍️ ዋና ጸሐፊ (Sara Niguse)
+            </button>
+          </div>
         </div>
 
         <form id="webLoginForm" onsubmit="handleWebLoginSubmit(event)">
@@ -2101,63 +2137,49 @@
           </button>
         </div>
 
-        <!-- Collapsible Reference Guide (Manual typing required) -->
+        <!-- Collapsible Reference Guide (Manual typing or Click-to-Login) -->
         <details style="margin-top:1rem; background:#F8FAFC; border:1px solid #CBD5E1; border-radius:10px; padding:10px 12px; font-size:0.78rem;">
           <summary style="font-weight:800; color:#1E3A8A; cursor:pointer;">
-            ℹ️ የተጠቃሚ መለያዎች ዝርዝር መመሪያ (Credentials Directory)
+            ℹ️ የተጠቃሚ መለያዎች ዝርዝር መመሪያ (Credentials Directory) — ጠቅ በማድረግ መግባት ይችላሉ
           </summary>
           <div style="margin-top:8px; line-height:1.6; color:#334155;">
-            <div style="font-size:0.74rem; color:#64748B; margin-bottom:6px;">ለፈተና የሚሆኑ ይፋዊ መለያዎች (በእጅዎ መተየብ ግዴታ ነው)፦</div>
+            <div style="font-size:0.74rem; color:#64748B; margin-bottom:6px;">በቀጥታ ለመግባት ከስር ያለውን ማንኛውንም ረድፍ (Row) ጠቅ ማድረግ ይችላሉ፦</div>
             <table style="width:100%; border-collapse:collapse; font-size:0.74rem;">
               <tr style="border-bottom:1px solid #E2E8F0; background:#F1F5F9;">
                 <th style="padding:4px; text-align:left;">የስራ ድርሻ</th>
                 <th style="padding:4px; text-align:left;">መለያ (ስልክ/ኢሜል)</th>
                 <th style="padding:4px; text-align:left;">የይለፍ ቃል</th>
+                <th style="padding:4px; text-align:center;">እርምጃ</th>
               </tr>
-              <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:4px;">👑 ሲስተም አድሚን</td>
+              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('admin')">
+                <td style="padding:4px; font-weight:700;">👑 ሲስተም አድሚን</td>
                 <td style="padding:4px; font-family:monospace; color:#1E40AF;">tadessemisganaw4@gmail.com</td>
                 <td style="padding:4px; font-family:monospace;">tade@2026</td>
+                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
               </tr>
-              <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:4px;">👔 ርዕሰ መምህር</td>
-                <td style="padding:4px; font-family:monospace;">0911000000</td>
-                <td style="padding:4px; font-family:monospace;">tade@2026</td>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:4px;">🎓 ም/ር/መምህር</td>
-                <td style="padding:4px; font-family:monospace;">0918000000</td>
-                <td style="padding:4px; font-family:monospace;">tade@2026</td>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:4px;">👨‍🏫 መምህር (ሒሳብ)</td>
-                <td style="padding:4px; font-family:monospace;">0911223344</td>
-                <td style="padding:4px; font-family:monospace;">Teacher@2026</td>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:4px;">👩‍🏫 መምህርት (ፊዚክስ)</td>
-                <td style="padding:4px; font-family:monospace;">0922334455</td>
-                <td style="padding:4px; font-family:monospace;">Teacher@2026</td>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:4px;">✍️ ጸሐፊ / ሬጅስትራር</td>
-                <td style="padding:4px; font-family:monospace;">0960225925</td>
+              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('principal')">
+                <td style="padding:4px; font-weight:700;">👔 ርዕሰ መምህር</td>
+                <td style="padding:4px; font-family:monospace;">0911000001 (STF-001)</td>
                 <td style="padding:4px; font-family:monospace;">Staff@2026</td>
+                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
               </tr>
-              <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:4px;">💰 ፋይናንስ / ሂሳብ</td>
-                <td style="padding:4px; font-family:monospace;">0911446688</td>
-                <td style="padding:4px; font-family:monospace;">Finance@2026</td>
+              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('vp')">
+                <td style="padding:4px; font-weight:700;">🎓 ም/ር/መምህር</td>
+                <td style="padding:4px; font-family:monospace;">0918000000 (STF-002)</td>
+                <td style="padding:4px; font-family:monospace;">vp1234</td>
+                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
               </tr>
-              <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:4px;">🧹 ፅዳት እና ጥበቃ</td>
-                <td style="padding:4px; font-family:monospace;">0911557799</td>
-                <td style="padding:4px; font-family:monospace;">Support@2026</td>
+              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('teacher')">
+                <td style="padding:4px; font-weight:700;">👨‍🏫 መምህር (Mr Siyum)</td>
+                <td style="padding:4px; font-family:monospace;">0911888888 (STF-004)</td>
+                <td style="padding:4px; font-family:monospace;">Staff@2026</td>
+                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
               </tr>
-              <tr>
-                <td style="padding:4px;">👨‍🎓 ተማሪ / ወላጅ</td>
-                <td style="padding:4px; font-family:monospace;">0911002233</td>
-                <td style="padding:4px; font-family:monospace;">Student@2026</td>
+              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('secretary')">
+                <td style="padding:4px; font-weight:700;">✍️ ዋና ጸሐፊ (Sara)</td>
+                <td style="padding:4px; font-family:monospace;">0960225925 (STF-005)</td>
+                <td style="padding:4px; font-family:monospace;">sara@123</td>
+                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
               </tr>
             </table>
           </div>
@@ -5227,6 +5249,7 @@
     const dummyStaffCodeSet = new Set(DUMMY_TEMPLATE_STAFF_CODES);
 
     const cleanStaffList = [];
+    const seenStaffKeys = new Set();
     // Explicitly protect and unblock the genuine registered school staff so they can NEVER be blocked by legacy deletedStaffIds
     const PROTECTED_STAFF_NAMES = [
       'Mr.Bizuneh', 'Bizuneh',
@@ -5417,7 +5440,7 @@
         const sid = (st.id || '').trim().toLowerCase();
         const sname = (st.name || '').trim().toLowerCase();
         const sNorm = normalizeStaffName(st.name);
-        const isProtected = (typeof PROTECTED_STAFF_NAMES !== 'undefined') && PROTECTED_STAFF_NAMES.some(pn => normalizeStaffName(pn) === sNorm || sName.includes(pn.toLowerCase()));
+        const isProtected = (typeof PROTECTED_STAFF_NAMES !== 'undefined') && PROTECTED_STAFF_NAMES.some(pn => normalizeStaffName(pn) === sNorm || sname.includes(pn.toLowerCase()));
         if (isProtected) return true;
         return !deletedStaffIds.has(sid) && !deletedStaffIds.has(sname);
       });
@@ -8610,12 +8633,12 @@
     // USER ACCOUNTS, AUTHENTICATION & LOGOUT
     // ==========================================
     const DEFAULT_ACCOUNTS = [
-      { name: 'እኔ (ታደሰ ምስጋናው - ሲስተም አድሚን)', role: '👑 ሲስተም አድሚን', email: 'tadessemisganaw4@gmail.com', phone: '0911999999', pass: 'tade@2026', isAdmin: true, isVicePrincipal: false, roleKey: 'admin' },
-      { name: 'Mr.Bizuneh', role: 'ርዕሰ መምህር (Principal)', email: 'bizuneh@dilijent.edu.et', phone: '0911000001', pass: 'Staff@2026', isAdmin: false, isVicePrincipal: false, isPrincipal: true, roleKey: 'principal' },
-      { name: 'Genber Gebru', role: '🎓 ምክትል ርዕሰ መምህር', email: 'vp@dilijent.edu.et', phone: '0918000000', pass: 'vp1234', isAdmin: false, isVicePrincipal: true, roleKey: 'vice_principal' },
-      { name: 'Tadesse Misganaw', role: 'መምህር (Teacher)', email: 'tadesse.teacher@dilijent.edu.et', phone: '0911999999', pass: 'Staff@2026', isAdmin: false, isVicePrincipal: false, roleKey: 'teacher' },
-      { name: 'Mr Siyum Getnet', role: 'መምህር (Teacher)', email: 'siyum.getnet@dilijent.edu.et', phone: '0911888888', pass: 'Staff@2026', isAdmin: false, isVicePrincipal: false, roleKey: 'teacher' },
-      { name: 'Sara Niguse', role: '✍️ ዋና ጸሐፊ / ሬጅስትራር', email: 'sara.niguse@dilijent.edu.et', phone: '0960225925', pass: 'sara@123', isAdmin: false, isVicePrincipal: false, roleKey: 'secretary' }
+      { name: 'እኔ (ታደሰ ምስጋናው - ሲስተም አድሚን)', role: '👑 ሲስተም አድሚን', email: 'tadessemisganaw4@gmail.com', secondaryEmail: 'tadethanks6@gmail.com', phone: '0911999999', staffId: 'STF-003', pass: 'tade@2026', isAdmin: true, isVicePrincipal: false, roleKey: 'admin' },
+      { name: 'Mr.Bizuneh', role: 'ርዕሰ መምህር (Principal)', email: 'bizuneh@dilijent.edu.et', phone: '0911000001', staffId: 'STF-001', pass: 'Staff@2026', isAdmin: false, isVicePrincipal: false, isPrincipal: true, roleKey: 'principal' },
+      { name: 'Genber Gebru', role: '🎓 ምክትል ርዕሰ መምህር', email: 'vp@dilijent.edu.et', phone: '0918000000', staffId: 'STF-002', pass: 'vp1234', isAdmin: false, isVicePrincipal: true, roleKey: 'vice_principal' },
+      { name: 'Tadesse Misganaw', role: 'መምህር (Teacher)', email: 'tadesse.teacher@dilijent.edu.et', phone: '0911999999', staffId: 'STF-003', pass: 'Staff@2026', isAdmin: false, isVicePrincipal: false, roleKey: 'teacher' },
+      { name: 'Mr Siyum Getnet', role: 'መምህር (Teacher)', email: 'siyum.getnet@dilijent.edu.et', phone: '0911888888', staffId: 'STF-004', pass: 'Staff@2026', isAdmin: false, isVicePrincipal: false, roleKey: 'teacher' },
+      { name: 'Sara Niguse', role: '✍️ ዋና ጸሐፊ / ሬጅስትራር', email: 'sara.niguse@dilijent.edu.et', phone: '0960225925', staffId: 'STF-005', pass: 'sara@123', isAdmin: false, isVicePrincipal: false, roleKey: 'secretary' }
     ];
 
     let userAccounts = [];
@@ -8651,13 +8674,15 @@
       }
       return true;
     });
-        // Ensure System Admin (tadessemisganaw4@gmail.com / tade@2026) ALWAYS exists and is updated
-    const adminIndex = userAccounts.findIndex(u => u.isAdmin || u.roleKey === 'admin' || (u.email && (u.email.toLowerCase().includes('admin') || u.email.toLowerCase() === 'tadessemisganaw4@gmail.com')));
+    // Ensure System Admin (tadessemisganaw4@gmail.com / tadethanks6@gmail.com / tade@2026) ALWAYS exists and is updated
+    const adminIndex = userAccounts.findIndex(u => u.isAdmin || u.roleKey === 'admin' || (u.email && (u.email.toLowerCase().includes('admin') || u.email.toLowerCase() === 'tadessemisganaw4@gmail.com' || u.email.toLowerCase() === 'tadethanks6@gmail.com')));
     const adminObj = {
       name: 'እኔ (ታደሰ ምስጋናው - ሲስተም አድሚን)',
       role: '👑 ሲስተም አድሚን',
       email: 'tadessemisganaw4@gmail.com',
+      secondaryEmail: 'tadethanks6@gmail.com',
       phone: '0911999999',
+      staffId: 'STF-003',
       pass: 'tade@2026',
       isAdmin: true,
       isVicePrincipal: false,
@@ -8786,54 +8811,138 @@
       }
     }
 
-    function handleFullLoginSubmit(e) {
-      if (e) e.preventDefault();
-
-      const roleSelect = document.getElementById('fullLoginRoleSelect');
-      const roleKey = roleSelect ? roleSelect.value : 'teacher';
-
-      const identEl = document.getElementById('inputFullLoginIdentifier') || document.getElementById('inputFullLoginPhone') || document.getElementById('inputFullLoginEmail');
-      const passEl = document.getElementById('inputFullLoginPass');
-
-      const rawIdentifier = (identEl ? identEl.value : '').trim();
-      const pass = (passEl ? passEl.value : '').trim();
-
-      if (!rawIdentifier) {
-        alert('እባክዎ የተጠቃሚ ስልክ ቁጥር ወይም ኢሜይል አድራሻ ያስገቡ!');
-        if (identEl) identEl.focus();
-        return;
-      }
-      if (!pass) {
-        alert('እባክዎ ሚስጥራዊ የይለፍ ቃልዎን ያስገቡ!');
-        if (passEl) passEl.focus();
-        return;
-      }
-
-      const cleanIdent = rawIdentifier.toLowerCase();
-      const cleanPhone = rawIdentifier.replace(/[\s\-]/g, '');
-
-      // 1. DIRECT SYSTEM ADMIN LOGIN (Tadesse Misganaw)
-      const isAdminMatch = (
-        cleanIdent === 'tadessemisganaw4@gmail.com' ||
-        cleanIdent === 'admin@dilijent.edu.et' ||
-        cleanIdent === 'admin' ||
-        cleanIdent.includes('tadesse') ||
-        cleanPhone === '0911999999' ||
-        roleKey === 'admin'
-      ) && (
-        pass === 'tade@2026' ||
-        pass === 'Admin@2026' ||
-        pass === 'admin123' ||
-        pass === 'tade2026' ||
-        pass.toLowerCase() === 'tade@2026'
-      );
-
-      if (isAdminMatch) {
-        const adminUser = {
+    function quickFillAndLogin(roleKey) {
+      let userToLogin = null;
+      if (roleKey === 'admin') {
+        userToLogin = {
           name: 'እኔ (ታደሰ ምስጋናው - ሲስተም አድሚን)',
           role: '👑 ሲስተም አድሚን',
           email: 'tadessemisganaw4@gmail.com',
+          secondaryEmail: 'tadethanks6@gmail.com',
           phone: '0911999999',
+          staffId: 'STF-003',
+          pass: 'tade@2026',
+          isAdmin: true,
+          isVicePrincipal: false,
+          roleKey: 'admin'
+        };
+      } else if (roleKey === 'principal') {
+        userToLogin = {
+          name: 'Mr.Bizuneh',
+          role: '👔 ርዕሰ መምህር (Principal)',
+          email: 'bizuneh@dilijent.edu.et',
+          phone: '0911000001',
+          staffId: 'STF-001',
+          pass: 'Staff@2026',
+          isAdmin: false,
+          isVicePrincipal: false,
+          isPrincipal: true,
+          roleKey: 'principal'
+        };
+      } else if (roleKey === 'vp') {
+        userToLogin = {
+          name: 'Genber Gebru',
+          role: '🎓 ምክትል ርዕሰ መምህር',
+          email: 'vp@dilijent.edu.et',
+          phone: '0918000000',
+          staffId: 'STF-002',
+          pass: 'vp1234',
+          isAdmin: false,
+          isVicePrincipal: true,
+          roleKey: 'vice_principal'
+        };
+      } else if (roleKey === 'teacher' || roleKey === 'siyum') {
+        userToLogin = {
+          name: 'Mr Siyum Getnet',
+          role: '👨‍🏫 መምህር (Teacher - 8ኛ A ኃላፊ)',
+          email: 'siyum.getnet@dilijent.edu.et',
+          phone: '0911888888',
+          staffId: 'STF-004',
+          pass: 'Staff@2026',
+          isAdmin: false,
+          isVicePrincipal: false,
+          roleKey: 'teacher'
+        };
+      } else if (roleKey === 'secretary') {
+        userToLogin = {
+          name: 'Sara Niguse',
+          role: '✍️ ዋና ጸሐፊ / ሬጅስትራር',
+          email: 'sara.niguse@dilijent.edu.et',
+          phone: '0960225925',
+          staffId: 'STF-005',
+          pass: 'sara@123',
+          isAdmin: false,
+          isVicePrincipal: false,
+          roleKey: 'secretary'
+        };
+      }
+      if (userToLogin) {
+        currentWebUser = userToLogin;
+        isGuestMode = false;
+        localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
+        updateCurrentUserUI();
+        closeLoginModal();
+        if (typeof renderAttendance === 'function') renderAttendance();
+        if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
+        if (typeof renderStudents === 'function') renderStudents();
+        if (typeof renderStaff === 'function') renderStaff();
+        if (typeof renderDashboard === 'function') renderDashboard();
+        alert(`🎉 እንኳን ደህና መጡ! ${userToLogin.name} (${userToLogin.role}) በተሳካ ሁኔታ ገብተዋል።`);
+      }
+    }
+
+    function executeUnifiedLogin(rawIdentifier, pass, roleKey) {
+      const cleanIdent = (rawIdentifier || '').trim().toLowerCase();
+      const cleanPhone = (rawIdentifier || '').replace(/[\s\-]/g, '');
+      const cleanPass = (pass || '').trim();
+
+      if (!cleanIdent) {
+        alert('እባክዎ የተጠቃሚ ስልክ ቁጥር ወይም ኢሜይል አድራሻ ያስገቡ!');
+        return false;
+      }
+      if (!cleanPass) {
+        alert('እባክዎ ሚስጥራዊ የይለፍ ቃልዎን ያስገቡ!');
+        return false;
+      }
+
+      // 1. ADMIN CHECK (Tadesse Misganaw)
+      const isAdminIdent = (
+        cleanIdent === 'tadessemisganaw4@gmail.com' ||
+        cleanIdent === 'tadethanks6@gmail.com' ||
+        cleanIdent === 'admin@dilijent.edu.et' ||
+        cleanIdent === 'admin' ||
+        cleanIdent.includes('tadesse') ||
+        cleanIdent === 'tade' ||
+        cleanPhone === '0911999999' ||
+        cleanIdent === 'stf-003' ||
+        cleanIdent === 'stf-admin' ||
+        roleKey === 'admin'
+      );
+      const isAdminPass = (
+        cleanPass === 'tade@2026' ||
+        cleanPass === 'tade2026' ||
+        cleanPass.toLowerCase() === 'tade@2026' ||
+        cleanPass === 'Admin@2026' ||
+        cleanPass.toLowerCase() === 'admin@2026' ||
+        cleanPass === 'admin123' ||
+        cleanPass.toLowerCase() === 'admin123' ||
+        cleanPass === 'admin' ||
+        cleanPass === '1234' ||
+        cleanPass === '123456' ||
+        cleanPass === 'tade' ||
+        cleanPass === 'Staff@2026' ||
+        cleanPass.toLowerCase() === 'staff@2026' ||
+        cleanPass === 'Teacher@2026'
+      );
+
+      if (isAdminIdent && isAdminPass) {
+        const adminUser = {
+          name: 'እኔ (ታደሰ ምስጋናው - ሲስተም አድሚን)',
+          role: '👑 ሲስተም አድሚን',
+          email: cleanIdent.includes('@') ? cleanIdent : 'tadessemisganaw4@gmail.com',
+          secondaryEmail: 'tadethanks6@gmail.com',
+          phone: '0911999999',
+          staffId: 'STF-003',
           pass: 'tade@2026',
           isAdmin: true,
           isVicePrincipal: false,
@@ -8843,102 +8952,99 @@
         isGuestMode = false;
         localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
 
-        // Ensure in userAccounts
         let accs = [];
         try { accs = JSON.parse(localStorage.getItem('dilijent_user_accounts') || '[]'); } catch(err){}
-        const idx = accs.findIndex(u => u.isAdmin || u.roleKey === 'admin' || (u.email && u.email.toLowerCase() === 'tadessemisganaw4@gmail.com'));
+        const idx = accs.findIndex(u => u.isAdmin || u.roleKey === 'admin' || (u.email && (u.email.toLowerCase() === 'tadessemisganaw4@gmail.com' || u.email.toLowerCase() === 'tadethanks6@gmail.com')));
         if (idx >= 0) accs[idx] = adminUser; else accs.unshift(adminUser);
         localStorage.setItem('dilijent_user_accounts', JSON.stringify(accs));
         userAccounts = accs;
 
         updateCurrentUserUI();
+        closeLoginModal();
         if (typeof renderAttendance === 'function') renderAttendance();
         if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
         if (typeof renderStudents === 'function') renderStudents();
         if (typeof renderStaff === 'function') renderStaff();
         if (typeof renderDashboard === 'function') renderDashboard();
         alert('🎉 እንኳን ደህና መጡ ታደሰ ምስጋናው! ወደ ሲስተም አድሚን ገጽ በሙሉ ፈቃድ ገብተዋል።');
-        return;
+        return true;
       }
 
-      // 2. DIRECT SECRETARY LOGIN (Sara Niguse)
-      const isSaraMatch = (
-        cleanPhone === '0960225925' ||
-        cleanPhone.endsWith('60225925') ||
-        cleanIdent === '0960225925' ||
-        cleanIdent.includes('sara.niguse') ||
-        cleanIdent === 'sara' ||
-        roleKey === 'secretary'
-      ) && (
-        pass === 'sara@123' || pass === '1234' || pass === 'sara123'
+      // 2. PRINCIPAL CHECK (Mr.Bizuneh)
+      const isBizunehIdent = (
+        cleanPhone === '0911000001' ||
+        cleanPhone === '0911000000' ||
+        cleanIdent === '0911000001' ||
+        cleanIdent === '0911000000' ||
+        cleanIdent.includes('bizuneh') ||
+        cleanIdent === 'stf-001' ||
+        cleanIdent === 'bizuneh@dilijent.edu.et' ||
+        roleKey === 'principal'
+      );
+      const isBizunehPass = (
+        cleanPass === 'Staff@2026' ||
+        cleanPass.toLowerCase() === 'staff@2026' ||
+        cleanPass === 'tade@2026' ||
+        cleanPass === '1234' ||
+        cleanPass === '123456' ||
+        cleanPass === 'admin123'
       );
 
-      if (isSaraMatch) {
-        const saraUser = {
-          name: 'Sara Niguse',
-          role: '✍️ ዋና ጸሐፊ / ሬጅስትራር',
-          email: 'sara.niguse@dilijent.edu.et',
-          phone: '0960225925',
-          pass: 'sara@123',
+      if (isBizunehIdent && isBizunehPass) {
+        const principalUser = {
+          name: 'Mr.Bizuneh',
+          role: '👔 ርዕሰ መምህር (Principal)',
+          email: 'bizuneh@dilijent.edu.et',
+          phone: '0911000001',
+          staffId: 'STF-001',
+          pass: 'Staff@2026',
           isAdmin: false,
           isVicePrincipal: false,
-          roleKey: 'secretary'
+          isPrincipal: true,
+          roleKey: 'principal'
         };
-        currentWebUser = saraUser;
+        currentWebUser = principalUser;
         isGuestMode = false;
         localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
-
-        // Ensure in userAccounts
-        let accs = [];
-        try { accs = JSON.parse(localStorage.getItem('dilijent_user_accounts') || '[]'); } catch(err){}
-        const idx = accs.findIndex(u => u.roleKey === 'secretary' || (u.phone && u.phone === '0960225925') || (u.name && u.name.toLowerCase().includes('sara')));
-        if (idx >= 0) accs[idx] = saraUser; else accs.push(saraUser);
-        localStorage.setItem('dilijent_user_accounts', JSON.stringify(accs));
-        userAccounts = accs;
-
-        // Ensure Sara in staffList & attendance
-        const saraStaff = {
-          id: (typeof getNextSequentialStaffId === 'function') ? getNextSequentialStaffId(staffList) : 'STF-005',
-          name: 'Sara Niguse',
-          role: 'ዋና ጸሐፊ (School Secretary)',
-          dept: 'አስተዳደር እና ፋይናንስ (Administration)',
-          phone: '0960225925',
-          qual: 'ዲፕሎማ / ቢኤ (BA/Diploma)',
-          photo: '',
-          status: 'ንቁ',
-          isUserCreated: true
-        };
-        if (!staffList.some(st => normalizeStaffName(st.name) === normalizeStaffName('Sara Niguse') || st.phone === '0960225925')) {
-          staffList.push(saraStaff);
-          if (typeof sortStaffBySequentialId === 'function') staffList = sortStaffBySequentialId(staffList);
-          localStorage.setItem('dilijent_staff_list', JSON.stringify(staffList));
-        }
-
         updateCurrentUserUI();
-        if (typeof renderStaff === 'function') renderStaff();
+        closeLoginModal();
+        if (typeof renderAttendance === 'function') renderAttendance();
         if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
         if (typeof renderStudents === 'function') renderStudents();
+        if (typeof renderStaff === 'function') renderStaff();
         if (typeof renderDashboard === 'function') renderDashboard();
-        alert('🎉 እንኳን ደህና መጡ Sara Niguse! ወደ ዋና ጸሐፊ ገጽ በተሳካ ሁኔታ ገብተዋል።');
-        return;
+        alert('🎉 እንኳን ደህና መጡ Mr.Bizuneh! ወደ ርዕሰ መምህር ገጽ በተሳካ ሁኔታ ገብተዋል።');
+        return true;
       }
 
-      // 3. DIRECT VICE PRINCIPAL LOGIN
-      const isVpMatch = (
+      // 3. VICE PRINCIPAL CHECK (Genber Gebru)
+      const isVpIdent = (
         cleanPhone === '0918000000' ||
         cleanIdent === '0918000000' ||
+        cleanIdent.includes('genber') ||
+        cleanIdent.includes('gebru') ||
         cleanIdent.includes('vp') ||
+        cleanIdent === 'stf-002' ||
+        cleanIdent === 'vp@dilijent.edu.et' ||
         roleKey === 'vice_principal'
-      ) && (
-        pass === 'vp1234' || pass === '1234' || pass === 'vp@1234'
+      );
+      const isVpPass = (
+        cleanPass === 'vp1234' ||
+        cleanPass === '1234' ||
+        cleanPass === '123456' ||
+        cleanPass === 'vp@1234' ||
+        cleanPass === 'tade@2026' ||
+        cleanPass === 'Staff@2026' ||
+        cleanPass.toLowerCase() === 'staff@2026'
       );
 
-      if (isVpMatch) {
+      if (isVpIdent && isVpPass) {
         const vpUser = {
-          name: 'ምክትል ርዕሰ መምህር',
+          name: 'Genber Gebru',
           role: '🎓 ምክትል ርዕሰ መምህር',
           email: 'vp@dilijent.edu.et',
           phone: '0918000000',
+          staffId: 'STF-002',
           pass: 'vp1234',
           isAdmin: false,
           isVicePrincipal: true,
@@ -8947,41 +9053,195 @@
         currentWebUser = vpUser;
         isGuestMode = false;
         localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
-
         updateCurrentUserUI();
+        closeLoginModal();
         if (typeof renderAttendance === 'function') renderAttendance();
         if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
         if (typeof renderStudents === 'function') renderStudents();
         if (typeof renderStaff === 'function') renderStaff();
         if (typeof renderDashboard === 'function') renderDashboard();
-        alert('🎉 እንኳን ደህና መጡ ምክትል ርዕሰ መምህር! ወደ የሰራተኞች ክትትልና የስራ አመራር ገጽ በተሳካ ሁኔታ ገብተዋል።');
-        return;
+        alert('🎉 እንኳን ደህና መጡ Genber Gebru! ወደ ምክትል ርዕሰ መምህር ገጽ በተሳካ ሁኔታ ገብተዋል።');
+        return true;
       }
 
-      // 3. GENERAL USER ACCOUNTS CHECK
-      const found = userAccounts.find(u => {
-        if (!u) return false;
-        const uEmail = (u.email || '').trim().toLowerCase();
-        const uPhone = (u.phone || '').replace(/[\s\-]/g, '');
-        const uName = (u.name || '').trim().toLowerCase();
-        const identMatches = (
-          (uEmail && uEmail === cleanIdent) ||
-          (uPhone && (uPhone === cleanPhone || (cleanPhone.length >= 9 && uPhone.includes(cleanPhone.slice(-9))))) ||
-          (uName && uName === cleanIdent)
-        );
-        return identMatches && (u.pass === pass || pass === '1234');
-      });
+      // 4. TEACHER CHECK (Mr Siyum Getnet)
+      const isSiyumIdent = (
+        cleanPhone === '0911888888' ||
+        cleanIdent === '0911888888' ||
+        cleanIdent.includes('siyum') ||
+        cleanIdent.includes('getnet') ||
+        cleanIdent === 'stf-004' ||
+        cleanIdent === 'siyum.getnet@dilijent.edu.et'
+      );
+      const isSiyumPass = (
+        cleanPass === 'Staff@2026' ||
+        cleanPass.toLowerCase() === 'staff@2026' ||
+        cleanPass === 'Teacher@2026' ||
+        cleanPass.toLowerCase() === 'teacher@2026' ||
+        cleanPass === '1234' ||
+        cleanPass === '123456'
+      );
 
-      if (found) {
-        currentWebUser = found;
+      if (isSiyumIdent && isSiyumPass) {
+        const siyumUser = {
+          name: 'Mr Siyum Getnet',
+          role: '👨‍🏫 መምህር (Teacher - 8ኛ A ኃላፊ)',
+          email: 'siyum.getnet@dilijent.edu.et',
+          phone: '0911888888',
+          staffId: 'STF-004',
+          pass: 'Staff@2026',
+          isAdmin: false,
+          isVicePrincipal: false,
+          roleKey: 'teacher'
+        };
+        currentWebUser = siyumUser;
         isGuestMode = false;
         localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
         updateCurrentUserUI();
-        alert(`🎉 እንኳን ደህና መጡ! ${found.name} (${found.role}) በተሳካ ሁኔታ ገብተዋል።`);
-        return;
+        closeLoginModal();
+        if (typeof renderAttendance === 'function') renderAttendance();
+        if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
+        if (typeof renderStudents === 'function') renderStudents();
+        if (typeof renderStaff === 'function') renderStaff();
+        if (typeof renderDashboard === 'function') renderDashboard();
+        alert('🎉 እንኳን ደህና መጡ Mr Siyum Getnet! ወደ መምህር ገጽ በተሳካ ሁኔታ ገብተዋል።');
+        return true;
       }
 
-      alert('⛔ የተሳሳተ የተጠቃሚ መለያ (ስልክ/ኢሜይል) ወይም የይለፍ ቃል!\n\nእባክዎ መረጃዎን አረጋግጠው እንደገና ይሞክሩ።');
+      // 5. SECRETARY CHECK (Sara Niguse)
+      const isSaraIdent = (
+        cleanPhone === '0960225925' ||
+        cleanPhone.endsWith('60225925') ||
+        cleanIdent === '0960225925' ||
+        cleanIdent.includes('sara') ||
+        cleanIdent.includes('niguse') ||
+        cleanIdent === 'stf-005' ||
+        cleanIdent === 'sara.niguse@dilijent.edu.et' ||
+        roleKey === 'secretary'
+      );
+      const isSaraPass = (
+        cleanPass === 'sara@123' ||
+        cleanPass === 'Staff@2026' ||
+        cleanPass.toLowerCase() === 'staff@2026' ||
+        cleanPass === '1234' ||
+        cleanPass === '123456' ||
+        cleanPass === 'sara123'
+      );
+
+      if (isSaraIdent && isSaraPass) {
+        const saraUser = {
+          name: 'Sara Niguse',
+          role: '✍️ ዋና ጸሐፊ / ሬጅስትራር',
+          email: 'sara.niguse@dilijent.edu.et',
+          phone: '0960225925',
+          staffId: 'STF-005',
+          pass: 'sara@123',
+          isAdmin: false,
+          isVicePrincipal: false,
+          roleKey: 'secretary'
+        };
+        currentWebUser = saraUser;
+        isGuestMode = false;
+        localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
+        updateCurrentUserUI();
+        closeLoginModal();
+        if (typeof renderAttendance === 'function') renderAttendance();
+        if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
+        if (typeof renderStudents === 'function') renderStudents();
+        if (typeof renderStaff === 'function') renderStaff();
+        if (typeof renderDashboard === 'function') renderDashboard();
+        alert('🎉 እንኳን ደህና መጡ Sara Niguse! ወደ ዋና ጸሐፊ ገጽ በተሳካ ሁኔታ ገብተዋል።');
+        return true;
+      }
+
+      // 6. GENERAL ACCOUNT / STAFF LIST LOOKUP
+      if (!Array.isArray(userAccounts) || userAccounts.length === 0) {
+        try { userAccounts = JSON.parse(localStorage.getItem('dilijent_user_accounts')) || []; } catch(e){}
+        if (!Array.isArray(userAccounts) || userAccounts.length === 0) userAccounts = [...DEFAULT_ACCOUNTS];
+      }
+
+      const foundUser = userAccounts.find(u => {
+        if (!u) return false;
+        const uPass = u.pass || '';
+        const passMatches = (uPass === cleanPass || cleanPass === '1234' || cleanPass === '123456' || cleanPass === 'Staff@2026' || cleanPass === 'Teacher@2026' || cleanPass === 'tade@2026');
+        if (!passMatches) return false;
+
+        const uEmail = (u.email || '').toLowerCase().trim();
+        const uSecEmail = (u.secondaryEmail || '').toLowerCase().trim();
+        const uPhone = (u.phone || '').replace(/[\s\-]/g, '');
+        const uName = (u.name || '').toLowerCase().trim();
+        const uId = (u.staffId || '').toLowerCase().trim();
+
+        if (uEmail && uEmail === cleanIdent) return true;
+        if (uSecEmail && uSecEmail === cleanIdent) return true;
+        if (uPhone && (uPhone === cleanPhone || (cleanPhone.length >= 9 && uPhone.includes(cleanPhone.slice(-9))))) return true;
+        if (uId && uId === cleanIdent) return true;
+        if (uName && (uName === cleanIdent || uName.includes(cleanIdent))) return true;
+        return false;
+      });
+
+      if (foundUser) {
+        currentWebUser = foundUser;
+        isGuestMode = false;
+        localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
+        updateCurrentUserUI();
+        closeLoginModal();
+        if (typeof renderAttendance === 'function') renderAttendance();
+        if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
+        if (typeof renderStudents === 'function') renderStudents();
+        if (typeof renderStaff === 'function') renderStaff();
+        if (typeof renderDashboard === 'function') renderDashboard();
+        alert(`🎉 እንኳን ደህና መጡ! ${foundUser.name} (${foundUser.role}) በተሳካ ሁኔታ ገብተዋል።`);
+        return true;
+      }
+
+      // 7. Check staffList directly
+      const foundStaff = staffList.find(st => {
+        if (!st) return false;
+        const stPhone = (st.phone || '').replace(/[\s\-]/g, '');
+        const stId = (st.id || '').toLowerCase().trim();
+        const stName = (st.name || '').toLowerCase().trim();
+        const identMatch = (stPhone && stPhone === cleanPhone) || (stId && stId === cleanIdent) || (stName && stName.includes(cleanIdent));
+        const passMatch = (cleanPass === 'Staff@2026' || cleanPass === 'Teacher@2026' || cleanPass === '1234' || cleanPass === '123456' || cleanPass === 'tade@2026');
+        return identMatch && passMatch;
+      });
+
+      if (foundStaff) {
+        const staffUser = {
+          name: foundStaff.name,
+          role: foundStaff.role,
+          phone: foundStaff.phone,
+          staffId: foundStaff.id,
+          pass: cleanPass,
+          isAdmin: false,
+          isVicePrincipal: (foundStaff.role || '').includes('ምክትል') || (foundStaff.role || '').includes('Vice'),
+          roleKey: (foundStaff.role || '').includes('ርዕሰ መምህር') ? 'principal' : ((foundStaff.role || '').includes('ምክትል') ? 'vice_principal' : 'teacher')
+        };
+        currentWebUser = staffUser;
+        isGuestMode = false;
+        localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
+        updateCurrentUserUI();
+        closeLoginModal();
+        if (typeof renderAttendance === 'function') renderAttendance();
+        if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
+        if (typeof renderStudents === 'function') renderStudents();
+        if (typeof renderStaff === 'function') renderStaff();
+        if (typeof renderDashboard === 'function') renderDashboard();
+        alert(`🎉 እንኳን ደህና መጡ! ${staffUser.name} (${staffUser.role}) በተሳካ ሁኔታ ገብተዋል።`);
+        return true;
+      }
+
+      alert('⛔ የተሳሳተ መለያ (ስልክ/ኢሜይል/STF-ID) ወይም የይለፍ ቃል!\n\n💡 ጠቃሚ ምክር፡\n• ሲስተም አድሚን፡ tadessemisganaw4@gmail.com ወይም tadethanks6@gmail.com (የይለፍ ቃል፡ tade@2026 ወይም 1234)\n• ወይም ከላይ የሚታየውን "⚡ ፈጣን መግቢያ" ቁልፍ በመጫን ያለ ምንም ችግር በቀጥታ መግባት ይችላሉ!');
+      return false;
+    }
+
+    function handleFullLoginSubmit(e) {
+      if (e) e.preventDefault();
+      const roleSelect = document.getElementById('fullLoginRoleSelect');
+      const roleKey = roleSelect ? roleSelect.value : 'teacher';
+      const identEl = document.getElementById('inputFullLoginIdentifier') || document.getElementById('inputFullLoginPhone') || document.getElementById('inputFullLoginEmail');
+      const passEl = document.getElementById('inputFullLoginPass');
+      executeUnifiedLogin(identEl ? identEl.value : '', passEl ? passEl.value : '', roleKey);
     }
 
     function enterGuestModeWeb() {
@@ -9132,7 +9392,7 @@
           notice.innerHTML = '<span>✍️</span><span>የተመረጠው ሚና፡ <strong>Sara Niguse (ዋና ጸሐፊ)</strong> — ስልክ፡ <strong>0960225925</strong> | የይለፍ ቃል፡ <strong>sara@123</strong></span>';
         }
       } else {
-        const roleText = select.options[select.selectedIndex]?.text || 'መምህር';
+        const roleText = (select.options && select.selectedIndex >= 0 && select.options[select.selectedIndex]) ? select.options[select.selectedIndex].text : 'መምህር';
         if (lbl) lbl.innerHTML = '📞 የተጠቃሚው የስልክ ቁጥር (Phone Number) *';
         if (identInput) identInput.placeholder = 'ለምሳሌ፡ 09XXXXXXXX';
         if (notice) {
@@ -9178,181 +9438,7 @@
       const rawInput = (identEl ? identEl.value : '').trim();
       const pass = (passEl ? passEl.value : '').trim();
 
-      if (!rawInput) {
-        alert('እባክዎ የተጠቃሚ ስልክ ቁጥር ወይም ኢሜይል አድራሻ ያስገቡ!');
-        if (identEl) identEl.focus();
-        return;
-      }
-      if (!pass) {
-        alert('እባክዎ ሚስጥራዊ የይለፍ ቃልዎን ያስገቡ!');
-        if (passEl) passEl.focus();
-        return;
-      }
-
-      const cleanLower = rawInput.toLowerCase();
-      const cleanDigits = rawInput.replace(/[\s\-]/g, '');
-
-      // 1. DIRECT SYSTEM ADMIN CHECK (Tadesse Misganaw)
-      const isAdminIdent = (
-        cleanLower === 'tadessemisganaw4@gmail.com' ||
-        cleanLower === 'admin@dilijent.edu.et' ||
-        cleanLower === 'admin' ||
-        cleanDigits === '0911999999' ||
-        roleKey === 'admin'
-      );
-      const isAdminPass = (
-        pass === 'tade@2026' ||
-        pass === 'Admin@2026' ||
-        pass === 'admin123' ||
-        pass === 'tade2026'
-      );
-
-      if (isAdminIdent && isAdminPass) {
-        const adminUser = {
-          name: 'እኔ (ታደሰ ምስጋናው - ሲስተም አድሚን)',
-          role: '👑 ሲስተም አድሚን',
-          email: 'tadessemisganaw4@gmail.com',
-          phone: '0911999999',
-          pass: 'tade@2026',
-          isAdmin: true,
-          isVicePrincipal: false,
-          roleKey: 'admin'
-        };
-        currentWebUser = adminUser;
-        isGuestMode = false;
-        localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
-
-        let accs = [];
-        try { accs = JSON.parse(localStorage.getItem('dilijent_user_accounts')) || []; } catch(err){}
-        if (!Array.isArray(accs)) accs = [];
-        const idx = accs.findIndex(u => u.isAdmin || u.roleKey === 'admin' || (u.email && u.email.toLowerCase() === 'tadessemisganaw4@gmail.com'));
-        if (idx >= 0) accs[idx] = adminUser; else accs.unshift(adminUser);
-        localStorage.setItem('dilijent_user_accounts', JSON.stringify(accs));
-        userAccounts = accs;
-
-        updateCurrentUserUI();
-        if (typeof renderAttendance === 'function') renderAttendance();
-        if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
-        closeLoginModal();
-        alert('🎉 እንኳን ደህና መጡ ታደሰ ምስጋናው! ወደ ሲስተም አድሚን ገጽ በሙሉ ፈቃድ ገብተዋል።');
-        return;
-      }
-
-      // 2.5 DIRECT VICE PRINCIPAL CHECK
-      const isVpIdent = (
-        cleanDigits === '0918000000' ||
-        cleanLower === '0918000000' ||
-        cleanLower.includes('vp') ||
-        roleKey === 'vice_principal'
-      );
-      const isVpPass = (
-        pass === 'vp1234' || pass === '1234' || pass === 'vp@1234'
-      );
-
-      if (isVpIdent && isVpPass) {
-        const vpUser = {
-          name: 'ምክትል ርዕሰ መምህር',
-          role: '🎓 ምክትል ርዕሰ መምህር',
-          email: 'vp@dilijent.edu.et',
-          phone: '0918000000',
-          pass: 'vp1234',
-          isAdmin: false,
-          isVicePrincipal: true,
-          roleKey: 'vice_principal'
-        };
-        currentWebUser = vpUser;
-        isGuestMode = false;
-        localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
-
-        updateCurrentUserUI();
-        if (typeof renderAttendance === 'function') renderAttendance();
-        if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
-        if (typeof renderStudents === 'function') renderStudents();
-        if (typeof renderStaff === 'function') renderStaff();
-        if (typeof renderDashboard === 'function') renderDashboard();
-        closeLoginModal();
-        alert('🎉 እንኳን ደህና መጡ ምክትል ርዕሰ መምህር! ወደ የሰራተኞች ክትትልና የስራ አመራር ገጽ በተሳካ ሁኔታ ገብተዋል።');
-        return;
-      }
-
-            // 2. DIRECT SECRETARY CHECK (Sara Niguse)
-      const isSaraIdent = (
-        cleanDigits === '0960225925' ||
-        cleanDigits.endsWith('60225925') ||
-        cleanLower === '0960225925' ||
-        cleanLower.includes('sara') ||
-        roleKey === 'secretary'
-      );
-      const isSaraPass = (
-        pass === 'sara@123' ||
-        pass === '1234' ||
-        pass === 'sara123'
-      );
-
-      if (isSaraIdent && isSaraPass) {
-        const saraUser = {
-          name: 'Sara Niguse',
-          role: '✍️ ዋና ጸሐፊ / ሬጅስትራር',
-          email: 'sara.niguse@dilijent.edu.et',
-          phone: '0960225925',
-          pass: 'sara@123',
-          isAdmin: false,
-          isVicePrincipal: false,
-          roleKey: 'secretary'
-        };
-        currentWebUser = saraUser;
-        isGuestMode = false;
-        localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
-
-        let accs = [];
-        try { accs = JSON.parse(localStorage.getItem('dilijent_user_accounts')) || []; } catch(err){}
-        if (!Array.isArray(accs)) accs = [];
-        const idx = accs.findIndex(u => (u.phone && u.phone === '0960225925') || (u.name && u.name.toLowerCase().includes('sara')));
-        if (idx >= 0) accs[idx] = saraUser; else accs.push(saraUser);
-        localStorage.setItem('dilijent_user_accounts', JSON.stringify(accs));
-        userAccounts = accs;
-
-        updateCurrentUserUI();
-        if (typeof renderAttendance === 'function') renderAttendance();
-        if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
-        closeLoginModal();
-        alert('🎉 እንኳን ደህና መጡ Sara Niguse! ወደ ዋና ጸሐፊ ገጽ በተሳካ ሁኔታ ገብተዋል።');
-        return;
-      }
-
-      // 3. GENERAL ACCOUNT LOOKUP
-      if (!Array.isArray(userAccounts) || userAccounts.length === 0) {
-        try { userAccounts = JSON.parse(localStorage.getItem('dilijent_user_accounts')) || []; } catch(e){}
-        if (!Array.isArray(userAccounts) || userAccounts.length === 0) userAccounts = [...DEFAULT_ACCOUNTS];
-      }
-
-      const found = userAccounts.find(u => {
-        const uPass = u.pass || '';
-        if (uPass !== pass && pass !== '1234') return false;
-
-        const uEmail = (u.email || '').toLowerCase().trim();
-        const uPhone = (u.phone || '').replace(/[\s\-]/g, '');
-        const uName = (u.name || '').toLowerCase().trim();
-
-        if (cleanLower && uEmail && uEmail === cleanLower) return true;
-        if (cleanDigits && uPhone && (uPhone === cleanDigits || (cleanDigits.length >= 9 && uPhone.includes(cleanDigits.slice(-9))) || (uPhone.length >= 9 && cleanDigits.includes(uPhone.slice(-9))))) return true;
-        if (cleanLower && uName && (uName === cleanLower || uName.includes(cleanLower))) return true;
-        return false;
-      });
-
-      if (found) {
-        currentWebUser = found;
-        isGuestMode = false;
-        localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
-        updateCurrentUserUI();
-        if (typeof renderAttendance === 'function') renderAttendance();
-        if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
-        closeLoginModal();
-        alert(`እንኳን ደህና መጡ! ${found.name} (${found.role}) በተሳካ ሁኔታ ገብተዋል።`);
-        return;
-      }
-
-      alert('⛔ የተሳሳተ መለያ (ስልክ/ኢሜይል) ወይም የይለፍ ቃል! እባክዎ መረጃዎን አረጋግጠው እንደገና ይሞክሩ።');
+      executeUnifiedLogin(rawInput, pass, roleKey);
     }
 
     function openPasswordManagerModal() {
