@@ -221,3 +221,82 @@ data class StaffAttendanceItem(
     val remarks: String = entryRemarks
 )
 
+data class StaffAttendanceDay(
+    val dayNum: Int,
+    val dateKey: String,
+    val ethDate: String,
+    val ethShort: String,
+    val ethDayOfWeek: String,
+    val gregDate: String,
+    val gregShort: String,
+    val isToday: Boolean
+)
+
+object EthiopianCalendarUtils {
+    val ethMonthsAm = listOf(
+        "መስከረም", "ጥቅምት", "ህዳር", "ታህሳስ", "ጥር", "የካቲት",
+        "መጋቢት", "ሚያዝያ", "ግንቦት", "ሰኔ", "ሐምሌ", "ነሐሴ", "ጳጉሜ"
+    )
+    val ethDaysOfWeekAm = listOf("እሑድ", "ሰኞ", "ማክሰኞ", "ረቡዕ", "ሐሙስ", "ዓርብ", "ቅዳሜ")
+
+    fun gregorianToEthiopian(calendar: java.util.Calendar): Pair<String, String> {
+        val gYear = calendar.get(java.util.Calendar.YEAR)
+        val gMonth = calendar.get(java.util.Calendar.MONTH) + 1
+        val gDay = calendar.get(java.util.Calendar.DAY_OF_MONTH)
+
+        val a = (14 - gMonth) / 12
+        val y = gYear + 4800 - a
+        val m = gMonth + 12 * a - 3
+        val jdn = gDay + (153 * m + 2) / 5 + 365 * y + y / 4 - y / 100 + y / 400 - 32045
+
+        val r = (jdn - 1723856) % 1461
+        val n = (r % 365) + 365 * (r / 1460)
+        val ethYear = 4 * ((jdn - 1723856) / 1461) + r / 365 - r / 1460
+        val ethMonth = n / 30 + 1
+        val ethDay = (n % 30) + 1
+
+        val monthName = ethMonthsAm.getOrElse(ethMonth - 1) { "ህዳር" }
+        val dayOfWeekIndex = calendar.get(java.util.Calendar.DAY_OF_WEEK) - 1
+        val dayOfWeek = ethDaysOfWeekAm.getOrElse(dayOfWeekIndex) { "ሰኞ" }
+
+        val formattedAm = "$monthName $ethDay፣ $ethYear ዓ.ም ($dayOfWeek)"
+        val shortAm = "$monthName $ethDay"
+        return Pair(formattedAm, shortAm)
+    }
+
+    fun getStaff30DaysRoster(): List<StaffAttendanceDay> {
+        val days = mutableListOf<StaffAttendanceDay>()
+        val cal = java.util.Calendar.getInstance()
+        val sdfGreg = java.text.SimpleDateFormat("EEE, MMM d, yyyy", java.util.Locale.US)
+        val sdfShortGreg = java.text.SimpleDateFormat("MMM d", java.util.Locale.US)
+        val sdfKey = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+
+        for (i in 29 downTo 0) {
+            val dCal = java.util.Calendar.getInstance().apply {
+                timeInMillis = cal.timeInMillis - (i.toLong() * 86400000L)
+            }
+            val (formattedAm, shortAm) = gregorianToEthiopian(dCal)
+            val dayOfWeekIndex = dCal.get(java.util.Calendar.DAY_OF_WEEK) - 1
+            val dayOfWeek = ethDaysOfWeekAm.getOrElse(dayOfWeekIndex) { "ሰኞ" }
+            val gregDate = sdfGreg.format(dCal.time)
+            val gregShort = sdfShortGreg.format(dCal.time)
+            val dateKey = sdfKey.format(dCal.time)
+            val dayNum = 30 - i
+
+            days.add(
+                StaffAttendanceDay(
+                    dayNum = dayNum,
+                    dateKey = dateKey,
+                    ethDate = formattedAm,
+                    ethShort = shortAm,
+                    ethDayOfWeek = dayOfWeek,
+                    gregDate = gregDate,
+                    gregShort = gregShort,
+                    isToday = (i == 0)
+                )
+            )
+        }
+        return days
+    }
+}
+

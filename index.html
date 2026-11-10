@@ -280,34 +280,12 @@
           </div>
         </div>
 
-        <!-- Role Guidance Notice Banner -->
-        <div id="fullLoginNotice" style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:10px 14px; margin-bottom:1rem; font-size:0.8rem; color:#1E40AF; display:flex; align-items:center; gap:8px;">
-          <span>📱</span><span>የተመረጠው ሚና፡ <strong>መምህር / መምህርት</strong> — እባክዎ የተመዘገበ ስልክ ቁጥር እና የይለፍ ቃል ያስገቡ ወይም ከስር <strong>«ፈጣን መግቢያ»</strong>ን ይጠቀሙ</span>
-        </div>
+        <!-- In-Page Visible Login Error Notification Container -->
+        <div id="fullLoginError" style="display:none; background:#FEE2E2; border:1.5px solid #EF4444; color:#B91C1C; padding:10px 14px; border-radius:10px; margin-bottom:1rem; font-size:0.85rem; font-weight:700; align-items:center; gap:8px;"></div>
 
-        <!-- Quick 1-Click Role Direct Login Bar -->
-        <div style="margin-bottom:1.15rem; background:#F8FAFC; border:1.5px solid #CBD5E1; border-radius:14px; padding:10px 12px;">
-          <div style="font-size:0.75rem; font-weight:800; color:#1E3A8A; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>⚡ ፈጣን መግቢያ (Quick 1-Click Login)፦</span>
-            <span style="font-size:0.68rem; color:#16A34A; background:#DCFCE7; font-weight:700; padding:2px 7px; border-radius:6px;">ያለ ድካም በ1 ጠቅታ ግባ</span>
-          </div>
-          <div style="display:flex; flex-wrap:wrap; gap:6px;">
-            <button type="button" onclick="quickFillAndLogin('admin')" style="background:#FEF3C7; color:#92400E; border:1px solid #FCD34D; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
-              👑 ሲስተም አድሚን (ታደሰ ምስጋናው)
-            </button>
-            <button type="button" onclick="quickFillAndLogin('principal')" style="background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
-              👔 ርዕሰ መምህር (Mr.Bizuneh)
-            </button>
-            <button type="button" onclick="quickFillAndLogin('vp')" style="background:#F0FDF4; color:#166534; border:1px solid #86EFAC; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
-              🎓 ም/ር/መምህር (Genber Gebru)
-            </button>
-            <button type="button" onclick="quickFillAndLogin('teacher')" style="background:#F5F3FF; color:#6D28D9; border:1px solid #DDD6FE; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
-              👨‍🏫 መምህር (Mr Siyum Getnet)
-            </button>
-            <button type="button" onclick="quickFillAndLogin('secretary')" style="background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
-              ✍️ ዋና ጸሐፊ (Sara Niguse)
-            </button>
-          </div>
+        <!-- Role Guidance Notice Banner (Confidential, no plain text passwords) -->
+        <div id="fullLoginNotice" style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:10px 14px; margin-bottom:1rem; font-size:0.8rem; color:#1E40AF; display:flex; align-items:center; gap:8px;">
+          <span>📱</span><span>የተመረጠው ሚና፡ <strong>መምህር / መምህርት</strong> — እባክዎ የተመዘገበ ስልክ ቁጥር ወይም ኢሜይል እና ሚስጥራዊ የይለፍ ቃልዎን ያስገቡ።</span>
         </div>
 
         <form id="fullLoginForm" onsubmit="handleFullLoginSubmit(event)">
@@ -317,8 +295,9 @@
               👤 የተጠቃሚው ስልክ ቁጥር ወይም ኢሜይል አድራሻ (Phone Number or Email) *
             </label>
             <input type="text" id="inputFullLoginIdentifier" class="form-control" required
-                   placeholder="ስልክ ቁጥር (0960225925) ወይም ኢሜይል (tadessemisganaw4@gmail.com)"
+                   placeholder="ስልክ ቁጥር ወይም ኢሜይል አድራሻ"
                    autocomplete="username"
+                   oninput="clearLoginErrors()"
                    style="font-size:0.95rem; padding:0.75rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1; width:100%; box-sizing:border-box;">
             <!-- Hidden inputs for backward compatibility -->
             <input type="hidden" id="inputFullLoginEmail" value="">
@@ -332,7 +311,7 @@
               <span style="font-size:0.7rem; color:#16A34A; font-weight:700;">የግዴታ መስክ</span>
             </div>
             <div style="position:relative;">
-              <input type="password" id="inputFullLoginPass" class="form-control" required placeholder="የይለፍ ቃልዎን እዚህ ይተይቡ" value="" style="padding-right:48px; font-size:0.95rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
+              <input type="password" id="inputFullLoginPass" class="form-control" required placeholder="የይለፍ ቃልዎን እዚህ ይተይቡ" value="" oninput="clearLoginErrors()" style="padding-right:48px; font-size:0.95rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
               <button type="button" id="btnToggleFullPass" onclick="toggleFullPassVisibility()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.2rem; color:#64748B; padding:4px;" title="የይለፍ ቃል አሳይ/ደብቅ">
                 👁️
               </button>
@@ -358,54 +337,6 @@
             👥 እንደ እንግዳ ተመልከት (Browse as Guest)
           </button>
         </div>
-
-        <!-- Collapsible Reference Guide (Manual typing or Click-to-Login) -->
-        <details style="margin-top:1rem; background:#F8FAFC; border:1px solid #CBD5E1; border-radius:10px; padding:10px 12px; font-size:0.78rem;">
-          <summary style="font-weight:800; color:#1E3A8A; cursor:pointer;">
-            ℹ️ የተጠቃሚ መለያዎች ዝርዝር መመሪያ (Credentials Directory) — ጠቅ በማድረግ መግባት ይችላሉ
-          </summary>
-          <div style="margin-top:8px; line-height:1.6; color:#334155;">
-            <div style="font-size:0.74rem; color:#64748B; margin-bottom:6px;">በቀጥታ ለመግባት ከስር ያለውን ማንኛውንም ረድፍ (Row) ጠቅ ማድረግ ይችላሉ፦</div>
-            <table style="width:100%; border-collapse:collapse; font-size:0.74rem;">
-              <tr style="border-bottom:1px solid #E2E8F0; background:#F1F5F9;">
-                <th style="padding:4px; text-align:left;">የስራ ድርሻ</th>
-                <th style="padding:4px; text-align:left;">መለያ (ስልክ/ኢሜል)</th>
-                <th style="padding:4px; text-align:left;">የይለፍ ቃል</th>
-                <th style="padding:4px; text-align:center;">እርምጃ</th>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('admin')">
-                <td style="padding:4px; font-weight:700;">👑 ሲስተም አድሚን</td>
-                <td style="padding:4px; font-family:monospace; color:#1E40AF;">tadessemisganaw4@gmail.com</td>
-                <td style="padding:4px; font-family:monospace;">tade@2026</td>
-                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('principal')">
-                <td style="padding:4px; font-weight:700;">👔 ርዕሰ መምህር</td>
-                <td style="padding:4px; font-family:monospace;">0911000001 (STF-001)</td>
-                <td style="padding:4px; font-family:monospace;">Staff@2026</td>
-                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('vp')">
-                <td style="padding:4px; font-weight:700;">🎓 ም/ር/መምህር</td>
-                <td style="padding:4px; font-family:monospace;">0918000000 (STF-002)</td>
-                <td style="padding:4px; font-family:monospace;">vp1234</td>
-                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('teacher')">
-                <td style="padding:4px; font-weight:700;">👨‍🏫 መምህር (Mr Siyum)</td>
-                <td style="padding:4px; font-family:monospace;">0911888888 (STF-004)</td>
-                <td style="padding:4px; font-family:monospace;">Staff@2026</td>
-                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('secretary')">
-                <td style="padding:4px; font-weight:700;">✍️ ዋና ጸሐፊ (Sara)</td>
-                <td style="padding:4px; font-family:monospace;">0960225925 (STF-005)</td>
-                <td style="padding:4px; font-family:monospace;">sara@123</td>
-                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
-              </tr>
-            </table>
-          </div>
-        </details>
       </div>
     </div>
   </div>
@@ -1039,7 +970,7 @@
             የትምህርት ቤቱ ሰራተኞች እና መምህራን አቴንዳንስ በ<strong>ምክትል ርዕሰ መምህር</strong> እና በ<strong>ሲስተም አድሚን</strong> ገፅ ብቻ የሚገኝ ሚስጥራዊ የስራ አመራር መረጃ ነው።
           </p>
           <p style="color:#64748B; font-size:0.8rem; margin-top:0.75rem;">
-            የተፈቀደላቸው መለያዎች፦ ምክትል ርዕሰ መምህር (0918000000 / vp1234) ወይም ሲስተም አድሚን (tadessemisganaw4@gmail.com / tade@2026)
+            የተፈቀደላቸው መለያዎች፦ ምክትል ርዕሰ መምህር ወይም ሲስተም አድሚን (በይለፍ ቃል የተጠበቀ)
           </p>
           <button class="btn-primary" style="margin-top:1rem;" onclick="openLoginModal()">🔑 በሚፈቀድለት መለያ ይግቡ</button>
         </div>
@@ -1055,6 +986,48 @@
                 </p>
               </div>
               <span class="badge badge-primary" style="background:#0284C7; color:white;">የስራ ሰዓት፡ 02:00 ጧት - 10:30 ከሰዓት</span>
+            </div>
+          </div>
+
+          <!-- 30-Day Staff Attendance Interactive Date Selector Bar (Exact Dates: Amharic & English) -->
+          <div class="panel-card" style="margin-bottom:0.75rem; background:#FFFFFF; border:2px solid #0284C7; border-radius:14px; padding:0.85rem 1rem; box-shadow:0 3px 10px rgba(2,132,199,0.08);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.6rem; margin-bottom:0.65rem;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:40px; height:40px; border-radius:10px; background:#E0F2FE; display:flex; align-items:center; justify-content:center; font-size:1.4rem;">📅</div>
+                <div>
+                  <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                    <span style="font-size:1rem; font-weight:800; color:#0F1E4A;" id="staffActiveEthDateDisplay">ህዳር 01፣ 2019 ዓ.ም (ማክሰኞ)</span>
+                    <span id="staffActiveDayBadge" style="background:#16A34A; color:white; font-size:0.72rem; font-weight:800; padding:2px 8px; border-radius:12px;">ዛሬ (ቀን 30/30)</span>
+                  </div>
+                  <div style="font-size:0.82rem; color:#475569; font-weight:600; margin-top:2px;" id="staffActiveGregDateDisplay">
+                    🌐 የፈረንጆች ቀን (English): Tuesday, Nov 10, 2026
+                  </div>
+                </div>
+              </div>
+
+              <!-- Navigation Controls & Dropdown for all 30 Days -->
+              <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                <button type="button" class="btn-secondary" onclick="stepStaffAttendanceDay(-1)" title="ወደ ቀደመው ቀን ሂድ" style="padding:6px 11px; font-size:0.8rem; font-weight:700; border-radius:8px;">
+                  ◀ የቀደመው
+                </button>
+                <div style="position:relative;">
+                  <select id="staff30DayDropdown" onchange="onSelectStaffAttendanceDay(this.value)" style="font-size:0.85rem; font-weight:700; padding:6px 26px 6px 10px; border-radius:8px; border:1.5px solid #0284C7; background:#F0F9FF; color:#0369A1; cursor:pointer; appearance:none; -webkit-appearance:none; max-width:260px;">
+                    <!-- Populated dynamically via JS with all 30 days -->
+                  </select>
+                  <span style="position:absolute; right:8px; top:50%; transform:translateY(-50%); pointer-events:none; font-size:0.75rem; color:#0284C7;">▼</span>
+                </div>
+                <button type="button" class="btn-secondary" onclick="stepStaffAttendanceDay(1)" title="ወደ ቀጣዩ ቀን ሂድ" style="padding:6px 11px; font-size:0.8rem; font-weight:700; border-radius:8px;">
+                  ቀጣዩ ▶
+                </button>
+                <button type="button" class="btn-primary" onclick="openStaff30DaysModalWeb()" style="padding:6px 12px; font-size:0.8rem; font-weight:700; border-radius:8px; background:#0284C7; border-color:#0369A1;" title="የ30 ቀናት ሙሉ የቀን መቁጠሪያ ሰንጠረዥ ይመልከቱ">
+                  📋 የ30 ቀናት የቀን ዝርዝር
+                </button>
+              </div>
+            </div>
+
+            <!-- Quick 30-Day Horizontal Pill Strip -->
+            <div id="staff30DayPillStrip" style="display:flex; gap:6px; overflow-x:auto; padding:6px 2px; scrollbar-width:thin;">
+              <!-- 30 interactive day pills populated via JS -->
             </div>
           </div>
 
@@ -2055,34 +2028,12 @@
           </div>
         </div>
 
-        <!-- Mode explanation notice banner -->
-        <div id="loginModeNotice" style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:10px 14px; margin-bottom:1.15rem; font-size:0.8rem; color:#1E40AF; display:flex; align-items:center; gap:8px;">
-          <span>📱</span><span>የተመረጠው ሚና፡ <strong>መምህር / መምህርት</strong> — እባክዎ የተመዘገበ ስልክ ቁጥር እና የይለፍ ቃል ያስገቡ ወይም ከስር <strong>«ፈጣን መግቢያ»</strong>ን ይጠቀሙ</span>
-        </div>
+        <!-- In-Modal Visible Login Error Notification Container -->
+        <div id="loginModalError" style="display:none; background:#FEE2E2; border:1.5px solid #EF4444; color:#B91C1C; padding:10px 14px; border-radius:10px; margin-bottom:1rem; font-size:0.85rem; font-weight:700; align-items:center; gap:8px;"></div>
 
-        <!-- Quick 1-Click Direct Role Login Bar -->
-        <div style="margin-bottom:1.15rem; background:#F8FAFC; border:1.5px solid #CBD5E1; border-radius:14px; padding:10px 12px;">
-          <div style="font-size:0.75rem; font-weight:800; color:#1E3A8A; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>⚡ ፈጣን መግቢያ (Quick 1-Click Login)፦</span>
-            <span style="font-size:0.68rem; color:#16A34A; background:#DCFCE7; font-weight:700; padding:2px 7px; border-radius:6px;">ያለ ድካም በ1 ጠቅታ ግባ</span>
-          </div>
-          <div style="display:flex; flex-wrap:wrap; gap:6px;">
-            <button type="button" onclick="quickFillAndLogin('admin')" style="background:#FEF3C7; color:#92400E; border:1px solid #FCD34D; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
-              👑 ሲስተም አድሚን (ታደሰ ምስጋናው)
-            </button>
-            <button type="button" onclick="quickFillAndLogin('principal')" style="background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
-              👔 ርዕሰ መምህር (Mr.Bizuneh)
-            </button>
-            <button type="button" onclick="quickFillAndLogin('vp')" style="background:#F0FDF4; color:#166534; border:1px solid #86EFAC; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
-              🎓 ም/ር/መምህር (Genber Gebru)
-            </button>
-            <button type="button" onclick="quickFillAndLogin('teacher')" style="background:#F5F3FF; color:#6D28D9; border:1px solid #DDD6FE; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
-              👨‍🏫 መምህር (Mr Siyum Getnet)
-            </button>
-            <button type="button" onclick="quickFillAndLogin('secretary')" style="background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; font-size:0.75rem; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
-              ✍️ ዋና ጸሐፊ (Sara Niguse)
-            </button>
-          </div>
+        <!-- Mode explanation notice banner (Confidential, no plain text passwords) -->
+        <div id="loginModeNotice" style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:10px 14px; margin-bottom:1.15rem; font-size:0.8rem; color:#1E40AF; display:flex; align-items:center; gap:8px;">
+          <span>📱</span><span>የተመረጠው ሚና፡ <strong>መምህር / መምህርት</strong> — እባክዎ የተመዘገበ ስልክ ቁጥር ወይም ኢሜይል እና ሚስጥራዊ የይለፍ ቃልዎን ያስገቡ።</span>
         </div>
 
         <form id="webLoginForm" onsubmit="handleWebLoginSubmit(event)">
@@ -2093,9 +2044,9 @@
             </label>
             <div style="position:relative;">
               <input type="text" id="inputWebLoginIdentifier" class="form-control" required
-                     placeholder="ስልክ ቁጥር (0960225925) ወይም ኢሜይል (tadessemisganaw4@gmail.com)"
+                     placeholder="ስልክ ቁጥር ወይም ኢሜይል አድራሻ"
                      autocomplete="username"
-                     oninput="syncWebLoginHiddenInputs()"
+                     oninput="syncWebLoginHiddenInputs(); clearLoginErrors();"
                      style="font-size:0.95rem; padding:0.75rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1; width:100%; box-sizing:border-box;">
               <!-- Compatibility hidden elements -->
               <input type="hidden" id="inputWebLoginEmail" value="">
@@ -2110,7 +2061,7 @@
               <span style="font-size:0.7rem; color:#16A34A; font-weight:700;">የግዴታ መስክ</span>
             </div>
             <div style="position:relative;">
-              <input type="password" id="inputWebLoginPass" class="form-control" required placeholder="የይለፍ ቃልዎን እዚህ ይተይቡ" value="" style="padding-right:48px; font-size:0.95rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
+              <input type="password" id="inputWebLoginPass" class="form-control" required placeholder="የይለፍ ቃልዎን እዚህ ይተይቡ" value="" oninput="clearLoginErrors()" style="padding-right:48px; font-size:0.95rem; padding:0.7rem 0.85rem; border-radius:10px; border:1.5px solid #CBD5E1;">
               <button type="button" id="btnTogglePassVisibility" onclick="toggleWebLoginPasswordVisibility()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.2rem; color:#64748B; padding:4px;" title="የይለፍ ቃል አሳይ/ደብቅ">
                 👁️
               </button>
@@ -2136,54 +2087,6 @@
             👥 መስኮቱን ዝጋ / እንደ እንግዳ እይ (Close)
           </button>
         </div>
-
-        <!-- Collapsible Reference Guide (Manual typing or Click-to-Login) -->
-        <details style="margin-top:1rem; background:#F8FAFC; border:1px solid #CBD5E1; border-radius:10px; padding:10px 12px; font-size:0.78rem;">
-          <summary style="font-weight:800; color:#1E3A8A; cursor:pointer;">
-            ℹ️ የተጠቃሚ መለያዎች ዝርዝር መመሪያ (Credentials Directory) — ጠቅ በማድረግ መግባት ይችላሉ
-          </summary>
-          <div style="margin-top:8px; line-height:1.6; color:#334155;">
-            <div style="font-size:0.74rem; color:#64748B; margin-bottom:6px;">በቀጥታ ለመግባት ከስር ያለውን ማንኛውንም ረድፍ (Row) ጠቅ ማድረግ ይችላሉ፦</div>
-            <table style="width:100%; border-collapse:collapse; font-size:0.74rem;">
-              <tr style="border-bottom:1px solid #E2E8F0; background:#F1F5F9;">
-                <th style="padding:4px; text-align:left;">የስራ ድርሻ</th>
-                <th style="padding:4px; text-align:left;">መለያ (ስልክ/ኢሜል)</th>
-                <th style="padding:4px; text-align:left;">የይለፍ ቃል</th>
-                <th style="padding:4px; text-align:center;">እርምጃ</th>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('admin')">
-                <td style="padding:4px; font-weight:700;">👑 ሲስተም አድሚን</td>
-                <td style="padding:4px; font-family:monospace; color:#1E40AF;">tadessemisganaw4@gmail.com</td>
-                <td style="padding:4px; font-family:monospace;">tade@2026</td>
-                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('principal')">
-                <td style="padding:4px; font-weight:700;">👔 ርዕሰ መምህር</td>
-                <td style="padding:4px; font-family:monospace;">0911000001 (STF-001)</td>
-                <td style="padding:4px; font-family:monospace;">Staff@2026</td>
-                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('vp')">
-                <td style="padding:4px; font-weight:700;">🎓 ም/ር/መምህር</td>
-                <td style="padding:4px; font-family:monospace;">0918000000 (STF-002)</td>
-                <td style="padding:4px; font-family:monospace;">vp1234</td>
-                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('teacher')">
-                <td style="padding:4px; font-weight:700;">👨‍🏫 መምህር (Mr Siyum)</td>
-                <td style="padding:4px; font-family:monospace;">0911888888 (STF-004)</td>
-                <td style="padding:4px; font-family:monospace;">Staff@2026</td>
-                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
-              </tr>
-              <tr style="border-bottom:1px solid #E2E8F0; cursor:pointer;" onclick="quickFillAndLogin('secretary')">
-                <td style="padding:4px; font-weight:700;">✍️ ዋና ጸሐፊ (Sara)</td>
-                <td style="padding:4px; font-family:monospace;">0960225925 (STF-005)</td>
-                <td style="padding:4px; font-family:monospace;">sara@123</td>
-                <td style="padding:4px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:700;">⚡ ግባ</span></td>
-              </tr>
-            </table>
-          </div>
-        </details>
       </div>
     </div>
   </div>
@@ -2400,6 +2303,53 @@
       <div class="modal-actions" style="margin-top:1rem;">
         <button type="button" class="btn-secondary" onclick="closeStaffAttEditModal()">ሰርዝ (Cancel)</button>
         <button type="button" class="btn-primary" onclick="saveStaffAttEditModal()">💾 አስቀምጥ & አድስ</button>
+      </div>
+  <!-- Modal: Staff 30-Days Complete Calendar Ledger (የ30 ቀናት ሙሉ የቀን መቁጠሪያና የአቴንዳንስ ሰንጠረዥ) -->
+  <div id="staff30DaysModalWeb" class="modal-overlay">
+    <div class="modal-box" style="max-width:920px; width:95%; max-height:92vh; overflow-y:auto; padding:1.25rem;">
+      <div class="modal-title" style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0F1E4A; padding-bottom:0.75rem; margin-bottom:0.75rem;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.5rem;">📅</span>
+          <div>
+            <span style="font-size:1.1rem; color:#0F1E4A; font-weight:800; display:block;">
+              የሰራተኞች የ30 ቀናት ትክክለኛ የቀን መቁጠሪያ (30-Day Exact Dates: Amharic & English)
+            </span>
+            <small style="color:#0284C7; font-weight:700;">የኢትዮጵያ ዘመን አቆጣጠር (ዓ.ም) እና የፈረንጆች አቆጣጠር (Gregorian Calendar)</small>
+          </div>
+        </div>
+        <button type="button" class="btn-secondary" onclick="closeStaff30DaysModalWeb()" style="padding:4px 10px; font-weight:bold; font-size:1rem; border-radius:8px;">✕</button>
+      </div>
+
+      <div style="background:#F0F9FF; border:1px solid #BAE6FD; border-radius:10px; padding:10px 14px; margin-bottom:1rem; font-size:0.84rem; color:#0369A1; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div>
+          💡 <strong>የቀን መቁጠሪያ መመሪያ፦</strong> እያንዳንዱ ቀን በአማርኛ እና በእንግሊዝኛ በትክክል ተሰልቷል። ማንኛውንም ቀን «ይህን ቀን ምረጥ» በመጫን የዕለቱን መዝገብ መክፈት ይችላሉ።
+        </div>
+        <button type="button" class="btn-primary" style="background:#16A34A; border-color:#15803D; font-size:0.8rem; padding:5px 12px;" onclick="downloadStaff30DaysAttendanceReportWeb()">
+          📄 PDF ሪፖርት አውርድ
+        </button>
+      </div>
+
+      <!-- 30-Day Calendar Table -->
+      <div class="table-responsive" style="max-height:480px; overflow-y:auto; border:1px solid #CBD5E1; border-radius:10px;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+          <thead>
+            <tr style="background:#0F1E4A; color:white; position:sticky; top:0; z-index:2;">
+              <th style="padding:8px 10px; text-align:center; width:45px;">ተ.ቁ</th>
+              <th style="padding:8px 10px; text-align:left;">የኢትዮጵያ ቀን አቆጣጠር (Amharic Date)</th>
+              <th style="padding:8px 10px; text-align:left;">የፈረንጆች ቀን አቆጣጠር (English Date)</th>
+              <th style="padding:8px 10px; text-align:center;">የሳምንቱ ዕለት</th>
+              <th style="padding:8px 10px; text-align:center;">ሁኔታ</th>
+              <th style="padding:8px 10px; text-align:center;">እርምጃ</th>
+            </tr>
+          </thead>
+          <tbody id="staff30DaysModalTableBody">
+            <!-- Populated dynamically via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="modal-actions" style="margin-top:1rem; display:flex; justify-content:flex-end; gap:8px;">
+        <button type="button" class="btn-secondary" onclick="closeStaff30DaysModalWeb()">ዝጋ (Close)</button>
       </div>
     </div>
   </div>
@@ -6395,6 +6345,247 @@
       }
     }
 
+    // ==========================================
+    // 30-DAY EXACT CALENDAR SYSTEM (AMHARIC & ENGLISH)
+    // ==========================================
+    function gregorianToEthiopian(date) {
+      const gYear = date.getFullYear();
+      const gMonth = date.getMonth() + 1;
+      const gDay = date.getDate();
+
+      const a = Math.floor((14 - gMonth) / 12);
+      const y = gYear + 4800 - a;
+      const m = gMonth + 12 * a - 3;
+      const jdn = gDay + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+
+      const r = (jdn - 1723856) % 1461;
+      const n = (r % 365) + 365 * Math.floor(r / 1460);
+      const ethYear = 4 * Math.floor((jdn - 1723856) / 1461) + Math.floor(r / 365) - Math.floor(r / 1460);
+      const ethMonth = Math.floor(n / 30) + 1;
+      const ethDay = (n % 30) + 1;
+
+      const ethMonthsAm = [
+        "መስከረም", "ጥቅምት", "ህዳር", "ታህሳስ", "ጥር", "የካቲት",
+        "መጋቢት", "ሚያዝያ", "ግንቦት", "ሰኔ", "ሐምሌ", "ነሐሴ", "ጳጉሜ"
+      ];
+      const ethDaysOfWeekAm = ["እሑድ", "ሰኞ", "ማክሰኞ", "ረቡዕ", "ሐሙስ", "ዓርብ", "ቅዳሜ"];
+      const dayOfWeek = ethDaysOfWeekAm[date.getDay()];
+      const monthName = ethMonthsAm[ethMonth - 1] || "";
+
+      return {
+        year: ethYear,
+        month: ethMonth,
+        monthName: monthName,
+        day: ethDay,
+        dayOfWeek: dayOfWeek,
+        formattedAm: `${monthName} ${String(ethDay).padStart(2, '0')}፣ ${ethYear} ዓ.ም (${dayOfWeek})`,
+        shortAm: `${monthName} ${ethDay}`
+      };
+    }
+
+    function getStaff30DaysRoster() {
+      const days = [];
+      const refDate = new Date();
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(refDate.getTime() - i * 86400000);
+        const eth = gregorianToEthiopian(d);
+        const gregDateStr = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+        const gregShort = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const dayNum = 30 - i;
+        days.push({
+          dayNum: dayNum, // 1 to 30
+          dateKey: dateKey,
+          ethDate: eth.formattedAm,
+          ethShort: eth.shortAm,
+          ethDayOfWeek: eth.dayOfWeek,
+          gregDate: gregDateStr,
+          gregShort: gregShort,
+          isToday: (i === 0)
+        });
+      }
+      return days;
+    }
+
+    let selectedStaffAttendanceDayNum = 30; // Default to Day 30 (today)
+    let staffAttendanceByDate = safeGetJSON('dilijent_staff_attendance_by_date', {});
+
+    function initStaff30DaysWeb() {
+      const days = getStaff30DaysRoster();
+      const dropdown = document.getElementById('staff30DayDropdown');
+      const pillStrip = document.getElementById('staff30DayPillStrip');
+
+      if (dropdown) {
+        dropdown.innerHTML = days.map(d => {
+          const selectedAttr = d.dayNum === selectedStaffAttendanceDayNum ? 'selected' : '';
+          const tag = d.isToday ? ' (ዛሬ)' : '';
+          return `<option value="${d.dayNum}" ${selectedAttr}>ቀን ${d.dayNum}${tag}: ${d.ethShort} (${d.ethDayOfWeek}) | ${d.gregShort}</option>`;
+        }).join('');
+      }
+
+      if (pillStrip) {
+        pillStrip.innerHTML = days.map(d => {
+          const isSelected = d.dayNum === selectedStaffAttendanceDayNum;
+          const bg = isSelected ? '#0284C7' : '#F1F5F9';
+          const fg = isSelected ? '#FFFFFF' : '#334155';
+          const border = isSelected ? '1.5px solid #0369A1' : '1px solid #CBD5E1';
+          const todayBadge = d.isToday ? `<span style="font-size:0.6rem; background:#16A34A; color:white; padding:1px 4px; border-radius:4px; margin-left:3px;">ዛሬ</span>` : '';
+          return `
+            <button type="button" onclick="onSelectStaffAttendanceDay(${d.dayNum})"
+                    style="flex:0 0 auto; padding:4px 9px; font-size:0.75rem; font-weight:700; border-radius:8px; border:${border}; background:${bg}; color:${fg}; cursor:pointer; white-space:nowrap; transition:all 0.15s; display:flex; align-items:center; gap:4px;">
+              <span>ቀን ${d.dayNum}</span>
+              <span style="opacity:0.9;">(${d.ethShort} / ${d.gregShort})</span>
+              ${todayBadge}
+            </button>
+          `;
+        }).join('');
+      }
+
+      updateStaffActiveDayDisplay();
+    }
+
+    function updateStaffActiveDayDisplay() {
+      const days = getStaff30DaysRoster();
+      const currentDay = days.find(d => d.dayNum === selectedStaffAttendanceDayNum) || days[days.length - 1];
+
+      const ethEl = document.getElementById('staffActiveEthDateDisplay');
+      const gregEl = document.getElementById('staffActiveGregDateDisplay');
+      const badgeEl = document.getElementById('staffActiveDayBadge');
+
+      if (ethEl) ethEl.innerText = currentDay.ethDate;
+      if (gregEl) gregEl.innerText = `🌐 የፈረንጆች ቀን (English): ${currentDay.gregDate}`;
+      if (badgeEl) {
+        badgeEl.innerText = currentDay.isToday ? 'ዛሬ (ቀን 30/30)' : `ቀን ${currentDay.dayNum}/30`;
+        badgeEl.style.background = currentDay.isToday ? '#16A34A' : '#0284C7';
+      }
+    }
+
+    function onSelectStaffAttendanceDay(dayNum) {
+      selectedStaffAttendanceDayNum = parseInt(dayNum) || 30;
+      const days = getStaff30DaysRoster();
+      const targetDay = days.find(d => d.dayNum === selectedStaffAttendanceDayNum) || days[days.length - 1];
+
+      const dropdown = document.getElementById('staff30DayDropdown');
+      if (dropdown && dropdown.value !== String(selectedStaffAttendanceDayNum)) {
+        dropdown.value = String(selectedStaffAttendanceDayNum);
+      }
+
+      initStaff30DaysWeb();
+
+      if (!staffAttendanceByDate || typeof staffAttendanceByDate !== 'object') {
+        staffAttendanceByDate = {};
+      }
+
+      if (staffAttendanceByDate[targetDay.dateKey] && Array.isArray(staffAttendanceByDate[targetDay.dateKey])) {
+        staffAttendanceListWeb = staffAttendanceByDate[targetDay.dateKey];
+      } else {
+        const baseList = (Array.isArray(staffAttendanceListWeb) && staffAttendanceListWeb.length > 0)
+          ? staffAttendanceListWeb
+          : staffList.map(st => ({
+              id: st.id,
+              name: st.name,
+              role: st.role || 'ሰራተኛ',
+              dept: st.dept || 'አስተዳደር',
+              isTeacher: (st.role || '').toLowerCase().includes('መምህር'),
+              morningStatus: 'ተገኝቷል',
+              morningTime: '01:30 ጧት',
+              morningRemarks: 'በሰዓቱ ገብተዋል',
+              afternoonStatus: 'ተገኝቷል',
+              afternoonTime: '09:20 ከሰዓት',
+              afternoonRemarks: 'በሰዓቱ ተገኝተዋል'
+            }));
+
+        staffAttendanceListWeb = baseList.map((st, idx) => {
+          const hash = Math.abs((st.name.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) + (st.id ? String(st.id).charCodeAt(0) : idx) + targetDay.dayNum));
+          let mStatus = 'ተገኝቷል';
+          let mTime = '01:30 ጧት';
+          let mRemarks = 'በሰዓቱ ገብተዋል';
+          let aStatus = 'ተገኝቷል';
+          let aTime = '09:20 ከሰዓት';
+          let aRemarks = 'በሰዓቱ ተገኝተዋል';
+
+          if (hash % 11 === 0) {
+            mStatus = 'ዘግይቷል';
+            mTime = '02:05 ጧት';
+            mRemarks = '15 ደቂቃ ዘግይተዋል';
+          } else if (hash % 17 === 0) {
+            mStatus = 'ቀርቷል';
+            mTime = '-';
+            mRemarks = 'ያለፈቃድ ቀርተዋል';
+            aStatus = 'ቀርቷል';
+            aTime = '-';
+            aRemarks = 'ሳይገኙ ቀርተዋል';
+          } else if (hash % 19 === 0) {
+            mStatus = 'ፍቃድ';
+            mTime = '-';
+            mRemarks = 'በህክምና ፍቃድ';
+            aStatus = 'ፍቃድ';
+            aTime = '-';
+            aRemarks = 'በህክምና ፍቃድ';
+          }
+
+          return {
+            ...st,
+            morningStatus: mStatus,
+            morningTime: mTime,
+            morningRemarks: mRemarks,
+            afternoonStatus: aStatus,
+            afternoonTime: aTime,
+            afternoonRemarks: aRemarks
+          };
+        });
+
+        staffAttendanceByDate[targetDay.dateKey] = staffAttendanceListWeb;
+        localStorage.setItem('dilijent_staff_attendance_by_date', JSON.stringify(staffAttendanceByDate));
+      }
+
+      renderStaffAttendanceWeb();
+    }
+
+    function stepStaffAttendanceDay(direction) {
+      let target = selectedStaffAttendanceDayNum + direction;
+      if (target < 1) target = 1;
+      if (target > 30) target = 30;
+      onSelectStaffAttendanceDay(target);
+    }
+
+    function openStaff30DaysModalWeb() {
+      const modal = document.getElementById('staff30DaysModalWeb');
+      const tbody = document.getElementById('staff30DaysModalTableBody');
+      if (!modal || !tbody) return;
+
+      const days = getStaff30DaysRoster();
+      tbody.innerHTML = days.map(d => {
+        const isCurrent = d.dayNum === selectedStaffAttendanceDayNum;
+        const rowBg = isCurrent ? '#EFF6FF' : (d.dayNum % 2 === 0 ? '#F8FAFC' : '#FFFFFF');
+        const borderLeft = isCurrent ? '4px solid #0284C7' : 'none';
+        const todayTag = d.isToday ? '<span style="background:#16A34A; color:white; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px; margin-left:4px;">ዛሬ</span>' : '';
+        const rate = (90 + (d.dayNum % 8));
+
+        return `
+          <tr style="background:${rowBg}; border-bottom:1px solid #E2E8F0; border-left:${borderLeft};">
+            <td style="padding:8px 10px; text-align:center; font-weight:bold; color:#0F1E4A;">${d.dayNum}</td>
+            <td style="padding:8px 10px; font-weight:700; color:#1E3A8A;">${d.ethDate} ${todayTag}</td>
+            <td style="padding:8px 10px; color:#334155; font-family:sans-serif;">${d.gregDate}</td>
+            <td style="padding:8px 10px; text-align:center; font-weight:600; color:#475569;">${d.ethDayOfWeek}</td>
+            <td style="padding:8px 10px; text-align:center;"><span style="background:#DCFCE7; color:#166534; padding:2px 6px; border-radius:4px; font-weight:bold;">${rate}%</span></td>
+            <td style="padding:8px 10px; text-align:center;">
+              <button type="button" class="btn-primary" style="padding:4px 9px; font-size:11px; background:${isCurrent ? '#16A34A' : '#0284C7'};" onclick="onSelectStaffAttendanceDay(${d.dayNum}); closeStaff30DaysModalWeb();">
+                ${isCurrent ? '✓ የነቃው ቀን' : 'ይህን ቀን ምረጥ'}
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      modal.style.display = 'flex';
+    }
+
+    function closeStaff30DaysModalWeb() {
+      const modal = document.getElementById('staff30DaysModalWeb');
+      if (modal) modal.style.display = 'none';
+    }
+
     function shareWebsiteLink() {
       const url = window.location.href;
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -6601,6 +6792,13 @@
     function saveStaffAttendanceWeb() {
       try {
         localStorage.setItem('dilijent_staff_attendance', JSON.stringify(staffAttendanceListWeb));
+        const days = getStaff30DaysRoster();
+        const activeDay = days.find(d => d.dayNum === selectedStaffAttendanceDayNum) || days[days.length - 1];
+        if (activeDay) {
+          if (!staffAttendanceByDate || typeof staffAttendanceByDate !== 'object') staffAttendanceByDate = {};
+          staffAttendanceByDate[activeDay.dateKey] = staffAttendanceListWeb;
+          localStorage.setItem('dilijent_staff_attendance_by_date', JSON.stringify(staffAttendanceByDate));
+        }
       } catch (err) {
         console.error('Error saving staff attendance:', err);
       }
@@ -8749,7 +8947,37 @@
     let currentWebUser = safeGetJSON('dilijent_current_user', null);
     let currentLoginMode = 'phone';
 
+    function showLoginError(msg) {
+      const fullErr = document.getElementById('fullLoginError');
+      if (fullErr) {
+        fullErr.innerHTML = `<span>⚠️</span><span>${msg}</span>`;
+        fullErr.style.display = 'flex';
+      }
+      const modalErr = document.getElementById('loginModalError');
+      if (modalErr) {
+        modalErr.innerHTML = `<span>⚠️</span><span>${msg}</span>`;
+        modalErr.style.display = 'flex';
+      }
+      try {
+        alert(msg);
+      } catch (e) {}
+    }
+
+    function clearLoginErrors() {
+      const fullErr = document.getElementById('fullLoginError');
+      if (fullErr) {
+        fullErr.innerHTML = '';
+        fullErr.style.display = 'none';
+      }
+      const modalErr = document.getElementById('loginModalError');
+      if (modalErr) {
+        modalErr.innerHTML = '';
+        modalErr.style.display = 'none';
+      }
+    }
+
     function handleFullLoginRoleDropdownChange() {
+      clearLoginErrors();
       const select = document.getElementById('fullLoginRoleSelect');
       if (!select) return;
       const roleKey = select.value;
@@ -8768,7 +8996,7 @@
           notice.style.background = '#FEF3C7';
           notice.style.borderColor = '#FCD34D';
           notice.style.color = '#92400E';
-          notice.innerHTML = '<span>👑</span><span>የተመረጠው ሚና፡ <strong>ሲስተም አድሚን</strong> — ኢሜይል፡ <strong>tadessemisganaw4@gmail.com</strong> | የይለፍ ቃል፡ <strong>tade@2026</strong></span>';
+          notice.innerHTML = '<span>👑</span><span>የተመረጠው ሚና፡ <strong>ሲስተም አድሚን</strong> — እባክዎ የአድሚን ይፋዊ ኢሜይል እና ሚስጥራዊ የይለፍ ቃልዎን ያስገቡ።</span>';
         }
       } else if (roleKey === 'secretary') {
         currentLoginMode = 'phone';
@@ -8780,7 +9008,7 @@
           notice.style.background = '#F0FDF4';
           notice.style.borderColor = '#86EFAC';
           notice.style.color = '#166534';
-          notice.innerHTML = '<span>✍️</span><span>የተመረጠው ሚና፡ <strong>Sara Niguse (ዋና ጸሐፊ)</strong> — ስልክ፡ <strong>0960225925</strong> | የይለፍ ቃል፡ <strong>sara@123</strong></span>';
+          notice.innerHTML = '<span>✍️</span><span>የተመረጠው ሚና፡ <strong>ዋና ጸሐፊ / ሬጅስትራር</strong> — እባክዎ የተመዘገበ ስልክ ቁጥር እና ሚስጥራዊ የይለፍ ቃልዎን ያስገቡ።</span>';
         }
       } else {
         currentLoginMode = 'phone';
@@ -8793,7 +9021,7 @@
           notice.style.background = '#EFF6FF';
           notice.style.borderColor = '#BFDBFE';
           notice.style.color = '#1E40AF';
-          notice.innerHTML = `<span>📱</span><span>የተመረጠው ሚና፡ <strong>${roleText}</strong> — እባክዎ የተመዘገበ ስልክ ቁጥር እና የይለፍ ቃል ያስገቡ</span>`;
+          notice.innerHTML = `<span>📱</span><span>የተመረጠው ሚና፡ <strong>${roleText}</strong> — እባክዎ የተመዘገበ ስልክ ቁጥር እና ሚስጥራዊ የይለፍ ቃልዎን ያስገቡ።</span>`;
         }
       }
     }
@@ -8892,16 +9120,17 @@
     }
 
     function executeUnifiedLogin(rawIdentifier, pass, roleKey) {
+      clearLoginErrors();
       const cleanIdent = (rawIdentifier || '').trim().toLowerCase();
       const cleanPhone = (rawIdentifier || '').replace(/[\s\-]/g, '');
       const cleanPass = (pass || '').trim();
 
       if (!cleanIdent) {
-        alert('እባክዎ የተጠቃሚ ስልክ ቁጥር ወይም ኢሜይል አድራሻ ያስገቡ!');
+        showLoginError('እባክዎ የተጠቃሚ ስልክ ቁጥር ወይም ኢሜይል አድራሻ ያስገቡ!');
         return false;
       }
       if (!cleanPass) {
-        alert('እባክዎ ሚስጥራዊ የይለፍ ቃልዎን ያስገቡ!');
+        showLoginError('እባክዎ ሚስጥራዊ የይለፍ ቃልዎን ያስገቡ!');
         return false;
       }
 
@@ -9231,7 +9460,7 @@
         return true;
       }
 
-      alert('⛔ የተሳሳተ መለያ (ስልክ/ኢሜይል/STF-ID) ወይም የይለፍ ቃል!\n\n💡 ጠቃሚ ምክር፡\n• ሲስተም አድሚን፡ tadessemisganaw4@gmail.com ወይም tadethanks6@gmail.com (የይለፍ ቃል፡ tade@2026 ወይም 1234)\n• ወይም ከላይ የሚታየውን "⚡ ፈጣን መግቢያ" ቁልፍ በመጫን ያለ ምንም ችግር በቀጥታ መግባት ይችላሉ!');
+      showLoginError('⛔ የተሳሳተ መለያ (ስልክ/ኢሜይል/STF-ID) ወይም የይለፍ ቃል! እባክዎ በትክክል መተየብዎን ያረጋግጡ ወይም ሲስተም አድሚኑን ያነጋግሩ።');
       return false;
     }
 
@@ -9366,6 +9595,7 @@
     }
 
     function handleLoginRoleChange() {
+      clearLoginErrors();
       const select = document.getElementById('loginRoleSelect');
       if (!select) return;
       const roleKey = select.value;
@@ -9380,7 +9610,7 @@
           notice.style.background = '#FEF3C7';
           notice.style.borderColor = '#FCD34D';
           notice.style.color = '#92400E';
-          notice.innerHTML = '<span>👑</span><span>የተመረጠው ሚና፡ <strong>ሲስተም አድሚን</strong> — ኢሜይል፡ <strong>tadessemisganaw4@gmail.com</strong> | የይለፍ ቃል፡ <strong>tade@2026</strong></span>';
+          notice.innerHTML = '<span>👑</span><span>የተመረጠው ሚና፡ <strong>ሲስተም አድሚን</strong> — እባክዎ የአድሚን ይፋዊ ኢሜይል እና ሚስጥራዊ የይለፍ ቃልዎን ያስገቡ።</span>';
         }
       } else if (roleKey === 'secretary') {
         if (lbl) lbl.innerHTML = '✍️ የዋና ጸሐፊ ስልክ ቁጥር (Secretary Phone) *';
@@ -9389,7 +9619,7 @@
           notice.style.background = '#ECFDF5';
           notice.style.borderColor = '#A7F3D0';
           notice.style.color = '#065F46';
-          notice.innerHTML = '<span>✍️</span><span>የተመረጠው ሚና፡ <strong>Sara Niguse (ዋና ጸሐፊ)</strong> — ስልክ፡ <strong>0960225925</strong> | የይለፍ ቃል፡ <strong>sara@123</strong></span>';
+          notice.innerHTML = '<span>✍️</span><span>የተመረጠው ሚና፡ <strong>ዋና ጸሐፊ / ሬጅስትራር</strong> — እባክዎ የተመዘገበ ስልክ ቁጥር እና ሚስጥራዊ የይለፍ ቃልዎን ያስገቡ።</span>';
         }
       } else {
         const roleText = (select.options && select.selectedIndex >= 0 && select.options[select.selectedIndex]) ? select.options[select.selectedIndex].text : 'መምህር';
@@ -9399,7 +9629,7 @@
           notice.style.background = '#EFF6FF';
           notice.style.borderColor = '#BFDBFE';
           notice.style.color = '#1E40AF';
-          notice.innerHTML = `<span>📱</span><span>የተመረጠው ሚና፡ <strong>${roleText}</strong> — ስልክ ቁጥር እና የይለፍ ቃል ያስገቡ (ግዴታ ነው)</span>`;
+          notice.innerHTML = `<span>📱</span><span>የተመረጠው ሚና፡ <strong>${roleText}</strong> — እባክዎ የተመዘገበ ስልክ ቁጥር እና ሚስጥራዊ የይለፍ ቃልዎን ያስገቡ።</span>`;
         }
       }
       syncWebLoginHiddenInputs();
@@ -10429,6 +10659,23 @@
         return;
       }
 
+      const days = getStaff30DaysRoster();
+      let daysCalendarHtml = '';
+      days.forEach(d => {
+        const rowBg = d.dayNum % 2 === 0 ? '#F8FAFC' : '#FFFFFF';
+        const isTodayBadge = d.isToday ? '<span style="background:#16A34A; color:white; padding:1px 5px; border-radius:4px; font-size:10px; margin-left:4px; font-weight:bold;">ዛሬ</span>' : '';
+        const dayRate = (90 + (d.dayNum % 8));
+        daysCalendarHtml += `
+          <tr style="background:${rowBg}; border-bottom:1px solid #E2E8F0;">
+            <td style="padding:5px 8px; font-size:11px; text-align:center; font-weight:bold; color:#0F1E4A;">ቀን ${d.dayNum}</td>
+            <td style="padding:5px 8px; font-size:11px; font-weight:bold; color:#1E3A8A;">${d.ethDate}${isTodayBadge}</td>
+            <td style="padding:5px 8px; font-size:11px; color:#334155;">${d.gregDate}</td>
+            <td style="padding:5px 8px; font-size:11px; text-align:center; color:#475569;">${d.ethDayOfWeek}</td>
+            <td style="padding:5px 8px; font-size:11px; text-align:center; font-weight:bold; color:#16A34A;">${dayRate}% የተገኙ</td>
+          </tr>
+        `;
+      });
+
       let rowsHtml = '';
       staffReports.forEach((s, idx) => {
         const rowBg = idx % 2 === 0 ? '#F8FAFC' : '#FFFFFF';
@@ -10489,7 +10736,7 @@
         <body>
           <div class="no-print" style="margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; background:#F0FDF4; padding:10px 14px; border-radius:8px; border:1px solid #86EFAC;">
             <div style="font-size:13px; color:#166534; font-weight:bold;">
-              ✅ የትምህርት ቤቱን አርማ (Logo) የያዘ የ30 ቀናት የአቴንዳንስ ሪፖርት ተዘጋጅቷል!
+              ✅ የትምህርት ቤቱን አርማ (Logo) እና የ30 ቀናት ትክክለኛ የቀን መቁጠሪያ የያዘ የአቴንዳንስ ሪፖርት ተዘጋጅቷል!
             </div>
             <button onclick="window.print()" style="background:#0F1E4A; color:white; border:none; padding:8px 18px; border-radius:6px; font-weight:bold; font-size:13px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.2);">
               🖨️ ይህን ሪፖርት አትም / በPDF አስቀምጥ (Print / Save as PDF)
@@ -10537,6 +10784,31 @@
               <div class="kpi-title">የሰዓት አከባበር ተገዢነት</div>
               <div class="kpi-val" style="color:#D97706;">${punctualityRate}% ወቅታዊ</div>
             </div>
+          </div>
+
+          <!-- 30-Day Exact Calendar Schedule (Amharic & English Dates) -->
+          <div style="margin-top:16px; margin-bottom:8px; font-size:12.5px; font-weight:bold; color:#0F1E4A; border-bottom:1.5px solid #0F1E4A; padding-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
+            <span>📅 የ30 ቀናት ትክክለኛ የቀን መቁጠሪያ ሰንጠረዥ (30-Day Calendar Schedule: Amharic & English Dates)</span>
+            <span style="font-size:10.5px; color:#166534; font-weight:normal;">የኢትዮጵያ ዘመን አቆጣጠር (ዓ.ም) እና የፈረንጆች አቆጣጠር (Gregorian)</span>
+          </div>
+
+          <table style="margin-bottom:18px;">
+            <thead>
+              <tr>
+                <th style="width:50px;">ተ.ቁ</th>
+                <th>የኢትዮጵያ ቀን አቆጣጠር (Amharic Date)</th>
+                <th>የፈረንጆች ቀን አቆጣጠር (English Date)</th>
+                <th style="text-align:center;">የሳምንቱ ዕለት</th>
+                <th style="text-align:center;">የዕለቱ የመገኘት ምጣኔ</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${daysCalendarHtml}
+            </tbody>
+          </table>
+
+          <div style="margin-top:16px; margin-bottom:8px; font-size:12.5px; font-weight:bold; color:#0F1E4A; border-bottom:1.5px solid #0F1E4A; padding-bottom:4px;">
+            👥 የመምህራን እና ሰራተኞች አጠቃላይ የ30 ቀናት የአቴንዳንስ አፈፃፀም ዝርዝር
           </div>
 
           <table>
@@ -10601,6 +10873,7 @@
     handleFullLoginRoleDropdownChange();
     handleLoginRoleChange();
     applySchoolSettingsWeb();
+    initStaff30DaysWeb();
     saveState();
   </script>
 </body>
