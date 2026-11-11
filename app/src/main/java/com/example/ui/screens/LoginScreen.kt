@@ -192,14 +192,18 @@ fun LoginScreen(
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column {
-                            // Top School Crest & Title
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+                            // Top School Crest & Title: Centered Logo Above Title
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
                                 Box(
                                     contentAlignment = Alignment.Center,
                                     modifier = Modifier
-                                        .size(54.dp)
+                                        .size(64.dp)
                                         .clip(CircleShape)
-                                        .background(GoldAccent)
+                                        .border(2.dp, GoldAccent, CircleShape)
+                                        .background(Color.White)
                                 ) {
                                     if (schoolLogoUri.isNotEmpty()) {
                                         AsyncImage(
@@ -213,28 +217,28 @@ fun LoginScreen(
                                             imageVector = Icons.Default.School,
                                             contentDescription = null,
                                             tint = Color.Black,
-                                            modifier = Modifier.size(32.dp)
+                                            modifier = Modifier.size(36.dp)
                                         )
                                     }
                                 }
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Column {
-                                    Text(
-                                        text = if (isAmharic) schoolNameAm else schoolNameEn,
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        color = Color.White
-                                    )
-                                    Text(
-                                        text = when (schoolGradeLevel) {
-                                            "1_8" -> if (isAmharic) "1ኛ - 8ኛ ክፍል • የመረጃ አያያዝ ስርዓት" else "Grade 1-8 • School Management System"
-                                            "9_12" -> if (isAmharic) "9ኛ - 12ኛ ክፍል • የመረጃ አያያዝ ስርዓት" else "Grade 9-12 • School Management System"
-                                            else -> if (isAmharic) "KG - 12ኛ ክፍል • የመረጃ አያያዝ ስርዓት" else "K-12 • School Management System"
-                                        },
-                                        fontSize = 11.sp,
-                                        color = GoldAccent
-                                    )
-                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = if (isAmharic) schoolNameAm else schoolNameEn,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = Color.White,
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
+                                Text(
+                                    text = when (schoolGradeLevel) {
+                                        "1_8" -> if (isAmharic) "1ኛ - 8ኛ ክፍል • የመረጃ አያያዝ ስርዓት" else "Grade 1-8 • School Management System"
+                                        "9_12" -> if (isAmharic) "9ኛ - 12ኛ ክፍል • የመረጃ አያያዝ ስርዓት" else "Grade 9-12 • School Management System"
+                                        else -> if (isAmharic) "KG - 12ኛ ክፍል • የመረጃ አያያዝ ስርዓት" else "K-12 • School Management System"
+                                    },
+                                    fontSize = 11.sp,
+                                    color = GoldAccent,
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
                             }
 
                             Spacer(modifier = Modifier.height(14.dp))

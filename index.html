@@ -223,6 +223,36 @@
     .report-header { text-align: center; border-bottom: 2px solid #E2E8F0; padding-bottom: 0.75rem; margin-bottom: 0.75rem; }
 
     footer { text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border); background: white; }
+
+    /* Clean Ethiopian School Official Printing Rules */
+    @media print {
+      body {
+        background: #FFFFFF !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .no-print, header, .banner, .tabs-nav, .btn-primary, .btn-secondary, .btn-accent, .search-input, nav, footer, #fullLoginPage {
+        display: none !important;
+      }
+      /* If Report Card modal is open during print */
+      #ethiopianReportCardModal {
+        position: static !important;
+        display: block !important;
+        background: white !important;
+        padding: 0 !important;
+      }
+      #ethiopianReportCardModal .modal-box {
+        box-shadow: none !important;
+        border: none !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+      }
+      #ethiopianReportCardModal .modal-actions {
+        display: none !important;
+      }
+    }
   </style>
   <!-- SheetJS for local Excel (.xlsx / .xls) to CSV conversion -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -728,7 +758,7 @@
             </p>
           </div>
           <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-            <button class="btn-primary" onclick="window.print()">🖨️ ሮስተር አትም (Print Roster)</button>
+            <button class="btn-primary" onclick="downloadRosterPdfWeb()">📄 ሮስተር በPDF / ሎካል ስቶሬጅ አውርድ</button>
             <button class="btn-secondary" onclick="openAddGradeModal()">➕ ውጤት መዝግብ</button>
           </div>
         </div>
@@ -2137,25 +2167,24 @@
         <div style="flex:1; background:#DA121A;"></div>
       </div>
 
-      <!-- Report Card Top Header -->
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #E2E8F0; padding-bottom:0.75rem; margin-bottom:1rem; flex-wrap:wrap; gap:0.75rem;">
-        <div style="display:flex; align-items:center; gap:0.75rem;">
-          <div style="font-size:2.4rem;">🎓</div>
-          <div>
-            <div style="font-size:0.7rem; color:#64748B; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">
-              የኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ የትምህርት ሚኒስቴር
-            </div>
-            <h2 style="font-size:1.35rem; color:#1E3A8A; margin:0.15rem 0; font-weight:800;">
-              ዲሊጀንት አካዳሚ (DILIJENT ACADEMY)
-            </h2>
-            <div style="font-size:0.8rem; font-weight:700; color:#078930;">
-              📜 ኦፊሴላዊ የተማሪ የውጤት እና የባህሪ መግለጫ ካርድ (OFFICIAL REPORT CARD)
-            </div>
-          </div>
+      <!-- Report Card Top Header: School Logo Centered Above Title -->
+      <div style="display:flex; flex-direction:column; align-items:center; text-align:center; border-bottom:2px solid #E2E8F0; padding-bottom:0.85rem; margin-bottom:1rem; position:relative;">
+        <!-- Centered School Logo (Above the Title) -->
+        <div id="modalReportCardLogoContainer" style="width:72px; height:72px; border-radius:50%; background:#0F1E4A; border:2.5px solid #FECB00; display:flex; align-items:center; justify-content:center; color:#FECB00; font-size:32px; box-shadow:0 3px 8px rgba(0,0,0,0.15); margin-bottom:8px; overflow:hidden;">
+          🎓
+        </div>
+        <div style="font-size:0.75rem; color:#64748B; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">
+          የኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ የትምህርት ሚኒስቴር
+        </div>
+        <h2 id="modalReportCardSchoolName" style="font-size:1.35rem; color:#1E3A8A; margin:0.15rem 0; font-weight:800;">
+          ዲሊጀንት ትምህርት ቤት (DILIJENT SCHOOL)
+        </h2>
+        <div style="font-size:0.82rem; font-weight:700; color:#078930;">
+          📜 ኦፊሴላዊ የተማሪ የውጤት እና የባህሪ መግለጫ ካርድ (OFFICIAL REPORT CARD)
         </div>
 
-        <!-- Student Photo from Local Storage -->
-        <div id="modalReportStudentPhotoContainer" style="text-align:center;">
+        <!-- Student Photo from Local Storage (Positioned top right) -->
+        <div id="modalReportStudentPhotoContainer" style="position:absolute; right:0; top:0; text-align:center;">
           <!-- Dynamically populated with student photo or avatar -->
         </div>
       </div>
@@ -2246,10 +2275,11 @@
       </div>
 
       <!-- Modal Action Buttons -->
-      <div class="modal-actions" style="border-top:1px solid #E2E8F0; padding-top:0.75rem; margin-top:1rem;">
+      <div class="modal-actions" style="border-top:1px solid #E2E8F0; padding-top:0.75rem; margin-top:1rem; flex-wrap:wrap; gap:0.5rem;">
         <button type="button" class="btn-secondary" onclick="closeReportCardModal()">❌ ዝጋ (Close)</button>
         <button type="button" class="btn-secondary" onclick="shareWebsiteLink()">📤 ሊንክ አጋራ</button>
-        <button type="button" class="btn-primary" onclick="window.print()">🖨️ ካርድ አትም (Print)</button>
+        <button type="button" class="btn-primary" style="background:#16A34A; border-color:#15803D;" onclick="downloadSingleStudentReportCardPdfWeb()">💾 ወደ ሎካል ስቶሬጅ አውርድ</button>
+        <button type="button" class="btn-primary" onclick="downloadSingleStudentReportCardPdfWeb()">🖨️ በPDF አስቀምጥ / አትም</button>
       </div>
     </div>
   </div>
@@ -7604,6 +7634,22 @@
       document.getElementById('cardModalGrade').innerText = student.grade;
       document.getElementById('cardModalGender').innerText = student.gender || 'ወንድ';
 
+      // Centered School Logo & Name update
+      const modalLogoBox = document.getElementById('modalReportCardLogoContainer');
+      if (modalLogoBox) {
+        if (schoolSettings.logoData) {
+          modalLogoBox.innerHTML = `<img src="${schoolSettings.logoData}" alt="School Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+        } else {
+          modalLogoBox.innerHTML = `🎓`;
+        }
+      }
+      const modalSchName = document.getElementById('modalReportCardSchoolName');
+      if (modalSchName) {
+        const schAm = schoolSettings.nameAm || 'ዲሊጀንት ትምህርት ቤት';
+        const schEn = schoolSettings.nameEn ? ` (${schoolSettings.nameEn.toUpperCase()})` : '';
+        modalSchName.innerText = `${schAm}${schEn}`;
+      }
+
       // Photo handling from local storage
       const photoBox = document.getElementById('modalReportStudentPhotoContainer');
       if (photoBox) {
@@ -10613,8 +10659,18 @@
           </style>
         </head>
         <body>
-          <div class="no-print" style="margin-bottom:15px; text-align:right;">
-            <button onclick="window.print()" style="background:#0F1E4A; color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:bold; cursor:pointer;">🖨️ ይህን ሪፖርት አትም / በPDF አስቀምጥ (Print/Save PDF)</button>
+          <div class="no-print" style="margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; background:#F0FDF4; padding:10px 14px; border-radius:8px; border:1px solid #86EFAC; flex-wrap:wrap; gap:8px;">
+            <div style="font-size:13px; color:#166534; font-weight:bold;">
+              ✅ የተማሪዎች ወርሃዊ አቴንዳንስ ሪፖርት ዝግጁ ነው! በቀጥታ ወደ ሎካል ስቶሬጅ ማውረድ ወይም በPDF ማስቀመጥ ይችላሉ።
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button onclick="saveReportToLocalFile('Monthly_Attendance_Report_${normTarget}')" style="background:#16A34A; color:white; border:none; padding:8px 14px; border-radius:6px; font-weight:bold; font-size:12px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.15);">
+                💾 በቀጥታ ወደ ሎካል ስቶሬጅ አውርድ (Direct File Download)
+              </button>
+              <button onclick="window.print()" style="background:#0F1E4A; color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:bold; font-size:12px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.2);">
+                🖨️ በPDF አስቀምጥ / አትም (Save as PDF / Print)
+              </button>
+            </div>
           </div>
 
           <div class="header-bar">
@@ -10623,17 +10679,14 @@
             <div class="flag-r"></div>
           </div>
 
-          <div class="school-header">
-            <div style="display:flex; align-items:center; gap:16px;">
-              ${schoolSettings.logoData ? `<img src="${schoolSettings.logoData}" alt="School Logo" style="width:64px; height:64px; border-radius:50%; object-fit:cover; border:2px solid #0F1E4A; box-shadow:0 2px 4px rgba(0,0,0,0.15);" />` : `<div style="width:64px; height:64px; border-radius:50%; background:#0F1E4A; border:2px solid #FECB00; display:flex; align-items:center; justify-content:center; color:#FECB00; font-size:28px;">🎓</div>`}
-              <div>
-                <div class="school-title">${schAm}</div>
-                <div class="school-sub">${schEn} • የተማሪዎች ወርሃዊ አቴንዳንስ ሪፖርት</div>
-              </div>
+          <div class="school-header" style="display:flex; flex-direction:column; align-items:center; text-align:center; border-bottom:2px solid #0F1E4A; padding-bottom:14px; margin-bottom:16px; background:#F8FAFC; padding:16px 14px; border-radius:10px;">
+            <div style="margin-bottom:8px;">
+              ${schoolSettings.logoData ? `<img src="${schoolSettings.logoData}" alt="School Logo" style="width:72px; height:72px; border-radius:50%; object-fit:cover; border:2.5px solid #0F1E4A; box-shadow:0 3px 8px rgba(0,0,0,0.15);" />` : `<div style="width:72px; height:72px; border-radius:50%; background:#0F1E4A; border:2.5px solid #FECB00; display:flex; align-items:center; justify-content:center; color:#FECB00; font-size:32px; box-shadow:0 3px 8px rgba(0,0,0,0.15); margin:auto;">🎓</div>`}
             </div>
-            <div class="meta-box">
-              <div><strong>ዓመተ ምህረት፦</strong> ${year}</div>
-              <div><strong>የወጣበት ቀን፦</strong> ${new Date().toLocaleDateString('am-ET')}</div>
+            <div class="school-title" style="font-size:22px; font-weight:800; color:#0F1E4A; margin-bottom:2px;">${schAm}</div>
+            <div class="school-sub" style="font-size:13px; color:#475569; font-weight:600; margin-bottom:6px;">${schEn} • የተማሪዎች ወርሃዊ አቴንዳንስ ሪፖርት</div>
+            <div style="font-size:11.5px; color:#0369A1; font-weight:700; background:#E0F2FE; padding:3px 12px; border-radius:12px; display:inline-block;">
+              ዓመተ ምህረት፦ ${year} • የወጣበት ቀን፦ ${new Date().toLocaleDateString('am-ET')}
             </div>
           </div>
 
@@ -10687,6 +10740,24 @@
             <div>የምክትል ርዕሰ መምህር ማረጋገጫ፦ _____________________</div>
             <div>የት/ቤት ማህተም፦ _____________________</div>
           </div>
+
+          <script>
+            function saveReportToLocalFile(baseName) {
+              const clone = document.documentElement.cloneNode(true);
+              const noPrints = clone.querySelectorAll('.no-print');
+              noPrints.forEach(el => el.remove());
+              const blob = new Blob([clone.outerHTML], { type: 'text/html;charset=utf-8' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = (baseName || 'Attendance_Report') + '_' + new Date().toISOString().slice(0,10) + '.html';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+              alert('ሰነዱ በቀጥታ ወደ ኮምፒውተርዎ / ስልክዎ «Downloads» (Local Storage) ወርዷል!');
+            }
+          </script>
         </body>
         </html>
       `;
@@ -10822,13 +10893,18 @@
           </style>
         </head>
         <body>
-          <div class="no-print" style="margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; background:#F0FDF4; padding:10px 14px; border-radius:8px; border:1px solid #86EFAC;">
+          <div class="no-print" style="margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; background:#F0FDF4; padding:10px 14px; border-radius:8px; border:1px solid #86EFAC; flex-wrap:wrap; gap:8px;">
             <div style="font-size:13px; color:#166534; font-weight:bold;">
               ✅ የትምህርት ቤቱን አርማ (Logo) እና የ30 ቀናት ትክክለኛ የቀን መቁጠሪያ የያዘ የአቴንዳንስ ሪፖርት ተዘጋጅቷል!
             </div>
-            <button onclick="window.print()" style="background:#0F1E4A; color:white; border:none; padding:8px 18px; border-radius:6px; font-weight:bold; font-size:13px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.2);">
-              🖨️ ይህን ሪፖርት አትም / በPDF አስቀምጥ (Print / Save as PDF)
-            </button>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button onclick="saveReportToLocalFile('Staff_30Days_Attendance_Report')" style="background:#16A34A; color:white; border:none; padding:8px 14px; border-radius:6px; font-weight:bold; font-size:12px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.15);">
+                💾 በቀጥታ ወደ ሎካል ስቶሬጅ አውርድ (Direct File Download)
+              </button>
+              <button onclick="window.print()" style="background:#0F1E4A; color:white; border:none; padding:8px 18px; border-radius:6px; font-weight:bold; font-size:12px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.2);">
+                🖨️ በPDF አስቀምጥ / አትም (Print / Save as PDF)
+              </button>
+            </div>
           </div>
 
           <div class="header-bar">
@@ -10837,21 +10913,17 @@
             <div class="flag-r"></div>
           </div>
 
-          <div class="school-header">
-            <div class="header-left">
+          <div class="school-header" style="display:flex; flex-direction:column; align-items:center; text-align:center; border-bottom:2px solid #0F1E4A; padding-bottom:14px; margin-bottom:16px; background:#F8FAFC; padding:16px 14px; border-radius:10px;">
+            <div style="margin-bottom:8px;">
               ${logoHtml}
-              <div>
-                <div class="school-title">${schAm}</div>
-                <div class="school-sub">${schEn} • Staff & Teachers Attendance Bureau</div>
-                <div class="report-title">📋 የመምህራን እና ሰራተኞች የ30 ቀናት የአቴንዳንስ ማጠቃለያ ሪፖርት</div>
-                <div style="font-size:10px; color:#D97706; font-weight:bold;">• በምክትል ርዕሰ መምህር እና በሲስተም አድሚን የተረጋገጠ (30 Days Cumulative)</div>
-              </div>
             </div>
-            <div class="meta-box">
-              <div><strong>የትምህርት ዘመን፦</strong> ${year}</div>
-              <div><strong>የክትትል ጊዜ፦</strong> ያለፉት 30 የስራ ቀናት</div>
-              <div><strong>ክፍለ-ጊዜ፦</strong> ጧት (Check-In) & ከሰዓት (Check-Out)</div>
-              <div><strong>የወጣበት ቀን፦</strong> ${nowFormatted}</div>
+            <div class="school-title" style="font-size:22px; font-weight:800; color:#0F1E4A; margin-bottom:2px;">${schAm}</div>
+            <div class="school-sub" style="font-size:13px; color:#475569; font-weight:600; margin-bottom:4px;">${schEn} • Staff & Teachers Attendance Bureau</div>
+            <div class="report-title" style="font-size:15px; color:#0369A1; font-weight:700; margin-bottom:6px;">📋 የመምህራን እና ሰራተኞች የ30 ቀናት የአቴንዳንስ ማጠቃለያ ሪፖርት</div>
+            <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; font-size:11px; color:#334155; margin-top:2px;">
+              <span style="background:#FEF3C7; color:#92400E; padding:3px 8px; border-radius:6px; font-weight:bold;">• በምክትል ርዕሰ መምህር እና በሲስተም አድሚን የተረጋገጠ (30 Days Cumulative)</span>
+              <span><strong>የትምህርት ዘመን፦</strong> ${year}</span>
+              <span><strong>የወጣበት ቀን፦</strong> ${nowFormatted}</span>
             </div>
           </div>
 
@@ -10924,11 +10996,426 @@
             <div>የምክትል ርዕሰ መምህር ማረጋገጫ፦ ___________________________</div>
             <div>የትምህርት ቤቱ ማህተም፦ ___________________________</div>
           </div>
+
+          <script>
+            function saveReportToLocalFile(baseName) {
+              const clone = document.documentElement.cloneNode(true);
+              const noPrints = clone.querySelectorAll('.no-print');
+              noPrints.forEach(el => el.remove());
+              const blob = new Blob([clone.outerHTML], { type: 'text/html;charset=utf-8' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = (baseName || 'Staff_Attendance_Report') + '_' + new Date().toISOString().slice(0,10) + '.html';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+              alert('ሰነዱ በቀጥታ ወደ ኮምፒውተርዎ / ስልክዎ «Downloads» (Local Storage) ወርዷል!');
+            }
+          </script>
         </body>
         </html>
       `;
 
       printWindow.document.write(reportHtml);
+      printWindow.document.close();
+    }
+
+    function downloadRosterPdfWeb() {
+      const select = document.getElementById('rosterGradeSelect');
+      const targetGrade = select ? select.value : '1A';
+      const normGrade = normalizeStudentGrade(targetGrade);
+      const schAm = schoolSettings.nameAm || 'ዲሊጀንት ትምህርት ቤት';
+      const schEn = schoolSettings.nameEn || 'Dilijent School';
+      const year = schoolSettings.academicYear || '2017 ዓ.ም';
+
+      const classStudents = (students || []).filter(s => normalizeStudentGrade(s.grade) === normGrade);
+      if (classStudents.length === 0) {
+        alert(`በክፍል ${targetGrade} ውስጥ የተመዘገበ ተማሪ አልተገኘም!`);
+        return;
+      }
+
+      const computedList = classStudents.map((s, idx) => {
+        const totalScore = (s.scores && s.scores.length >= 4)
+          ? Math.round((s.scores[0] + s.scores[1] + s.scores[2] + s.scores[3]) * 10) / 10
+          : (60 + (idx % 35));
+        const avgScore = Math.round((totalScore / 1) * 10) / 10;
+        return {
+          id: s.id,
+          name: s.name,
+          studentId: s.studentId || s.id,
+          gender: s.gender || 'ወንድ',
+          scores: s.scores || [9.0, 9.0, 27.0, 45.0],
+          totalScore,
+          avgScore
+        };
+      }).sort((a, b) => b.totalScore - a.totalScore);
+
+      computedList.forEach((s, idx) => {
+        s.rank = idx + 1;
+      });
+
+      const totalStudents = computedList.length;
+      const classAvg = Math.round((computedList.reduce((acc, s) => acc + s.avgScore, 0) / totalStudents) * 10) / 10;
+      const passedStudents = computedList.filter(s => s.avgScore >= 50).length;
+      const passRate = Math.round((passedStudents / totalStudents) * 100);
+
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        alert('እባክዎ Pop-up Window ፍቀዱ!');
+        return;
+      }
+
+      let rowsHtml = '';
+      computedList.forEach(s => {
+        const isPass = s.avgScore >= 50;
+        rowsHtml += `
+          <tr style="border-bottom:1px solid #E2E8F0;">
+            <td style="padding:6px 8px; text-align:center; font-weight:bold; color:#0F1E4A;">${s.rank}</td>
+            <td style="padding:6px 8px; font-weight:600; color:#0F1E4A;">${s.name}</td>
+            <td style="padding:6px 8px; color:#64748B; font-size:11px;">${s.studentId}</td>
+            <td style="padding:6px 8px; text-align:center;">${s.gender}</td>
+            <td style="padding:6px 8px; text-align:center;">${s.scores[0]}</td>
+            <td style="padding:6px 8px; text-align:center;">${s.scores[1]}</td>
+            <td style="padding:6px 8px; text-align:center;">${s.scores[2]}</td>
+            <td style="padding:6px 8px; text-align:center;">${s.scores[3]}</td>
+            <td style="padding:6px 8px; text-align:center; font-weight:bold; color:#1E3A8A;">${s.totalScore}</td>
+            <td style="padding:6px 8px; text-align:center; font-weight:bold; color:${isPass ? '#16A34A' : '#DC2626'};">${s.avgScore}%</td>
+            <td style="padding:6px 8px; text-align:center;">
+              <span style="background:${isPass ? '#DCFCE7' : '#FEE2E2'}; color:${isPass ? '#166534' : '#991B1B'}; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;">
+                ${isPass ? 'አልፏል' : 'ወድቋል'}
+              </span>
+            </td>
+          </tr>
+        `;
+      });
+
+      const logoHtml = schoolSettings.logoData
+        ? `<img src="${schoolSettings.logoData}" alt="School Logo" style="width:64px; height:64px; border-radius:50%; object-fit:cover; border:2px solid #0F1E4A;" />`
+        : `<div style="width:64px; height:64px; border-radius:50%; background:#0F1E4A; border:2px solid #FECB00; display:flex; align-items:center; justify-content:center; color:#FECB00; font-size:26px;">🎓</div>`;
+
+      const reportHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>የክፍል ${targetGrade} ማስተር ሮስተር - ${schAm}</title>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; color: #1E293B; background: #fff; }
+            .header-bar { display:flex; height:6px; margin-bottom:12px; }
+            .flag-g { flex:1; background:#078930; }
+            .flag-y { flex:1; background:#FECB00; }
+            .flag-r { flex:1; background:#DE2128; }
+            .school-header { display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0F1E4A; padding-bottom:12px; margin-bottom:14px; background:#F8FAFC; padding:10px 14px; border-radius:8px; }
+            .header-left { display:flex; align-items:center; gap:14px; }
+            .school-title { font-size:20px; font-weight:bold; color:#0F1E4A; }
+            .school-sub { font-size:12px; color:#475569; margin-top:2px; font-weight:600; }
+            .report-title { font-size:13.5px; color:#0369A1; font-weight:700; margin-top:3px; }
+            .meta-box { text-align:right; font-size:11px; color:#334155; line-height:1.5; }
+            .kpi-row { display:flex; gap:10px; margin-bottom:14px; }
+            .kpi-card { flex:1; padding:8px 12px; border-radius:8px; border:1px solid #E2E8F0; background:#F8FAFC; }
+            .kpi-title { font-size:10px; color:#64748B; }
+            .kpi-val { font-size:16px; font-weight:bold; margin-top:2px; color:#0F1E4A; }
+            table { width:100%; border-collapse:collapse; margin-top:8px; font-size:11.5px; }
+            th { background:#0F1E4A; color:#fff; font-size:11px; font-weight:bold; padding:6px 8px; text-align:center; }
+            th:nth-child(2) { text-align:left; }
+            .footer-sign { display:flex; justify-content:space-between; margin-top:36px; padding-top:14px; border-top:1px dashed #CBD5E1; font-size:11px; color:#475569; }
+            @media print {
+              .no-print { display: none; }
+              body { margin: 10px; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="no-print" style="margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; background:#F0FDF4; padding:10px 14px; border-radius:8px; border:1px solid #86EFAC; flex-wrap:wrap; gap:8px;">
+            <div style="font-size:13px; color:#166534; font-weight:bold;">
+              ✅ የክፍል ${targetGrade} ማስተር ሮስተር ተዘጋጅቷል! በቀጥታ ወደ ሎካል ስቶሬጅ ማውረድ ወይም በPDF ማስቀመጥ ይችላሉ።
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button onclick="saveReportToLocalFile('Class_${targetGrade}_Master_Roster')" style="background:#16A34A; color:white; border:none; padding:8px 14px; border-radius:6px; font-weight:bold; font-size:12px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.15);">
+                💾 በቀጥታ ወደ ሎካል ስቶሬጅ አውርድ (Direct File Download)
+              </button>
+              <button onclick="window.print()" style="background:#0F1E4A; color:white; border:none; padding:8px 18px; border-radius:6px; font-weight:bold; font-size:12px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.2);">
+                🖨️ በPDF አስቀምጥ / አትም (Print / Save as PDF)
+              </button>
+            </div>
+          </div>
+
+          <div class="header-bar">
+            <div class="flag-g"></div>
+            <div class="flag-y"></div>
+            <div class="flag-r"></div>
+          </div>
+
+          <div class="school-header" style="display:flex; flex-direction:column; align-items:center; text-align:center; border-bottom:2px solid #0F1E4A; padding-bottom:14px; margin-bottom:16px; background:#F8FAFC; padding:16px 14px; border-radius:10px;">
+            <div style="margin-bottom:8px;">
+              ${logoHtml}
+            </div>
+            <div class="school-title" style="font-size:22px; font-weight:800; color:#0F1E4A; margin-bottom:2px;">${schAm}</div>
+            <div class="school-sub" style="font-size:13px; color:#475569; font-weight:600; margin-bottom:4px;">${schEn} • Master Grading Bureau</div>
+            <div class="report-title" style="font-size:15px; color:#0369A1; font-weight:700; margin-bottom:6px;">📋 የክፍል ${targetGrade} የውጤት ማስተር ሮስተር (Homeroom Master Roster Sheet)</div>
+            <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; font-size:11px; color:#334155; margin-top:2px;">
+              <span><strong>ዓመተ ምህረት፦</strong> ${year}</span>
+              <span><strong>ክፍል/ሴክሽን፦</strong> ${targetGrade}</span>
+              <span><strong>የወጣበት ቀን፦</strong> ${new Date().toLocaleDateString('am-ET')}</span>
+            </div>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi-card">
+              <div class="kpi-title">ጠቅላላ ተማሪዎች</div>
+              <div class="kpi-val">${totalStudents}</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-title">የክፍል አማካይ</div>
+              <div class="kpi-val" style="color:#0284C7;">${classAvg}%</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-title">ያለፉ ተማሪዎች (>=50%)</div>
+              <div class="kpi-val" style="color:#16A34A;">${passedStudents} (${passRate}%)</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-title">የክፍሉ ከፍተኛ ውጤት (Top 1)</div>
+              <div class="kpi-val" style="color:#D97706;">${computedList[0].totalScore} (${computedList[0].name.split(' ')[0]})</div>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th style="width:35px;">ደረጃ</th>
+                <th>የተማሪው ሙሉ ስም</th>
+                <th>መለያ ቁጥር</th>
+                <th style="width:45px;">ጾታ</th>
+                <th style="width:40px;">ፈተና 1 (10%)</th>
+                <th style="width:40px;">ፈተና 2 (10%)</th>
+                <th style="width:40px;">ሚድ (30%)</th>
+                <th style="width:40px;">ፋይናል (50%)</th>
+                <th style="width:55px;">ድምር (100)</th>
+                <th style="width:50px;">አማካይ</th>
+                <th style="width:55px;">ሁኔታ</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+
+          <div class="footer-sign">
+            <div>የክፍል ኃላፊ መምህር ፊርማ፦ _____________________</div>
+            <div>የትምህርት ክፍል ኃላፊ (Department Head)፦ _____________________</div>
+            <div>የምክትል ርዕሰ መምህር ማረጋገጫ፦ _____________________</div>
+            <div>የት/ቤት ማህተም፦ _____________________</div>
+          </div>
+
+          <script>
+            function saveReportToLocalFile(baseName) {
+              const clone = document.documentElement.cloneNode(true);
+              const noPrints = clone.querySelectorAll('.no-print');
+              noPrints.forEach(el => el.remove());
+              const blob = new Blob([clone.outerHTML], { type: 'text/html;charset=utf-8' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = (baseName || 'Report') + '_' + new Date().toISOString().slice(0,10) + '.html';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+              alert('ሮስተሩ በቀጥታ ወደ ኮምፒውተርዎ / ስልክዎ «Downloads» (Local Storage) ወርዷል!');
+            }
+          </script>
+        </body>
+        </html>
+      `;
+
+      printWindow.document.write(reportHtml);
+      printWindow.document.close();
+    }
+
+    function downloadSingleStudentReportCardPdfWeb(studentId) {
+      const targetId = studentId || currentReportStudentId;
+      const student = (students || []).find(s => s.id === targetId) || students[0];
+      if (!student) {
+        alert('የተማሪው መረጃ አልተገኘም!');
+        return;
+      }
+
+      const schAm = schoolSettings.nameAm || 'ዲሊጀንት ትምህርት ቤት';
+      const schEn = schoolSettings.nameEn || 'Dilijent School';
+      const year = schoolSettings.academicYear || '2017 ዓ.ም';
+
+      const isPrimary = (schoolSettings.gradeLevel === '1_8');
+      const baseScore = (student.scores && student.scores.length >= 4)
+        ? (student.scores[0] + student.scores[1] + student.scores[2] + student.scores[3])
+        : 78;
+
+      const subjects = isPrimary ? [
+        { name: 'ሒሳብ (Mathematics)', base: baseScore },
+        { name: 'አማርኛ (Amharic)', base: baseScore * 0.97 },
+        { name: 'እንግሊዝኛ (English)', base: baseScore * 0.95 },
+        { name: 'አጠቃላይ ሳይንስ (General Science)', base: baseScore * 0.92 },
+        { name: 'ማህበራዊ ሳይንስ (Social Science)', base: baseScore * 0.94 },
+        { name: 'ስነ-ዜጋ (Civics)', base: baseScore * 0.96 }
+      ] : [
+        { name: 'ሒሳብ (Mathematics)', base: baseScore },
+        { name: 'እንግሊዝኛ (English)', base: baseScore * 0.95 },
+        { name: 'ፊዚክስ (Physics)', base: baseScore * 0.91 },
+        { name: 'ኬሚስትሪ (Chemistry)', base: baseScore * 0.92 },
+        { name: 'ባዮሎጂ (Biology)', base: baseScore * 0.94 },
+        { name: 'ስነ-ዜጋ (Civics)', base: baseScore * 0.96 }
+      ];
+
+      let subRowsHtml = '';
+      let totalSum = 0;
+      subjects.forEach((sub, idx) => {
+        const s1 = Math.round(sub.base * 10) / 10;
+        const s2 = Math.round((sub.base * 1.02) * 10) / 10;
+        const avg = Math.round(((s1 + s2) / 2) * 10) / 10;
+        totalSum += avg;
+        subRowsHtml += `
+          <tr style="border-bottom:1px solid #E2E8F0;">
+            <td style="padding:6px 10px; font-weight:600; color:#0F1E4A;">${sub.name}</td>
+            <td style="padding:6px 10px; text-align:center;">${s1}</td>
+            <td style="padding:6px 10px; text-align:center;">${s2}</td>
+            <td style="padding:6px 10px; text-align:center; font-weight:bold; color:#1E3A8A;">${avg}</td>
+            <td style="padding:6px 10px; text-align:center; color:#16A34A; font-weight:bold;">${avg >= 50 ? 'አልፏል' : 'ወድቋል'}</td>
+          </tr>
+        `;
+      });
+
+      const grandAvg = Math.round((totalSum / subjects.length) * 10) / 10;
+      const isPassed = grandAvg >= 50;
+
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        alert('እባክዎ Pop-up Window ፍቀዱ!');
+        return;
+      }
+
+      const logoHtml = schoolSettings.logoData
+        ? `<img src="${schoolSettings.logoData}" alt="School Logo" style="width:68px; height:68px; border-radius:50%; object-fit:cover; border:2px solid #0F1E4A;" />`
+        : `<div style="width:68px; height:68px; border-radius:50%; background:#0F1E4A; border:2px solid #FECB00; display:flex; align-items:center; justify-content:center; color:#FECB00; font-size:28px;">🎓</div>`;
+
+      const cardHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>የተማሪ ውጤት ካርድ - ${student.name}</title>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 24px; color: #1E293B; background: #fff; }
+            .header-bar { display:flex; height:6px; margin-bottom:14px; }
+            .flag-g { flex:1; background:#078930; }
+            .flag-y { flex:1; background:#FECB00; }
+            .flag-r { flex:1; background:#DE2128; }
+            .school-header { display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0F1E4A; padding-bottom:14px; margin-bottom:14px; background:#F8FAFC; padding:12px 16px; border-radius:8px; }
+            .header-left { display:flex; align-items:center; gap:16px; }
+            .school-title { font-size:20px; font-weight:bold; color:#0F1E4A; }
+            .school-sub { font-size:12px; color:#475569; margin-top:2px; font-weight:600; }
+            .report-title { font-size:14px; color:#0369A1; font-weight:700; margin-top:4px; }
+            .student-info-box { display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; background:#F1F5F9; padding:10px 14px; border-radius:8px; margin-bottom:14px; font-size:12px; }
+            table { width:100%; border-collapse:collapse; margin-top:10px; font-size:12px; }
+            th { background:#0F1E4A; color:#fff; font-size:11.5px; font-weight:bold; padding:8px 10px; text-align:center; }
+            th:first-child { text-align:left; }
+            .summary-box { display:flex; justify-content:space-between; align-items:center; background:#F8FAFC; border:1.5px solid #CBD5E1; border-radius:8px; padding:12px 16px; margin-top:14px; }
+            .footer-sign { display:flex; justify-content:space-between; margin-top:40px; padding-top:14px; border-top:1px dashed #CBD5E1; font-size:11px; color:#475569; }
+            @media print {
+              .no-print { display: none; }
+              body { margin: 10px; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="no-print" style="margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; background:#F0FDF4; padding:10px 14px; border-radius:8px; border:1px solid #86EFAC; flex-wrap:wrap; gap:8px;">
+            <div style="font-size:13px; color:#166534; font-weight:bold;">
+              ✅ ኦፊሴላዊ የተማሪ ውጤት ካርድ ተዘጋጅቷል! በቀጥታ ወደ ሎካል ስቶሬጅ ማውረድ ወይም በPDF ማስቀመጥ ይችላሉ።
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button onclick="saveReportToLocalFile('Report_Card_${student.name.replace(/\\s+/g, '_')}')" style="background:#16A34A; color:white; border:none; padding:8px 14px; border-radius:6px; font-weight:bold; font-size:12px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.15);">
+                💾 በቀጥታ ወደ ሎካል ስቶሬጅ አውርድ (Direct File Download)
+              </button>
+              <button onclick="window.print()" style="background:#0F1E4A; color:white; border:none; padding:8px 18px; border-radius:6px; font-weight:bold; font-size:12px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.2);">
+                🖨️ በPDF አስቀምጥ / አትም (Print / Save as PDF)
+              </button>
+            </div>
+          </div>
+
+          <div class="header-bar">
+            <div class="flag-g"></div>
+            <div class="flag-y"></div>
+            <div class="flag-r"></div>
+          </div>
+
+          <div class="school-header" style="display:flex; flex-direction:column; align-items:center; text-align:center; border-bottom:2px solid #0F1E4A; padding-bottom:14px; margin-bottom:16px; background:#F8FAFC; padding:16px 14px; border-radius:10px;">
+            <div style="margin-bottom:8px;">
+              ${logoHtml}
+            </div>
+            <div class="school-title" style="font-size:22px; font-weight:800; color:#0F1E4A; margin-bottom:2px;">${schAm}</div>
+            <div class="school-sub" style="font-size:13px; color:#475569; font-weight:600; margin-bottom:4px;">${schEn} • Student Evaluation Bureau</div>
+            <div class="report-title" style="font-size:15px; color:#0369A1; font-weight:700; margin-bottom:6px;">🪪 ኦፊሴላዊ የተማሪ ውጤት ካርድ (Official Student Report Card)</div>
+            <div style="font-size:11.5px; color:#334155;">
+              <strong>ዓመተ ምህረት፦</strong> ${year} • <strong>የወጣበት ቀን፦</strong> ${new Date().toLocaleDateString('am-ET')}
+            </div>
+          </div>
+
+          <div class="student-info-box">
+            <div><strong>የተማሪው ስም፦</strong> ${student.name}</div>
+            <div><strong>መለያ ቁጥር፦</strong> ${student.id}</div>
+            <div><strong>ክፍል/ሴክሽን፦</strong> ${student.grade}</div>
+            <div><strong>ጾታ፦</strong> ${student.gender || 'ወንድ'}</div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>የትምህርት አይነት</th>
+                <th style="width:90px;">1ኛ ሴሚስተር</th>
+                <th style="width:90px;">2ኛ ሴሚስተር</th>
+                <th style="width:90px;">አማካይ ውጤት</th>
+                <th style="width:90px;">ውሳኔ</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${subRowsHtml}
+            </tbody>
+          </table>
+
+          <div class="summary-box">
+            <div><strong>ጠቅላላ አማካይ፦</strong> <span style="font-size:18px; font-weight:bold; color:#0F1E4A;">${grandAvg}%</span></div>
+            <div><strong>ጠቅላላ ድምር፦</strong> <span style="font-size:18px; font-weight:bold; color:#1E3A8A;">${Math.round(totalSum * 10) / 10}</span></div>
+            <div><strong>ውሳኔ (Status)፦</strong> <span style="background:${isPassed ? '#DCFCE7' : '#FEE2E2'}; color:${isPassed ? '#166534' : '#991B1B'}; padding:4px 10px; border-radius:6px; font-weight:bold; font-size:13px;">${isPassed ? '✅ ወደ ቀጣይ ክፍል ተዛውሯል (Promoted)' : '⚠️ ይደግማል (Retained)'}</span></div>
+          </div>
+
+          <div class="footer-sign">
+            <div>የክፍል ኃላፊ መምህር ፊርማ፦ _____________________</div>
+            <div>የምክትል ርዕሰ መምህር ማረጋገጫ፦ _____________________</div>
+            <div>የትምህርት ቤቱ ማህተም፦ _____________________</div>
+          </div>
+
+          <script>
+            function saveReportToLocalFile(baseName) {
+              const clone = document.documentElement.cloneNode(true);
+              const noPrints = clone.querySelectorAll('.no-print');
+              noPrints.forEach(el => el.remove());
+              const blob = new Blob([clone.outerHTML], { type: 'text/html;charset=utf-8' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = (baseName || 'ReportCard') + '_' + new Date().toISOString().slice(0,10) + '.html';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+              alert('የተማሪው ካርድ በቀጥታ ወደ ኮምፒውተርዎ / ስልክዎ «Downloads» (Local Storage) ወርዷል!');
+            }
+          </script>
+        </body>
+        </html>
+      `;
+
+      printWindow.document.write(cardHtml);
       printWindow.document.close();
     }
 

@@ -1,5 +1,6 @@
 package com.example.ui.components
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -11,7 +12,9 @@ import android.graphics.RectF
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import com.example.data.model.AttendanceRecord
@@ -113,50 +116,57 @@ object AttendancePdfGenerator {
             paint.color = Color.rgb(222, 33, 40) // Red
             canvas.drawRect(0f, 12f, pageWidth.toFloat(), 18f, paint)
 
+            val centerX = pageWidth / 2f
+
             // Header Background
             paint.color = Color.rgb(243, 246, 252)
-            canvas.drawRect(0f, 18f, pageWidth.toFloat(), 110f, paint)
+            canvas.drawRect(0f, 18f, pageWidth.toFloat(), 140f, paint)
 
-            // School Title
-            textPaint.color = Color.rgb(15, 30, 74) // Navy
+            // Centered School Logo (Above the Title)
+            val logoRadius = 22f
+            val logoCenterY = 44f
+            paint.color = Color.WHITE
+            canvas.drawCircle(centerX, logoCenterY, logoRadius, paint)
+            paint.color = Color.rgb(254, 203, 0) // Gold accent border
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = 2f
+            canvas.drawCircle(centerX, logoCenterY, logoRadius, paint)
+            paint.style = Paint.Style.FILL
+
+            textPaint.textAlign = Paint.Align.CENTER
+            textPaint.textSize = 20f
+            textPaint.color = Color.rgb(15, 30, 74)
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            textPaint.textSize = 18f
-            canvas.drawText(schoolNameAm, 30f, 50f, textPaint)
+            canvas.drawText("🎓", centerX, logoCenterY + 7f, textPaint)
 
-            textPaint.textSize = 12f
+            // School Title (Centered below logo)
+            textPaint.color = Color.rgb(15, 30, 74) // Navy
+            textPaint.textSize = 17f
+            canvas.drawText(schoolNameAm, centerX, 80f, textPaint)
+
+            textPaint.textSize = 11.5f
             textPaint.color = Color.rgb(70, 80, 95)
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
-            canvas.drawText(schoolNameEn, 30f, 68f, textPaint)
+            canvas.drawText(schoolNameEn, centerX, 96f, textPaint)
 
-            // Report Title
-            textPaint.textSize = 15f
+            // Report Title (Centered)
+            textPaint.textSize = 13.5f
             textPaint.color = Color.rgb(15, 30, 74)
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            canvas.drawText(
-                if (isAmharic) "የተማሪዎች ወርሃዊ አቴንዳንስ ሪፖርት (Monthly Attendance Report)" else "Students Monthly Attendance Summary Report",
-                30f,
-                96f,
-                textPaint
-            )
+            val reportTitleText = if (isAmharic) "የተማሪዎች ወርሃዊ አቴንዳንስ ሪፖርት (Monthly Attendance Report)" else "Students Monthly Attendance Summary Report"
+            canvas.drawText(reportTitleText, centerX, 114f, textPaint)
 
-            // Academic Year & Metadata on Right
-            textPaint.textSize = 10f
-            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            textPaint.color = Color.rgb(15, 30, 74)
-            val rightMeta = "ዓመተ ምህረት፦ $academicYear"
-            canvas.drawText(rightMeta, (pageWidth - 30f - textPaint.measureText(rightMeta)), 48f, textPaint)
-
+            // Sub-info Bar (Centered)
+            textPaint.textSize = 9.5f
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
             textPaint.color = Color.rgb(90, 100, 115)
-            val classMeta = "ክፍል፦ $selectedGrade - $selectedSection"
-            canvas.drawText(classMeta, (pageWidth - 30f - textPaint.measureText(classMeta)), 66f, textPaint)
-
             val currentDateStr = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
-            val dateMeta = "የወጣበት ቀን፦ $currentDateStr"
-            canvas.drawText(dateMeta, (pageWidth - 30f - textPaint.measureText(dateMeta)), 84f, textPaint)
+            val subMeta = "ዓመተ ምህረት፦ $academicYear   |   ክፍል፦ $selectedGrade - $selectedSection   |   የወጣበት ቀን፦ $currentDateStr"
+            canvas.drawText(subMeta, centerX, 130f, textPaint)
+            textPaint.textAlign = Paint.Align.LEFT
 
             // 2. Summary KPI Cards
-            var currentY = 125f
+            var currentY = 152f
 
             // Card 1: Total Students
             drawKpiBox(canvas, 30f, currentY, 120f, 44f, "ጠቅላላ ተማሪ", "${classStudents.size}", Color.rgb(15, 30, 74))
@@ -301,6 +311,9 @@ object AttendancePdfGenerator {
             outputStream.close()
             pdfDocument.close()
 
+            // Save permanent copy to device's public Downloads directory (Local Storage)
+            savePdfToLocalStorage(context, outputFile)
+
             // Open or Share PDF via Intent
             val uri: Uri = FileProvider.getUriForFile(
                 context,
@@ -328,7 +341,7 @@ object AttendancePdfGenerator {
 
             Toast.makeText(
                 context,
-                if (isAmharic) "የወርሃዊ አቴንዳንስ ሪፖርት PDF ተዘጋጅቷል!" else "Monthly Attendance PDF Generated!",
+                if (isAmharic) "የወርሃዊ አቴንዳንስ ሪፖርት PDF ወደ ሎካል ስቶሬጅ (Downloads) ተቀምጧል!" else "Monthly Attendance PDF saved to Downloads!",
                 Toast.LENGTH_LONG
             ).show()
 
@@ -426,11 +439,13 @@ object AttendancePdfGenerator {
             paint.color = Color.rgb(222, 33, 40) // Red
             canvas.drawRect(0f, 12f, pageWidth.toFloat(), 18f, paint)
 
+            val centerX = pageWidth / 2f
+
             // 2. Header Background Box
             paint.color = Color.rgb(243, 246, 252)
-            canvas.drawRect(0f, 18f, pageWidth.toFloat(), 118f, paint)
+            canvas.drawRect(0f, 18f, pageWidth.toFloat(), 146f, paint)
 
-            // 3. Render School Logo in Header
+            // 3. Render School Logo Centered Above Title
             var logoDrawn = false
             try {
                 var bitmap: Bitmap? = null
@@ -448,17 +463,16 @@ object AttendancePdfGenerator {
                     }
                 }
                 if (bitmap != null) {
-                    val scaled = Bitmap.createScaledBitmap(bitmap, 64, 64, true)
-                    // Draw white circle background for logo
+                    val scaled = Bitmap.createScaledBitmap(bitmap, 48, 48, true)
                     paint.color = Color.WHITE
-                    canvas.drawCircle(60f, 68f, 34f, paint)
+                    canvas.drawCircle(centerX, 45f, 26f, paint)
                     paint.color = Color.rgb(203, 213, 225)
                     paint.style = Paint.Style.STROKE
                     paint.strokeWidth = 1.5f
-                    canvas.drawCircle(60f, 68f, 34f, paint)
+                    canvas.drawCircle(centerX, 45f, 26f, paint)
                     paint.style = Paint.Style.FILL
 
-                    canvas.drawBitmap(scaled, 28f, 36f, null)
+                    canvas.drawBitmap(scaled, centerX - 24f, 21f, null)
                     logoDrawn = true
                 }
             } catch (e: Exception) {
@@ -468,33 +482,34 @@ object AttendancePdfGenerator {
             // Fallback Stylized School Logo Emblem if no custom logo was found
             if (!logoDrawn) {
                 paint.color = Color.rgb(15, 30, 74)
-                canvas.drawCircle(60f, 68f, 32f, paint)
+                canvas.drawCircle(centerX, 45f, 24f, paint)
                 paint.color = Color.rgb(254, 203, 0)
                 paint.style = Paint.Style.STROKE
-                paint.strokeWidth = 2.5f
-                canvas.drawCircle(60f, 68f, 32f, paint)
+                paint.strokeWidth = 2f
+                canvas.drawCircle(centerX, 45f, 24f, paint)
                 paint.style = Paint.Style.FILL
 
                 textPaint.color = Color.WHITE
                 textPaint.textSize = 20f
+                textPaint.textAlign = Paint.Align.CENTER
                 textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-                canvas.drawText("🎓", 48f, 75f, textPaint)
+                canvas.drawText("🎓", centerX, 52f, textPaint)
             }
 
-            val textStartX = 106f
+            textPaint.textAlign = Paint.Align.CENTER
 
-            // School Name in Header
+            // School Name in Header (Centered below logo)
             textPaint.color = Color.rgb(15, 30, 74) // Navy
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             textPaint.textSize = 17f
-            canvas.drawText(schoolNameAm, textStartX, 48f, textPaint)
+            canvas.drawText(schoolNameAm, centerX, 82f, textPaint)
 
             textPaint.textSize = 11.5f
             textPaint.color = Color.rgb(71, 85, 105)
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
-            canvas.drawText(schoolNameEn, textStartX, 65f, textPaint)
+            canvas.drawText(schoolNameEn, centerX, 97f, textPaint)
 
-            // Report Title with 30-Day Badge
+            // Report Title with 30-Day Badge (Centered)
             textPaint.textSize = 13.5f
             textPaint.color = Color.rgb(15, 30, 74)
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
@@ -502,34 +517,19 @@ object AttendancePdfGenerator {
                 "የመምህራን እና ሰራተኞች የ30 ቀናት የአቴንዳንስ ማጠቃለያ ሪፖርት"
             else
                 "Staff & Teachers 30-Days Attendance Summary Report"
-            canvas.drawText(titleText, textStartX, 88f, textPaint)
+            canvas.drawText(titleText, centerX, 115f, textPaint)
 
+            // Subtitle & Date Meta (Centered)
             textPaint.textSize = 9.5f
-            textPaint.color = Color.rgb(180, 83, 9)
-            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            canvas.drawText("• በምክትል ርዕሰ መምህር እና በሲስተም አድሚን የተረጋገጠ (30 Days Cumulative)", textStartX, 104f, textPaint)
-
-            // Metadata on Right Side
-            textPaint.textSize = 9.5f
-            textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            textPaint.color = Color.rgb(15, 30, 74)
-            val yrText = "የትምህርት ዘመን፦ $academicYear"
-            canvas.drawText(yrText, (pageWidth - 25f - textPaint.measureText(yrText)), 46f, textPaint)
-
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
-            textPaint.color = Color.rgb(71, 85, 105)
-            val durText = "የክትትል ጊዜ፦ ${roster30Days.first().ethShort} - ${roster30Days.last().ethShort} (${roster30Days.first().gregShort} - ${roster30Days.last().gregShort})"
-            canvas.drawText(durText, (pageWidth - 25f - textPaint.measureText(durText)), 62f, textPaint)
-
+            textPaint.color = Color.rgb(90, 100, 115)
             val currentDateStr = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
-            val dateText = "የወጣበት ቀን፦ $currentDateStr"
-            canvas.drawText(dateText, (pageWidth - 25f - textPaint.measureText(dateText)), 78f, textPaint)
-
-            val shiftText = "ክፍለ-ጊዜ፦ ጧት (Check-In) & ከሰዓት (Check-Out)"
-            canvas.drawText(shiftText, (pageWidth - 25f - textPaint.measureText(shiftText)), 94f, textPaint)
+            val subMetaText = "የትምህርት ዘመን፦ $academicYear   |   የወጣበት ቀን፦ $currentDateStr   |   ክፍለ-ጊዜ፦ ጧት (Check-In) & ከሰዓት (Check-Out)"
+            canvas.drawText(subMetaText, centerX, 131f, textPaint)
+            textPaint.textAlign = Paint.Align.LEFT
 
             // 4. Executive Summary KPI Badges
-            var currentY = 130f
+            var currentY = 158f
             val totalStaff = staffList.size
             // Simulated 30-day aggregate stats based on current status and staff counts
             val avgPresentDays = 27
@@ -765,6 +765,9 @@ object AttendancePdfGenerator {
             outputStream.close()
             pdfDocument.close()
 
+            // Save permanent copy to device's public Downloads directory (Local Storage)
+            savePdfToLocalStorage(context, outputFile)
+
             // Open or Share PDF via Intent
             val uri: Uri = FileProvider.getUriForFile(
                 context,
@@ -792,7 +795,7 @@ object AttendancePdfGenerator {
 
             Toast.makeText(
                 context,
-                if (isAmharic) "የሰራተኞች የ30 ቀናት አቴንዳንስ ሪፖርት PDF በስኬት ተዘጋጅቷል!" else "Staff 30-Days Attendance PDF Generated!",
+                if (isAmharic) "የሰራተኞች የ30 ቀናት አቴንዳንስ ሪፖርት PDF ወደ ሎካል ስቶሬጅ (Downloads) ተቀምጧል!" else "Staff 30-Days Attendance PDF saved to Downloads!",
                 Toast.LENGTH_LONG
             ).show()
 
@@ -801,6 +804,40 @@ object AttendancePdfGenerator {
             android.util.Log.e("AttendancePdfGenerator", "Error generating staff 30-day PDF report", e)
             Toast.makeText(context, "የሰራተኞች ሪፖርት ማመንጨት አልተሳካም፦ ${e.message}", Toast.LENGTH_SHORT).show()
             return null
+        }
+    }
+
+    /**
+     * Saves a copy of the generated PDF directly to the device's public Downloads directory
+     * so it persists permanently in the user's local storage (ፋይል ማከማቻ / Downloads).
+     */
+    private fun savePdfToLocalStorage(context: Context, sourceFile: File): File? {
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val values = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, sourceFile.name)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/DilijentReports")
+                }
+                val resolver = context.contentResolver
+                val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+                if (uri != null) {
+                    resolver.openOutputStream(uri)?.use { output ->
+                        sourceFile.inputStream().use { input ->
+                            input.copyTo(output)
+                        }
+                    }
+                }
+            } else {
+                val publicDownloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                val targetDir = File(publicDownloads, "DilijentReports").apply { if (!exists()) mkdirs() }
+                val targetFile = File(targetDir, sourceFile.name)
+                sourceFile.copyTo(targetFile, overwrite = true)
+            }
+            sourceFile
+        } catch (e: Exception) {
+            android.util.Log.w("AttendancePdfGenerator", "Could not copy directly to public Downloads folder: ${e.message}")
+            sourceFile
         }
     }
 }

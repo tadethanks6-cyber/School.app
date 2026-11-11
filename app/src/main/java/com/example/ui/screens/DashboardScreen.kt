@@ -197,45 +197,47 @@ fun DashboardScreen(
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
                             )
                         }
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            if (schoolLogoUri.isNotEmpty()) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(46.dp)
-                                        .clip(CircleShape)
-                                        .border(2.dp, GoldAccent, CircleShape)
-                                        .background(Color.White.copy(alpha = 0.15f)),
-                                    contentAlignment = Alignment.Center
-                                ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(54.dp)
+                                    .clip(CircleShape)
+                                    .border(2.dp, GoldAccent, CircleShape)
+                                    .background(Color.White),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (schoolLogoUri.isNotEmpty()) {
                                     AsyncImage(
                                         model = schoolLogoUri,
                                         contentDescription = "School Logo",
                                         modifier = Modifier.fillMaxSize(),
                                         contentScale = ContentScale.Crop
                                     )
+                                } else {
+                                    Text(text = "🎓", fontSize = 28.sp)
                                 }
-                                Spacer(modifier = Modifier.width(10.dp))
                             }
-                            Column {
-                                Text(
-                                    text = if (isAmharic) "$schoolNameAm ($schoolNameEn)" else "$schoolNameEn Management System",
-                                    fontSize = 19.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                                Text(
-                                    text = when (schoolGradeLevel) {
-                                        "1_8" -> if (isAmharic) "1ኛ - 8ኛ ክፍል • የተጠቃሚ መረጃ እና የስራ ድርሻ ስርዓት" else "Grade 1-8 • School Operations Portal"
-                                        "9_12" -> if (isAmharic) "9ኛ - 12ኛ ክፍል • የተጠቃሚ መረጃ እና የስራ ድርሻ ስርዓት" else "Grade 9-12 • School Operations Portal"
-                                        else -> if (isAmharic) "KG - 12ኛ ክፍል • የተጠቃሚ መረጃ እና የስራ ድርሻ ስርዓት" else "K-12 • School Operations Portal"
-                                    },
-                                    fontSize = 12.sp,
-                                    color = Color.White.copy(alpha = 0.9f)
-                                )
-                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = if (isAmharic) "$schoolNameAm ($schoolNameEn)" else "$schoolNameEn Management System",
+                                fontSize = 19.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                            Text(
+                                text = when (schoolGradeLevel) {
+                                    "1_8" -> if (isAmharic) "1ኛ - 8ኛ ክፍል • የተጠቃሚ መረጃ እና የስራ ድርሻ ስርዓት" else "Grade 1-8 • School Operations Portal"
+                                    "9_12" -> if (isAmharic) "9ኛ - 12ኛ ክፍል • የተጠቃሚ መረጃ እና የስራ ድርሻ ስርዓት" else "Grade 9-12 • School Operations Portal"
+                                    else -> if (isAmharic) "KG - 12ኛ ክፍል • የተጠቃሚ መረጃ እና የስራ ድርሻ ስርዓት" else "K-12 • School Operations Portal"
+                                },
+                                fontSize = 12.sp,
+                                color = Color.White.copy(alpha = 0.9f),
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
                         }
                     }
                 }
