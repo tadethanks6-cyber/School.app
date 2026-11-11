@@ -4869,6 +4869,23 @@
   }
 ];
 
+    const OFFICIAL_GRADE_8_STUDENTS = [
+      { id: "H/01/19", name: "Abel Tesfaye Girma", gender: "ወንድ", grade: "8A", phone: "0911223344", scores: [9.0, 9.0, 27.0, 46.0], photo: "", status: "ንቁ" },
+      { id: "H/02/19", name: "Bethlehem Alemu Desta", gender: "ሴት", grade: "8A", phone: "0911334455", scores: [9.5, 9.0, 28.0, 48.0], photo: "", status: "ንቁ" },
+      { id: "H/03/19", name: "Daniel Kassa Haile", gender: "ወንድ", grade: "8A", phone: "0911445566", scores: [8.5, 9.0, 26.0, 44.5], photo: "", status: "ንቁ" },
+      { id: "H/04/19", name: "Edelawit Mulugeta Kebede", gender: "ሴት", grade: "8A", phone: "0911556677", scores: [9.0, 9.5, 27.5, 47.0], photo: "", status: "ንቁ" },
+      { id: "H/05/19", name: "Fikadu Bekele Shiferaw", gender: "ወንድ", grade: "8A", phone: "0911667788", scores: [8.5, 8.5, 25.5, 43.5], photo: "", status: "ንቁ" },
+      { id: "H/06/19", name: "Hanna Berhanu Tadesse", gender: "ሴት", grade: "8A", phone: "0911778899", scores: [9.5, 9.5, 28.5, 48.5], photo: "", status: "ንቁ" },
+      { id: "H/07/19", name: "Kalkidan Dereje Lemma", gender: "ሴት", grade: "8A", phone: "0911889900", scores: [9.0, 9.0, 27.0, 46.0], photo: "", status: "ንቁ" },
+      { id: "H/08/19", name: "Mikiyas Solomon Dires", gender: "ወንድ", grade: "8A", phone: "0911990011", scores: [9.0, 8.5, 26.5, 45.0], photo: "", status: "ንቁ" },
+      { id: "H/09/19", name: "Natnael Yohannes Tekle", gender: "ወንድ", grade: "8A", phone: "0912112233", scores: [8.5, 9.0, 26.0, 44.0], photo: "", status: "ንቁ" },
+      { id: "H/10/19", name: "Rahel Ermias Tilahun", gender: "ሴት", grade: "8A", phone: "0912223344", scores: [9.5, 9.0, 28.0, 47.5], photo: "", status: "ንቁ" },
+      { id: "H/11/19", name: "Samuel Sintayehu Assefa", gender: "ወንድ", grade: "8A", phone: "0912334455", scores: [9.0, 9.0, 27.0, 46.0], photo: "", status: "ንቁ" },
+      { id: "H/12/19", name: "Tsion Getachew Hailu", gender: "ሴት", grade: "8A", phone: "0912445566", scores: [9.5, 9.5, 29.0, 49.0], photo: "", status: "ንቁ" },
+      { id: "H/13/19", name: "Yared Melaku Bogale", gender: "ወንድ", grade: "8A", phone: "0912556677", scores: [8.5, 8.5, 25.0, 42.5], photo: "", status: "ንቁ" },
+      { id: "H/14/19", name: "Zeineb Mohammed Kedir", gender: "ሴት", grade: "8A", phone: "0912667788", scores: [9.0, 9.0, 26.5, 45.0], photo: "", status: "ንቁ" }
+    ];
+
     const ALL_OFFICIAL_STUDENTS = [
       ...OFFICIAL_GRADE_1_STUDENTS,
       ...OFFICIAL_GRADE_2_STUDENTS,
@@ -4876,7 +4893,8 @@
       ...OFFICIAL_GRADE_4_STUDENTS,
       ...OFFICIAL_GRADE_5_STUDENTS,
       ...OFFICIAL_GRADE_6_STUDENTS,
-      ...OFFICIAL_GRADE_7_STUDENTS
+      ...OFFICIAL_GRADE_7_STUDENTS,
+      ...OFFICIAL_GRADE_8_STUDENTS
     ];
 
     // Initial Official Student Data (genuine official records, no artificial dummy samples)
@@ -5051,7 +5069,31 @@
       }
     });
 
-    // Clean official students: ONLY students in ALL_OFFICIAL_STUDENTS (Grade 1: 60, Grade 6: 28 = 88 students)
+    function normalizeStudentGrade(g) {
+      if (!g) return '1A';
+      let str = String(g).trim();
+      const simpleMatch = str.match(/^([1-8])\s*([A-Za-z])$/i);
+      if (simpleMatch) return `${simpleMatch[1]}${simpleMatch[2].toUpperCase()}`;
+
+      const amharicMatch = str.match(/^(\d+)(?:ኛ|\/|\.|\s*ክፍል|\s*Grade)*\s*[-_]?\s*([A-Za-z])/i);
+      if (amharicMatch) return `${amharicMatch[1]}${amharicMatch[2].toUpperCase()}`;
+
+      const numOnlyMatch = str.match(/^(\d+)(?:ኛ|\s*ክፍል)?$/i);
+      if (numOnlyMatch) return `${numOnlyMatch[1]}A`;
+
+      if (str.includes('9') && str.toUpperCase().includes('A')) return '9A (General)';
+      if (str.includes('9') && str.toUpperCase().includes('B')) return '9B (General)';
+      if (str.includes('10') && str.toUpperCase().includes('A')) return '10A (General)';
+      if (str.includes('10') && str.toUpperCase().includes('B')) return '10B (General)';
+      if (str.includes('11') && str.toUpperCase().includes('A')) return '11A (Natural Science)';
+      if (str.includes('11') && str.toUpperCase().includes('B')) return '11B (Social Science)';
+      if (str.includes('12') && str.toUpperCase().includes('A')) return '12A (Natural Science)';
+      if (str.includes('12') && str.toUpperCase().includes('B')) return '12B (Social Science)';
+
+      return str.replace(/ኛ/g, '').trim();
+    }
+
+    // Clean official students: All students in ALL_OFFICIAL_STUDENTS (Grades 1 through 8)
     const cleanOfficialStudents = [];
     const seenOfficialNames = new Set();
     ALL_OFFICIAL_STUDENTS.forEach(os => {
@@ -5068,7 +5110,7 @@
         id: os.id,
         name: os.name,
         gender: os.gender,
-        grade: os.grade,
+        grade: normalizeStudentGrade(os.grade),
         phone: os.phone || '+251 911 000000',
         scores: (prev && Array.isArray(prev.scores)) ? prev.scores : [0, 0, 0, 0],
         subjectGrades: (prev && prev.subjectGrades) ? prev.subjectGrades : {},
@@ -5101,11 +5143,16 @@
       seenAllNames.add(uNorm);
       if (uId) seenAllIds.add(uId);
       us.isUserCreated = true;
+      us.grade = normalizeStudentGrade(us.grade);
       finalStudents.unshift(us);
     });
 
+    finalStudents.forEach(st => {
+      if (st && st.grade) st.grade = normalizeStudentGrade(st.grade);
+    });
+
     students = finalStudents;
-    // Overwrite localStorage to permanently eliminate the old 242 corrupted/duplicate entries
+    // Overwrite localStorage to permanently eliminate any old unnormalized records
     localStorage.setItem('dilijent_students', JSON.stringify(students));
 
     // 2. STAFF: Strictly ONLY user/school-registered staff (all dummy template staff 100% purged)
@@ -5313,11 +5360,13 @@
 
       activeStudents.forEach(st => {
         const sName = (st.name || '').trim().toLowerCase();
+        const normGrade = normalizeStudentGrade(st.grade || '1A');
+        st.grade = normGrade;
         if (sName && !existingNames.has(sName)) {
           attendance.push({
             id: st.id || '',
             name: st.name,
-            grade: st.grade || '1A',
+            grade: normGrade,
             status: 'Present',
             note: 'በሰዓቱ ገብቷል'
           });
@@ -5329,8 +5378,9 @@
       attendance.forEach(a => {
         const sName = (a.name || '').trim().toLowerCase();
         const st = activeStudents.find(s => (s.name || '').trim().toLowerCase() === sName);
-        if (st && st.grade && a.grade !== st.grade) {
-          a.grade = st.grade;
+        const targetGrade = st && st.grade ? normalizeStudentGrade(st.grade) : normalizeStudentGrade(a.grade || '1A');
+        if (a.grade !== targetGrade) {
+          a.grade = targetGrade;
           changed = true;
         }
       });
@@ -5342,7 +5392,7 @@
     ensureAllStudentsInAttendance();
     function isGradeInLevelWeb(grade, level) {
       if (!level || level === 'ALL') return true;
-      const g = (grade || '').trim();
+      const g = normalizeStudentGrade(grade);
       const nums = (g.match(/\d+/g) || []).map(Number);
       if (level === '1_8') {
         if (nums.some(n => n >= 9 && n <= 12)) return false;
@@ -5400,9 +5450,10 @@
     function getFilteredAttendanceWeb() {
       const lvl = (schoolSettings && schoolSettings.gradeLevel) ? schoolSettings.gradeLevel : '1_8';
       return attendance.filter(a => {
-        if (!isGradeInLevelWeb(a.grade, lvl)) return false;
+        const aGrade = normalizeStudentGrade(a.grade);
+        if (!isGradeInLevelWeb(aGrade, lvl)) return false;
         if (typeof currentAttendanceGradeFilter !== 'undefined' && currentAttendanceGradeFilter && currentAttendanceGradeFilter !== 'ALL') {
-          return a.grade === currentAttendanceGradeFilter;
+          return aGrade === normalizeStudentGrade(currentAttendanceGradeFilter);
         }
         return true;
       });
@@ -7003,15 +7054,16 @@
     function onAttendanceGradeFilterChangedWeb() {
       const sel = document.getElementById('selectAttendanceGradeFilter');
       if (sel) {
-        currentAttendanceGradeFilter = sel.value;
+        currentAttendanceGradeFilter = sel.value === 'ALL' ? 'ALL' : normalizeStudentGrade(sel.value);
         renderAttendance();
       }
     }
 
     function viewClassAttendanceWeb(grade) {
-      currentAttendanceGradeFilter = grade;
+      const norm = normalizeStudentGrade(grade);
+      currentAttendanceGradeFilter = norm;
       const sel = document.getElementById('selectAttendanceGradeFilter');
-      if (sel) sel.value = grade;
+      if (sel) sel.value = norm;
       renderAttendance();
       const tbl = document.getElementById('studentAttendanceTableTitle');
       if (tbl) tbl.scrollIntoView({ behavior: 'smooth' });
@@ -7024,8 +7076,9 @@
         : (document.getElementById('selectAttendanceGradeFilter') ? document.getElementById('selectAttendanceGradeFilter').value : 'ALL');
       
       let count = 0;
+      const normTarget = targetGrade === 'ALL' ? 'ALL' : normalizeStudentGrade(targetGrade);
       attendance.forEach(a => {
-        if (targetGrade === 'ALL' || a.grade === targetGrade) {
+        if (normTarget === 'ALL' || normalizeStudentGrade(a.grade) === normTarget) {
           a.status = 'Present';
           a.note = 'በሰዓቱ ገብቷል';
           count++;
@@ -7034,7 +7087,7 @@
       saveState();
       renderAttendance();
       renderHomeroomAttendanceSummaryWeb();
-      alert(`✅ የ${targetGrade === 'ALL' ? 'ሁሉም ክፍሎች' : targetGrade} ተማሪዎች (${count} ተማሪዎች) በሙሉ 'ተገኝቷል' ተብለው ተመዝግበዋል!`);
+      alert(`✅ የ${normTarget === 'ALL' ? 'ሁሉም ክፍሎች' : 'ክፍል ' + normTarget} ተማሪዎች (${count} ተማሪዎች) በሙሉ 'ተገኝቷል' ተብለው ተመዝግበዋል!`);
     }
 
     function submitCurrentHomeroomAttendanceWeb() {
@@ -7048,13 +7101,14 @@
         return;
       }
 
-      const teacher = getHomeroomTeacherForGrade(targetGrade);
+      const normTarget = normalizeStudentGrade(targetGrade);
+      const teacher = getHomeroomTeacherForGrade(normTarget);
       const teacherName = (currentWebUser && currentWebUser.name) ? currentWebUser.name : (teacher ? teacher.name : 'የክፍል ኃላፊ');
       const now = new Date();
       const timeStr = now.toLocaleTimeString('am-ET', { hour: '2-digit', minute: '2-digit' }) || '02:45 ጧት';
 
       if (!homeroomAttendanceSubmissions) homeroomAttendanceSubmissions = {};
-      homeroomAttendanceSubmissions[targetGrade] = {
+      homeroomAttendanceSubmissions[normTarget] = {
         submitted: true,
         teacherName: teacherName,
         time: timeStr,
@@ -7103,21 +7157,47 @@
       window.open(`sms:${parentPhone}?body=${encodeURIComponent(msg)}`, '_blank');
     }
 
+    function getAllAvailableClassesWeb() {
+      const base = (typeof getClassesForGradeLevel === 'function' && typeof schoolSettings !== 'undefined')
+        ? getClassesForGradeLevel(schoolSettings.gradeLevel || '1_8')
+        : ['1A', '1B', '2A', '2B', '3A', '3B', '4A', '4B', '5A', '5B', '6A', '6B', '7A', '7B', '8A', '8B'];
+      const set = new Set(base.map(c => normalizeStudentGrade(c)));
+      if (typeof students !== 'undefined' && Array.isArray(students)) {
+        students.forEach(s => {
+          if (s && s.grade) {
+            const norm = normalizeStudentGrade(s.grade);
+            if (norm) set.add(norm);
+          }
+        });
+      }
+      return Array.from(set).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    }
+
     function renderHomeroomAttendanceSummaryWeb() {
       const tbody = document.getElementById('homeroomAttendanceSummaryTableBody');
       if (!tbody) return;
 
-      const availableClasses = getClassesForGradeLevel(schoolSettings.gradeLevel);
-      const activeAtt = getFilteredAttendanceWeb();
+      const availableClasses = getAllAvailableClassesWeb();
+      const allAttendance = (typeof attendance !== 'undefined' && Array.isArray(attendance)) ? attendance : [];
 
       if (!homeroomAttendanceSubmissions || Object.keys(homeroomAttendanceSubmissions).length === 0) {
         homeroomAttendanceSubmissions = {
           '1A': { submitted: true, teacherName: 'አቶ ደረጀ ተሾመ', time: '02:20 ጧት', date: '2017 ዓ.ም' },
+          '1B': { submitted: false, teacherName: 'ወ/ሮ ዘውዲቱ ሀይሌ', time: '02:25 ጧት', date: '2017 ዓ.ም' },
           '2A': { submitted: true, teacherName: 'ወ/ሮ አልማዝ አየለ', time: '02:30 ጧት', date: '2017 ዓ.ም' },
+          '2B': { submitted: false, teacherName: 'አቶ ፍሰሃ ተክሌ', time: '02:32 ጧት', date: '2017 ዓ.ም' },
           '3A': { submitted: true, teacherName: 'አቶ ዮናስ በቀለ', time: '02:35 ጧት', date: '2017 ዓ.ም' },
+          '3B': { submitted: false, teacherName: 'ወ/ሮ ታደለች ገብሬ', time: '02:38 ጧት', date: '2017 ዓ.ም' },
+          '4A': { submitted: true, teacherName: 'አቶ ከበደ ለማ', time: '02:40 ጧት', date: '2017 ዓ.ም' },
+          '4B': { submitted: false, teacherName: 'ወ/ሪት ሰላማዊት አበበ', time: '02:42 ጧት', date: '2017 ዓ.ም' },
           '5A': { submitted: true, teacherName: 'ወ/ሮ ታደለች ገብሬ', time: '02:40 ጧት', date: '2017 ዓ.ም' },
+          '5B': { submitted: false, teacherName: 'አቶ በላይነህ ጥላሁን', time: '02:43 ጧት', date: '2017 ዓ.ም' },
           '6A': { submitted: true, teacherName: 'ወ/ሮ ሳራ ንጉሴ', time: '02:45 ጧት', date: '2017 ዓ.ም' },
-          '7A': { submitted: true, teacherName: 'አቶ ሙሉጌታ ከበደ', time: '02:50 ጧት', date: '2017 ዓ.ም' }
+          '6B': { submitted: false, teacherName: 'አቶ ዳዊት ብርሃኑ', time: '02:48 ጧት', date: '2017 ዓ.ም' },
+          '7A': { submitted: true, teacherName: 'አቶ ሙሉጌታ ከበደ', time: '02:50 ጧት', date: '2017 ዓ.ም' },
+          '7B': { submitted: false, teacherName: 'ወ/ሮ ብርቱካን በቀለ', time: '02:52 ጧት', date: '2017 ዓ.ም' },
+          '8A': { submitted: true, teacherName: 'አቶ ብርሃኑ ተፈራ', time: '02:55 ጧት', date: '2017 ዓ.ም' },
+          '8B': { submitted: false, teacherName: 'ዶ/ር ቴዎድሮስ ካሳ', time: '02:58 ጧት', date: '2017 ዓ.ም' }
         };
         localStorage.setItem('dilijent_homeroom_submissions', JSON.stringify(homeroomAttendanceSubmissions));
       }
@@ -7129,7 +7209,8 @@
 
       const rowsHtml = availableClasses.map(cls => {
         const hrTeacher = getHomeroomTeacherForGrade(cls);
-        const classRecords = activeAtt.filter(a => a.grade === cls);
+        const normCls = normalizeStudentGrade(cls);
+        const classRecords = allAttendance.filter(a => normalizeStudentGrade(a.grade) === normCls);
         const totalStudents = classRecords.length;
         const presentCount = classRecords.filter(a => a.status === 'Present').length;
         const absentCount = classRecords.filter(a => a.status === 'Absent').length;
@@ -7206,13 +7287,13 @@
       ensureAllStudentsInAttendance();
 
       // Ensure class filter options exist
-      const availableClasses = getClassesForGradeLevel(schoolSettings.gradeLevel);
+      const availableClasses = getAllAvailableClassesWeb();
       const gradeSelect = document.getElementById('selectAttendanceGradeFilter');
       if (gradeSelect) {
         const curVal = currentAttendanceGradeFilter || 'ALL';
         const optionsHtml = `
           <option value="ALL" ${curVal === 'ALL' ? 'selected' : ''}>📋 ሁሉም ክፍሎች (ማጠቃለያ)</option>
-          ${availableClasses.map(c => `<option value="${c}" ${curVal === c ? 'selected' : ''}>ክፍል ${c}</option>`).join('')}
+          ${availableClasses.map(c => `<option value="${c}" ${normalizeStudentGrade(curVal) === normalizeStudentGrade(c) ? 'selected' : ''}>ክፍል ${c}</option>`).join('')}
         `;
         gradeSelect.innerHTML = optionsHtml;
       }
@@ -10433,8 +10514,15 @@
       const schAm = schoolSettings.nameAm || 'ዲሊጀንት ትምህርት ቤት';
       const schEn = schoolSettings.nameEn || 'Dilijent School';
 
-      // Compute statistics per student
-      const studentReports = (students || []).map((s, idx) => {
+      // Compute statistics per student (Filtered by selected class if one is active)
+      const targetGrade = (typeof currentAttendanceGradeFilter !== 'undefined' && currentAttendanceGradeFilter) ? currentAttendanceGradeFilter : 'ALL';
+      const normTarget = targetGrade === 'ALL' ? 'ALL' : normalizeStudentGrade(targetGrade);
+      const filteredStudents = (students || []).filter(s => {
+        if (normTarget === 'ALL') return true;
+        return normalizeStudentGrade(s.grade) === normTarget;
+      });
+
+      const studentReports = filteredStudents.map((s, idx) => {
         // Sample simulated monthly attendance stats with absentees
         const isSampleAbsentee = (idx % 4 === 1);
         const presentDays = isSampleAbsentee ? Math.floor(Math.random() * 8) + 12 : Math.floor(Math.random() * 4) + 18;
@@ -10447,7 +10535,7 @@
           id: s.id,
           name: s.name,
           studentId: s.studentId || `ET-${idx + 101}`,
-          grade: s.grade,
+          grade: normalizeStudentGrade(s.grade),
           presentDays,
           absentDays,
           excusedDays,

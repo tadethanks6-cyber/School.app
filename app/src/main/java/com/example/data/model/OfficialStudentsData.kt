@@ -3090,6 +3090,191 @@ object OfficialStudentsData {
         )
     )
 
+    val GRADE_8_STUDENTS = listOf(
+        Student(
+            studentIdNumber = "H/01/19",
+            fullName = "Abel Tesfaye Girma",
+            gender = "ወንድ",
+            age = 14,
+            grade = "8ኛ ክፍል",
+            section = "A",
+            academicYear = "2017 ዓ.ም",
+            parentName = "Tesfaye Girma",
+            parentPhone = "0911223344",
+            address = "Addis Ababa",
+            status = "ንቁ"
+        ),
+        Student(
+            studentIdNumber = "H/02/19",
+            fullName = "Bethlehem Alemu Desta",
+            gender = "ሴት",
+            age = 14,
+            grade = "8ኛ ክፍል",
+            section = "A",
+            academicYear = "2017 ዓ.ም",
+            parentName = "Alemu Desta",
+            parentPhone = "0911334455",
+            address = "Addis Ababa",
+            status = "ንቁ"
+        ),
+        Student(
+            studentIdNumber = "H/03/19",
+            fullName = "Daniel Kassa Haile",
+            gender = "ወንድ",
+            age = 14,
+            grade = "8ኛ ክፍል",
+            section = "A",
+            academicYear = "2017 ዓ.ም",
+            parentName = "Kassa Haile",
+            parentPhone = "0911445566",
+            address = "Addis Ababa",
+            status = "ንቁ"
+        ),
+        Student(
+            studentIdNumber = "H/04/19",
+            fullName = "Edelawit Mulugeta Kebede",
+            gender = "ሴት",
+            age = 14,
+            grade = "8ኛ ክፍል",
+            section = "A",
+            academicYear = "2017 ዓ.ም",
+            parentName = "Mulugeta Kebede",
+            parentPhone = "0911556677",
+            address = "Addis Ababa",
+            status = "ንቁ"
+        ),
+        Student(
+            studentIdNumber = "H/05/19",
+            fullName = "Fikadu Bekele Shiferaw",
+            gender = "ወንድ",
+            age = 14,
+            grade = "8ኛ ክፍል",
+            section = "A",
+            academicYear = "2017 ዓ.ም",
+            parentName = "Bekele Shiferaw",
+            parentPhone = "0911667788",
+            address = "Addis Ababa",
+            status = "ንቁ"
+        ),
+        Student(
+            studentIdNumber = "H/06/19",
+            fullName = "Hanna Berhanu Tadesse",
+            gender = "ሴት",
+            age = 14,
+            grade = "8ኛ ክፍል",
+            section = "A",
+            academicYear = "2017 ዓ.ም",
+            parentName = "Berhanu Tadesse",
+            parentPhone = "0911778899",
+            address = "Addis Ababa",
+            status = "ንቁ"
+        ),
+        Student(
+            studentIdNumber = "H/07/19",
+            fullName = "Kalkidan Dereje Lemma",
+            gender = "ሴት",
+            age = 14,
+            grade = "8ኛ ክፍል",
+            section = "A",
+            academicYear = "2017 ዓ.ም",
+            parentName = "Dereje Lemma",
+            parentPhone = "0911889900",
+            address = "Addis Ababa",
+            status = "ንቁ"
+        ),
+        Student(
+            studentIdNumber = "H/08/19",
+            fullName = "Mikiyas Solomon Dires",
+            gender = "ወንድ",
+            age = 14,
+            grade = "8ኛ ክፍል",
+            section = "A",
+            academicYear = "2017 ዓ.ም",
+            parentName = "Solomon Dires",
+            parentPhone = "0911990011",
+            address = "Addis Ababa",
+            status = "ንቁ"
+        ),
+        Student(
+            studentIdNumber = "H/09/19",
+            fullName = "Natnael Yohannes Tekle",
+            gender = "ወንድ",
+            age = 14,
+            grade = "8ኛ ክፍል",
+            section = "A",
+            academicYear = "2017 ዓ.ም",
+            parentName = "Yohannes Tekle",
+            parentPhone = "0912112233",
+            address = "Addis Ababa",
+            status = "ንቁ"
+        ),
+        Student(
+            studentIdNumber = "H/10/19",
+            fullName = "Rahel Ermias Tilahun",
+            gender = "ሴት",
+            age = 14,
+            grade = "8ኛ ክፍል",
+            section = "A",
+            academicYear = "2017 ዓ.ም",
+            parentName = "Ermias Tilahun",
+            parentPhone = "0912223344",
+            address = "Addis Ababa",
+            status = "ንቁ"
+        ),
+        Student(
+            studentIdNumber = "H/11/19",
+            fullName = "Samuel Sintayehu Assefa",
+            gender = "ወንድ",
+            age = 14,
+            grade = "8ኛ ክፍል",
+            section = "A",
+            academicYear = "2017 ዓ.ም",
+            parentName = "Sintayehu Assefa",
+            parentPhone = "0912334455",
+            address = "Addis Ababa",
+            status = "ንቁ"
+        ),
+        Student(
+            studentIdNumber = "H/12/19",
+            fullName = "Tsion Getachew Hailu",
+            gender = "ሴት",
+            age = 14,
+            grade = "8ኛ ክፍል",
+            section = "A",
+            academicYear = "2017 ዓ.ም",
+            parentName = "Getachew Hailu",
+            parentPhone = "0912445566",
+            address = "Addis Ababa",
+            status = "ንቁ"
+        ),
+        Student(
+            studentIdNumber = "H/13/19",
+            fullName = "Yared Melaku Bogale",
+            gender = "ወንድ",
+            age = 14,
+            grade = "8ኛ ክፍል",
+            section = "A",
+            academicYear = "2017 ዓ.ም",
+            parentName = "Melaku Bogale",
+            parentPhone = "0912556677",
+            address = "Addis Ababa",
+            status = "ንቁ"
+        ),
+        Student(
+            studentIdNumber = "H/14/19",
+            fullName = "Zeineb Mohammed Kedir",
+            gender = "ሴት",
+            age = 14,
+            grade = "8ኛ ክፍል",
+            section = "A",
+            academicYear = "2017 ዓ.ም",
+            parentName = "Mohammed Kedir",
+            parentPhone = "0912667788",
+            address = "Addis Ababa",
+            status = "ንቁ"
+        )
+    )
+
     fun getAllOfficialStudents(): List<Student> =
         GRADE_1_STUDENTS +
         GRADE_2_STUDENTS +
@@ -3097,5 +3282,6 @@ object OfficialStudentsData {
         GRADE_4_STUDENTS +
         GRADE_5_STUDENTS +
         GRADE_6_STUDENTS +
-        GRADE_7_STUDENTS
+        GRADE_7_STUDENTS +
+        GRADE_8_STUDENTS
 }

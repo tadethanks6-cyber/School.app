@@ -154,7 +154,7 @@ fun AttendanceScreen(
     }
 
     var selectedGrade by remember(usableGrades) {
-        mutableStateOf(usableGrades.firstOrNull() ?: "9ኛ ክፍል")
+        mutableStateOf(usableGrades.firstOrNull() ?: "1ኛ ክፍል")
     }
 
     val assignedSections = remember(teacherWorkloads, selectedGrade) {
@@ -180,6 +180,14 @@ fun AttendanceScreen(
     // Cross-class homeroom submission status map: "Grade-Section" -> isSubmitted
     val homeroomSubmissionMap = remember {
         mutableStateMapOf<String, Boolean>().apply {
+            put("1ኛ ክፍል-A", true)
+            put("2ኛ ክፍል-A", true)
+            put("3ኛ ክፍል-A", true)
+            put("4ኛ ክፍል-A", true)
+            put("5ኛ ክፍል-A", true)
+            put("6ኛ ክፍል-A", true)
+            put("7ኛ ክፍል-A", true)
+            put("8ኛ ክፍል-A", true)
             put("9ኛ ክፍል-A", true)
             put("9ኛ ክፍል-B", true)
             put("10ኛ ክፍል-A", true)
@@ -218,7 +226,16 @@ fun AttendanceScreen(
         if (isStudent && currentStudent != null) {
             listOf(currentStudent)
         } else {
-            students.filter { it.grade == selectedGrade && it.section == selectedSection }
+            students.filter { s ->
+                val normStudentGrade = s.grade.replace("ኛ", "").replace("ክፍል", "").trim()
+                val normSelectedGrade = selectedGrade.replace("ኛ", "").replace("ክፍል", "").trim()
+                val gradeMatches = s.grade.equals(selectedGrade, ignoreCase = true) ||
+                        normStudentGrade.equals(normSelectedGrade, ignoreCase = true) ||
+                        normStudentGrade.startsWith(normSelectedGrade, ignoreCase = true)
+                val sectionMatches = s.section.equals(selectedSection, ignoreCase = true) ||
+                        s.grade.endsWith(selectedSection, ignoreCase = true)
+                gradeMatches && sectionMatches
+            }
         }
     }
 
@@ -777,7 +794,7 @@ fun AttendanceScreen(
                             Spacer(modifier = Modifier.height(6.dp))
 
                             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                activeGradesList.take(4).forEach { gr ->
+                                activeGradesList.forEach { gr ->
                                     usableSections.forEach { sec ->
                                         val classKey = "$gr-$sec"
                                         val isSub = homeroomSubmissionMap[classKey] == true
