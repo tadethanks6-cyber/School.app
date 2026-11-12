@@ -155,42 +155,35 @@
       margin-bottom: 0.6rem;
     }
 
-    /* Roster table specific sticky headers & pinned first columns */
+    /* Roster table: smooth 2D scrolling for all columns (including student names and marks) */
+    #rosterTable {
+      min-width: 1100px;
+      table-layout: auto;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
     #rosterTable thead th {
       position: sticky;
       top: 0;
-      z-index: 12;
+      z-index: 10;
       background: #1E3A8A;
       color: white;
       box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+      white-space: nowrap;
     }
-    #rosterTable thead th:nth-child(1),
-    #rosterTable thead th:nth-child(2) {
-      position: sticky;
-      z-index: 22;
-      background: #1E3A8A;
-    }
-    #rosterTable thead th:nth-child(1) { left: 0; }
-    #rosterTable thead th:nth-child(2) { left: 55px; }
-
-    #rosterTable td:nth-child(1),
-    #rosterTable td:nth-child(2) {
-      position: sticky;
-      z-index: 8;
-      background: white;
+    #rosterTable td {
+      white-space: nowrap;
     }
     #rosterTable td:nth-child(1) {
-      left: 0;
       background: #F8FAFC;
       text-align: center;
       font-weight: 700;
     }
     #rosterTable td:nth-child(2) {
-      left: 55px;
-      box-shadow: 2px 0 4px rgba(0,0,0,0.06);
+      min-width: 190px;
+      font-weight: 600;
     }
-    #rosterTable tr:hover td:nth-child(1),
-    #rosterTable tr:hover td:nth-child(2) {
+    #rosterTable tr:hover td {
       background: #EFF6FF;
     }
 
@@ -361,11 +354,9 @@
           </button>
         </form>
 
-        <!-- Secondary Actions (Guest Browse ONLY - no 1-click bypass!) -->
-        <div style="margin-top:1.1rem;">
-          <button type="button" class="btn-secondary" onclick="enterGuestModeWeb()" style="width:100%; padding:0.65rem 0.8rem; border-radius:8px; font-size:0.82rem; font-weight:700; cursor:pointer; text-align:center;">
-            👥 እንደ እንግዳ ተመልከት (Browse as Guest)
-          </button>
+        <!-- Strict Security Notice: No unauthenticated guest bypass -->
+        <div style="margin-top:1.1rem; text-align:center; padding:0.6rem 0.8rem; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; font-size:0.75rem; color:#64748B;">
+          🔒 <strong>ደህንነት፦</strong> ያለ ትክክለኛ የይለፍ ቃል ወደ ሲስተሙ መግባት በጥብቅ የተከለከለ ነው።
         </div>
       </div>
     </div>
@@ -507,7 +498,29 @@
             <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.15rem;">ከExcel (.xlsx) ወይም CSV ፋይል በቀጥታ ወደ ሲስተሙ ማስገባት ይችላሉ</p>
           </div>
           <div style="display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center;">
-            <input type="text" id="studentSearch" class="search-input" placeholder="በስም ወይም በመለያ ፈልግ..." onkeyup="filterStudents()">
+            <input type="text" id="studentSearch" class="search-input" placeholder="🔍 በስም፣ መለያ ወይም ክፍል (3A, 3B) ፈልግ..." onkeyup="filterStudents()" style="min-width:210px;">
+            <select id="filterStudentGrade" class="form-control" style="width:auto; font-size:0.8rem; padding:0.4rem 0.6rem; font-weight:600;" onchange="filterStudents()">
+              <option value="ALL">ክፍል፦ ሁሉም</option>
+              <option value="1">1ኛ ክፍል</option>
+              <option value="2">2ኛ ክፍል</option>
+              <option value="3">3ኛ ክፍል</option>
+              <option value="4">4ኛ ክፍል</option>
+              <option value="5">5ኛ ክፍል</option>
+              <option value="6">6ኛ ክፍል</option>
+              <option value="7">7ኛ ክፍል</option>
+              <option value="8">8ኛ ክፍል</option>
+              <option value="9">9ኛ ክፍል</option>
+              <option value="10">10ኛ ክፍል</option>
+              <option value="11">11ኛ ክፍል</option>
+              <option value="12">12ኛ ክፍል</option>
+            </select>
+            <select id="filterStudentSection" class="form-control" style="width:auto; font-size:0.8rem; padding:0.4rem 0.6rem; font-weight:700; color:var(--primary);" onchange="filterStudents()">
+              <option value="ALL">ሴክሽን፦ ሁሉም</option>
+              <option value="A">ሴክሽን A</option>
+              <option value="B">ሴክሽን B</option>
+              <option value="C">ሴክሽን C</option>
+              <option value="D">ሴክሽን D</option>
+            </select>
             <button class="btn-accent" style="font-size:0.8rem;" onclick="openImportModal('students')">📥 ከExcel/CSV/PDF ጫን</button>
             <button class="btn-secondary" style="font-size:0.8rem;" onclick="exportDataToCsv('students')">📤 ወደ CSV ላክ</button>
             <button class="btn-primary" style="font-size:0.8rem;" onclick="openAddStudentModal()">+ አዲስ ተማሪ</button>
@@ -766,8 +779,8 @@
         <!-- Filter & Homeroom Teacher Assignment Info Bar -->
         <div style="background:#F8FAFC; border:1px solid var(--border); border-radius:10px; padding:0.9rem; margin-top:1rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
           <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
-            <label style="font-size:0.85rem; font-weight:700; color:var(--primary);">የክፍል ክፍልፋይ ምረጥ (Select Class/Section):</label>
-            <select id="rosterGradeSelect" class="form-control" style="width:auto; min-width:140px; font-weight:600;" onchange="renderHomeroomRoster()">
+            <label style="font-size:0.83rem; font-weight:700; color:var(--primary);">ክፍልፋይ፦</label>
+            <select id="rosterGradeSelect" class="form-control" style="width:auto; min-width:130px; font-weight:700;" onchange="renderHomeroomRoster()">
               <option value="12A">12A (Natural Science)</option>
               <option value="12B">12B (Social Science)</option>
               <option value="11B">11B (Social Science)</option>
@@ -775,9 +788,15 @@
               <option value="9A">9A (General)</option>
             </select>
 
-            <span id="rosterHomeroomBadge" class="badge badge-primary" style="font-size:0.75rem; padding:0.4rem 0.65rem;">
-              👨‍🏫 የክፍል ኃላፊ፦ <span id="rosterHomeroomTeacherName">ያልተመደበ</span>
-            </span>
+            <label style="font-size:0.83rem; font-weight:700; color:#1E3A8A; margin-left:6px;">👨‍🏫 የክፍል ኃላፊ መምህር (ለፊርማ)፦</label>
+            <select id="rosterTeacherSelect" class="form-control" style="width:auto; min-width:170px; font-weight:700; color:#1E3A8A;" onchange="onRosterTeacherChange()">
+              <!-- Populated dynamically -->
+            </select>
+
+            <label style="font-size:0.83rem; font-weight:700; color:#1E3A8A; margin-left:6px;">👔 ርዕሰ መምህር (ለፊርማ)፦</label>
+            <select id="rosterPrincipalSelect" class="form-control" style="width:auto; min-width:170px; font-weight:700; color:#0F1E4A;" onchange="onRosterPrincipalChange()">
+              <!-- Populated dynamically -->
+            </select>
           </div>
 
           <div style="display:flex; gap:1rem; align-items:center; flex-wrap:wrap;">
@@ -826,6 +845,33 @@
               <!-- Rendered dynamically via JS -->
             </tbody>
           </table>
+        </div>
+
+        <!-- Roster Official Signature & Verification Block -->
+        <div style="background:#F8FAFC; border:1.5px solid #CBD5E1; border-radius:10px; padding:1.1rem; margin-top:1.2rem; box-shadow:0 2px 6px rgba(0,0,0,0.04);">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #E2E8F0; padding-bottom:0.6rem; margin-bottom:0.9rem; flex-wrap:wrap; gap:0.5rem;">
+            <div style="font-weight:800; color:#0F1E4A; font-size:0.88rem; display:flex; align-items:center; gap:6px;">
+              <span>✍️</span><span>የክፍል ኃላፊ እና ርዕሰ መምህር ይፋዊ ማረጋገጫ (Official Roster Signatures)</span>
+            </div>
+            <div style="font-size:0.75rem; color:#64748B;">ቀን፦ <strong id="rosterSignatureDate" style="color:#0F1E4A;">2017 ዓ.ም</strong></div>
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:1rem; font-size:0.8rem;">
+            <div style="background:white; border:1.5px solid #BFDBFE; border-radius:8px; padding:0.85rem;">
+              <div style="color:#1E3A8A; font-weight:700; font-size:0.78rem;">👨‍🏫 የክፍል ኃላፊ መምህር (Homeroom Teacher)፦</div>
+              <div id="rosterFooterTeacherName" style="font-size:0.95rem; font-weight:800; color:#1E3A8A; margin:0.35rem 0;">-</div>
+              <div style="color:#64748B; font-size:0.74rem; border-top:1px dashed #CBD5E1; padding-top:0.4rem; margin-top:0.5rem;">ፊርማ፦ _______________________ ቀን፦ _________</div>
+            </div>
+            <div style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:0.85rem;">
+              <div style="color:#0F1E4A; font-weight:700; font-size:0.78rem;">👔 ርዕሰ መምህር (School Principal)፦</div>
+              <div id="rosterFooterPrincipalName" style="font-size:0.95rem; font-weight:800; color:#0F1E4A; margin:0.35rem 0;">Mr.Bizuneh</div>
+              <div style="color:#64748B; font-size:0.74rem; border-top:1px dashed #CBD5E1; padding-top:0.4rem; margin-top:0.5rem;">ፊርማና ማህተም፦ _______________________</div>
+            </div>
+            <div style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:0.85rem;">
+              <div style="color:#475569; font-weight:700; font-size:0.78rem;">🏢 የትምህርት ጥራትና ሱፐርቪዥን፦</div>
+              <div style="font-size:0.95rem; font-weight:800; color:#334155; margin:0.35rem 0;">Genber Gebru (ምክትል ር/መ)</div>
+              <div style="color:#64748B; font-size:0.74rem; border-top:1px dashed #CBD5E1; padding-top:0.4rem; margin-top:0.5rem;">ማረጋገጫ፦ _______________________</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -2111,10 +2157,10 @@
           </button>
         </form>
 
-        <!-- Close / Guest preview action (no 1-click bypass) -->
+        <!-- Close action (Strict: no unauthenticated guest bypass) -->
         <div style="margin-top:1rem;">
           <button type="button" class="btn-secondary" style="width:100%; padding:0.65rem 1rem; border-radius:8px; font-size:0.82rem; font-weight:700; cursor:pointer;" onclick="closeLoginModal()">
-            👥 መስኮቱን ዝጋ / እንደ እንግዳ እይ (Close)
+            ❌ ዝጋ (Close)
           </button>
         </div>
       </div>
@@ -2258,19 +2304,32 @@
         </div>
       </div>
 
-      <!-- Signature Blocks -->
-      <div style="display:flex; justify-content:space-between; align-items:flex-end; border-top:1px solid #E2E8F0; padding-top:0.75rem; margin-top:0.5rem; font-size:0.78rem; flex-wrap:wrap; gap:1rem;">
-        <div>
-          <div>የክፍል ኃላፊ መምህር፦ <strong id="cardModalHomeroomTeacher">ያልተመደበ</strong></div>
-          <div style="margin-top:0.4rem; color:#64748B;">ፊርማ፦ __________________ ቀን፦ _________</div>
+      <!-- Signature Blocks with Selectable Homeroom Teacher and Principal -->
+      <div style="background:#F8FAFC; border:1.5px solid #CBD5E1; border-radius:10px; padding:0.85rem 1rem; margin-top:0.85rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #E2E8F0; padding-bottom:0.45rem; margin-bottom:0.75rem;">
+          <strong style="color:#0F1E4A; font-size:0.82rem;">✍️ የውጤት ካርድ ይፋዊ ፊርማ እና ማረጋገጫ (Official Report Signatures)</strong>
+          <span style="font-size:0.72rem; color:#64748B;">የትምህርት ዓመት፦ <strong style="color:#0F1E4A;">2017 ዓ.ም</strong></span>
         </div>
-        <div>
-          <div>የርዕሰ-መምህር ስም፦ <strong id="cardModalPrincipalName">ርዕሰ መምህር</strong></div>
-          <div style="margin-top:0.4rem; color:#64748B;">ፊርማና ማህተም፦ __________________</div>
-        </div>
-        <div>
-          <div>የወላጅ/አሳዳጊ ስም፦ __________________</div>
-          <div style="margin-top:0.4rem; color:#64748B;">ፊርማ፦ __________________</div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:0.85rem; font-size:0.78rem;">
+          <div style="background:white; border:1.5px solid #BFDBFE; border-radius:8px; padding:0.65rem 0.8rem;">
+            <label for="cardModalTeacherSelect" style="font-weight:700; color:#1E3A8A; display:block; margin-bottom:0.25rem;">👨‍🏫 የክፍል ኃላፊ መምህር (ይምረጡ)፦</label>
+            <select id="cardModalTeacherSelect" class="form-control" style="font-weight:700; color:#1E3A8A; width:100%; padding:5px 8px; font-size:0.82rem; border-radius:6px;" onchange="onCardTeacherSelectChange()">
+              <!-- Populated dynamically -->
+            </select>
+            <div style="margin-top:0.45rem; color:#64748B; font-size:0.73rem; border-top:1px dashed #CBD5E1; padding-top:0.35rem;">ፊርማ፦ __________________ ቀን፦ _________</div>
+          </div>
+          <div style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:0.65rem 0.8rem;">
+            <label for="cardModalPrincipalSelect" style="font-weight:700; color:#0F1E4A; display:block; margin-bottom:0.25rem;">👔 ርዕሰ መምህር (ይምረጡ)፦</label>
+            <select id="cardModalPrincipalSelect" class="form-control" style="font-weight:700; color:#0F1E4A; width:100%; padding:5px 8px; font-size:0.82rem; border-radius:6px;" onchange="onCardPrincipalSelectChange()">
+              <!-- Populated dynamically -->
+            </select>
+            <div style="margin-top:0.45rem; color:#64748B; font-size:0.73rem; border-top:1px dashed #CBD5E1; padding-top:0.35rem;">ፊርማና ማህተም፦ __________________</div>
+          </div>
+          <div style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:0.65rem 0.8rem;">
+            <div style="font-weight:700; color:#475569; margin-bottom:0.25rem;">👨‍👩‍👧 የወላጅ / አሳዳጊ ስም፦</div>
+            <div style="font-weight:700; color:#0F172A; padding:5px 0;">________________________</div>
+            <div style="margin-top:0.45rem; color:#64748B; font-size:0.73rem; border-top:1px dashed #CBD5E1; padding-top:0.35rem;">ፊርማ፦ __________________</div>
+          </div>
         </div>
       </div>
 
@@ -2585,20 +2644,20 @@
       { id: 'F/12/19', name: 'Fatima Abubeker Suleman', gender: 'ሴት', grade: '6A', phone: '0964202931', scores: [9.5, 9.0, 28.0, 47.0], photo: '', status: 'ንቁ' },
       { id: 'F/13/19', name: 'Fikir Ashagre Gesesse', gender: 'ወንድ', grade: '6A', phone: '0913371522', scores: [8.5, 9.0, 26.0, 44.5], photo: '', status: 'ንቁ' },
       { id: 'F/14/19', name: 'Kalikidan Zeleke Timotiwos', gender: 'ሴት', grade: '6A', phone: '0921412080', scores: [9.0, 9.5, 27.5, 46.5], photo: '', status: 'ንቁ' },
-      { id: 'F/15/19', name: 'Liyona Addis Tekelabe', gender: 'ሴት', grade: '6A', phone: '0911074921', scores: [9.5, 9.5, 29.0, 48.0], photo: '', status: 'ንቁ' },
-      { id: 'F/16/19', name: 'Mohammed Nuredin Kedir', gender: 'ወንድ', grade: '6A', phone: '0942180101', scores: [8.5, 8.5, 25.5, 43.0], photo: '', status: 'ንቁ' },
-      { id: 'F/17/19', name: 'Maramawit Andarige', gender: 'ሴት', grade: '6A', phone: '0912928141', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
-      { id: 'F/18/19', name: 'Makbel Isaal Assfaw', gender: 'ወንድ', grade: '6A', phone: '0913960156', scores: [8.5, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
-      { id: 'F/19/19', name: 'Marikon Million', gender: 'ወንድ', grade: '6A', phone: '0911643150', scores: [9.0, 8.5, 26.5, 45.0], photo: '', status: 'ንቁ' },
-      { id: 'F/20/19', name: 'Naod Solomon', gender: 'ወንድ', grade: '6A', phone: '0911410703', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
-      { id: 'F/21/19', name: 'Nebile Kalif', gender: 'ወንድ', grade: '6A', phone: '0911282484', scores: [8.5, 8.5, 25.0, 43.0], photo: '', status: 'ንቁ' },
-      { id: 'F/22/19', name: 'Reyan Kalif', gender: 'ወንድ', grade: '6A', phone: '0911282484', scores: [8.5, 9.0, 25.5, 43.5], photo: '', status: 'ንቁ' },
-      { id: 'F/23/19', name: 'Robel Arega', gender: 'ወንድ', grade: '6A', phone: '0911042484', scores: [9.0, 8.5, 26.0, 44.5], photo: '', status: 'ንቁ' },
-      { id: 'F/24/19', name: 'Yusuf Enyew Kesaye', gender: 'ወንድ', grade: '6A', phone: '0913084728', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
-      { id: 'F/25/19', name: 'Yusuf Musema Kedir', gender: 'ወንድ', grade: '6A', phone: '0942180101', scores: [8.5, 8.5, 25.0, 42.5], photo: '', status: 'ንቁ' },
-      { id: 'F/26/19', name: 'Yohana Farasim Tilawu', gender: 'ወንድ', grade: '6A', phone: '0911426507', scores: [9.0, 9.0, 26.5, 45.0], photo: '', status: 'ንቁ' },
-      { id: 'F/27/19', name: 'Yonas Selamu', gender: 'ወንድ', grade: '6A', phone: '0913978333', scores: [8.5, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
-      { id: 'F/28/19', name: 'Micjael Leulseged Tamiru', gender: 'ወንድ', grade: '6A', phone: '0910970202', scores: [9.0, 8.5, 26.5, 45.0], photo: '', status: 'ንቁ' }
+      { id: 'F/15/19', name: 'Liyona Addis Tekelabe', gender: 'ሴት', grade: '6B', phone: '0911074921', scores: [9.5, 9.5, 29.0, 48.0], photo: '', status: 'ንቁ' },
+      { id: 'F/16/19', name: 'Mohammed Nuredin Kedir', gender: 'ወንድ', grade: '6B', phone: '0942180101', scores: [8.5, 8.5, 25.5, 43.0], photo: '', status: 'ንቁ' },
+      { id: 'F/17/19', name: 'Maramawit Andarige', gender: 'ሴት', grade: '6B', phone: '0912928141', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'F/18/19', name: 'Makbel Isaal Assfaw', gender: 'ወንድ', grade: '6B', phone: '0913960156', scores: [8.5, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
+      { id: 'F/19/19', name: 'Marikon Million', gender: 'ወንድ', grade: '6B', phone: '0911643150', scores: [9.0, 8.5, 26.5, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'F/20/19', name: 'Naod Solomon', gender: 'ወንድ', grade: '6B', phone: '0911410703', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'F/21/19', name: 'Nebile Kalif', gender: 'ወንድ', grade: '6B', phone: '0911282484', scores: [8.5, 8.5, 25.0, 43.0], photo: '', status: 'ንቁ' },
+      { id: 'F/22/19', name: 'Reyan Kalif', gender: 'ወንድ', grade: '6B', phone: '0911282484', scores: [8.5, 9.0, 25.5, 43.5], photo: '', status: 'ንቁ' },
+      { id: 'F/23/19', name: 'Robel Arega', gender: 'ወንድ', grade: '6B', phone: '0911042484', scores: [9.0, 8.5, 26.0, 44.5], photo: '', status: 'ንቁ' },
+      { id: 'F/24/19', name: 'Yusuf Enyew Kesaye', gender: 'ወንድ', grade: '6B', phone: '0913084728', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'F/25/19', name: 'Yusuf Musema Kedir', gender: 'ወንድ', grade: '6B', phone: '0942180101', scores: [8.5, 8.5, 25.0, 42.5], photo: '', status: 'ንቁ' },
+      { id: 'F/26/19', name: 'Yohana Farasim Tilawu', gender: 'ወንድ', grade: '6B', phone: '0911426507', scores: [9.0, 9.0, 26.5, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'F/27/19', name: 'Yonas Selamu', gender: 'ወንድ', grade: '6B', phone: '0913978333', scores: [8.5, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
+      { id: 'F/28/19', name: 'Micjael Leulseged Tamiru', gender: 'ወንድ', grade: '6B', phone: '0910970202', scores: [9.0, 8.5, 26.5, 45.0], photo: '', status: 'ንቁ' }
     ];
 
     const OFFICIAL_GRADE_1_STUDENTS = [
@@ -2632,36 +2691,36 @@
       { id: 'A/28/19', name: 'Haron derese', gender: 'ወንድ', grade: '1A', phone: '0911870201', scores: [9.0, 8.5, 26.0, 44.0], photo: '', status: 'ንቁ' },
       { id: 'A/29/19', name: 'Haron Halid Redi', gender: 'ወንድ', grade: '1A', phone: '0921732788', scores: [9.0, 9.0, 26.5, 45.0], photo: '', status: 'ንቁ' },
       { id: 'A/30/19', name: 'Hawlet Seid Dese', gender: 'ሴት', grade: '1A', phone: '0935851020', scores: [9.5, 9.0, 28.0, 47.0], photo: '', status: 'ንቁ' },
-      { id: 'A/31/19', name: 'Haykel Mustefa Mohammed', gender: 'ወንድ', grade: '1A', phone: '0949438091', scores: [8.5, 9.0, 26.0, 44.5], photo: '', status: 'ንቁ' },
-      { id: 'A/32/19', name: 'Hemen Fantahun Aray', gender: 'ሴት', grade: '1A', phone: '0968670919', scores: [9.0, 9.5, 28.5, 48.0], photo: '', status: 'ንቁ' },
-      { id: 'A/33/19', name: 'Heran dereje', gender: 'ሴት', grade: '1A', phone: '0911919600', scores: [9.5, 9.0, 27.5, 47.0], photo: '', status: 'ንቁ' },
-      { id: 'A/34/19', name: 'Judi Zeki Abdlhadi', gender: 'ወንድ', grade: '1A', phone: '0961134950', scores: [8.5, 8.5, 25.5, 43.0], photo: '', status: 'ንቁ' },
-      { id: 'A/35/19', name: 'Junior Asrat Biru', gender: 'ወንድ', grade: '1A', phone: '0911861486', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
-      { id: 'A/36/19', name: 'Kaleab Dawit Ayele', gender: 'ወንድ', grade: '1A', phone: '0904186642', scores: [9.0, 9.0, 26.5, 45.5], photo: '', status: 'ንቁ' },
-      { id: 'A/37/19', name: 'Kalkidan Alamneh Meseret', gender: 'ወንድ', grade: '1A', phone: '0900831486', scores: [8.5, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
-      { id: 'A/38/19', name: 'Kerab Moges Gezahegn', gender: 'ወንድ', grade: '1A', phone: '0910526407', scores: [9.0, 8.5, 26.0, 45.0], photo: '', status: 'ንቁ' },
-      { id: 'A/39/19', name: 'Lelina Tesfaye Shewangizew', gender: 'ሴት', grade: '1A', phone: '0926873989', scores: [9.5, 9.5, 29.0, 48.5], photo: '', status: 'ንቁ' },
-      { id: 'A/40/19', name: 'Madot Getu Abraham', gender: 'ሴት', grade: '1A', phone: '0920725394', scores: [9.0, 9.0, 27.5, 46.5], photo: '', status: 'ንቁ' },
-      { id: 'A/41/19', name: 'Maraki Tilahun Gashaw', gender: 'ሴት', grade: '1A', phone: '0913314886', scores: [9.5, 9.0, 28.0, 47.5], photo: '', status: 'ንቁ' },
-      { id: 'A/42/19', name: 'Maramawit Getaneh Addisu', gender: 'ሴት', grade: '1A', phone: '0947893246', scores: [9.0, 9.5, 28.0, 47.0], photo: '', status: 'ንቁ' },
-      { id: 'A/43/19', name: 'Maramawit Sintayehu Semeneh', gender: 'ወንድ', grade: '1A', phone: '0967600763', scores: [8.5, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
-      { id: 'A/44/19', name: 'Melona Girum Gemechu', gender: 'ሴት', grade: '1A', phone: '0921772073', scores: [9.5, 9.0, 28.0, 48.0], photo: '', status: 'ንቁ' },
-      { id: 'A/45/19', name: 'Menesa Jemil Sultan', gender: 'ሴት', grade: '1A', phone: '0910107981', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
-      { id: 'A/46/19', name: 'Mohomred Yusuf sunkamo', gender: 'ወንድ', grade: '1A', phone: '0911972002', scores: [8.5, 8.5, 25.0, 43.0], photo: '', status: 'ንቁ' },
-      { id: 'A/47/19', name: 'Nafkot Yilkal Abebaw', gender: 'ወንድ', grade: '1A', phone: '0913553315', scores: [9.0, 9.0, 26.5, 45.0], photo: '', status: 'ንቁ' },
-      { id: 'A/48/19', name: 'Nahom Lekenaw Beyazen', gender: 'ወንድ', grade: '1A', phone: '0961224215', scores: [8.5, 9.0, 26.0, 44.5], photo: '', status: 'ንቁ' },
-      { id: 'A/49/19', name: 'Natan Hilemikael Eyasu', gender: 'ወንድ', grade: '1A', phone: '0934540158', scores: [9.0, 8.5, 26.5, 45.0], photo: '', status: 'ንቁ' },
-      { id: 'A/50/19', name: 'Natnael Dereje Mulatu', gender: 'ወንድ', grade: '1A', phone: '0991179169', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
-      { id: 'A/51/19', name: 'Reyan Abdu Sani', gender: 'ወንድ', grade: '1A', phone: '0910148921', scores: [8.5, 8.5, 25.5, 43.5], photo: '', status: 'ንቁ' },
-      { id: 'A/52/19', name: 'Robel Behailu Eba', gender: 'ወንድ', grade: '1A', phone: '0927168669', scores: [9.0, 9.0, 26.5, 45.0], photo: '', status: 'ንቁ' },
-      { id: 'A/53/19', name: 'Robel Shegaw Muche', gender: 'ወንድ', grade: '1A', phone: '0910527807', scores: [8.5, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
-      { id: 'A/54/19', name: 'Robel Yohanis Hosen', gender: 'ወንድ', grade: '1A', phone: '0911472377', scores: [9.0, 8.5, 26.0, 44.5], photo: '', status: 'ንቁ' },
-      { id: 'A/55/19', name: 'Ruth zeleke Timotewos', gender: 'ሴት', grade: '1A', phone: '0929120667', scores: [9.5, 9.5, 28.5, 48.0], photo: '', status: 'ንቁ' },
-      { id: 'A/56/19', name: 'Sunper Eyasu', gender: 'ሴት', grade: '1A', phone: '0920729676', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
-      { id: 'A/57/19', name: 'Tensye Agegnew Yirdaw', gender: 'ሴት', grade: '1A', phone: '0913266595', scores: [9.0, 9.5, 27.5, 47.0], photo: '', status: 'ንቁ' },
-      { id: 'A/58/19', name: 'Tina Tewodros Ararsa', gender: 'ሴት', grade: '1A', phone: '0920707552', scores: [9.5, 9.0, 28.0, 47.5], photo: '', status: 'ንቁ' },
-      { id: 'A/59/19', name: 'Yosef Siraj Awoel', gender: 'ወንድ', grade: '1A', phone: '0911012368', scores: [9.0, 9.0, 26.5, 45.5], photo: '', status: 'ንቁ' },
-      { id: 'A/60/19', name: 'Tinbit Yonas Yazachew', gender: 'ሴት', grade: '1A', phone: '0937397127', scores: [9.5, 9.5, 28.5, 48.0], photo: '', status: 'ንቁ' }
+      { id: 'A/31/19', name: 'Haykel Mustefa Mohammed', gender: 'ወንድ', grade: '1B', phone: '0949438091', scores: [8.5, 9.0, 26.0, 44.5], photo: '', status: 'ንቁ' },
+      { id: 'A/32/19', name: 'Hemen Fantahun Aray', gender: 'ሴት', grade: '1B', phone: '0968670919', scores: [9.0, 9.5, 28.5, 48.0], photo: '', status: 'ንቁ' },
+      { id: 'A/33/19', name: 'Heran dereje', gender: 'ሴት', grade: '1B', phone: '0911919600', scores: [9.5, 9.0, 27.5, 47.0], photo: '', status: 'ንቁ' },
+      { id: 'A/34/19', name: 'Judi Zeki Abdlhadi', gender: 'ወንድ', grade: '1B', phone: '0961134950', scores: [8.5, 8.5, 25.5, 43.0], photo: '', status: 'ንቁ' },
+      { id: 'A/35/19', name: 'Junior Asrat Biru', gender: 'ወንድ', grade: '1B', phone: '0911861486', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'A/36/19', name: 'Kaleab Dawit Ayele', gender: 'ወንድ', grade: '1B', phone: '0904186642', scores: [9.0, 9.0, 26.5, 45.5], photo: '', status: 'ንቁ' },
+      { id: 'A/37/19', name: 'Kalkidan Alamneh Meseret', gender: 'ወንድ', grade: '1B', phone: '0900831486', scores: [8.5, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
+      { id: 'A/38/19', name: 'Kerab Moges Gezahegn', gender: 'ወንድ', grade: '1B', phone: '0910526407', scores: [9.0, 8.5, 26.0, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'A/39/19', name: 'Lelina Tesfaye Shewangizew', gender: 'ሴት', grade: '1B', phone: '0926873989', scores: [9.5, 9.5, 29.0, 48.5], photo: '', status: 'ንቁ' },
+      { id: 'A/40/19', name: 'Madot Getu Abraham', gender: 'ሴት', grade: '1B', phone: '0920725394', scores: [9.0, 9.0, 27.5, 46.5], photo: '', status: 'ንቁ' },
+      { id: 'A/41/19', name: 'Maraki Tilahun Gashaw', gender: 'ሴት', grade: '1B', phone: '0913314886', scores: [9.5, 9.0, 28.0, 47.5], photo: '', status: 'ንቁ' },
+      { id: 'A/42/19', name: 'Maramawit Getaneh Addisu', gender: 'ሴት', grade: '1B', phone: '0947893246', scores: [9.0, 9.5, 28.0, 47.0], photo: '', status: 'ንቁ' },
+      { id: 'A/43/19', name: 'Maramawit Sintayehu Semeneh', gender: 'ወንድ', grade: '1B', phone: '0967600763', scores: [8.5, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
+      { id: 'A/44/19', name: 'Melona Girum Gemechu', gender: 'ሴት', grade: '1B', phone: '0921772073', scores: [9.5, 9.0, 28.0, 48.0], photo: '', status: 'ንቁ' },
+      { id: 'A/45/19', name: 'Menesa Jemil Sultan', gender: 'ሴት', grade: '1B', phone: '0910107981', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'A/46/19', name: 'Mohomred Yusuf sunkamo', gender: 'ወንድ', grade: '1B', phone: '0911972002', scores: [8.5, 8.5, 25.0, 43.0], photo: '', status: 'ንቁ' },
+      { id: 'A/47/19', name: 'Nafkot Yilkal Abebaw', gender: 'ወንድ', grade: '1B', phone: '0913553315', scores: [9.0, 9.0, 26.5, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'A/48/19', name: 'Nahom Lekenaw Beyazen', gender: 'ወንድ', grade: '1B', phone: '0961224215', scores: [8.5, 9.0, 26.0, 44.5], photo: '', status: 'ንቁ' },
+      { id: 'A/49/19', name: 'Natan Hilemikael Eyasu', gender: 'ወንድ', grade: '1B', phone: '0934540158', scores: [9.0, 8.5, 26.5, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'A/50/19', name: 'Natnael Dereje Mulatu', gender: 'ወንድ', grade: '1B', phone: '0991179169', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'A/51/19', name: 'Reyan Abdu Sani', gender: 'ወንድ', grade: '1B', phone: '0910148921', scores: [8.5, 8.5, 25.5, 43.5], photo: '', status: 'ንቁ' },
+      { id: 'A/52/19', name: 'Robel Behailu Eba', gender: 'ወንድ', grade: '1B', phone: '0927168669', scores: [9.0, 9.0, 26.5, 45.0], photo: '', status: 'ንቁ' },
+      { id: 'A/53/19', name: 'Robel Shegaw Muche', gender: 'ወንድ', grade: '1B', phone: '0910527807', scores: [8.5, 9.0, 26.0, 44.0], photo: '', status: 'ንቁ' },
+      { id: 'A/54/19', name: 'Robel Yohanis Hosen', gender: 'ወንድ', grade: '1B', phone: '0911472377', scores: [9.0, 8.5, 26.0, 44.5], photo: '', status: 'ንቁ' },
+      { id: 'A/55/19', name: 'Ruth zeleke Timotewos', gender: 'ሴት', grade: '1B', phone: '0929120667', scores: [9.5, 9.5, 28.5, 48.0], photo: '', status: 'ንቁ' },
+      { id: 'A/56/19', name: 'Sunper Eyasu', gender: 'ሴት', grade: '1B', phone: '0920729676', scores: [9.0, 9.0, 27.0, 46.0], photo: '', status: 'ንቁ' },
+      { id: 'A/57/19', name: 'Tensye Agegnew Yirdaw', gender: 'ሴት', grade: '1B', phone: '0913266595', scores: [9.0, 9.5, 27.5, 47.0], photo: '', status: 'ንቁ' },
+      { id: 'A/58/19', name: 'Tina Tewodros Ararsa', gender: 'ሴት', grade: '1B', phone: '0920707552', scores: [9.5, 9.0, 28.0, 47.5], photo: '', status: 'ንቁ' },
+      { id: 'A/59/19', name: 'Yosef Siraj Awoel', gender: 'ወንድ', grade: '1B', phone: '0911012368', scores: [9.0, 9.0, 26.5, 45.5], photo: '', status: 'ንቁ' },
+      { id: 'A/60/19', name: 'Tinbit Yonas Yazachew', gender: 'ሴት', grade: '1B', phone: '0937397127', scores: [9.5, 9.5, 28.5, 48.0], photo: '', status: 'ንቁ' }
     ];
 
     const OFFICIAL_GRADE_2_STUDENTS = [
@@ -3074,7 +3133,7 @@
     "id": "B/28/19",
     "name": "Marisel Dejeny",
     "gender": "ወንድ",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0913626074",
     "scores": [
       9.0,
@@ -3089,7 +3148,7 @@
     "id": "B/29/19",
     "name": "Markon Getachew Nedi",
     "gender": "ወንድ",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0913130678",
     "scores": [
       9.0,
@@ -3104,7 +3163,7 @@
     "id": "B/30/19",
     "name": "Mekilit Sefefi",
     "gender": "ሴት",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0991744843",
     "scores": [
       9.0,
@@ -3119,7 +3178,7 @@
     "id": "B/31/19",
     "name": "Meskir Teshom",
     "gender": "ሴት",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0929304671",
     "scores": [
       9.0,
@@ -3134,7 +3193,7 @@
     "id": "B/32/19",
     "name": "Millen Mulugeta kifle",
     "gender": "ሴት",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0931718145",
     "scores": [
       9.0,
@@ -3149,7 +3208,7 @@
     "id": "B/33/19",
     "name": "Nabek H/geberale",
     "gender": "ወንድ",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0921978963",
     "scores": [
       9.0,
@@ -3164,7 +3223,7 @@
     "id": "B/34/19",
     "name": "Nabeki Hailegebrel Garomsa",
     "gender": "ወንድ",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0921978963",
     "scores": [
       9.0,
@@ -3179,7 +3238,7 @@
     "id": "B/35/19",
     "name": "Nahom Asenafi",
     "gender": "ወንድ",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0912150856",
     "scores": [
       9.0,
@@ -3194,7 +3253,7 @@
     "id": "B/36/19",
     "name": "Nahom Ashenafi Tadesse",
     "gender": "ወንድ",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0912150856",
     "scores": [
       9.0,
@@ -3209,7 +3268,7 @@
     "id": "B/37/19",
     "name": "Natnae Solomon Zenabe",
     "gender": "ወንድ",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0923253086",
     "scores": [
       9.0,
@@ -3224,7 +3283,7 @@
     "id": "B/38/19",
     "name": "Nolawi Tywederose",
     "gender": "ሴት",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0911602285",
     "scores": [
       9.0,
@@ -3239,7 +3298,7 @@
     "id": "B/39/19",
     "name": "Riyan Emame Aliy",
     "gender": "ሴት",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0911710783",
     "scores": [
       9.0,
@@ -3254,7 +3313,7 @@
     "id": "B/40/19",
     "name": "Robel Yohan Osi",
     "gender": "ወንድ",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0911472377",
     "scores": [
       9.0,
@@ -3269,7 +3328,7 @@
     "id": "B/41/19",
     "name": "Rute Tefera Kebde",
     "gender": "ሴት",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0911513788",
     "scores": [
       9.0,
@@ -3284,7 +3343,7 @@
     "id": "B/42/19",
     "name": "Samuel Erimeys Gerema",
     "gender": "ወንድ",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0911933522",
     "scores": [
       9.0,
@@ -3299,7 +3358,7 @@
     "id": "B/43/19",
     "name": "Selam Belete Siyoum",
     "gender": "ሴት",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0951979672",
     "scores": [
       9.0,
@@ -3314,7 +3373,7 @@
     "id": "B/44/19",
     "name": "Selendos Tomase",
     "gender": "ሴት",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0923706479",
     "scores": [
       9.0,
@@ -3329,7 +3388,7 @@
     "id": "B/45/19",
     "name": "Semper Edeom",
     "gender": "ሴት",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0910072738",
     "scores": [
       9.0,
@@ -3344,7 +3403,7 @@
     "id": "B/46/19",
     "name": "Sipara Getnet Demlew",
     "gender": "ሴት",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0913461004",
     "scores": [
       9.0,
@@ -3359,7 +3418,7 @@
     "id": "B/47/19",
     "name": "Tihon Addis Cerey",
     "gender": "ሴት",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0900353529",
     "scores": [
       9.0,
@@ -3374,7 +3433,7 @@
     "id": "B/48/19",
     "name": "Twebisita addis",
     "gender": "ሴት",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0922858079",
     "scores": [
       9.0,
@@ -3389,7 +3448,7 @@
     "id": "B/49/19",
     "name": "Yordanos Mekuriya",
     "gender": "ሴት",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0910459939",
     "scores": [
       9.0,
@@ -3404,7 +3463,7 @@
     "id": "B/50/19",
     "name": "Zemen Alembirhan Haile",
     "gender": "ሴት",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0944101301",
     "scores": [
       9.0,
@@ -3419,7 +3478,7 @@
     "id": "B/51/19",
     "name": "Zemikael Tesefaye Mekone",
     "gender": "ወንድ",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0919721919",
     "scores": [
       9.0,
@@ -3434,7 +3493,7 @@
     "id": "B/52/19",
     "name": "Hawlet Addi Shifa",
     "gender": "ሴት",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0911013515",
     "scores": [
       9.0,
@@ -3449,7 +3508,7 @@
     "id": "B/53/19",
     "name": "Tibebu Solomon H/mariam",
     "gender": "ሴት",
-    "grade": "2ኛA",
+    "grade": "2ኛB",
     "phone": "0921804013",
     "scores": [
       9.0,
@@ -3827,7 +3886,7 @@
     "id": "C/25/19",
     "name": "Maedot Sintayehu Tekelabe",
     "gender": "ሴት",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0967650566",
     "scores": [
       9.0,
@@ -3842,7 +3901,7 @@
     "id": "C/26/19",
     "name": "Makiba Getahun",
     "gender": "ሴት",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0916822368",
     "scores": [
       9.0,
@@ -3857,7 +3916,7 @@
     "id": "C/27/19",
     "name": "Monet Fekiru Kejela",
     "gender": "ሴት",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0912929367",
     "scores": [
       9.0,
@@ -3872,7 +3931,7 @@
     "id": "C/28/19",
     "name": "Naode Solomom",
     "gender": "ሴት",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0911373909",
     "scores": [
       9.0,
@@ -3887,7 +3946,7 @@
     "id": "C/29/19",
     "name": "Natan Anteneh Getachew",
     "gender": "ወንድ",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0911478443",
     "scores": [
       9.0,
@@ -3902,7 +3961,7 @@
     "id": "C/30/19",
     "name": "Nathan Demelash Kume",
     "gender": "ወንድ",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0912688490",
     "scores": [
       9.0,
@@ -3917,7 +3976,7 @@
     "id": "C/31/19",
     "name": "Natinm Worken Guta",
     "gender": "ወንድ",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0939670104",
     "scores": [
       9.0,
@@ -3932,7 +3991,7 @@
     "id": "C/32/19",
     "name": "Nebat  Mehammed",
     "gender": "ሴት",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0925989652",
     "scores": [
       9.0,
@@ -3947,7 +4006,7 @@
     "id": "C/33/19",
     "name": "Nejat Mehmmed Alemye",
     "gender": "ሴት",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0925989652",
     "scores": [
       9.0,
@@ -3962,7 +4021,7 @@
     "id": "C/34/19",
     "name": "Newal Abubeker Suleyman",
     "gender": "ሴት",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0964202931",
     "scores": [
       9.0,
@@ -3977,7 +4036,7 @@
     "id": "C/35/19",
     "name": "Nolawi million Lemma",
     "gender": "ወንድ",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0924848134",
     "scores": [
       9.0,
@@ -3992,7 +4051,7 @@
     "id": "C/36/19",
     "name": "Nuhamin Solomon Dessalegn",
     "gender": "ሴት",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0992552686",
     "scores": [
       9.0,
@@ -4007,7 +4066,7 @@
     "id": "C/37/19",
     "name": "Rakib solomon Temame",
     "gender": "ሴት",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0911373909",
     "scores": [
       9.0,
@@ -4022,7 +4081,7 @@
     "id": "C/38/19",
     "name": "Sebirina Selahadin Temame",
     "gender": "ሴት",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0963201304",
     "scores": [
       9.0,
@@ -4037,7 +4096,7 @@
     "id": "C/39/19",
     "name": "Selman Jemil Delil",
     "gender": "ወንድ",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0913708797",
     "scores": [
       9.0,
@@ -4052,7 +4111,7 @@
     "id": "C/40/19",
     "name": "Yabesera Melaku",
     "gender": "ወንድ",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0940256301",
     "scores": [
       9.0,
@@ -4067,7 +4126,7 @@
     "id": "C/41/19",
     "name": "Yeausera Melaku Desalgn",
     "gender": "ወንድ",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0940256301",
     "scores": [
       9.0,
@@ -4082,7 +4141,7 @@
     "id": "C/42/19",
     "name": "Yohannes Geta Teshome",
     "gender": "ወንድ",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0944364243",
     "scores": [
       9.0,
@@ -4097,7 +4156,7 @@
     "id": "C/43/19",
     "name": "Yohannes Sentayehu",
     "gender": "ወንድ",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0911944734",
     "scores": [
       9.0,
@@ -4112,7 +4171,7 @@
     "id": "C/44/19",
     "name": "Zekariase Tadesse Ayele",
     "gender": "ወንድ",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0902458781",
     "scores": [
       9.0,
@@ -4127,7 +4186,7 @@
     "id": "C/45/19",
     "name": "Robel Gebeyehu Negash",
     "gender": "ወንድ",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0911000000",
     "scores": [
       9.0,
@@ -4142,7 +4201,7 @@
     "id": "C/46/19",
     "name": "Elroe Ashenafi Solomon",
     "gender": "ሴት",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0913637740",
     "scores": [
       9.0,
@@ -4157,7 +4216,7 @@
     "id": "C/47/19",
     "name": "Abikem Asdesach Habtie",
     "gender": "ወንድ",
-    "grade": "3ኛA",
+    "grade": "3ኛB",
     "phone": "0913307330",
     "scores": [
       9.0,
@@ -4325,7 +4384,7 @@
     "id": "D/11/19",
     "name": "Elroi  Ashenafi Solomon",
     "gender": "ሴት",
-    "grade": "4ኛA",
+    "grade": "4ኛB",
     "phone": "0929193220",
     "scores": [
       9.0,
@@ -4340,7 +4399,7 @@
     "id": "D/12/19",
     "name": "Enas Abubeker Hmza",
     "gender": "ሴት",
-    "grade": "4ኛA",
+    "grade": "4ኛB",
     "phone": "0912025302",
     "scores": [
       9.0,
@@ -4355,7 +4414,7 @@
     "id": "D/13/19",
     "name": "Harun Dawud Kemal",
     "gender": "ወንድ",
-    "grade": "4ኛA",
+    "grade": "4ኛB",
     "phone": "0913201522",
     "scores": [
       9.0,
@@ -4370,7 +4429,7 @@
     "id": "D/14/19",
     "name": "Kalkidan Adisu Senbet",
     "gender": "ሴት",
-    "grade": "4ኛA",
+    "grade": "4ኛB",
     "phone": "0964468034",
     "scores": [
       9.0,
@@ -4385,7 +4444,7 @@
     "id": "D/15/19",
     "name": "Makibel Aneteneh Getacew",
     "gender": "ወንድ",
-    "grade": "4ኛA",
+    "grade": "4ኛB",
     "phone": "0911478443",
     "scores": [
       9.0,
@@ -4400,7 +4459,7 @@
     "id": "D/16/19",
     "name": "Mintsenot Dereje",
     "gender": "ወንድ",
-    "grade": "4ኛA",
+    "grade": "4ኛB",
     "phone": "0991179169",
     "scores": [
       9.0,
@@ -4415,7 +4474,7 @@
     "id": "D/17/19",
     "name": "Nohel Million",
     "gender": "ወንድ",
-    "grade": "4ኛA",
+    "grade": "4ኛB",
     "phone": "0911643150",
     "scores": [
       9.0,
@@ -4430,7 +4489,7 @@
     "id": "D/18/19",
     "name": "Samuel Yoseph Sahelmariame",
     "gender": "ወንድ",
-    "grade": "4ኛA",
+    "grade": "4ኛB",
     "phone": "0930011709",
     "scores": [
       9.0,
@@ -4445,7 +4504,7 @@
     "id": "D/19/19",
     "name": "Yanet Tesefahun Belay",
     "gender": "ሴት",
-    "grade": "4ኛA",
+    "grade": "4ኛB",
     "phone": "0911128772",
     "scores": [
       9.0,
@@ -4460,7 +4519,7 @@
     "id": "D/20/19",
     "name": "Yonatan Negatu W/senbet",
     "gender": "ወንድ",
-    "grade": "4ኛA",
+    "grade": "4ኛB",
     "phone": "0910560557",
     "scores": [
       9.0,
@@ -4475,7 +4534,7 @@
     "id": "D/21/19",
     "name": "Yohannes Zewudu Tadesse",
     "gender": "ወንድ",
-    "grade": "4ኛA",
+    "grade": "4ኛB",
     "phone": "0943100850",
     "scores": [
       9.0,
@@ -4613,7 +4672,7 @@
     "id": "E/09/19",
     "name": "Natan Gosaye Abera",
     "gender": "ወንድ",
-    "grade": "5ኛA",
+    "grade": "5ኛB",
     "phone": "0911810965",
     "scores": [
       9.0,
@@ -4628,7 +4687,7 @@
     "id": "E/10/19",
     "name": "Raey Yohannes Mihirtu",
     "gender": "ወንድ",
-    "grade": "5ኛA",
+    "grade": "5ኛB",
     "phone": "0911178392",
     "scores": [
       9.0,
@@ -4643,7 +4702,7 @@
     "id": "E/11/19",
     "name": "Rakeb Solomon G/selasy",
     "gender": "ሴት",
-    "grade": "5ኛA",
+    "grade": "5ኛB",
     "phone": "0913160768",
     "scores": [
       9.0,
@@ -4658,7 +4717,7 @@
     "id": "E/12/19",
     "name": "Shalom Muluken",
     "gender": "ሴት",
-    "grade": "5ኛA",
+    "grade": "5ኛB",
     "phone": "0911000000",
     "scores": [
       9.0,
@@ -4673,7 +4732,7 @@
     "id": "E/13/19",
     "name": "Tsion Ashenafi Tadesse",
     "gender": "ሴት",
-    "grade": "5ኛA",
+    "grade": "5ኛB",
     "phone": "0912150856",
     "scores": [
       9.0,
@@ -4688,7 +4747,7 @@
     "id": "E/14/19",
     "name": "Yemariyam Dagmawi Alemayehu",
     "gender": "ሴት",
-    "grade": "5ኛA",
+    "grade": "5ኛB",
     "phone": "0913371054",
     "scores": [
       9.0,
@@ -4703,7 +4762,7 @@
     "id": "E/15/19",
     "name": "Yenus  Abdu Sane",
     "gender": "ወንድ",
-    "grade": "5ኛA",
+    "grade": "5ኛB",
     "phone": "0910148921",
     "scores": [
       9.0,
@@ -4718,7 +4777,7 @@
     "id": "E/16/19",
     "name": "Yonatan Dawit G/mariyam",
     "gender": "ወንድ",
-    "grade": "5ኛA",
+    "grade": "5ኛB",
     "phone": "0913552460",
     "scores": [
       9.0,
@@ -4811,7 +4870,7 @@
     "id": "G/06/19",
     "name": "Emran Mohammed Hassen",
     "gender": "ወንድ",
-    "grade": "7ኛA",
+    "grade": "7ኛB",
     "phone": "0913906652",
     "scores": [
       9.0,
@@ -4826,7 +4885,7 @@
     "id": "G/07/19",
     "name": "Hayat  Kemale",
     "gender": "ሴት",
-    "grade": "7ኛA",
+    "grade": "7ኛB",
     "phone": "0966035768",
     "scores": [
       9.0,
@@ -4841,7 +4900,7 @@
     "id": "G/08/19",
     "name": "Natnael Yonas Mulugeta",
     "gender": "ወንድ",
-    "grade": "7ኛA",
+    "grade": "7ኛB",
     "phone": "0913345058",
     "scores": [
       9.0,
@@ -4856,7 +4915,7 @@
     "id": "G/09/19",
     "name": "Rut Yared Tilahun",
     "gender": "ሴት",
-    "grade": "7ኛA",
+    "grade": "7ኛB",
     "phone": "0965808912",
     "scores": [
       9.0,
@@ -4871,7 +4930,7 @@
     "id": "G/10/19",
     "name": "Yonatan Samuel Mekasha",
     "gender": "ወንድ",
-    "grade": "7ኛA",
+    "grade": "7ኛB",
     "phone": "0900820060",
     "scores": [
       9.0,
@@ -4886,7 +4945,7 @@
     "id": "G/11/19",
     "name": "Yordanos Mengest Abebe",
     "gender": "ሴት",
-    "grade": "7ኛA",
+    "grade": "7ኛB",
     "phone": "0912711636",
     "scores": [
       9.0,
@@ -5683,11 +5742,16 @@
       const tbody = document.getElementById('studentsTableBody');
       if (!tbody) return;
       tbody.innerHTML = activeStudents.map((s, index) => {
+        const normGrade = normalizeStudentGrade(s.grade);
+        const gMatch = normGrade.match(/\d+/);
+        const gNum = gMatch ? gMatch[0] : '';
+        const secMatch = normGrade.match(/[A-Za-z]/);
+        const secLetter = secMatch ? secMatch[0].toUpperCase() : 'A';
         const avatar = s.photo
           ? `<img src="${s.photo}" alt="${s.name}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid var(--accent); vertical-align:middle; margin-right:8px; box-shadow:0 1px 4px rgba(0,0,0,0.1);">`
           : `<span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; background:${s.gender === 'ሴት' ? '#FCE7F3' : '#DBEAFE'}; color:${s.gender === 'ሴት' ? '#BE185D' : '#1E40AF'}; font-weight:bold; font-size:0.85rem; margin-right:8px; vertical-align:middle;">${s.name.charAt(0)}</span>`;
         return `
-        <tr>
+        <tr data-grade="${gNum}" data-section="${secLetter}" data-fullgrade="${normGrade}">
           <td style="text-align:center; font-weight:bold; color:#64748B;">${index + 1}</td>
           <td><span class="badge-id">${s.id}</span></td>
           <td>
@@ -5700,7 +5764,7 @@
             </div>
           </td>
           <td><span style="font-size:0.8rem; font-weight:600; padding:2px 8px; border-radius:12px; background:${s.gender === 'ሴት' ? '#FCE7F3' : '#DBEAFE'}; color:${s.gender === 'ሴት' ? '#BE185D' : '#1E40AF'};">${s.gender}</span></td>
-          <td><span class="badge badge-primary">${s.grade}</span></td>
+          <td><span class="badge badge-primary">${normGrade}</span></td>
           <td><a href="tel:${s.phone}" style="color:var(--primary); text-decoration:none; font-weight:600;">${s.phone}</a></td>
           <td><span class="badge badge-success">${s.status}</span></td>
           <td style="text-align:center; white-space:nowrap;">
@@ -5710,9 +5774,7 @@
         </tr>
       `}).join('');
 
-      if (document.getElementById('studentSearch') && document.getElementById('studentSearch').value.trim()) {
-        filterStudents();
-      }
+      filterStudents();
     }
 
     const STANDARD_ETHIO_SUBJECTS = [
@@ -7436,6 +7498,94 @@
       changeStudentAttendanceStatusWeb(activeAttendance[index].id || activeAttendance[index].name, newStatus);
     }
 
+    // Teacher & Principal signature helpers for Roster and Report Card
+    function getDefaultHomeroomTeacherForGrade(gradeStr) {
+      const norm = normalizeStudentGrade(gradeStr || '1A');
+      const mapping = {
+        '1A': 'አቶ ደረጀ ተሾመ',
+        '1B': 'ወ/ሮ አልማዝ አየለ',
+        '2A': 'አቶ ዮናስ በቀለ',
+        '2B': 'ወ/ሮ ታደለች ገብሬ',
+        '3A': 'አቶ ሙሉጌታ ታከለ',
+        '3B': 'ወ/ሮ ሳራ ንጉሴ',
+        '4A': 'አቶ ደረጀ ተሾመ',
+        '4B': 'ወ/ሮ አልማዝ አየለ',
+        '5A': 'አቶ ዮናስ በቀለ',
+        '5B': 'ወ/ሮ ታደለች ገብሬ',
+        '6A': 'አቶ ሙሉጌታ ከበደ',
+        '6B': 'ዶ/ር ቴዎድሮስ ካሳ',
+        '7A': 'አቶ ብርሃኑ ተፈራ',
+        '7B': 'ወ/ሮ ሳራ ንጉሴ',
+        '8A': 'Mr Siyum Getnet',
+        '8B': 'ወ/ሮ አልማዝ አየለ',
+        '9A': 'አቶ ሙሉጌታ ከበደ',
+        '10C': 'አቶ ብርሃኑ ተፈራ',
+        '11B': 'ዶ/ር ቴዎድሮስ ካሳ',
+        '12A': 'Mr Siyum Getnet',
+        '12B': 'ወ/ሮ አልማዝ አየለ'
+      };
+      return mapping[norm] || mapping[gradeStr] || 'አቶ ደረጀ ተሾመ';
+    }
+
+    function getAllAvailableTeachersForSignatures() {
+      const standardList = [
+        'አቶ ደረጀ ተሾመ (1A/4A ክፍል ኃላፊ)',
+        'ወ/ሮ አልማዝ አየለ (1B/4B/8B ክፍል ኃላፊ)',
+        'አቶ ዮናስ በቀለ (2A/5A ክፍል ኃላፊ)',
+        'ወ/ሮ ታደለች ገብሬ (2B/5B ክፍል ኃላፊ)',
+        'አቶ ሙሉጌታ ታከለ (3A ክፍል ኃላፊ)',
+        'ወ/ሮ ሳራ ንጉሴ (3B/7B ክፍል ኃላፊ)',
+        'አቶ ሙሉጌታ ከበደ (6A/9A ክፍል ኃላፊ)',
+        'ዶ/ር ቴዎድሮስ ካሳ (6B/11B ክፍል ኃላፊ)',
+        'አቶ ብርሃኑ ተፈራ (7A/10C ክፍል ኃላፊ)',
+        'Mr Siyum Getnet (8A/12A ክፍል ኃላፊ)',
+        'Tadesse Misganaw (መምህር / አድሚን)'
+      ];
+      const activeStaff = (typeof getFilteredStaffWeb === 'function' ? getFilteredStaffWeb() : (staffList || []));
+      activeStaff.forEach(st => {
+        if (!st || !st.name) return;
+        const exists = standardList.some(item => item.includes(st.name));
+        if (!exists) {
+          standardList.push(`${st.name} (${st.role || 'መምህር'})`);
+        }
+      });
+      return standardList;
+    }
+
+    function getAllAvailablePrincipalsForSignatures() {
+      return [
+        'Mr.Bizuneh (ርዕሰ መምህር - Principal)',
+        'Genber Gebru (ምክትል ርዕሰ መምህር - Vice Principal)',
+        'ታደሰ ምስጋናው (ሲስተም አድሚን - Super Admin)'
+      ];
+    }
+
+    function onRosterTeacherChange() {
+      const tSelect = document.getElementById('rosterTeacherSelect');
+      const gSelect = document.getElementById('rosterGradeSelect');
+      const teacherName = tSelect ? tSelect.value : '';
+      const selectedGrade = gSelect ? gSelect.value : '';
+      const badge = document.getElementById('rosterHomeroomBadge');
+      if (badge) badge.innerText = `👨‍🏫 የክፍል ኃላፊ፦ ${teacherName} (${selectedGrade})`;
+      const footerTeacher = document.getElementById('rosterFooterTeacherName');
+      if (footerTeacher) footerTeacher.innerText = teacherName;
+    }
+
+    function onRosterPrincipalChange() {
+      const pSelect = document.getElementById('rosterPrincipalSelect');
+      const principalName = pSelect ? pSelect.value : 'Mr.Bizuneh';
+      const footerPrincipal = document.getElementById('rosterFooterPrincipalName');
+      if (footerPrincipal) footerPrincipal.innerText = principalName;
+    }
+
+    function onCardTeacherSelectChange() {
+      // Updates selected teacher for report card
+    }
+
+    function onCardPrincipalSelectChange() {
+      // Updates selected principal for report card
+    }
+
     // Homeroom Master Roster Generator (የክፍል ኃላፊ ሮስተር ማመንጫ - Strictly Segregated)
     function renderHomeroomRoster() {
       const activeStudents = getFilteredStudentsWeb();
@@ -7456,23 +7606,48 @@
 
       const selectedGrade = select ? select.value : (availableClasses[0] || '8A');
 
-      // Find homeroom teacher matching this section or level
-      const hrTeacher = activeStaff.find(s => (s.role || '').includes('የክፍል ኃላፊ') && ((s.role || '').includes(selectedGrade) || (s.dept || '').includes(selectedGrade)))
-        || activeStaff.find(s => (s.role || '').includes('የክፍል ኃላፊ'))
-        || activeStaff.find(s => (s.role || '').includes('መምህር'))
-        || activeStaff[0]
-        || { name: (schoolSettings && schoolSettings.nameAm ? schoolSettings.nameAm + ' መምህር' : 'ያልተመደበ') };
-      
-      const badge = document.getElementById('rosterHomeroomBadge');
-      if (badge) {
-        badge.innerText = `👨‍🏫 የክፍል ኃላፊ፦ ${hrTeacher.name} (${selectedGrade})`;
+      // Populate Roster Teacher & Principal Selectors
+      const tSelect = document.getElementById('rosterTeacherSelect');
+      const pSelect = document.getElementById('rosterPrincipalSelect');
+      const defTeacher = getDefaultHomeroomTeacherForGrade(selectedGrade);
+
+      if (tSelect) {
+        const teachers = getAllAvailableTeachersForSignatures();
+        const curVal = tSelect.value;
+        tSelect.innerHTML = teachers.map(t => {
+          const rawName = t.split(' (')[0];
+          const isMatch = curVal ? (rawName === curVal || t.includes(curVal)) : (rawName === defTeacher || t.includes(defTeacher));
+          return `<option value="${rawName}" ${isMatch ? 'selected' : ''}>${t}</option>`;
+        }).join('');
       }
 
-      // Filter students strictly belonging to this grade/level
-      let classStudents = activeStudents.filter(s => s.grade === selectedGrade);
-      if (classStudents.length === 0) {
-        classStudents = activeStudents;
+      if (pSelect) {
+        const principals = getAllAvailablePrincipalsForSignatures();
+        const curPVal = pSelect.value || 'Mr.Bizuneh';
+        pSelect.innerHTML = principals.map(p => {
+          const rawPName = p.split(' (')[0];
+          const isMatch = (rawPName === curPVal || p.includes(curPVal));
+          return `<option value="${rawPName}" ${isMatch ? 'selected' : ''}>${p}</option>`;
+        }).join('');
       }
+
+      const activeTeacherName = (tSelect && tSelect.value) ? tSelect.value : defTeacher;
+      const activePrincipalName = (pSelect && pSelect.value) ? pSelect.value : 'Mr.Bizuneh';
+
+      const badge = document.getElementById('rosterHomeroomBadge');
+      if (badge) {
+        badge.innerText = `👨‍🏫 የክፍል ኃላፊ፦ ${activeTeacherName} (${selectedGrade})`;
+      }
+      const footerTeacher = document.getElementById('rosterFooterTeacherName');
+      if (footerTeacher) footerTeacher.innerText = activeTeacherName;
+      const footerPrincipal = document.getElementById('rosterFooterPrincipalName');
+      if (footerPrincipal) footerPrincipal.innerText = activePrincipalName;
+      const rosterDate = document.getElementById('rosterSignatureDate');
+      if (rosterDate) rosterDate.innerText = new Date().toLocaleDateString('am-ET') + ' (2017 ዓ.ም)';
+
+      // Filter students strictly belonging to this grade and section (e.g. 3A strictly 3A, 3B strictly 3B)
+      const targetGradeNorm = normalizeStudentGrade(selectedGrade);
+      let classStudents = activeStudents.filter(s => normalizeStudentGrade(s.grade) === targetGradeNorm);
 
       // Dynamic Roster Header per Grade Level
       const theadRow = document.getElementById('rosterTableHeaderRow');
@@ -7541,6 +7716,11 @@
 
       const tbody = document.getElementById('rosterTableBody');
       if (!tbody) return;
+
+      if (rosterData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${subjects.length + 6}" style="text-align:center; padding:2.5rem 1rem; color:#64748B; font-weight:600; font-size:0.85rem;">ℹ️ በክፍል ${selectedGrade} የተመዘገበ ተማሪ አልተገኘም (0 ተማሪዎች)። ተማሪዎችን ለመመዝገብ «የተማሪዎች መዝገብ» ገፅ ይጠቀሙ።</td></tr>`;
+        return;
+      }
 
       tbody.innerHTML = rosterData.map(row => {
         const s = row.student;
@@ -7772,27 +7952,48 @@
       // Calculate class rank strictly within segregated class
       const activeStudents = getFilteredStudentsWeb();
       const activeStaff = getFilteredStaffWeb();
-      const selectedGrade = student.grade;
-      const classStudents = activeStudents.filter(s => s.grade === selectedGrade);
+      const selectedGrade = normalizeStudentGrade(student.grade);
+      const classStudents = activeStudents.filter(s => normalizeStudentGrade(s.grade) === selectedGrade);
       const studentIdx = classStudents.findIndex(s => s.id === student.id);
       const rank = (studentIdx >= 0 ? studentIdx + 1 : 1);
-      document.getElementById('cardModalRank').innerText = `${rank}ኛ ደረጃ (ከ ${classStudents.length || activeStudents.length} ተማሪዎች)`;
+      document.getElementById('cardModalRank').innerText = `${rank}ኛ ደረጃ (ከ ${classStudents.length} ተማሪዎች)`;
 
-      // Homeroom Teacher name strictly matching active level
-      const hrTeacher = activeStaff.find(s => (s.role || '').includes('የክፍል ኃላፊ') && ((s.role || '').includes(selectedGrade) || (s.dept || '').includes(selectedGrade)))
-        || activeStaff.find(s => (s.role || '').includes('የክፍል ኃላፊ'))
-        || activeStaff.find(s => (s.role || '').includes('መምህር'))
-        || activeStaff[0]
-        || { name: (schoolSettings && schoolSettings.nameAm ? schoolSettings.nameAm + ' መምህር' : 'ያልተመደበ') };
-      document.getElementById('cardModalHomeroomTeacher').innerText = hrTeacher.name;
+      // Populate Report Card Teacher & Principal Selectors
+      const cardTSelect = document.getElementById('cardModalTeacherSelect');
+      const cardPSelect = document.getElementById('cardModalPrincipalSelect');
+      const defTeacher = getDefaultHomeroomTeacherForGrade(student.grade);
+
+      if (cardTSelect) {
+        const teachers = getAllAvailableTeachersForSignatures();
+        cardTSelect.innerHTML = teachers.map(t => {
+          const rawName = t.split(' (')[0];
+          const isMatch = (rawName === defTeacher || t.includes(defTeacher));
+          return `<option value="${rawName}" ${isMatch ? 'selected' : ''}>${t}</option>`;
+        }).join('');
+      }
+
+      if (cardPSelect) {
+        const principals = getAllAvailablePrincipalsForSignatures();
+        cardPSelect.innerHTML = principals.map((p, idx) => {
+          const rawPName = p.split(' (')[0];
+          return `<option value="${rawPName}" ${idx === 0 ? 'selected' : ''}>${p}</option>`;
+        }).join('');
+      }
+
+      const assignedTeacher = (cardTSelect && cardTSelect.value) ? cardTSelect.value : defTeacher;
+      const assignedPrincipal = (cardPSelect && cardPSelect.value) ? cardPSelect.value : 'Mr.Bizuneh';
+
+      if (document.getElementById('cardModalHomeroomTeacher')) {
+        document.getElementById('cardModalHomeroomTeacher').innerText = assignedTeacher;
+      }
       if (document.getElementById('cardModalPrincipalName')) {
-        document.getElementById('cardModalPrincipalName').innerText = (schoolSettings && schoolSettings.principalAm) ? schoolSettings.principalAm : 'ርዕሰ መምህር';
+        document.getElementById('cardModalPrincipalName').innerText = assignedPrincipal;
       }
       if (document.getElementById('reportCardPrintTeacher')) {
-        document.getElementById('reportCardPrintTeacher').innerText = hrTeacher.name;
+        document.getElementById('reportCardPrintTeacher').innerText = assignedTeacher;
       }
       if (document.getElementById('reportCardPrintPrincipal')) {
-        document.getElementById('reportCardPrintPrincipal').innerText = (schoolSettings && schoolSettings.principalAm) ? schoolSettings.principalAm : 'ርዕሰ መምህር';
+        document.getElementById('reportCardPrintPrincipal').innerText = assignedPrincipal;
       }
     }
 
@@ -8235,9 +8436,66 @@
     }
 
     function filterStudents() {
-      const q = document.getElementById('studentSearch').value.toLowerCase();
-      document.querySelectorAll('#studentsTableBody tr').forEach(row => {
-        row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
+      const searchRaw = (document.getElementById('studentSearch')?.value || '').trim();
+      const searchLower = searchRaw.toLowerCase();
+      const gradeFilter = document.getElementById('filterStudentGrade')?.value || 'ALL';
+      const sectionFilter = document.getElementById('filterStudentSection')?.value || 'ALL';
+
+      // Pattern: "3A", "3B", "3-A", "3-B", "Grade 3A", "ክፍል 3A", "1B", "6A", etc.
+      const gradeSecRegex = /^(?:ክፍል\s*|grade\s*)?(\d{1,2})\s*[-_ ]?\s*([A-Za-z])$/i;
+      // Pattern: "A", "B", "sec A", "sec B", "ሴክሽን A", "ሴክሽን B"
+      const secOnlyRegex = /^(?:ሴክሽን\s*|section\s*|sec\s*)?([A-Za-z])$/i;
+
+      const gradeSecMatch = searchRaw.match(gradeSecRegex);
+      const secOnlyMatch = (!gradeSecMatch && searchRaw.length <= 4) ? searchRaw.match(secOnlyRegex) : null;
+
+      let targetGradeNum = null;
+      let targetSectionLetter = null;
+      if (gradeSecMatch) {
+        targetGradeNum = gradeSecMatch[1];
+        targetSectionLetter = gradeSecMatch[2].toUpperCase();
+      } else if (secOnlyMatch) {
+        targetSectionLetter = secOnlyMatch[1].toUpperCase();
+      }
+
+      const rows = document.querySelectorAll('#studentsTableBody tr');
+      rows.forEach(row => {
+        const studentGradeNum = row.getAttribute('data-grade') || '';
+        const studentSection = (row.getAttribute('data-section') || '').toUpperCase();
+        const fullGrade = (row.getAttribute('data-fullgrade') || '').toLowerCase();
+        const rowText = row.innerText.toLowerCase();
+
+        // 1. Strict Section Matching
+        let matchSection = true;
+        if (targetSectionLetter) {
+          matchSection = (studentSection === targetSectionLetter);
+        } else if (sectionFilter !== 'ALL') {
+          matchSection = (studentSection === sectionFilter.toUpperCase());
+        }
+
+        // 2. Strict Grade Matching
+        let matchGrade = true;
+        if (targetGradeNum) {
+          matchGrade = (studentGradeNum === targetGradeNum);
+        } else if (gradeFilter !== 'ALL') {
+          matchGrade = (studentGradeNum === gradeFilter);
+        }
+
+        // 3. Search Query Matching (Student Name, ID, Phone)
+        let matchQuery = true;
+        if (searchLower) {
+          if (targetGradeNum && targetSectionLetter) {
+            // Explicit 3A or 3B searched: already handled strictly by grade & section!
+            matchQuery = true;
+          } else if (targetSectionLetter && !targetGradeNum) {
+            // Explicit section searched: already handled strictly by section!
+            matchQuery = true;
+          } else {
+            matchQuery = rowText.includes(searchLower) || fullGrade.includes(searchLower);
+          }
+        }
+
+        row.style.display = (matchSection && matchGrade && matchQuery) ? '' : 'none';
       });
     }
 
@@ -9167,83 +9425,23 @@
     }
 
     function quickFillAndLogin(roleKey) {
-      let userToLogin = null;
-      if (roleKey === 'admin') {
-        userToLogin = {
-          name: 'እኔ (ታደሰ ምስጋናው - ሲስተም አድሚን)',
-          role: '👑 ሲስተም አድሚን',
-          email: 'tadessemisganaw4@gmail.com',
-          secondaryEmail: 'tadethanks6@gmail.com',
-          phone: '0911999999',
-          staffId: 'STF-003',
-          pass: 'tade@2026',
-          isAdmin: true,
-          isVicePrincipal: false,
-          roleKey: 'admin'
-        };
-      } else if (roleKey === 'principal') {
-        userToLogin = {
-          name: 'Mr.Bizuneh',
-          role: '👔 ርዕሰ መምህር (Principal)',
-          email: 'bizuneh@dilijent.edu.et',
-          phone: '0911000001',
-          staffId: 'STF-001',
-          pass: 'Staff@2026',
-          isAdmin: false,
-          isVicePrincipal: false,
-          isPrincipal: true,
-          roleKey: 'principal'
-        };
-      } else if (roleKey === 'vp') {
-        userToLogin = {
-          name: 'Genber Gebru',
-          role: '🎓 ምክትል ርዕሰ መምህር',
-          email: 'vp@dilijent.edu.et',
-          phone: '0918000000',
-          staffId: 'STF-002',
-          pass: 'vp1234',
-          isAdmin: false,
-          isVicePrincipal: true,
-          roleKey: 'vice_principal'
-        };
-      } else if (roleKey === 'teacher' || roleKey === 'siyum') {
-        userToLogin = {
-          name: 'Mr Siyum Getnet',
-          role: '👨‍🏫 መምህር (Teacher - 8ኛ A ኃላፊ)',
-          email: 'siyum.getnet@dilijent.edu.et',
-          phone: '0911888888',
-          staffId: 'STF-004',
-          pass: 'Staff@2026',
-          isAdmin: false,
-          isVicePrincipal: false,
-          roleKey: 'teacher'
-        };
-      } else if (roleKey === 'secretary') {
-        userToLogin = {
-          name: 'Sara Niguse',
-          role: '✍️ ዋና ጸሐፊ / ሬጅስትራር',
-          email: 'sara.niguse@dilijent.edu.et',
-          phone: '0960225925',
-          staffId: 'STF-005',
-          pass: 'sara@123',
-          isAdmin: false,
-          isVicePrincipal: false,
-          roleKey: 'secretary'
-        };
+      const select = document.getElementById('fullLoginRoleSelect') || document.getElementById('loginRoleSelect');
+      if (select) {
+        select.value = roleKey;
+        if (typeof handleFullLoginRoleDropdownChange === 'function') handleFullLoginRoleDropdownChange();
       }
-      if (userToLogin) {
-        currentWebUser = userToLogin;
-        isGuestMode = false;
-        localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
-        updateCurrentUserUI();
-        closeLoginModal();
-        if (typeof renderAttendance === 'function') renderAttendance();
-        if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
-        if (typeof renderStudents === 'function') renderStudents();
-        if (typeof renderStaff === 'function') renderStaff();
-        if (typeof renderDashboard === 'function') renderDashboard();
-        alert(`🎉 እንኳን ደህና መጡ! ${userToLogin.name} (${userToLogin.role}) በተሳካ ሁኔታ ገብተዋል።`);
+      const identInput = document.getElementById('inputFullLoginIdentifier') || document.getElementById('inputWebLoginIdentifier');
+      const passInput = document.getElementById('inputFullLoginPass') || document.getElementById('inputWebLoginPass');
+      if (roleKey === 'admin' && identInput) identInput.value = 'tadessemisganaw4@gmail.com';
+      else if (roleKey === 'principal' && identInput) identInput.value = '0911000001';
+      else if (roleKey === 'vp' && identInput) identInput.value = '0918000000';
+      else if (roleKey === 'teacher' && identInput) identInput.value = '0911888888';
+      else if (roleKey === 'secretary' && identInput) identInput.value = '0960225925';
+      if (passInput) {
+        passInput.value = '';
+        passInput.focus();
       }
+      alert('🔒 ደህንነት፦ እባክዎ ሚስጥራዊ የይለፍ ቃልዎን አስገብተው «ግባ» የሚለውን ይጫኑ!');
     }
 
     function executeUnifiedLogin(rawIdentifier, pass, roleKey) {
@@ -9261,34 +9459,24 @@
         return false;
       }
 
-      // 1. ADMIN CHECK (Tadesse Misganaw)
+      // 1. ADMIN CHECK (Tadesse Misganaw - Strict Email/Identifier & Password)
       const isAdminIdent = (
         cleanIdent === 'tadessemisganaw4@gmail.com' ||
         cleanIdent === 'tadethanks6@gmail.com' ||
         cleanIdent === 'admin@dilijent.edu.et' ||
         cleanIdent === 'admin' ||
-        cleanIdent.includes('tadesse') ||
+        cleanIdent === 'tadesse' ||
         cleanIdent === 'tade' ||
         cleanPhone === '0911999999' ||
         cleanIdent === 'stf-003' ||
-        cleanIdent === 'stf-admin' ||
-        roleKey === 'admin'
+        cleanIdent === 'stf-admin'
       );
       const isAdminPass = (
         cleanPass === 'tade@2026' ||
         cleanPass === 'tade2026' ||
         cleanPass.toLowerCase() === 'tade@2026' ||
         cleanPass === 'Admin@2026' ||
-        cleanPass.toLowerCase() === 'admin@2026' ||
-        cleanPass === 'admin123' ||
-        cleanPass.toLowerCase() === 'admin123' ||
-        cleanPass === 'admin' ||
-        cleanPass === '1234' ||
-        cleanPass === '123456' ||
-        cleanPass === 'tade' ||
-        cleanPass === 'Staff@2026' ||
-        cleanPass.toLowerCase() === 'staff@2026' ||
-        cleanPass === 'Teacher@2026'
+        cleanPass.toLowerCase() === 'admin@2026'
       );
 
       if (isAdminIdent && isAdminPass) {
@@ -9326,24 +9514,20 @@
         return true;
       }
 
-      // 2. PRINCIPAL CHECK (Mr.Bizuneh)
+      // 2. PRINCIPAL CHECK (Mr.Bizuneh - Strict Phone/ID & Password)
       const isBizunehIdent = (
         cleanPhone === '0911000001' ||
         cleanPhone === '0911000000' ||
         cleanIdent === '0911000001' ||
         cleanIdent === '0911000000' ||
-        cleanIdent.includes('bizuneh') ||
+        cleanIdent === 'bizuneh' ||
         cleanIdent === 'stf-001' ||
-        cleanIdent === 'bizuneh@dilijent.edu.et' ||
-        roleKey === 'principal'
+        cleanIdent === 'bizuneh@dilijent.edu.et'
       );
       const isBizunehPass = (
         cleanPass === 'Staff@2026' ||
         cleanPass.toLowerCase() === 'staff@2026' ||
-        cleanPass === 'tade@2026' ||
-        cleanPass === '1234' ||
-        cleanPass === '123456' ||
-        cleanPass === 'admin123'
+        cleanPass === 'tade@2026'
       );
 
       if (isBizunehIdent && isBizunehPass) {
@@ -9373,25 +9557,18 @@
         return true;
       }
 
-      // 3. VICE PRINCIPAL CHECK (Genber Gebru)
+      // 3. VICE PRINCIPAL CHECK (Genber Gebru - Strict Phone/ID & Password)
       const isVpIdent = (
         cleanPhone === '0918000000' ||
         cleanIdent === '0918000000' ||
-        cleanIdent.includes('genber') ||
-        cleanIdent.includes('gebru') ||
-        cleanIdent.includes('vp') ||
+        cleanIdent === 'genber' ||
+        cleanIdent === 'gebru' ||
         cleanIdent === 'stf-002' ||
-        cleanIdent === 'vp@dilijent.edu.et' ||
-        roleKey === 'vice_principal'
+        cleanIdent === 'vp@dilijent.edu.et'
       );
       const isVpPass = (
         cleanPass === 'vp1234' ||
-        cleanPass === '1234' ||
-        cleanPass === '123456' ||
-        cleanPass === 'vp@1234' ||
-        cleanPass === 'tade@2026' ||
-        cleanPass === 'Staff@2026' ||
-        cleanPass.toLowerCase() === 'staff@2026'
+        cleanPass === 'vp@1234'
       );
 
       if (isVpIdent && isVpPass) {
@@ -9420,12 +9597,11 @@
         return true;
       }
 
-      // 4. TEACHER CHECK (Mr Siyum Getnet)
+      // 4. TEACHER CHECK (Mr Siyum Getnet - Strict Phone/ID & Password)
       const isSiyumIdent = (
         cleanPhone === '0911888888' ||
         cleanIdent === '0911888888' ||
-        cleanIdent.includes('siyum') ||
-        cleanIdent.includes('getnet') ||
+        cleanIdent === 'siyum' ||
         cleanIdent === 'stf-004' ||
         cleanIdent === 'siyum.getnet@dilijent.edu.et'
       );
@@ -9433,9 +9609,7 @@
         cleanPass === 'Staff@2026' ||
         cleanPass.toLowerCase() === 'staff@2026' ||
         cleanPass === 'Teacher@2026' ||
-        cleanPass.toLowerCase() === 'teacher@2026' ||
-        cleanPass === '1234' ||
-        cleanPass === '123456'
+        cleanPass.toLowerCase() === 'teacher@2026'
       );
 
       if (isSiyumIdent && isSiyumPass) {
@@ -9464,24 +9638,18 @@
         return true;
       }
 
-      // 5. SECRETARY CHECK (Sara Niguse)
+      // 5. SECRETARY CHECK (Sara Niguse - Strict Phone/ID & Password)
       const isSaraIdent = (
         cleanPhone === '0960225925' ||
         cleanPhone.endsWith('60225925') ||
         cleanIdent === '0960225925' ||
-        cleanIdent.includes('sara') ||
-        cleanIdent.includes('niguse') ||
+        cleanIdent === 'sara' ||
         cleanIdent === 'stf-005' ||
-        cleanIdent === 'sara.niguse@dilijent.edu.et' ||
-        roleKey === 'secretary'
+        cleanIdent === 'sara.niguse@dilijent.edu.et'
       );
       const isSaraPass = (
         cleanPass === 'sara@123' ||
-        cleanPass === 'Staff@2026' ||
-        cleanPass.toLowerCase() === 'staff@2026' ||
-        cleanPass === '1234' ||
-        cleanPass === '123456' ||
-        cleanPass === 'sara123'
+        cleanPass.toLowerCase() === 'sara@123'
       );
 
       if (isSaraIdent && isSaraPass) {
@@ -9510,7 +9678,7 @@
         return true;
       }
 
-      // 6. GENERAL ACCOUNT / STAFF LIST LOOKUP
+      // 6. GENERAL REGISTERED ACCOUNTS LOOKUP (Strict Password Match Only!)
       if (!Array.isArray(userAccounts) || userAccounts.length === 0) {
         try { userAccounts = JSON.parse(localStorage.getItem('dilijent_user_accounts')) || []; } catch(e){}
         if (!Array.isArray(userAccounts) || userAccounts.length === 0) userAccounts = [...DEFAULT_ACCOUNTS];
@@ -9519,7 +9687,7 @@
       const foundUser = userAccounts.find(u => {
         if (!u) return false;
         const uPass = u.pass || '';
-        const passMatches = (uPass === cleanPass || cleanPass === '1234' || cleanPass === '123456' || cleanPass === 'Staff@2026' || cleanPass === 'Teacher@2026' || cleanPass === 'tade@2026');
+        const passMatches = (uPass && uPass === cleanPass);
         if (!passMatches) return false;
 
         const uEmail = (u.email || '').toLowerCase().trim();
@@ -9551,14 +9719,14 @@
         return true;
       }
 
-      // 7. Check staffList directly
+      // 7. CHECK REGISTERED STAFF LIST (Strict Staff Password Only!)
       const foundStaff = staffList.find(st => {
         if (!st) return false;
         const stPhone = (st.phone || '').replace(/[\s\-]/g, '');
         const stId = (st.id || '').toLowerCase().trim();
         const stName = (st.name || '').toLowerCase().trim();
-        const identMatch = (stPhone && stPhone === cleanPhone) || (stId && stId === cleanIdent) || (stName && stName.includes(cleanIdent));
-        const passMatch = (cleanPass === 'Staff@2026' || cleanPass === 'Teacher@2026' || cleanPass === '1234' || cleanPass === '123456' || cleanPass === 'tade@2026');
+        const identMatch = (stPhone && stPhone === cleanPhone) || (stId && stId === cleanIdent) || (stName && stName === cleanIdent);
+        const passMatch = (cleanPass === 'Staff@2026' || cleanPass === 'Teacher@2026');
         return identMatch && passMatch;
       });
 
@@ -9587,7 +9755,7 @@
         return true;
       }
 
-      showLoginError('⛔ የተሳሳተ መለያ (ስልክ/ኢሜይል/STF-ID) ወይም የይለፍ ቃል! እባክዎ በትክክል መተየብዎን ያረጋግጡ ወይም ሲስተም አድሚኑን ያነጋግሩ።');
+      showLoginError('⛔ የተሳሳተ መለያ (ስልክ/ኢሜይል/STF-ID) ወይም የይለፍ ቃል! ያለ ትክክለኛ የይለፍ ቃል ወደ ሲስተሙ መግባት አይቻልም። እባክዎ በትክክል መተየብዎን ያረጋግጡ።');
       return false;
     }
 
@@ -9601,9 +9769,8 @@
     }
 
     function enterGuestModeWeb() {
-      isGuestMode = true;
-      updateCurrentUserUI();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      alert('⛔ ያለ ትክክለኛ የይለፍ ቃል መግባት አይፈቀድም! እባክዎ በትክክለኛ መለያ ቁጥርዎ እና ሚስጥራዊ የይለፍ ቃልዎ ይግቡ።');
+      openLoginModal();
     }
 
     function canAccessStaffAttendanceWeb() {
@@ -9650,7 +9817,7 @@
       const fullLoginPage = document.getElementById('fullLoginPage');
       const mainAppWrapper = document.getElementById('mainAppWrapper');
 
-      if (currentWebUser || isGuestMode) {
+      if (currentWebUser) {
         if (fullLoginPage) fullLoginPage.style.display = 'none';
         if (mainAppWrapper) mainAppWrapper.style.display = 'block';
       } else {
@@ -9776,9 +9943,6 @@
     function closeLoginModal() {
       const modal = document.getElementById('loginModal');
       if (modal) modal.style.display = 'none';
-      if (!currentWebUser && !isGuestMode) {
-        isGuestMode = true;
-      }
       updateCurrentUserUI();
     }
 
@@ -11029,6 +11193,11 @@
       const schAm = schoolSettings.nameAm || 'ዲሊጀንት ትምህርት ቤት';
       const schEn = schoolSettings.nameEn || 'Dilijent School';
       const year = schoolSettings.academicYear || '2017 ዓ.ም';
+
+      const tSelect = document.getElementById('rosterTeacherSelect');
+      const pSelect = document.getElementById('rosterPrincipalSelect');
+      const selectedTeacherName = (tSelect && tSelect.value) ? tSelect.value : getDefaultHomeroomTeacherForGrade(targetGrade);
+      const selectedPrincipalName = (pSelect && pSelect.value) ? pSelect.value : 'Mr.Bizuneh (ርዕሰ መምህር)';
 
       const classStudents = (students || []).filter(s => normalizeStudentGrade(s.grade) === normGrade);
       if (classStudents.length === 0) {

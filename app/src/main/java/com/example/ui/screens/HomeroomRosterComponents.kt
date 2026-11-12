@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -151,11 +152,14 @@ fun HomeroomRosterView(
 
     var classDropdownExpanded by remember { mutableStateOf(false) }
 
-    // Filter students belonging to this homeroom class
+    // Filter students belonging strictly to this homeroom class and section (e.g. 3A strictly 3A, 3B strictly 3B)
     val classStudents = remember(students, targetGrade, targetSection) {
+        val targetNum = targetGrade.filter { it.isDigit() }
         students.filter { s ->
-            (s.grade.equals(targetGrade, ignoreCase = true) || s.grade.contains(targetGrade.filter { it.isDigit() })) &&
-            (s.section.equals(targetSection, ignoreCase = true))
+            val sNum = s.grade.filter { it.isDigit() }
+            val gradeMatches = if (targetNum.isNotEmpty() && sNum.isNotEmpty()) sNum == targetNum else s.grade.equals(targetGrade, ignoreCase = true)
+            val sectionMatches = s.section.trim().equals(targetSection.trim(), ignoreCase = true)
+            gradeMatches && sectionMatches
         }
     }
 
@@ -572,7 +576,11 @@ fun HomeroomRosterView(
                                 .fillMaxSize()
                                 .horizontalScroll(horizontalScrollState)
                         ) {
-                            Column(modifier = Modifier.fillMaxHeight()) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .widthIn(min = 1080.dp)
+                            ) {
                                 // Table Header Row (Sticky at the top while scrolling vertically)
                                 Surface(
                                     color = NavyPrimary,

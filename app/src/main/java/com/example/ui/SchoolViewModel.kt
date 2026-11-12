@@ -354,14 +354,52 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         selectedGradeFilter,
         selectedSectionFilter
     ) { students, query, grade, section ->
+        val trimmed = query.trim()
+        val queryGradeSecRegex = Regex("""^(?:ክፍል\s*|grade\s*)?(\d{1,2})\s*[-_ ]?\s*([A-Da-d])$""", RegexOption.IGNORE_CASE)
+        val querySecOnlyRegex = Regex("""^(?:ሴክሽን\s*|section\s*|sec\s*)?([A-Da-d])$""", RegexOption.IGNORE_CASE)
+
+        val gradeSecMatch = queryGradeSecRegex.find(trimmed)
+        val secOnlyMatch = if (gradeSecMatch == null && trimmed.length <= 4) querySecOnlyRegex.find(trimmed) else null
+
+        val targetGradeNum = gradeSecMatch?.groupValues?.get(1)
+        val targetSectionLetter = gradeSecMatch?.groupValues?.get(2)?.uppercase()
+            ?: secOnlyMatch?.groupValues?.get(1)?.uppercase()
+
         students.filter { student ->
-            val matchesQuery = query.isBlank() ||
-                    student.fullName.contains(query, ignoreCase = true) ||
-                    student.studentIdNumber.contains(query, ignoreCase = true) ||
-                    student.parentPhone.contains(query, ignoreCase = true)
-            val matchesGrade = grade == "ሁሉም" || student.grade == grade
-            val matchesSection = section == "ሁሉም" || student.section == section
-            matchesQuery && matchesGrade && matchesSection
+            val sGradeNum = student.grade.filter { it.isDigit() }
+            val sSection = student.section.trim().uppercase()
+
+            // 1. Strict Section Filtering
+            val matchesSection = when {
+                targetSectionLetter != null -> sSection == targetSectionLetter
+                section != "ሁሉም" -> sSection == section.trim().uppercase()
+                else -> true
+            }
+
+            // 2. Strict Grade Filtering
+            val matchesGrade = when {
+                targetGradeNum != null -> sGradeNum == targetGradeNum
+                grade != "ሁሉም" -> {
+                    val gNum = grade.filter { it.isDigit() }
+                    if (gNum.isNotEmpty() && sGradeNum.isNotEmpty()) gNum == sGradeNum else student.grade.equals(grade, ignoreCase = true)
+                }
+                else -> true
+            }
+
+            // 3. Search Query Filtering
+            val matchesQuery = when {
+                trimmed.isBlank() -> true
+                targetGradeNum != null || targetSectionLetter != null -> true // Handled strictly by grade & section
+                else -> {
+                    student.fullName.contains(trimmed, ignoreCase = true) ||
+                    student.studentIdNumber.contains(trimmed, ignoreCase = true) ||
+                    student.parentPhone.contains(trimmed, ignoreCase = true) ||
+                    "${student.grade}${student.section}".contains(trimmed, ignoreCase = true) ||
+                    "${sGradeNum}${sSection}".contains(trimmed, ignoreCase = true)
+                }
+            }
+
+            matchesSection && matchesGrade && matchesQuery
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 

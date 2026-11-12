@@ -227,13 +227,14 @@ fun AttendanceScreen(
             listOf(currentStudent)
         } else {
             students.filter { s ->
-                val normStudentGrade = s.grade.replace("ኛ", "").replace("ክፍል", "").trim()
-                val normSelectedGrade = selectedGrade.replace("ኛ", "").replace("ክፍል", "").trim()
-                val gradeMatches = s.grade.equals(selectedGrade, ignoreCase = true) ||
-                        normStudentGrade.equals(normSelectedGrade, ignoreCase = true) ||
-                        normStudentGrade.startsWith(normSelectedGrade, ignoreCase = true)
-                val sectionMatches = s.section.equals(selectedSection, ignoreCase = true) ||
-                        s.grade.endsWith(selectedSection, ignoreCase = true)
+                val sGradeNum = s.grade.filter { it.isDigit() }
+                val selGradeNum = selectedGrade.filter { it.isDigit() }
+                val gradeMatches = if (selGradeNum.isNotEmpty() && sGradeNum.isNotEmpty()) {
+                    selGradeNum == sGradeNum
+                } else {
+                    s.grade.equals(selectedGrade, ignoreCase = true)
+                }
+                val sectionMatches = s.section.trim().equals(selectedSection.trim(), ignoreCase = true)
                 gradeMatches && sectionMatches
             }
         }
