@@ -273,15 +273,14 @@ class MainActivity : ComponentActivity() {
                             }
                         },
                         onQuickDemoLogin = { viewModel.quickLoginAsAdmin() },
-                        onQuickRoleLogin = { identifier, isEmail, pass ->
+                        onQuickRoleLogin = { identifier, isEmail, _ ->
                             viewModel.isAdminLoginMode.value = isEmail
                             if (isEmail) {
                                 viewModel.loginEmail.value = identifier
                             } else {
                                 viewModel.loginPhone.value = identifier
                             }
-                            viewModel.loginPassword.value = pass
-                            viewModel.login(identifier, pass, isEmailLogin = isEmail)
+                            viewModel.loginPassword.value = ""
                         },
                         onRegisterNewUser = { name, regPhone, regPass, role ->
                             viewModel.registerAccount(name, regPhone, regPass, role) {}
@@ -503,6 +502,7 @@ class MainActivity : ComponentActivity() {
                                     isStudent = isStudent,
                                     currentTeacher = currentTeacher,
                                     currentStudent = currentStudent,
+                                    teachers = teachers,
                                     teacherWorkloads = teacherWorkloads,
                                     assessmentScheme = assessmentScheme,
                                     onConfigureSchemeClick = { viewModel.showAssessmentSchemeDialog.value = true },

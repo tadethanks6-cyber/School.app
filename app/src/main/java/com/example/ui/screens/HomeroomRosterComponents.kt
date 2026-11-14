@@ -90,6 +90,75 @@ import com.example.ui.theme.EthioRed
 import com.example.ui.theme.GoldAccent
 import com.example.ui.theme.NavyPrimary
 
+fun defaultHomeroomTeacherForGrade(
+    grade: String,
+    section: String,
+    teachers: List<Teacher> = emptyList()
+): String {
+    val num = grade.filter { it.isDigit() }
+    val sec = section.trim().uppercase()
+    val key = if (num.isNotEmpty()) "${num}${sec}" else "${grade.trim()}${sec}"
+    val assignedTeacher = teachers.firstOrNull { t ->
+        t.isHomeroomTeacher && (
+            t.homeroomClass.equals(key, ignoreCase = true) ||
+            t.homeroomClass.equals("${num}-${sec}", ignoreCase = true) ||
+            t.homeroomClass.contains("${num}ኛ ክፍል-${sec}", ignoreCase = true) ||
+            t.homeroomClass.contains("${num}ኛ ክፍል ${sec}", ignoreCase = true)
+        )
+    }
+    if (assignedTeacher != null) return assignedTeacher.fullName
+    return when (key) {
+        "1A" -> "አቶ ደረጀ ተሾመ"
+        "1B" -> "ወ/ሮ አልማዝ አየለ"
+        "2A" -> "አቶ ዮናስ በቀለ"
+        "2B" -> "ወ/ሮ ታደለች ገብሬ"
+        "3A" -> "አቶ ሙሉጌታ ታከለ"
+        "3B" -> "ወ/ሮ ሳራ ንጉሴ"
+        "4A" -> "አቶ ደረጀ ተሾመ"
+        "4B" -> "ወ/ሮ አልማዝ አየለ"
+        "5A" -> "አቶ ዮናስ በቀለ"
+        "5B" -> "ወ/ሮ ታደለች ገብሬ"
+        "6A" -> "አቶ ሙሉጌታ ከበደ"
+        "6B" -> "ዶ/ር ቴዎድሮስ ካሳ"
+        "7A" -> "አቶ ብርሃኑ ተፈራ"
+        "7B" -> "ወ/ሮ ሳራ ንጉሴ"
+        "8A" -> "Mr Siyum Getnet"
+        "8B" -> "ወ/ሮ አልማዝ አየለ"
+        "9A" -> "አቶ ሙሉጌታ ከበደ"
+        "9B" -> "አቶ ዳዊት ተስፋዬ"
+        "10A" -> "ወ/ሮ አልማዝ በቀለ"
+        "10C" -> "አቶ ብርሃኑ ተፈራ"
+        "11B" -> "ዶ/ር ቴዎድሮስ ካሳ"
+        "12A" -> "Mr Siyum Getnet"
+        "12B" -> "ወ/ሮ አልማዝ አየለ"
+        else -> "አቶ ሙሉጌታ ታከለ"
+    }
+}
+
+fun getAvailableSignatureTeachers(teachers: List<Teacher> = emptyList()): List<String> {
+    val defaults = listOf(
+        "አቶ ደረጀ ተሾመ",
+        "ወ/ሮ አልማዝ አየለ",
+        "አቶ ዮናስ በቀለ",
+        "ወ/ሮ ታደለች ገብሬ",
+        "አቶ ሙሉጌታ ታከለ",
+        "ወ/ሮ ሳራ ንጉሴ",
+        "አቶ ሙሉጌታ ከበደ",
+        "ዶ/ር ቴዎድሮስ ካሳ",
+        "አቶ ብርሃኑ ተፈራ",
+        "Mr Siyum Getnet",
+        "አቶ ዳዊት ተስፋዬ",
+        "ወ/ሮ አልማዝ በቀለ"
+    )
+    return (teachers.map { it.fullName } + defaults).distinct()
+}
+
+val availableSignaturePrincipals = listOf(
+    "Mr.Bizuneh",
+    "Genber Gebru",
+    "ታደሰ ምስጋናው"
+)
+
 /**
  * Data representation of a student row within the composite Homeroom Roster.
  */
@@ -117,7 +186,8 @@ fun HomeroomRosterView(
     isAmharic: Boolean,
     isAdmin: Boolean,
     currentTeacher: Teacher?,
-    onViewReportCard: (Student, List<StudentGrade>, Int, Int) -> Unit,
+    teachers: List<Teacher> = emptyList(),
+    onViewReportCard: (Student, List<StudentGrade>, Int, Int, String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isQuarterMode by remember { mutableStateOf(false) }
@@ -143,6 +213,18 @@ fun HomeroomRosterView(
 
     val targetGrade = classParts.first
     val targetSection = classParts.second
+
+    val defaultTeacherForSection = remember(targetGrade, targetSection, currentTeacher, teachers, isAdmin) {
+        if (currentTeacher?.isHomeroomTeacher == true && !isAdmin) currentTeacher.fullName
+        else defaultHomeroomTeacherForGrade(targetGrade, targetSection, teachers)
+    }
+    var selectedRosterTeacher by remember(defaultTeacherForSection) { mutableStateOf(defaultTeacherForSection) }
+    var selectedRosterPrincipal by remember { mutableStateOf("Mr.Bizuneh") }
+    var rosterTeacherDropdownExpanded by remember { mutableStateOf(false) }
+    var rosterPrincipalDropdownExpanded by remember { mutableStateOf(false) }
+    val signatureTeacherOptions = remember(teachers, defaultTeacherForSection) {
+        (listOf(defaultTeacherForSection) + getAvailableSignatureTeachers(teachers)).distinct()
+    }
 
     // Available homeroom class options
     val availableClasses = remember(students) {
@@ -388,6 +470,82 @@ fun HomeroomRosterView(
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Homeroom Teacher & Principal Signature Selectors
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    ExposedDropdownMenuBox(
+                        expanded = rosterTeacherDropdownExpanded,
+                        onExpandedChange = { rosterTeacherDropdownExpanded = it },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        OutlinedTextField(
+                            value = selectedRosterTeacher,
+                            onValueChange = {},
+                            readOnly = true,
+                            singleLine = true,
+                            label = { Text(if (isAmharic) "የክፍል ኃላፊ (ለፊርማ)" else "Homeroom Teacher", fontSize = 11.sp) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = rosterTeacherDropdownExpanded) },
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
+                                .testTag("dropdown_roster_homeroom_teacher")
+                        )
+                        ExposedDropdownMenu(
+                            expanded = rosterTeacherDropdownExpanded,
+                            onDismissRequest = { rosterTeacherDropdownExpanded = false }
+                        ) {
+                            signatureTeacherOptions.forEach { teacherName ->
+                                DropdownMenuItem(
+                                    text = { Text(teacherName, fontSize = 12.sp, fontWeight = if (teacherName == selectedRosterTeacher) FontWeight.Bold else FontWeight.Normal) },
+                                    onClick = {
+                                        selectedRosterTeacher = teacherName
+                                        rosterTeacherDropdownExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    ExposedDropdownMenuBox(
+                        expanded = rosterPrincipalDropdownExpanded,
+                        onExpandedChange = { rosterPrincipalDropdownExpanded = it },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        OutlinedTextField(
+                            value = selectedRosterPrincipal,
+                            onValueChange = {},
+                            readOnly = true,
+                            singleLine = true,
+                            label = { Text(if (isAmharic) "ርዕሰ መምህር (ለፊርማ)" else "Principal", fontSize = 11.sp) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = rosterPrincipalDropdownExpanded) },
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
+                                .testTag("dropdown_roster_principal")
+                        )
+                        ExposedDropdownMenu(
+                            expanded = rosterPrincipalDropdownExpanded,
+                            onDismissRequest = { rosterPrincipalDropdownExpanded = false }
+                        ) {
+                            availableSignaturePrincipals.forEach { principalOpt ->
+                                DropdownMenuItem(
+                                    text = { Text(principalOpt, fontSize = 12.sp, fontWeight = if (principalOpt == selectedRosterPrincipal) FontWeight.Bold else FontWeight.Normal) },
+                                    onClick = {
+                                        selectedRosterPrincipal = principalOpt
+                                        rosterPrincipalDropdownExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -465,7 +623,7 @@ fun HomeroomRosterView(
                     Button(
                         onClick = {
                             val stGrades = classGrades.filter { it.studentId == topStudent.student.id }
-                            onViewReportCard(topStudent.student, stGrades, topStudent.rank, rosterRows.size)
+                            onViewReportCard(topStudent.student, stGrades, topStudent.rank, rosterRows.size, selectedRosterTeacher, selectedRosterPrincipal)
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = GoldAccent),
                         shape = RoundedCornerShape(16.dp),
@@ -573,7 +731,8 @@ fun HomeroomRosterView(
 
                         Box(
                             modifier = Modifier
-                                .fillMaxSize()
+                                .weight(1f)
+                                .fillMaxWidth()
                                 .horizontalScroll(horizontalScrollState)
                         ) {
                             Column(
@@ -648,7 +807,7 @@ fun HomeroomRosterView(
                                         .padding(vertical = 2.dp)
                                         .clickable {
                                             val stGrades = classGrades.filter { it.studentId == row.student.id }
-                                            onViewReportCard(row.student, stGrades, row.rank, rosterRows.size)
+                                            onViewReportCard(row.student, stGrades, row.rank, rosterRows.size, selectedRosterTeacher, selectedRosterPrincipal)
                                         }
                                 ) {
                                     Row(
@@ -764,7 +923,7 @@ fun HomeroomRosterView(
                                         Button(
                                             onClick = {
                                                 val stGrades = classGrades.filter { it.studentId == row.student.id }
-                                                onViewReportCard(row.student, stGrades, row.rank, rosterRows.size)
+                                                onViewReportCard(row.student, stGrades, row.rank, rosterRows.size, selectedRosterTeacher, selectedRosterPrincipal)
                                             },
                                             shape = RoundedCornerShape(12.dp),
                                             colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary),
@@ -786,7 +945,33 @@ fun HomeroomRosterView(
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(20.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+                // Official Signatures Footer on Roster Sheet
+                Surface(
+                    shape = RoundedCornerShape(10.dp),
+                    color = NavyPrimary.copy(alpha = 0.06f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, GoldAccent.copy(alpha = 0.45f)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                            Text(if (isAmharic) "የክፍል ኃላፊ መምህር ፊርማ" else "Homeroom Teacher", fontSize = 9.5.sp, fontWeight = FontWeight.Bold, color = NavyPrimary)
+                            Text(selectedRosterTeacher, fontSize = 10.5.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface, maxLines = 1)
+                            Text("__________________", fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                            Text(if (isAmharic) "የርዕሰ መምህር ፊርማና ማህተም" else "Principal & Seal", fontSize = 9.5.sp, fontWeight = FontWeight.Bold, color = NavyPrimary)
+                            Text(selectedRosterPrincipal, fontSize = 10.5.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface, maxLines = 1)
+                            Text("__________________", fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 }
@@ -830,7 +1015,9 @@ fun EthiopianReportCardDialog(
     totalStudents: Int,
     assessmentScheme: AssessmentScheme,
     isAmharic: Boolean,
-    homeroomTeacherName: String = "አቶ ሙሉጌታ ታከለ",
+    homeroomTeacherName: String = "",
+    principalName: String = "Mr.Bizuneh",
+    teachers: List<Teacher> = emptyList(),
     schoolLogoUri: String = "",
     schoolNameAm: String = "ዲሊጀንት ትምህርት ቤት",
     schoolNameEn: String = "Dilijent School",
@@ -840,6 +1027,17 @@ fun EthiopianReportCardDialog(
     BackHandler(onBack = onDismiss)
 
     var isQuarterSystem by remember { mutableStateOf(false) }
+
+    val resolvedDefaultTeacher = remember(student.id, homeroomTeacherName, teachers) {
+        homeroomTeacherName.takeIf { it.isNotBlank() } ?: defaultHomeroomTeacherForGrade(student.grade, student.section, teachers)
+    }
+    var selectedTeacherName by remember(student.id, resolvedDefaultTeacher) { mutableStateOf(resolvedDefaultTeacher) }
+    var selectedPrincipalName by remember(student.id, principalName) { mutableStateOf(principalName.ifBlank { "Mr.Bizuneh" }) }
+    var cardTeacherDropdownExpanded by remember { mutableStateOf(false) }
+    var cardPrincipalDropdownExpanded by remember { mutableStateOf(false) }
+    val cardTeacherOptions = remember(teachers, resolvedDefaultTeacher, student.grade, student.section) {
+        (listOf(defaultHomeroomTeacherForGrade(student.grade, student.section, teachers), resolvedDefaultTeacher) + getAvailableSignatureTeachers(teachers)).distinct()
+    }
 
     // Build subject report items strictly based on Semester (Sem 1 & Sem 2) or Quarter (Q1, Q2, Q3, Q4)
     val reportItems = remember(allSubjects, studentGrades) {
@@ -925,7 +1123,8 @@ fun EthiopianReportCardDialog(
             }
         }
         sb.append("---------------------------------------\n")
-        sb.append("የክፍል ኃላፊ መምህር: ${homeroomTeacherName}\n")
+        sb.append("የክፍል ኃላፊ መምህር: ${selectedTeacherName}\n")
+        sb.append("ርዕሰ መምህር: ${selectedPrincipalName}\n")
         sb.append("የባህሪ ምዘና: እጅግ በጣም ጥሩ (A)\n")
         sb.append("═══════════════════════════════════════\n")
 
@@ -1434,27 +1633,103 @@ fun EthiopianReportCardDialog(
                                 HorizontalDivider()
                                 Spacer(modifier = Modifier.height(10.dp))
 
+                                // Interactive Signatory Selectors for Homeroom Teacher & Principal
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    ExposedDropdownMenuBox(
+                                        expanded = cardTeacherDropdownExpanded,
+                                        onExpandedChange = { cardTeacherDropdownExpanded = it },
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        OutlinedTextField(
+                                            value = selectedTeacherName,
+                                            onValueChange = {},
+                                            readOnly = true,
+                                            singleLine = true,
+                                            label = { Text(if (isAmharic) "የክፍል ኃላፊ መምህር" else "Homeroom Teacher", fontSize = 10.sp) },
+                                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = cardTeacherDropdownExpanded) },
+                                            shape = RoundedCornerShape(8.dp),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .menuAnchor()
+                                                .testTag("dropdown_card_homeroom_teacher")
+                                        )
+                                        ExposedDropdownMenu(
+                                            expanded = cardTeacherDropdownExpanded,
+                                            onDismissRequest = { cardTeacherDropdownExpanded = false }
+                                        ) {
+                                            cardTeacherOptions.forEach { teacherName ->
+                                                DropdownMenuItem(
+                                                    text = { Text(teacherName, fontSize = 12.sp) },
+                                                    onClick = {
+                                                        selectedTeacherName = teacherName
+                                                        cardTeacherDropdownExpanded = false
+                                                    }
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    ExposedDropdownMenuBox(
+                                        expanded = cardPrincipalDropdownExpanded,
+                                        onExpandedChange = { cardPrincipalDropdownExpanded = it },
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        OutlinedTextField(
+                                            value = selectedPrincipalName,
+                                            onValueChange = {},
+                                            readOnly = true,
+                                            singleLine = true,
+                                            label = { Text(if (isAmharic) "ርዕሰ መምህር" else "Principal", fontSize = 10.sp) },
+                                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = cardPrincipalDropdownExpanded) },
+                                            shape = RoundedCornerShape(8.dp),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .menuAnchor()
+                                                .testTag("dropdown_card_principal")
+                                        )
+                                        ExposedDropdownMenu(
+                                            expanded = cardPrincipalDropdownExpanded,
+                                            onDismissRequest = { cardPrincipalDropdownExpanded = false }
+                                        ) {
+                                            availableSignaturePrincipals.forEach { principalOpt ->
+                                                DropdownMenuItem(
+                                                    text = { Text(principalOpt, fontSize = 12.sp) },
+                                                    onClick = {
+                                                        selectedPrincipalName = principalOpt
+                                                        cardPrincipalDropdownExpanded = false
+                                                    }
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(10.dp))
+
                                 // Signatures Grid
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text("_____________________", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                        Text("የክፍል ኃላፊ ፊርማ", fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                        Text(homeroomTeacherName, fontSize = 9.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                                        Text("________________", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text("የክፍል ኃላፊ ፊርማ", fontSize = 9.5.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                                        Text(selectedTeacherName, fontSize = 9.5.sp, fontWeight = FontWeight.SemiBold, color = NavyPrimary, textAlign = TextAlign.Center)
                                     }
 
-                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text("_____________________", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                        Text("የርዕሰ-መምህር ፊርማና ማህተም", fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                        Text("ርዕሰ-መምህር (Principal)", fontSize = 9.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                                        Text("________________", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text("የርዕሰ-መምህር ፊርማና ማህተም", fontSize = 9.5.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                                        Text(selectedPrincipalName, fontSize = 9.5.sp, fontWeight = FontWeight.SemiBold, color = NavyPrimary, textAlign = TextAlign.Center)
                                     }
 
-                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text("_____________________", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                        Text("የወላጅ/አሳዳጊ ፊርማ", fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                        Text(student.parentName.take(12), fontSize = 9.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                                        Text("________________", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text("የወላጅ/አሳዳጊ ፊርማ", fontSize = 9.5.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                                        Text(student.parentName.take(14), fontSize = 9.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
                                     }
                                 }
                             }

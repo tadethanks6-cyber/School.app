@@ -99,28 +99,28 @@ data class DemoRoleProfile(
     val titleEn: String,
     val identifier: String, // email or phone
     val isEmail: Boolean = false,
-    val defaultPass: String = "1234",
+    val defaultPass: String = "",
     val color: Color,
     val iconVector: androidx.compose.ui.graphics.vector.ImageVector
 )
 
 val availableDemoRoles = listOf(
-    DemoRoleProfile("👑 ሲስተም አድሚን (ታደሰ ምስጋናው)", "System Admin (Tadesse)", "tadessemisganaw4@gmail.com", isEmail = true, defaultPass = "tade@2026", color = Color(0xFFB45309), Icons.Default.Security),
-    DemoRoleProfile("🎓 ርዕሰ መምህር (Principal)", "School Principal", "0911000000", isEmail = false, defaultPass = "1234", color = Color(0xFF1E3A8A), Icons.Default.School),
-    DemoRoleProfile("👨‍🏫 መምህር - ሂሳብ (9A)", "Math Teacher (Grade 9A)", "0911223344", isEmail = false, defaultPass = "1234", color = Color(0xFF6D28D9), Icons.Default.MenuBook),
-    DemoRoleProfile("👩‍🏫 መምህርት - እንግሊዝኛ (9A)", "English Teacher (Grade 9A)", "0922334455", isEmail = false, defaultPass = "1234", color = Color(0xFF7C3AED), Icons.Default.MenuBook),
-    DemoRoleProfile("👨‍🎓 ተማሪ - ዮናስ (9A)", "Student - Jonas (9A)", "0911002233", isEmail = false, defaultPass = "1234", color = Color(0xFF0284C7), Icons.Default.School),
-    DemoRoleProfile("✍️ ዋና ጸሐፊ (Sara Niguse)", "Secretary (Sara Niguse)", "0960225925", isEmail = false, defaultPass = "sara@123", color = Color(0xFF0D9488), Icons.Default.People),
-    DemoRoleProfile("💰 ፋይናንስ / ሂሳብ ሹም", "Finance Officer", "0913445566", isEmail = false, defaultPass = "1234", color = Color(0xFF047857), Icons.Default.CheckCircle),
-    DemoRoleProfile("📦 ንብረት ክፍል ኃላፊ", "Store & Property Head", "0914556677", isEmail = false, defaultPass = "1234", color = Color(0xFFD97706), Icons.Default.Lock),
-    DemoRoleProfile("🎓 ም/ርዕሰ መምህር", "Vice Principal", "0918000000", isEmail = false, defaultPass = "1234", color = Color(0xFF4338CA), Icons.Default.Badge)
+    DemoRoleProfile("👑 ሲስተም አድሚን (ታደሰ ምስጋናው)", "System Admin (Tadesse)", "tadessemisganaw4@gmail.com", isEmail = true, defaultPass = "", color = Color(0xFFB45309), Icons.Default.Security),
+    DemoRoleProfile("🎓 ርዕሰ መምህር (Principal)", "School Principal", "0911000000", isEmail = false, defaultPass = "", color = Color(0xFF1E3A8A), Icons.Default.School),
+    DemoRoleProfile("👨‍🏫 መምህር - ሂሳብ (9A)", "Math Teacher (Grade 9A)", "0911223344", isEmail = false, defaultPass = "", color = Color(0xFF6D28D9), Icons.Default.MenuBook),
+    DemoRoleProfile("👩‍🏫 መምህርት - እንግሊዝኛ (9A)", "English Teacher (Grade 9A)", "0922334455", isEmail = false, defaultPass = "", color = Color(0xFF7C3AED), Icons.Default.MenuBook),
+    DemoRoleProfile("👨‍🎓 ተማሪ - ዮናስ (9A)", "Student - Jonas (9A)", "0911002233", isEmail = false, defaultPass = "", color = Color(0xFF0284C7), Icons.Default.School),
+    DemoRoleProfile("✍️ ዋና ጸሐፊ (Sara Niguse)", "Secretary (Sara Niguse)", "0960225925", isEmail = false, defaultPass = "", color = Color(0xFF0D9488), Icons.Default.People),
+    DemoRoleProfile("💰 ፋይናንስ / ሂሳብ ሹም", "Finance Officer", "0913445566", isEmail = false, defaultPass = "", color = Color(0xFF047857), Icons.Default.CheckCircle),
+    DemoRoleProfile("📦 ንብረት ክፍል ኃላፊ", "Store & Property Head", "0914556677", isEmail = false, defaultPass = "", color = Color(0xFFD97706), Icons.Default.Lock),
+    DemoRoleProfile("🎓 ም/ርዕሰ መምህር", "Vice Principal", "0918000000", isEmail = false, defaultPass = "", color = Color(0xFF4338CA), Icons.Default.Badge)
 )
 
 @Composable
 fun LoginScreen(
     isAdminMode: Boolean = false,
     onToggleAdminMode: (Boolean) -> Unit = {},
-    email: String = "tadessemisganaw4@gmail.com",
+    email: String = "",
     onEmailChange: (String) -> Unit = {},
     phone: String,
     onPhoneChange: (String) -> Unit,
@@ -1183,7 +1183,7 @@ private fun RoleSelectorGrid(
                             .weight(1f)
                             .clip(RoundedCornerShape(10.dp))
                             .clickable {
-                                onRoleSelected(roleProfile.identifier, roleProfile.isEmail, roleProfile.defaultPass)
+                                onRoleSelected(roleProfile.identifier, roleProfile.isEmail, "")
                             }
                             .testTag("btn_role_${roleProfile.identifier}")
                     ) {

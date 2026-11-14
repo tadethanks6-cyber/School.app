@@ -354,11 +354,9 @@
           </button>
         </form>
 
-        <!-- Secondary Actions (Guest Browse ONLY - no 1-click bypass!) -->
-        <div style="margin-top:1.1rem;">
-          <button type="button" class="btn-secondary" onclick="enterGuestModeWeb()" style="width:100%; padding:0.65rem 0.8rem; border-radius:8px; font-size:0.82rem; font-weight:700; cursor:pointer; text-align:center;">
-            👥 እንደ እንግዳ ተመልከት (Browse as Guest)
-          </button>
+        <!-- Strict Security Notice: No unauthenticated guest bypass -->
+        <div style="margin-top:1.1rem; text-align:center; padding:0.6rem 0.8rem; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; font-size:0.75rem; color:#64748B;">
+          🔒 <strong>ደህንነት፦</strong> ያለ ትክክለኛ የይለፍ ቃል ወደ ሲስተሙ መግባት በጥብቅ የተከለከለ ነው።
         </div>
       </div>
     </div>
@@ -781,8 +779,8 @@
         <!-- Filter & Homeroom Teacher Assignment Info Bar -->
         <div style="background:#F8FAFC; border:1px solid var(--border); border-radius:10px; padding:0.9rem; margin-top:1rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
           <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
-            <label style="font-size:0.85rem; font-weight:700; color:var(--primary);">የክፍል ክፍልፋይ ምረጥ (Select Class/Section):</label>
-            <select id="rosterGradeSelect" class="form-control" style="width:auto; min-width:140px; font-weight:600;" onchange="renderHomeroomRoster()">
+            <label style="font-size:0.83rem; font-weight:700; color:var(--primary);">ክፍልፋይ፦</label>
+            <select id="rosterGradeSelect" class="form-control" style="width:auto; min-width:130px; font-weight:700;" onchange="renderHomeroomRoster()">
               <option value="12A">12A (Natural Science)</option>
               <option value="12B">12B (Social Science)</option>
               <option value="11B">11B (Social Science)</option>
@@ -790,9 +788,15 @@
               <option value="9A">9A (General)</option>
             </select>
 
-            <span id="rosterHomeroomBadge" class="badge badge-primary" style="font-size:0.75rem; padding:0.4rem 0.65rem;">
-              👨‍🏫 የክፍል ኃላፊ፦ <span id="rosterHomeroomTeacherName">ያልተመደበ</span>
-            </span>
+            <label style="font-size:0.83rem; font-weight:700; color:#1E3A8A; margin-left:6px;">👨‍🏫 የክፍል ኃላፊ መምህር (ለፊርማ)፦</label>
+            <select id="rosterTeacherSelect" class="form-control" style="width:auto; min-width:170px; font-weight:700; color:#1E3A8A;" onchange="onRosterTeacherChange()">
+              <!-- Populated dynamically -->
+            </select>
+
+            <label style="font-size:0.83rem; font-weight:700; color:#1E3A8A; margin-left:6px;">👔 ርዕሰ መምህር (ለፊርማ)፦</label>
+            <select id="rosterPrincipalSelect" class="form-control" style="width:auto; min-width:170px; font-weight:700; color:#0F1E4A;" onchange="onRosterPrincipalChange()">
+              <!-- Populated dynamically -->
+            </select>
           </div>
 
           <div style="display:flex; gap:1rem; align-items:center; flex-wrap:wrap;">
@@ -841,6 +845,33 @@
               <!-- Rendered dynamically via JS -->
             </tbody>
           </table>
+        </div>
+
+        <!-- Roster Official Signature & Verification Block -->
+        <div style="background:#F8FAFC; border:1.5px solid #CBD5E1; border-radius:10px; padding:1.1rem; margin-top:1.2rem; box-shadow:0 2px 6px rgba(0,0,0,0.04);">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #E2E8F0; padding-bottom:0.6rem; margin-bottom:0.9rem; flex-wrap:wrap; gap:0.5rem;">
+            <div style="font-weight:800; color:#0F1E4A; font-size:0.88rem; display:flex; align-items:center; gap:6px;">
+              <span>✍️</span><span>የክፍል ኃላፊ እና ርዕሰ መምህር ይፋዊ ማረጋገጫ (Official Roster Signatures)</span>
+            </div>
+            <div style="font-size:0.75rem; color:#64748B;">ቀን፦ <strong id="rosterSignatureDate" style="color:#0F1E4A;">2017 ዓ.ም</strong></div>
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:1rem; font-size:0.8rem;">
+            <div style="background:white; border:1.5px solid #BFDBFE; border-radius:8px; padding:0.85rem;">
+              <div style="color:#1E3A8A; font-weight:700; font-size:0.78rem;">👨‍🏫 የክፍል ኃላፊ መምህር (Homeroom Teacher)፦</div>
+              <div id="rosterFooterTeacherName" style="font-size:0.95rem; font-weight:800; color:#1E3A8A; margin:0.35rem 0;">-</div>
+              <div style="color:#64748B; font-size:0.74rem; border-top:1px dashed #CBD5E1; padding-top:0.4rem; margin-top:0.5rem;">ፊርማ፦ _______________________ ቀን፦ _________</div>
+            </div>
+            <div style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:0.85rem;">
+              <div style="color:#0F1E4A; font-weight:700; font-size:0.78rem;">👔 ርዕሰ መምህር (School Principal)፦</div>
+              <div id="rosterFooterPrincipalName" style="font-size:0.95rem; font-weight:800; color:#0F1E4A; margin:0.35rem 0;">Mr.Bizuneh</div>
+              <div style="color:#64748B; font-size:0.74rem; border-top:1px dashed #CBD5E1; padding-top:0.4rem; margin-top:0.5rem;">ፊርማና ማህተም፦ _______________________</div>
+            </div>
+            <div style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:0.85rem;">
+              <div style="color:#475569; font-weight:700; font-size:0.78rem;">🏢 የትምህርት ጥራትና ሱፐርቪዥን፦</div>
+              <div style="font-size:0.95rem; font-weight:800; color:#334155; margin:0.35rem 0;">Genber Gebru (ምክትል ር/መ)</div>
+              <div style="color:#64748B; font-size:0.74rem; border-top:1px dashed #CBD5E1; padding-top:0.4rem; margin-top:0.5rem;">ማረጋገጫ፦ _______________________</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1234,9 +1265,25 @@
               </tbody>
             </table>
           </div>
-          <div style="margin-top:1.25rem; font-size:0.8rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
-            <div><strong>የክፍል ኃላፊ ፊርማ:</strong> <span id="reportCardPrintTeacher">የክፍል ኃላፊ</span> _________</div>
-            <div><strong>የርዕሰ-መምህር ፊርማ:</strong> <span id="reportCardPrintPrincipal">ርዕሰ-መምህር</span> _________</div>
+          <div style="margin-top:1.25rem; background:#F8FAFC; border:1.5px solid #CBD5E1; border-radius:10px; padding:0.95rem;">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:0.85rem; font-size:0.8rem;">
+              <div style="background:white; border:1.5px solid #BFDBFE; border-radius:8px; padding:0.75rem;">
+                <label for="inlineCardTeacherSelect" style="font-weight:700; color:#1E3A8A; display:block; margin-bottom:0.25rem;">👨‍🏫 የክፍል ኃላፊ መምህር (ለፊርማ ይምረጡ)፦</label>
+                <select id="inlineCardTeacherSelect" class="form-control no-print" style="font-weight:700; color:#1E3A8A; width:100%; padding:5px 8px; font-size:0.82rem; border-radius:6px; margin-bottom:0.35rem;" onchange="onInlineCardSignChange()">
+                  <!-- Populated dynamically -->
+                </select>
+                <div><strong>ስም፦</strong> <span id="reportCardPrintTeacher" style="font-weight:800; color:#1E3A8A;">የክፍል ኃላፊ</span></div>
+                <div style="margin-top:0.35rem; color:#64748B;">ፊርማ፦ __________________ ቀን፦ _________</div>
+              </div>
+              <div style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:0.75rem;">
+                <label for="inlineCardPrincipalSelect" style="font-weight:700; color:#0F1E4A; display:block; margin-bottom:0.25rem;">👔 ርዕሰ መምህር (ለፊርማ ይምረጡ)፦</label>
+                <select id="inlineCardPrincipalSelect" class="form-control no-print" style="font-weight:700; color:#0F1E4A; width:100%; padding:5px 8px; font-size:0.82rem; border-radius:6px; margin-bottom:0.35rem;" onchange="onInlineCardSignChange()">
+                  <!-- Populated dynamically -->
+                </select>
+                <div><strong>ስም፦</strong> <span id="reportCardPrintPrincipal" style="font-weight:800; color:#0F1E4A;">Mr.Bizuneh</span></div>
+                <div style="margin-top:0.35rem; color:#64748B;">ፊርማና ማህተም፦ __________________</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -2126,10 +2173,10 @@
           </button>
         </form>
 
-        <!-- Close / Guest preview action (no 1-click bypass) -->
+        <!-- Close action (Strict: no unauthenticated guest bypass) -->
         <div style="margin-top:1rem;">
           <button type="button" class="btn-secondary" style="width:100%; padding:0.65rem 1rem; border-radius:8px; font-size:0.82rem; font-weight:700; cursor:pointer;" onclick="closeLoginModal()">
-            👥 መስኮቱን ዝጋ / እንደ እንግዳ እይ (Close)
+            ❌ ዝጋ (Close)
           </button>
         </div>
       </div>
@@ -2273,19 +2320,32 @@
         </div>
       </div>
 
-      <!-- Signature Blocks -->
-      <div style="display:flex; justify-content:space-between; align-items:flex-end; border-top:1px solid #E2E8F0; padding-top:0.75rem; margin-top:0.5rem; font-size:0.78rem; flex-wrap:wrap; gap:1rem;">
-        <div>
-          <div>የክፍል ኃላፊ መምህር፦ <strong id="cardModalHomeroomTeacher">ያልተመደበ</strong></div>
-          <div style="margin-top:0.4rem; color:#64748B;">ፊርማ፦ __________________ ቀን፦ _________</div>
+      <!-- Signature Blocks with Selectable Homeroom Teacher and Principal -->
+      <div style="background:#F8FAFC; border:1.5px solid #CBD5E1; border-radius:10px; padding:0.85rem 1rem; margin-top:0.85rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #E2E8F0; padding-bottom:0.45rem; margin-bottom:0.75rem;">
+          <strong style="color:#0F1E4A; font-size:0.82rem;">✍️ የውጤት ካርድ ይፋዊ ፊርማ እና ማረጋገጫ (Official Report Signatures)</strong>
+          <span style="font-size:0.72rem; color:#64748B;">የትምህርት ዓመት፦ <strong style="color:#0F1E4A;">2017 ዓ.ም</strong></span>
         </div>
-        <div>
-          <div>የርዕሰ-መምህር ስም፦ <strong id="cardModalPrincipalName">ርዕሰ መምህር</strong></div>
-          <div style="margin-top:0.4rem; color:#64748B;">ፊርማና ማህተም፦ __________________</div>
-        </div>
-        <div>
-          <div>የወላጅ/አሳዳጊ ስም፦ __________________</div>
-          <div style="margin-top:0.4rem; color:#64748B;">ፊርማ፦ __________________</div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:0.85rem; font-size:0.78rem;">
+          <div style="background:white; border:1.5px solid #BFDBFE; border-radius:8px; padding:0.65rem 0.8rem;">
+            <label for="cardModalTeacherSelect" style="font-weight:700; color:#1E3A8A; display:block; margin-bottom:0.25rem;">👨‍🏫 የክፍል ኃላፊ መምህር (ይምረጡ)፦</label>
+            <select id="cardModalTeacherSelect" class="form-control" style="font-weight:700; color:#1E3A8A; width:100%; padding:5px 8px; font-size:0.82rem; border-radius:6px;" onchange="onCardTeacherSelectChange()">
+              <!-- Populated dynamically -->
+            </select>
+            <div style="margin-top:0.45rem; color:#64748B; font-size:0.73rem; border-top:1px dashed #CBD5E1; padding-top:0.35rem;">ፊርማ፦ __________________ ቀን፦ _________</div>
+          </div>
+          <div style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:0.65rem 0.8rem;">
+            <label for="cardModalPrincipalSelect" style="font-weight:700; color:#0F1E4A; display:block; margin-bottom:0.25rem;">👔 ርዕሰ መምህር (ይምረጡ)፦</label>
+            <select id="cardModalPrincipalSelect" class="form-control" style="font-weight:700; color:#0F1E4A; width:100%; padding:5px 8px; font-size:0.82rem; border-radius:6px;" onchange="onCardPrincipalSelectChange()">
+              <!-- Populated dynamically -->
+            </select>
+            <div style="margin-top:0.45rem; color:#64748B; font-size:0.73rem; border-top:1px dashed #CBD5E1; padding-top:0.35rem;">ፊርማና ማህተም፦ __________________</div>
+          </div>
+          <div style="background:white; border:1.5px solid #CBD5E1; border-radius:8px; padding:0.65rem 0.8rem;">
+            <div style="font-weight:700; color:#475569; margin-bottom:0.25rem;">👨‍👩‍👧 የወላጅ / አሳዳጊ ስም፦</div>
+            <div style="font-weight:700; color:#0F172A; padding:5px 0;">________________________</div>
+            <div style="margin-top:0.45rem; color:#64748B; font-size:0.73rem; border-top:1px dashed #CBD5E1; padding-top:0.35rem;">ፊርማ፦ __________________</div>
+          </div>
         </div>
       </div>
 
@@ -6342,6 +6402,36 @@
           `;
         }
       }
+
+      // Populate inline Report Card Teacher & Principal selectors
+      const inTSelect = document.getElementById('inlineCardTeacherSelect');
+      const inPSelect = document.getElementById('inlineCardPrincipalSelect');
+      const defTeacher = typeof getDefaultHomeroomTeacherForGrade === 'function' ? getDefaultHomeroomTeacherForGrade(targetStudent.grade) : 'አቶ ደረጀ ተሾመ';
+      if (inTSelect && typeof getAllAvailableTeachersForSignatures === 'function') {
+        const teachers = getAllAvailableTeachersForSignatures();
+        inTSelect.innerHTML = teachers.map(t => {
+          const rawName = t.split(' (')[0];
+          const isMatch = (rawName === defTeacher || t.includes(defTeacher));
+          return `<option value="${rawName}" ${isMatch ? 'selected' : ''}>${t}</option>`;
+        }).join('');
+      }
+      if (inPSelect && typeof getAllAvailablePrincipalsForSignatures === 'function') {
+        const principals = getAllAvailablePrincipalsForSignatures();
+        inPSelect.innerHTML = principals.map((p, idx) => {
+          const rawPName = p.split(' (')[0];
+          return `<option value="${rawPName}" ${idx === 0 ? 'selected' : ''}>${p}</option>`;
+        }).join('');
+      }
+      onInlineCardSignChange();
+    }
+
+    function onInlineCardSignChange() {
+      const inTSelect = document.getElementById('inlineCardTeacherSelect');
+      const inPSelect = document.getElementById('inlineCardPrincipalSelect');
+      const lblTeacher = document.getElementById('reportCardPrintTeacher');
+      const lblPrincipal = document.getElementById('reportCardPrintPrincipal');
+      if (lblTeacher && inTSelect && inTSelect.value) lblTeacher.innerText = inTSelect.value;
+      if (lblPrincipal && inPSelect && inPSelect.value) lblPrincipal.innerText = inPSelect.value;
     }
 
     // ==========================================
@@ -7454,6 +7544,94 @@
       changeStudentAttendanceStatusWeb(activeAttendance[index].id || activeAttendance[index].name, newStatus);
     }
 
+    // Teacher & Principal signature helpers for Roster and Report Card
+    function getDefaultHomeroomTeacherForGrade(gradeStr) {
+      const norm = normalizeStudentGrade(gradeStr || '1A');
+      const mapping = {
+        '1A': 'አቶ ደረጀ ተሾመ',
+        '1B': 'ወ/ሮ አልማዝ አየለ',
+        '2A': 'አቶ ዮናስ በቀለ',
+        '2B': 'ወ/ሮ ታደለች ገብሬ',
+        '3A': 'አቶ ሙሉጌታ ታከለ',
+        '3B': 'ወ/ሮ ሳራ ንጉሴ',
+        '4A': 'አቶ ደረጀ ተሾመ',
+        '4B': 'ወ/ሮ አልማዝ አየለ',
+        '5A': 'አቶ ዮናስ በቀለ',
+        '5B': 'ወ/ሮ ታደለች ገብሬ',
+        '6A': 'አቶ ሙሉጌታ ከበደ',
+        '6B': 'ዶ/ር ቴዎድሮስ ካሳ',
+        '7A': 'አቶ ብርሃኑ ተፈራ',
+        '7B': 'ወ/ሮ ሳራ ንጉሴ',
+        '8A': 'Mr Siyum Getnet',
+        '8B': 'ወ/ሮ አልማዝ አየለ',
+        '9A': 'አቶ ሙሉጌታ ከበደ',
+        '10C': 'አቶ ብርሃኑ ተፈራ',
+        '11B': 'ዶ/ር ቴዎድሮስ ካሳ',
+        '12A': 'Mr Siyum Getnet',
+        '12B': 'ወ/ሮ አልማዝ አየለ'
+      };
+      return mapping[norm] || mapping[gradeStr] || 'አቶ ደረጀ ተሾመ';
+    }
+
+    function getAllAvailableTeachersForSignatures() {
+      const standardList = [
+        'አቶ ደረጀ ተሾመ (1A/4A ክፍል ኃላፊ)',
+        'ወ/ሮ አልማዝ አየለ (1B/4B/8B ክፍል ኃላፊ)',
+        'አቶ ዮናስ በቀለ (2A/5A ክፍል ኃላፊ)',
+        'ወ/ሮ ታደለች ገብሬ (2B/5B ክፍል ኃላፊ)',
+        'አቶ ሙሉጌታ ታከለ (3A ክፍል ኃላፊ)',
+        'ወ/ሮ ሳራ ንጉሴ (3B/7B ክፍል ኃላፊ)',
+        'አቶ ሙሉጌታ ከበደ (6A/9A ክፍል ኃላፊ)',
+        'ዶ/ር ቴዎድሮስ ካሳ (6B/11B ክፍል ኃላፊ)',
+        'አቶ ብርሃኑ ተፈራ (7A/10C ክፍል ኃላፊ)',
+        'Mr Siyum Getnet (8A/12A ክፍል ኃላፊ)',
+        'Tadesse Misganaw (መምህር / አድሚን)'
+      ];
+      const activeStaff = (typeof getFilteredStaffWeb === 'function' ? getFilteredStaffWeb() : (staffList || []));
+      activeStaff.forEach(st => {
+        if (!st || !st.name) return;
+        const exists = standardList.some(item => item.includes(st.name));
+        if (!exists) {
+          standardList.push(`${st.name} (${st.role || 'መምህር'})`);
+        }
+      });
+      return standardList;
+    }
+
+    function getAllAvailablePrincipalsForSignatures() {
+      return [
+        'Mr.Bizuneh (ርዕሰ መምህር - Principal)',
+        'Genber Gebru (ምክትል ርዕሰ መምህር - Vice Principal)',
+        'ታደሰ ምስጋናው (ሲስተም አድሚን - Super Admin)'
+      ];
+    }
+
+    function onRosterTeacherChange() {
+      const tSelect = document.getElementById('rosterTeacherSelect');
+      const gSelect = document.getElementById('rosterGradeSelect');
+      const teacherName = tSelect ? tSelect.value : '';
+      const selectedGrade = gSelect ? gSelect.value : '';
+      const badge = document.getElementById('rosterHomeroomBadge');
+      if (badge) badge.innerText = `👨‍🏫 የክፍል ኃላፊ፦ ${teacherName} (${selectedGrade})`;
+      const footerTeacher = document.getElementById('rosterFooterTeacherName');
+      if (footerTeacher) footerTeacher.innerText = teacherName;
+    }
+
+    function onRosterPrincipalChange() {
+      const pSelect = document.getElementById('rosterPrincipalSelect');
+      const principalName = pSelect ? pSelect.value : 'Mr.Bizuneh';
+      const footerPrincipal = document.getElementById('rosterFooterPrincipalName');
+      if (footerPrincipal) footerPrincipal.innerText = principalName;
+    }
+
+    function onCardTeacherSelectChange() {
+      // Updates selected teacher for report card
+    }
+
+    function onCardPrincipalSelectChange() {
+      // Updates selected principal for report card
+    }
+
     // Homeroom Master Roster Generator (የክፍል ኃላፊ ሮስተር ማመንጫ - Strictly Segregated)
     function renderHomeroomRoster() {
       const activeStudents = getFilteredStudentsWeb();
@@ -7474,17 +7652,44 @@
 
       const selectedGrade = select ? select.value : (availableClasses[0] || '8A');
 
-      // Find homeroom teacher matching this section or level
-      const hrTeacher = activeStaff.find(s => (s.role || '').includes('የክፍል ኃላፊ') && ((s.role || '').includes(selectedGrade) || (s.dept || '').includes(selectedGrade)))
-        || activeStaff.find(s => (s.role || '').includes('የክፍል ኃላፊ'))
-        || activeStaff.find(s => (s.role || '').includes('መምህር'))
-        || activeStaff[0]
-        || { name: (schoolSettings && schoolSettings.nameAm ? schoolSettings.nameAm + ' መምህር' : 'ያልተመደበ') };
-      
+      // Populate Roster Teacher & Principal Selectors
+      const tSelect = document.getElementById('rosterTeacherSelect');
+      const pSelect = document.getElementById('rosterPrincipalSelect');
+      const defTeacher = getDefaultHomeroomTeacherForGrade(selectedGrade);
+
+      if (tSelect) {
+        const teachers = getAllAvailableTeachersForSignatures();
+        const curVal = tSelect.value;
+        tSelect.innerHTML = teachers.map(t => {
+          const rawName = t.split(' (')[0];
+          const isMatch = curVal ? (rawName === curVal || t.includes(curVal)) : (rawName === defTeacher || t.includes(defTeacher));
+          return `<option value="${rawName}" ${isMatch ? 'selected' : ''}>${t}</option>`;
+        }).join('');
+      }
+
+      if (pSelect) {
+        const principals = getAllAvailablePrincipalsForSignatures();
+        const curPVal = pSelect.value || 'Mr.Bizuneh';
+        pSelect.innerHTML = principals.map(p => {
+          const rawPName = p.split(' (')[0];
+          const isMatch = (rawPName === curPVal || p.includes(curPVal));
+          return `<option value="${rawPName}" ${isMatch ? 'selected' : ''}>${p}</option>`;
+        }).join('');
+      }
+
+      const activeTeacherName = (tSelect && tSelect.value) ? tSelect.value : defTeacher;
+      const activePrincipalName = (pSelect && pSelect.value) ? pSelect.value : 'Mr.Bizuneh';
+
       const badge = document.getElementById('rosterHomeroomBadge');
       if (badge) {
-        badge.innerText = `👨‍🏫 የክፍል ኃላፊ፦ ${hrTeacher.name} (${selectedGrade})`;
+        badge.innerText = `👨‍🏫 የክፍል ኃላፊ፦ ${activeTeacherName} (${selectedGrade})`;
       }
+      const footerTeacher = document.getElementById('rosterFooterTeacherName');
+      if (footerTeacher) footerTeacher.innerText = activeTeacherName;
+      const footerPrincipal = document.getElementById('rosterFooterPrincipalName');
+      if (footerPrincipal) footerPrincipal.innerText = activePrincipalName;
+      const rosterDate = document.getElementById('rosterSignatureDate');
+      if (rosterDate) rosterDate.innerText = new Date().toLocaleDateString('am-ET') + ' (2017 ዓ.ም)';
 
       // Filter students strictly belonging to this grade and section (e.g. 3A strictly 3A, 3B strictly 3B)
       const targetGradeNorm = normalizeStudentGrade(selectedGrade);
@@ -7799,21 +8004,42 @@
       const rank = (studentIdx >= 0 ? studentIdx + 1 : 1);
       document.getElementById('cardModalRank').innerText = `${rank}ኛ ደረጃ (ከ ${classStudents.length} ተማሪዎች)`;
 
-      // Homeroom Teacher name strictly matching active level
-      const hrTeacher = activeStaff.find(s => (s.role || '').includes('የክፍል ኃላፊ') && ((s.role || '').includes(selectedGrade) || (s.dept || '').includes(selectedGrade)))
-        || activeStaff.find(s => (s.role || '').includes('የክፍል ኃላፊ'))
-        || activeStaff.find(s => (s.role || '').includes('መምህር'))
-        || activeStaff[0]
-        || { name: (schoolSettings && schoolSettings.nameAm ? schoolSettings.nameAm + ' መምህር' : 'ያልተመደበ') };
-      document.getElementById('cardModalHomeroomTeacher').innerText = hrTeacher.name;
+      // Populate Report Card Teacher & Principal Selectors
+      const cardTSelect = document.getElementById('cardModalTeacherSelect');
+      const cardPSelect = document.getElementById('cardModalPrincipalSelect');
+      const defTeacher = getDefaultHomeroomTeacherForGrade(student.grade);
+
+      if (cardTSelect) {
+        const teachers = getAllAvailableTeachersForSignatures();
+        cardTSelect.innerHTML = teachers.map(t => {
+          const rawName = t.split(' (')[0];
+          const isMatch = (rawName === defTeacher || t.includes(defTeacher));
+          return `<option value="${rawName}" ${isMatch ? 'selected' : ''}>${t}</option>`;
+        }).join('');
+      }
+
+      if (cardPSelect) {
+        const principals = getAllAvailablePrincipalsForSignatures();
+        cardPSelect.innerHTML = principals.map((p, idx) => {
+          const rawPName = p.split(' (')[0];
+          return `<option value="${rawPName}" ${idx === 0 ? 'selected' : ''}>${p}</option>`;
+        }).join('');
+      }
+
+      const assignedTeacher = (cardTSelect && cardTSelect.value) ? cardTSelect.value : defTeacher;
+      const assignedPrincipal = (cardPSelect && cardPSelect.value) ? cardPSelect.value : 'Mr.Bizuneh';
+
+      if (document.getElementById('cardModalHomeroomTeacher')) {
+        document.getElementById('cardModalHomeroomTeacher').innerText = assignedTeacher;
+      }
       if (document.getElementById('cardModalPrincipalName')) {
-        document.getElementById('cardModalPrincipalName').innerText = (schoolSettings && schoolSettings.principalAm) ? schoolSettings.principalAm : 'ርዕሰ መምህር';
+        document.getElementById('cardModalPrincipalName').innerText = assignedPrincipal;
       }
       if (document.getElementById('reportCardPrintTeacher')) {
-        document.getElementById('reportCardPrintTeacher').innerText = hrTeacher.name;
+        document.getElementById('reportCardPrintTeacher').innerText = assignedTeacher;
       }
       if (document.getElementById('reportCardPrintPrincipal')) {
-        document.getElementById('reportCardPrintPrincipal').innerText = (schoolSettings && schoolSettings.principalAm) ? schoolSettings.principalAm : 'ርዕሰ መምህር';
+        document.getElementById('reportCardPrintPrincipal').innerText = assignedPrincipal;
       }
     }
 
@@ -9245,83 +9471,23 @@
     }
 
     function quickFillAndLogin(roleKey) {
-      let userToLogin = null;
-      if (roleKey === 'admin') {
-        userToLogin = {
-          name: 'እኔ (ታደሰ ምስጋናው - ሲስተም አድሚን)',
-          role: '👑 ሲስተም አድሚን',
-          email: 'tadessemisganaw4@gmail.com',
-          secondaryEmail: 'tadethanks6@gmail.com',
-          phone: '0911999999',
-          staffId: 'STF-003',
-          pass: 'tade@2026',
-          isAdmin: true,
-          isVicePrincipal: false,
-          roleKey: 'admin'
-        };
-      } else if (roleKey === 'principal') {
-        userToLogin = {
-          name: 'Mr.Bizuneh',
-          role: '👔 ርዕሰ መምህር (Principal)',
-          email: 'bizuneh@dilijent.edu.et',
-          phone: '0911000001',
-          staffId: 'STF-001',
-          pass: 'Staff@2026',
-          isAdmin: false,
-          isVicePrincipal: false,
-          isPrincipal: true,
-          roleKey: 'principal'
-        };
-      } else if (roleKey === 'vp') {
-        userToLogin = {
-          name: 'Genber Gebru',
-          role: '🎓 ምክትል ርዕሰ መምህር',
-          email: 'vp@dilijent.edu.et',
-          phone: '0918000000',
-          staffId: 'STF-002',
-          pass: 'vp1234',
-          isAdmin: false,
-          isVicePrincipal: true,
-          roleKey: 'vice_principal'
-        };
-      } else if (roleKey === 'teacher' || roleKey === 'siyum') {
-        userToLogin = {
-          name: 'Mr Siyum Getnet',
-          role: '👨‍🏫 መምህር (Teacher - 8ኛ A ኃላፊ)',
-          email: 'siyum.getnet@dilijent.edu.et',
-          phone: '0911888888',
-          staffId: 'STF-004',
-          pass: 'Staff@2026',
-          isAdmin: false,
-          isVicePrincipal: false,
-          roleKey: 'teacher'
-        };
-      } else if (roleKey === 'secretary') {
-        userToLogin = {
-          name: 'Sara Niguse',
-          role: '✍️ ዋና ጸሐፊ / ሬጅስትራር',
-          email: 'sara.niguse@dilijent.edu.et',
-          phone: '0960225925',
-          staffId: 'STF-005',
-          pass: 'sara@123',
-          isAdmin: false,
-          isVicePrincipal: false,
-          roleKey: 'secretary'
-        };
+      const select = document.getElementById('fullLoginRoleSelect') || document.getElementById('loginRoleSelect');
+      if (select) {
+        select.value = roleKey;
+        if (typeof handleFullLoginRoleDropdownChange === 'function') handleFullLoginRoleDropdownChange();
       }
-      if (userToLogin) {
-        currentWebUser = userToLogin;
-        isGuestMode = false;
-        localStorage.setItem('dilijent_current_user', JSON.stringify(currentWebUser));
-        updateCurrentUserUI();
-        closeLoginModal();
-        if (typeof renderAttendance === 'function') renderAttendance();
-        if (typeof renderStaffAttendanceWeb === 'function') renderStaffAttendanceWeb();
-        if (typeof renderStudents === 'function') renderStudents();
-        if (typeof renderStaff === 'function') renderStaff();
-        if (typeof renderDashboard === 'function') renderDashboard();
-        alert(`🎉 እንኳን ደህና መጡ! ${userToLogin.name} (${userToLogin.role}) በተሳካ ሁኔታ ገብተዋል።`);
+      const identInput = document.getElementById('inputFullLoginIdentifier') || document.getElementById('inputWebLoginIdentifier');
+      const passInput = document.getElementById('inputFullLoginPass') || document.getElementById('inputWebLoginPass');
+      if (roleKey === 'admin' && identInput) identInput.value = 'tadessemisganaw4@gmail.com';
+      else if (roleKey === 'principal' && identInput) identInput.value = '0911000001';
+      else if (roleKey === 'vp' && identInput) identInput.value = '0918000000';
+      else if (roleKey === 'teacher' && identInput) identInput.value = '0911888888';
+      else if (roleKey === 'secretary' && identInput) identInput.value = '0960225925';
+      if (passInput) {
+        passInput.value = '';
+        passInput.focus();
       }
+      alert('🔒 ደህንነት፦ እባክዎ ሚስጥራዊ የይለፍ ቃልዎን አስገብተው «ግባ» የሚለውን ይጫኑ!');
     }
 
     function executeUnifiedLogin(rawIdentifier, pass, roleKey) {
@@ -9339,34 +9505,24 @@
         return false;
       }
 
-      // 1. ADMIN CHECK (Tadesse Misganaw)
+      // 1. ADMIN CHECK (Tadesse Misganaw - Strict Email/Identifier & Password)
       const isAdminIdent = (
         cleanIdent === 'tadessemisganaw4@gmail.com' ||
         cleanIdent === 'tadethanks6@gmail.com' ||
         cleanIdent === 'admin@dilijent.edu.et' ||
         cleanIdent === 'admin' ||
-        cleanIdent.includes('tadesse') ||
+        cleanIdent === 'tadesse' ||
         cleanIdent === 'tade' ||
         cleanPhone === '0911999999' ||
         cleanIdent === 'stf-003' ||
-        cleanIdent === 'stf-admin' ||
-        roleKey === 'admin'
+        cleanIdent === 'stf-admin'
       );
       const isAdminPass = (
         cleanPass === 'tade@2026' ||
         cleanPass === 'tade2026' ||
         cleanPass.toLowerCase() === 'tade@2026' ||
         cleanPass === 'Admin@2026' ||
-        cleanPass.toLowerCase() === 'admin@2026' ||
-        cleanPass === 'admin123' ||
-        cleanPass.toLowerCase() === 'admin123' ||
-        cleanPass === 'admin' ||
-        cleanPass === '1234' ||
-        cleanPass === '123456' ||
-        cleanPass === 'tade' ||
-        cleanPass === 'Staff@2026' ||
-        cleanPass.toLowerCase() === 'staff@2026' ||
-        cleanPass === 'Teacher@2026'
+        cleanPass.toLowerCase() === 'admin@2026'
       );
 
       if (isAdminIdent && isAdminPass) {
@@ -9404,24 +9560,20 @@
         return true;
       }
 
-      // 2. PRINCIPAL CHECK (Mr.Bizuneh)
+      // 2. PRINCIPAL CHECK (Mr.Bizuneh - Strict Phone/ID & Password)
       const isBizunehIdent = (
         cleanPhone === '0911000001' ||
         cleanPhone === '0911000000' ||
         cleanIdent === '0911000001' ||
         cleanIdent === '0911000000' ||
-        cleanIdent.includes('bizuneh') ||
+        cleanIdent === 'bizuneh' ||
         cleanIdent === 'stf-001' ||
-        cleanIdent === 'bizuneh@dilijent.edu.et' ||
-        roleKey === 'principal'
+        cleanIdent === 'bizuneh@dilijent.edu.et'
       );
       const isBizunehPass = (
         cleanPass === 'Staff@2026' ||
         cleanPass.toLowerCase() === 'staff@2026' ||
-        cleanPass === 'tade@2026' ||
-        cleanPass === '1234' ||
-        cleanPass === '123456' ||
-        cleanPass === 'admin123'
+        cleanPass === 'tade@2026'
       );
 
       if (isBizunehIdent && isBizunehPass) {
@@ -9451,25 +9603,18 @@
         return true;
       }
 
-      // 3. VICE PRINCIPAL CHECK (Genber Gebru)
+      // 3. VICE PRINCIPAL CHECK (Genber Gebru - Strict Phone/ID & Password)
       const isVpIdent = (
         cleanPhone === '0918000000' ||
         cleanIdent === '0918000000' ||
-        cleanIdent.includes('genber') ||
-        cleanIdent.includes('gebru') ||
-        cleanIdent.includes('vp') ||
+        cleanIdent === 'genber' ||
+        cleanIdent === 'gebru' ||
         cleanIdent === 'stf-002' ||
-        cleanIdent === 'vp@dilijent.edu.et' ||
-        roleKey === 'vice_principal'
+        cleanIdent === 'vp@dilijent.edu.et'
       );
       const isVpPass = (
         cleanPass === 'vp1234' ||
-        cleanPass === '1234' ||
-        cleanPass === '123456' ||
-        cleanPass === 'vp@1234' ||
-        cleanPass === 'tade@2026' ||
-        cleanPass === 'Staff@2026' ||
-        cleanPass.toLowerCase() === 'staff@2026'
+        cleanPass === 'vp@1234'
       );
 
       if (isVpIdent && isVpPass) {
@@ -9498,12 +9643,11 @@
         return true;
       }
 
-      // 4. TEACHER CHECK (Mr Siyum Getnet)
+      // 4. TEACHER CHECK (Mr Siyum Getnet - Strict Phone/ID & Password)
       const isSiyumIdent = (
         cleanPhone === '0911888888' ||
         cleanIdent === '0911888888' ||
-        cleanIdent.includes('siyum') ||
-        cleanIdent.includes('getnet') ||
+        cleanIdent === 'siyum' ||
         cleanIdent === 'stf-004' ||
         cleanIdent === 'siyum.getnet@dilijent.edu.et'
       );
@@ -9511,9 +9655,7 @@
         cleanPass === 'Staff@2026' ||
         cleanPass.toLowerCase() === 'staff@2026' ||
         cleanPass === 'Teacher@2026' ||
-        cleanPass.toLowerCase() === 'teacher@2026' ||
-        cleanPass === '1234' ||
-        cleanPass === '123456'
+        cleanPass.toLowerCase() === 'teacher@2026'
       );
 
       if (isSiyumIdent && isSiyumPass) {
@@ -9542,24 +9684,18 @@
         return true;
       }
 
-      // 5. SECRETARY CHECK (Sara Niguse)
+      // 5. SECRETARY CHECK (Sara Niguse - Strict Phone/ID & Password)
       const isSaraIdent = (
         cleanPhone === '0960225925' ||
         cleanPhone.endsWith('60225925') ||
         cleanIdent === '0960225925' ||
-        cleanIdent.includes('sara') ||
-        cleanIdent.includes('niguse') ||
+        cleanIdent === 'sara' ||
         cleanIdent === 'stf-005' ||
-        cleanIdent === 'sara.niguse@dilijent.edu.et' ||
-        roleKey === 'secretary'
+        cleanIdent === 'sara.niguse@dilijent.edu.et'
       );
       const isSaraPass = (
         cleanPass === 'sara@123' ||
-        cleanPass === 'Staff@2026' ||
-        cleanPass.toLowerCase() === 'staff@2026' ||
-        cleanPass === '1234' ||
-        cleanPass === '123456' ||
-        cleanPass === 'sara123'
+        cleanPass.toLowerCase() === 'sara@123'
       );
 
       if (isSaraIdent && isSaraPass) {
@@ -9588,7 +9724,7 @@
         return true;
       }
 
-      // 6. GENERAL ACCOUNT / STAFF LIST LOOKUP
+      // 6. GENERAL REGISTERED ACCOUNTS LOOKUP (Strict Password Match Only!)
       if (!Array.isArray(userAccounts) || userAccounts.length === 0) {
         try { userAccounts = JSON.parse(localStorage.getItem('dilijent_user_accounts')) || []; } catch(e){}
         if (!Array.isArray(userAccounts) || userAccounts.length === 0) userAccounts = [...DEFAULT_ACCOUNTS];
@@ -9597,7 +9733,7 @@
       const foundUser = userAccounts.find(u => {
         if (!u) return false;
         const uPass = u.pass || '';
-        const passMatches = (uPass === cleanPass || cleanPass === '1234' || cleanPass === '123456' || cleanPass === 'Staff@2026' || cleanPass === 'Teacher@2026' || cleanPass === 'tade@2026');
+        const passMatches = (uPass && uPass === cleanPass);
         if (!passMatches) return false;
 
         const uEmail = (u.email || '').toLowerCase().trim();
@@ -9629,14 +9765,14 @@
         return true;
       }
 
-      // 7. Check staffList directly
+      // 7. CHECK REGISTERED STAFF LIST (Strict Staff Password Only!)
       const foundStaff = staffList.find(st => {
         if (!st) return false;
         const stPhone = (st.phone || '').replace(/[\s\-]/g, '');
         const stId = (st.id || '').toLowerCase().trim();
         const stName = (st.name || '').toLowerCase().trim();
-        const identMatch = (stPhone && stPhone === cleanPhone) || (stId && stId === cleanIdent) || (stName && stName.includes(cleanIdent));
-        const passMatch = (cleanPass === 'Staff@2026' || cleanPass === 'Teacher@2026' || cleanPass === '1234' || cleanPass === '123456' || cleanPass === 'tade@2026');
+        const identMatch = (stPhone && stPhone === cleanPhone) || (stId && stId === cleanIdent) || (stName && stName === cleanIdent);
+        const passMatch = (cleanPass === 'Staff@2026' || cleanPass === 'Teacher@2026');
         return identMatch && passMatch;
       });
 
@@ -9665,7 +9801,7 @@
         return true;
       }
 
-      showLoginError('⛔ የተሳሳተ መለያ (ስልክ/ኢሜይል/STF-ID) ወይም የይለፍ ቃል! እባክዎ በትክክል መተየብዎን ያረጋግጡ ወይም ሲስተም አድሚኑን ያነጋግሩ።');
+      showLoginError('⛔ የተሳሳተ መለያ (ስልክ/ኢሜይል/STF-ID) ወይም የይለፍ ቃል! ያለ ትክክለኛ የይለፍ ቃል ወደ ሲስተሙ መግባት አይቻልም። እባክዎ በትክክል መተየብዎን ያረጋግጡ።');
       return false;
     }
 
@@ -9679,9 +9815,8 @@
     }
 
     function enterGuestModeWeb() {
-      isGuestMode = true;
-      updateCurrentUserUI();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      alert('⛔ ያለ ትክክለኛ የይለፍ ቃል መግባት አይፈቀድም! እባክዎ በትክክለኛ መለያ ቁጥርዎ እና ሚስጥራዊ የይለፍ ቃልዎ ይግቡ።');
+      openLoginModal();
     }
 
     function canAccessStaffAttendanceWeb() {
@@ -9728,7 +9863,7 @@
       const fullLoginPage = document.getElementById('fullLoginPage');
       const mainAppWrapper = document.getElementById('mainAppWrapper');
 
-      if (currentWebUser || isGuestMode) {
+      if (currentWebUser) {
         if (fullLoginPage) fullLoginPage.style.display = 'none';
         if (mainAppWrapper) mainAppWrapper.style.display = 'block';
       } else {
@@ -9854,9 +9989,6 @@
     function closeLoginModal() {
       const modal = document.getElementById('loginModal');
       if (modal) modal.style.display = 'none';
-      if (!currentWebUser && !isGuestMode) {
-        isGuestMode = true;
-      }
       updateCurrentUserUI();
     }
 
@@ -10835,7 +10967,7 @@
               URL.revokeObjectURL(url);
               alert('ሰነዱ በቀጥታ ወደ ኮምፒውተርዎ / ስልክዎ «Downloads» (Local Storage) ወርዷል!');
             }
-          </script>
+          <\/script>
         </body>
         </html>
       `;
@@ -11091,7 +11223,7 @@
               URL.revokeObjectURL(url);
               alert('ሰነዱ በቀጥታ ወደ ኮምፒውተርዎ / ስልክዎ «Downloads» (Local Storage) ወርዷል!');
             }
-          </script>
+          <\/script>
         </body>
         </html>
       `;
@@ -11107,6 +11239,11 @@
       const schAm = schoolSettings.nameAm || 'ዲሊጀንት ትምህርት ቤት';
       const schEn = schoolSettings.nameEn || 'Dilijent School';
       const year = schoolSettings.academicYear || '2017 ዓ.ም';
+
+      const tSelect = document.getElementById('rosterTeacherSelect');
+      const pSelect = document.getElementById('rosterPrincipalSelect');
+      const selectedTeacherName = (tSelect && tSelect.value) ? tSelect.value : getDefaultHomeroomTeacherForGrade(targetGrade);
+      const selectedPrincipalName = (pSelect && pSelect.value) ? pSelect.value : 'Mr.Bizuneh (ርዕሰ መምህር)';
 
       const classStudents = (students || []).filter(s => normalizeStudentGrade(s.grade) === normGrade);
       if (classStudents.length === 0) {
@@ -11198,7 +11335,9 @@
             table { width:100%; border-collapse:collapse; margin-top:8px; font-size:11.5px; }
             th { background:#0F1E4A; color:#fff; font-size:11px; font-weight:bold; padding:6px 8px; text-align:center; }
             th:nth-child(2) { text-align:left; }
-            .footer-sign { display:flex; justify-content:space-between; margin-top:36px; padding-top:14px; border-top:1px dashed #CBD5E1; font-size:11px; color:#475569; }
+            .footer-sign { display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-top:32px; padding-top:14px; border-top:1.5px solid #CBD5E1; font-size:11.5px; color:#334155; }
+            .sign-box { background:#F8FAFC; border:1px solid #E2E8F0; border-radius:6px; padding:10px 12px; }
+            .sign-name { font-size:13px; font-weight:bold; color:#0F1E4A; margin:4px 0 8px; }
             @media print {
               .no-print { display: none; }
               body { margin: 10px; }
@@ -11236,6 +11375,8 @@
             <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; font-size:11px; color:#334155; margin-top:2px;">
               <span><strong>ዓመተ ምህረት፦</strong> ${year}</span>
               <span><strong>ክፍል/ሴክሽን፦</strong> ${targetGrade}</span>
+              <span><strong>የክፍል ኃላፊ መምህር፦</strong> ${selectedTeacherName}</span>
+              <span><strong>ርዕሰ መምህር፦</strong> ${selectedPrincipalName}</span>
               <span><strong>የወጣበት ቀን፦</strong> ${new Date().toLocaleDateString('am-ET')}</span>
             </div>
           </div>
@@ -11281,10 +11422,24 @@
           </table>
 
           <div class="footer-sign">
-            <div>የክፍል ኃላፊ መምህር ፊርማ፦ _____________________</div>
-            <div>የትምህርት ክፍል ኃላፊ (Department Head)፦ _____________________</div>
-            <div>የምክትል ርዕሰ መምህር ማረጋገጫ፦ _____________________</div>
-            <div>የት/ቤት ማህተም፦ _____________________</div>
+            <div class="sign-box">
+              <div>👨‍🏫 የክፍል ኃላፊ መምህር (Homeroom Teacher)</div>
+              <div class="sign-name">${selectedTeacherName}</div>
+              <div>ፊርማ፦ _______________________</div>
+              <div style="margin-top:4px; font-size:10px; color:#64748B;">ቀን፦ _______________________</div>
+            </div>
+            <div class="sign-box">
+              <div>👔 ርዕሰ መምህር (School Principal)</div>
+              <div class="sign-name">${selectedPrincipalName}</div>
+              <div>ፊርማና ማህተም፦ _______________________</div>
+              <div style="margin-top:4px; font-size:10px; color:#64748B;">ቀን፦ _______________________</div>
+            </div>
+            <div class="sign-box">
+              <div>🏢 ምክትል ርዕሰ መምህር / ትምህርት ክፍል</div>
+              <div class="sign-name">Genber Gebru</div>
+              <div>ማረጋገጫ ፊርማ፦ _______________________</div>
+              <div style="margin-top:4px; font-size:10px; color:#64748B;">ማህተም፦ [Official School Seal]</div>
+            </div>
           </div>
 
           <script>
@@ -11303,7 +11458,7 @@
               URL.revokeObjectURL(url);
               alert('ሮስተሩ በቀጥታ ወደ ኮምፒውተርዎ / ስልክዎ «Downloads» (Local Storage) ወርዷል!');
             }
-          </script>
+          <\/script>
         </body>
         </html>
       `;
@@ -11323,6 +11478,18 @@
       const schAm = schoolSettings.nameAm || 'ዲሊጀንት ትምህርት ቤት';
       const schEn = schoolSettings.nameEn || 'Dilijent School';
       const year = schoolSettings.academicYear || '2017 ዓ.ም';
+
+      const cardTSelect = document.getElementById('cardModalTeacherSelect');
+      const cardPSelect = document.getElementById('cardModalPrincipalSelect');
+      const inTSelect = document.getElementById('inlineCardTeacherSelect');
+      const inPSelect = document.getElementById('inlineCardPrincipalSelect');
+
+      const selectedTeacherName = (cardTSelect && cardTSelect.value)
+        ? cardTSelect.value
+        : ((inTSelect && inTSelect.value) ? inTSelect.value : getDefaultHomeroomTeacherForGrade(student.grade));
+      const selectedPrincipalName = (cardPSelect && cardPSelect.value)
+        ? cardPSelect.value
+        : ((inPSelect && inPSelect.value) ? inPSelect.value : 'Mr.Bizuneh');
 
       const isPrimary = (schoolSettings.gradeLevel === '1_8');
       const baseScore = (student.scores && student.scores.length >= 4)
@@ -11398,7 +11565,9 @@
             th { background:#0F1E4A; color:#fff; font-size:11.5px; font-weight:bold; padding:8px 10px; text-align:center; }
             th:first-child { text-align:left; }
             .summary-box { display:flex; justify-content:space-between; align-items:center; background:#F8FAFC; border:1.5px solid #CBD5E1; border-radius:8px; padding:12px 16px; margin-top:14px; }
-            .footer-sign { display:flex; justify-content:space-between; margin-top:40px; padding-top:14px; border-top:1px dashed #CBD5E1; font-size:11px; color:#475569; }
+            .footer-sign { display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-top:34px; padding-top:14px; border-top:1.5px solid #CBD5E1; font-size:11.5px; color:#334155; }
+            .sign-box { background:#F8FAFC; border:1px solid #E2E8F0; border-radius:6px; padding:10px 12px; }
+            .sign-name { font-size:13px; font-weight:bold; color:#0F1E4A; margin:4px 0 8px; }
             @media print {
               .no-print { display: none; }
               body { margin: 10px; }
@@ -11467,9 +11636,24 @@
           </div>
 
           <div class="footer-sign">
-            <div>የክፍል ኃላፊ መምህር ፊርማ፦ _____________________</div>
-            <div>የምክትል ርዕሰ መምህር ማረጋገጫ፦ _____________________</div>
-            <div>የትምህርት ቤቱ ማህተም፦ _____________________</div>
+            <div class="sign-box">
+              <div>👨‍🏫 የክፍል ኃላፊ መምህር (Homeroom Teacher)</div>
+              <div class="sign-name">${selectedTeacherName}</div>
+              <div>ፊርማ፦ _______________________</div>
+              <div style="margin-top:4px; font-size:10px; color:#64748B;">ቀን፦ _______________________</div>
+            </div>
+            <div class="sign-box">
+              <div>👔 ርዕሰ መምህር (School Principal)</div>
+              <div class="sign-name">${selectedPrincipalName}</div>
+              <div>ፊርማና ማህተም፦ _______________________</div>
+              <div style="margin-top:4px; font-size:10px; color:#64748B;">ማህተም፦ [Official School Seal]</div>
+            </div>
+            <div class="sign-box">
+              <div>👨‍👩‍👧 የወላጅ / አሳዳጊ (Parent / Guardian)</div>
+              <div class="sign-name">________________________</div>
+              <div>ፊርማ፦ _______________________</div>
+              <div style="margin-top:4px; font-size:10px; color:#64748B;">ቀን፦ _______________________</div>
+            </div>
           </div>
 
           <script>
@@ -11488,7 +11672,7 @@
               URL.revokeObjectURL(url);
               alert('የተማሪው ካርድ በቀጥታ ወደ ኮምፒውተርዎ / ስልክዎ «Downloads» (Local Storage) ወርዷል!');
             }
-          </script>
+          <\/script>
         </body>
         </html>
       `;

@@ -95,6 +95,7 @@ fun GradesScreen(
     isStudent: Boolean = false,
     currentTeacher: Teacher? = null,
     currentStudent: Student? = null,
+    teachers: List<Teacher> = emptyList(),
     teacherWorkloads: List<TeacherWorkload> = emptyList(),
     assessmentScheme: AssessmentScheme = AssessmentScheme.MOE_STANDARD,
     onConfigureSchemeClick: (() -> Unit)? = null,
@@ -114,6 +115,8 @@ fun GradesScreen(
     var activeReportCardGrades by remember { mutableStateOf<List<StudentGrade>>(emptyList()) }
     var activeReportCardRank by remember { mutableStateOf(1) }
     var activeReportCardTotal by remember { mutableStateOf(1) }
+    var activeReportCardTeacher by remember { mutableStateOf("") }
+    var activeReportCardPrincipal by remember { mutableStateOf("Mr.Bizuneh") }
 
     // Tab switcher: 0 = Subject Mark List, 1 = Homeroom Roster Table, 2 = Individual Student Card
     val isHomeroomTeacher = currentTeacher?.isHomeroomTeacher == true
@@ -393,11 +396,14 @@ fun GradesScreen(
                         isAmharic = isAmharic,
                         isAdmin = isAdmin,
                         currentTeacher = currentTeacher,
-                        onViewReportCard = { student, stGrades, rank, total ->
+                        teachers = teachers,
+                        onViewReportCard = { student, stGrades, rank, total, teacherName, principalName ->
                             activeReportCardStudent = student
                             activeReportCardGrades = stGrades
                             activeReportCardRank = rank
                             activeReportCardTotal = total
+                            activeReportCardTeacher = teacherName
+                            activeReportCardPrincipal = principalName
                         },
                         modifier = Modifier.fillMaxSize()
                     )
@@ -580,6 +586,12 @@ fun GradesScreen(
                                     activeReportCardGrades = filteredGrades
                                     activeReportCardRank = 1
                                     activeReportCardTotal = visibleStudents.size.coerceAtLeast(1)
+                                    activeReportCardTeacher = if (currentTeacher?.isHomeroomTeacher == true && !isAdmin) {
+                                        currentTeacher.fullName
+                                    } else {
+                                        defaultHomeroomTeacherForGrade(selectedStudent.grade, selectedStudent.section, teachers)
+                                    }
+                                    activeReportCardPrincipal = "Mr.Bizuneh"
                                 },
                                 colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary),
                                 shape = RoundedCornerShape(10.dp),
@@ -680,7 +692,11 @@ fun GradesScreen(
             totalStudents = activeReportCardTotal,
             assessmentScheme = assessmentScheme,
             isAmharic = isAmharic,
-            homeroomTeacherName = currentTeacher?.fullName ?: "አቶ ሙሉጌታ ታከለ",
+            homeroomTeacherName = activeReportCardTeacher.ifBlank {
+                defaultHomeroomTeacherForGrade(student.grade, student.section, teachers)
+            },
+            principalName = activeReportCardPrincipal,
+            teachers = teachers,
             schoolLogoUri = schoolLogoUri,
             schoolNameAm = schoolNameAm,
             schoolNameEn = schoolNameEn,

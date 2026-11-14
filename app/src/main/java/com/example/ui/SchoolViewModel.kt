@@ -1065,9 +1065,9 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
 
     // Login Form State
     val isAdminLoginMode = MutableStateFlow(false) // false = Phone mode (Teacher/Student/Staff), true = Email mode (Admin)
-    val loginEmail = MutableStateFlow("admin@dilijent.edu.et")
-    val loginPhone = MutableStateFlow("0911000000")
-    val loginPassword = MutableStateFlow("1234")
+    val loginEmail = MutableStateFlow("")
+    val loginPhone = MutableStateFlow("")
+    val loginPassword = MutableStateFlow("")
     val loginErrorMessage = MutableStateFlow<String?>(null)
     val isAuthenticating = MutableStateFlow(false)
 
@@ -1085,40 +1085,44 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
             loginErrorMessage.value = null
             val cleanId = identifier.trim()
             val cleanPass = pass.trim()
+
+            if (cleanId.isEmpty() || cleanPass.isEmpty()) {
+                isAuthenticating.value = false
+                loginErrorMessage.value = if (_isAmharic.value) {
+                    "⛔ የተጠቃሚ መለያ እና ሚስጥራዊ የይለፍ ቃል በትክክል ማስገባት ግዴታ ነው!"
+                } else {
+                    "⛔ Both identifier and valid password are required!"
+                }
+                return@launch
+            }
+
             val isAdminIdentifier = cleanId.equals("tadessemisganaw4@gmail.com", ignoreCase = true) ||
                     cleanId.equals("tadethanks6@gmail.com", ignoreCase = true) ||
                     cleanId.equals("admin@dilijent.edu.et", ignoreCase = true) ||
                     cleanId.equals("admin", ignoreCase = true) ||
                     cleanId.equals("0911999999") ||
-                    cleanId.contains("tadesse", ignoreCase = true) ||
+                    cleanId.equals("tadesse", ignoreCase = true) ||
                     cleanId.equals("STF-003", ignoreCase = true) ||
                     cleanId.equals("STF-ADMIN", ignoreCase = true)
 
             val isAdminPassword = cleanPass == "tade@2026" ||
                     cleanPass.equals("tade@2026", ignoreCase = true) ||
                     cleanPass == "tade2026" ||
-                    cleanPass == "Admin@2026" ||
-                    cleanPass == "admin123" ||
-                    cleanPass.equals("admin", ignoreCase = true) ||
-                    cleanPass == "1234" ||
-                    cleanPass == "123456" ||
-                    cleanPass == "tade" ||
-                    cleanPass == "Staff@2026" ||
-                    cleanPass == "Teacher@2026"
+                    cleanPass == "Admin@2026"
 
             val treatAsEmail = isEmailLogin || cleanId.contains("@") || isAdminIdentifier
 
             var user: UserAccount? = if (treatAsEmail) {
-                // Email / Identifier login for System Admin
+                // Email / Identifier login for System Admin (strict password verification only)
                 val found = repository.authenticateByEmail(cleanId, cleanPass)
                 if (found != null) {
                     found
-                } else if (isAdminIdentifier && (isAdminPassword || cleanPass.isNotEmpty())) {
+                } else if (isAdminIdentifier && isAdminPassword) {
                     val fallbackAdmin = UserAccount(
                         fullName = "ታደሰ ምስጋናው (ሲስተም አድሚን)",
                         email = if (cleanId.contains("@")) cleanId else "tadessemisganaw4@gmail.com",
                         phone = "0911999999",
-                        password = if (cleanPass.isNotEmpty()) cleanPass else "tade@2026",
+                        password = cleanPass,
                         role = "ሲስተም አድሚን (Super Admin)"
                     )
                     repository.registerUser(fallbackAdmin)
@@ -1127,21 +1131,21 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                     null
                 }
             } else {
-                // Phone / Staff ID login for Teachers, Students, Staff, and Principal
+                // Phone / Staff ID login for Teachers, Students, Staff, and Principal (strict password verification only)
                 val authed = repository.authenticate(cleanId, cleanPass)
                 if (authed != null) {
                     authed
-                } else if (isAdminIdentifier && (isAdminPassword || cleanPass.isNotEmpty())) {
+                } else if (isAdminIdentifier && isAdminPassword) {
                     val fallbackAdmin = UserAccount(
                         fullName = "ታደሰ ምስጋናው (ሲስተም አድሚን)",
                         email = "tadessemisganaw4@gmail.com",
                         phone = "0911999999",
-                        password = if (cleanPass.isNotEmpty()) cleanPass else "tade@2026",
+                        password = cleanPass,
                         role = "ሲስተም አድሚን (Super Admin)"
                     )
                     repository.registerUser(fallbackAdmin)
                     fallbackAdmin
-                } else if ((cleanId == "0960225925" || cleanId.endsWith("60225925") || cleanId.contains("sara", ignoreCase = true) || cleanId.equals("STF-005", ignoreCase = true)) && (cleanPass == "sara@123" || cleanPass == "Staff@2026" || cleanPass == "1234" || cleanPass == "123456" || cleanPass == "sara123")) {
+                } else if ((cleanId == "0960225925" || cleanId.endsWith("60225925") || cleanId.equals("sara", ignoreCase = true) || cleanId.equals("STF-005", ignoreCase = true)) && cleanPass == "sara@123") {
                     val fallbackSara = UserAccount(
                         fullName = "Sara Niguse",
                         email = "sara.niguse@dilijent.edu.et",
@@ -1151,7 +1155,7 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                     )
                     repository.registerUser(fallbackSara)
                     fallbackSara
-                } else if ((cleanId == "0918000000" || cleanId.contains("vp", ignoreCase = true) || cleanId.contains("genber", ignoreCase = true) || cleanId.equals("STF-002", ignoreCase = true)) && (cleanPass == "vp1234" || cleanPass == "1234" || cleanPass == "123456" || cleanPass == "vp@1234" || cleanPass == "tade@2026" || cleanPass == "Staff@2026")) {
+                } else if ((cleanId == "0918000000" || cleanId.equals("genber", ignoreCase = true) || cleanId.equals("STF-002", ignoreCase = true)) && (cleanPass == "vp1234" || cleanPass == "vp@1234")) {
                     val fallbackVp = UserAccount(
                         fullName = "Genber Gebru",
                         email = "vp@dilijent.edu.et",
@@ -1161,7 +1165,7 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                     )
                     repository.registerUser(fallbackVp)
                     fallbackVp
-                } else if ((cleanId == "0911000001" || cleanId == "0911000000" || cleanId.contains("bizuneh", ignoreCase = true) || cleanId.equals("STF-001", ignoreCase = true)) && (cleanPass == "Staff@2026" || cleanPass == "tade@2026" || cleanPass == "1234" || cleanPass == "123456" || cleanPass == "admin123")) {
+                } else if ((cleanId == "0911000001" || cleanId == "0911000000" || cleanId.equals("bizuneh", ignoreCase = true) || cleanId.equals("STF-001", ignoreCase = true)) && (cleanPass == "Staff@2026" || cleanPass == "tade@2026")) {
                     val fallbackPrincipal = UserAccount(
                         fullName = "Mr.Bizuneh",
                         email = "bizuneh@dilijent.edu.et",
@@ -1171,7 +1175,7 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                     )
                     repository.registerUser(fallbackPrincipal)
                     fallbackPrincipal
-                } else if ((cleanId == "0911888888" || cleanId.contains("siyum", ignoreCase = true) || cleanId.equals("STF-004", ignoreCase = true)) && (cleanPass == "Staff@2026" || cleanPass == "Teacher@2026" || cleanPass == "1234" || cleanPass == "123456")) {
+                } else if ((cleanId == "0911888888" || cleanId.equals("siyum", ignoreCase = true) || cleanId.equals("STF-004", ignoreCase = true)) && (cleanPass == "Staff@2026" || cleanPass == "Teacher@2026")) {
                     val fallbackSiyum = UserAccount(
                         fullName = "Mr Siyum Getnet",
                         email = "siyum.getnet@dilijent.edu.et",
@@ -1186,41 +1190,29 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
                 }
             }
 
-            // Fallback for teacher/student/staff matching with initial PIN 1234, 123456, or Staff@2026
-            if (user == null && (pass.trim() == "1234" || pass.trim() == "123456" || pass.trim() == "Staff@2026" || pass.trim() == "Teacher@2026")) {
-                val matchingTeacher = allTeachers.value.firstOrNull { it.phone == identifier.trim() || it.fullName.contains(identifier.trim(), ignoreCase = true) }
+            // Registered teacher/staff provisioning requires strong default password (Staff@2026 / Teacher@2026) — NO weak 1234/123456 bypass
+            if (user == null && (cleanPass == "Staff@2026" || cleanPass == "Teacher@2026")) {
+                val matchingTeacher = allTeachers.value.firstOrNull { it.phone == cleanId || it.fullName.equals(cleanId, ignoreCase = true) }
                 if (matchingTeacher != null) {
                     val created = UserAccount(
                         fullName = matchingTeacher.fullName,
                         phone = matchingTeacher.phone,
-                        password = pass.trim(),
+                        password = cleanPass,
                         role = "መምህር (Teacher)"
                     )
                     repository.registerUser(created)
                     user = created
                 } else {
-                    val matchingStudent = allStudents.value.firstOrNull { it.parentPhone == identifier.trim() || it.studentIdNumber.equals(identifier.trim(), ignoreCase = true) }
-                    if (matchingStudent != null) {
+                    val matchingStaff = allStaff.value.firstOrNull { it.phone == cleanId || it.fullName.equals(cleanId, ignoreCase = true) || it.staffCode.equals(cleanId, ignoreCase = true) }
+                    if (matchingStaff != null) {
                         val created = UserAccount(
-                            fullName = matchingStudent.fullName,
-                            phone = matchingStudent.parentPhone,
-                            password = pass.trim(),
-                            role = "ተማሪ (Student)"
+                            fullName = matchingStaff.fullName,
+                            phone = matchingStaff.phone,
+                            password = cleanPass,
+                            role = matchingStaff.role
                         )
                         repository.registerUser(created)
                         user = created
-                    } else {
-                        val matchingStaff = allStaff.value.firstOrNull { it.phone == identifier.trim() || it.fullName.contains(identifier.trim(), ignoreCase = true) || it.staffCode.equals(identifier.trim(), ignoreCase = true) }
-                        if (matchingStaff != null) {
-                            val created = UserAccount(
-                                fullName = matchingStaff.fullName,
-                                phone = matchingStaff.phone,
-                                password = pass.trim(),
-                                role = matchingStaff.role
-                            )
-                            repository.registerUser(created)
-                            user = created
-                        }
                     }
                 }
             }
@@ -1241,33 +1233,44 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
             } else {
                 isAuthenticating.value = false
                 loginErrorMessage.value = if (_isAmharic.value) {
-                    if (isEmailLogin) "የአድሚን ኢሜል ወይም የይለፍ ቃል ልክ አይደለም! እባክዎ እንደገና ይሞክሩ።"
-                    else "የስልክ ቁጥር ወይም የይለፍ ቃል ልክ አይደለም! እባክዎ እንደገና ይሞክሩ።"
+                    "⛔ የተሳሳተ የይለፍ ቃል ወይም መለያ ቁጥር! ያለ ትክክለኛ የይለፍ ቃል መግባት አይቻልም።"
                 } else {
-                    if (isEmailLogin) "Incorrect admin email or password! Please try again."
-                    else "Incorrect phone number or password! Please try again."
+                    "⛔ Incorrect identifier or password! Cannot sign in without valid credentials."
                 }
             }
         }
     }
 
-    // Role-specific quick login for testing and instant access
+    // Secure Role Prefill (No automatic login bypass — user must type valid password)
     fun quickLoginAsAdmin() {
         isAdminLoginMode.value = true
-        loginEmail.value = "admin@dilijent.edu.et"
-        loginPassword.value = "admin123"
-        login("admin@dilijent.edu.et", "admin123", isEmailLogin = true)
+        loginEmail.value = "tadessemisganaw4@gmail.com"
+        loginPassword.value = ""
+        loginErrorMessage.value = if (_isAmharic.value) {
+            "🔒 ደህንነት፦ እባክዎ የአድሚን ሚስጥራዊ የይለፍ ቃልዎን አስገብተው ይግቡ።"
+        } else {
+            "🔒 Security: Please type the Admin password to sign in."
+        }
     }
 
-    fun quickLoginAs(phone: String, pass: String = "1234") {
+    fun quickLoginAs(phone: String, pass: String = "") {
         isAdminLoginMode.value = false
         loginPhone.value = phone
-        loginPassword.value = pass
-        login(phone, pass, isEmailLogin = false)
+        loginPassword.value = ""
+        if (pass.isNotBlank()) {
+            login(phone, pass, isEmailLogin = false)
+        }
     }
 
     fun quickLoginAsPrincipal() {
-        quickLoginAs("0911000000", "1234")
+        isAdminLoginMode.value = false
+        loginPhone.value = "0911000001"
+        loginPassword.value = ""
+        loginErrorMessage.value = if (_isAmharic.value) {
+            "🔒 ደህንነት፦ እባክዎ የርዕሰ መምህር ሚስጥራዊ የይለፍ ቃልዎን አስገብተው ይግቡ።"
+        } else {
+            "🔒 Security: Please type the Principal password to sign in."
+        }
     }
 
     fun updateUserPassword(userId: Long, newPass: String, onDone: () -> Unit = {}) {
